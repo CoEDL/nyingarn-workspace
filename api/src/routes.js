@@ -1,12 +1,18 @@
 // these endpoints will only return data they are responsible for
 //
+
+import { demandKnownApplication } from "./middleware";
+
 export function setupRoutes({ server }) {
     server.get("/", (req, res, next) => {
         res.send({});
         next();
     });
     // user mgt routes
-    // server.get("/user", 'return user list', { page = 0, limit = 10 });
+    server.get(
+        "/user",
+        route((req, res, next) => {})
+    );
     // server.get("/user/:userId", 'return data for userId', { properties = [] });
     // server.post('/user', 'create new user known to this application', { identifier, username, authenticationService })
     // server.del('/user/:userId', 'delete user known to this application', { identifier, authenticationService })
@@ -34,28 +40,6 @@ export function setupRoutes({ server }) {
     // server.del('/user/:userId/role/:roleId', 'disassociate user from the role')
 }
 
-// database model associations
-//  group can have many users
-//  group can have many roles
-//  user can be in many groups
-//  user can have many roles
-
-// all database models tied to application
-//  applications created at boot up from configuration
-//  application secret updated at boot if 'name and origin' unchanged
-//
-
-// let configuration = {
-//     applications: [
-//         {
-//             name: "nyingarn workspace",
-//             origin: "https://workspace.nyingarn.net",
-//             secret: "the-shared-secret-sent-in-the-headers",
-//         },
-//         {
-//             name: "nabu",
-//             origin: "https://workspace.catalog.paradisec.org.au",
-//             secret: "a-different-shared-secret-sent-in-the-headers",
-//         },
-//     ],
-// };
+function route(handler) {
+    return [demandKnownApplication, handler];
+}

@@ -54,11 +54,6 @@ const log = getLogger();
         })
     );
     setupRoutes({ server });
-    // const configuration = {
-    //     api: {
-    //         port: "8080",
-    //     },
-    // };
 
     const app = server.listen(configuration.api.port, function () {
         console.log("ready on %s", server.url);

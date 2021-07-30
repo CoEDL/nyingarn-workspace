@@ -2,6 +2,10 @@ import { UnauthorizedError, ForbiddenError } from "restify-errors";
 import { getLogger } from "./common/logger";
 const log = getLogger();
 
+export function route(handler) {
+    return [demandKnownApplication, handler];
+}
+
 export async function demandKnownApplication(req, res, next) {
     if (!req.headers.authorization) {
         log.error(`demandKnownApplication: Authorization header not preset in request`);

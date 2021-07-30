@@ -5,6 +5,11 @@ keeps track of the user infromation you require after an external login process 
 AAF, social login) and then you call out to this service to keep track of user -> group mappings,
 user -> role mappings and group -> role mappings.
 
+## API Documentation
+
+If you're using the service you probably want the API documentation:
+[https://coedl.github.io/nyingarn-users-groups-roles/](https://coedl.github.io/nyingarn-users-groups-roles/)
+
 ## Developing this application
 
 -   Start up the environment: `docker compose up`

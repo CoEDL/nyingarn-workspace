@@ -14,14 +14,15 @@ services:
         environment:
             TERM: "xterm-256color"
             NODE_ENV: "development"
-            POSTGRES_DB: "describo"
-            POSTGRES_USER: "admin"
-            POSTGRES_PASSWORD: "admin"
+            POSTGRES_DB: "nyingarn_groups"
+            POSTGRES_USER: "root"
+            POSTGRES_PASSWORD: ""
+            POSTGRES_HOST_AUTH_METHOD: "trust"
             PGDATA: /postgresql/data
         # volumes:
         #     - describo_online_db_test:/postgresql
-        ports:
-            - 5432:5432
+        #ports:
+        #    - 5432:5432
 
     api:
         image: node:14-buster
@@ -32,9 +33,9 @@ services:
             NODE_ENV: "development"
             DB_HOST: "db"
             DB_PORT: "5432"
-            DB_USER: "admin"
-            DB_PASSWORD: "admin"
-            DB_DATABASE: "describo"
+            DB_USER: "root"
+            DB_PASSWORD: ""
+            DB_DATABASE: "nyingarn_groups"
         volumes:
             - api_node_modules:/srv/api/node_modules:delegated
             - ./api:/srv/api:delegated

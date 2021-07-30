@@ -1,8 +1,7 @@
 require("regenerator-runtime");
 const restify = require("restify");
 const server = restify.createServer();
-// const models = require("./src/models");
-// const { setupRoutes } = require("./src/routes");
+const models = require("./src/models");
 const { loadConfiguration, getLogger } = require("./src/common");
 const { setupRoutes } = require("./src/routes");
 const corsMiddleware = require("restify-cors-middleware");
@@ -16,7 +15,7 @@ const log = getLogger();
         console.error("configuration.json not found - stopping now");
         process.exit();
     }
-    // await models.sequelize.sync();
+    await models.sequelize.sync();
 
     const cors = corsMiddleware({
         preflightMaxAge: 5, //Optional

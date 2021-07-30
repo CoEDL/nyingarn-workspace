@@ -1,5 +1,6 @@
 import { UnauthorizedError, ForbiddenError } from "restify-errors";
 import { getLogger } from "./common/logger";
+import models from "./models";
 const log = getLogger();
 
 export function route(handler) {
@@ -8,15 +9,17 @@ export function route(handler) {
 
 export async function demandKnownApplication(req, res, next) {
     if (!req.headers.authorization) {
-        log.error(`demandKnownApplication: Authorization header not preset in request`);
+        log.error(`demandKnownApplication: Authorization header not present in request`);
         return next(new UnauthorizedError());
     }
-    // let [authType, token] = req.headers.authorization.split(" ");
-    // if (!expectedAuthorizationTypes.includes(authType)) {
-    //     log.error(
-    //         `demandKnownUser: unknown authorization presented: expected okta || sid got authType`
-    //     );
-    //     return next(new UnauthorizedError());
-    // }
+    let application = await models.application.findOne({
+        where: { secret: req.headers.authorization },
+    });
+    if (!application) {
+        return next(new UnauthorizedError());
+    }
+    req.session = {
+        application: application.get(),
+    };
     return next();
 }

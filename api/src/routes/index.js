@@ -1,8 +1,18 @@
 // these endpoints will only return data they are responsible for
 //
 import { setupRoutes as setupUserRoutes } from "./user";
+import { route } from "../middleware";
 
 export function setupRoutes({ server }) {
+    if (process.env.NODE_ENV === "development") {
+        server.get(
+            "/test-middleware",
+            route((req, res, next) => {
+                res.send({});
+                next();
+            })
+        );
+    }
     server.get("/", (req, res, next) => {
         res.send({});
         next();

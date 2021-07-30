@@ -2,7 +2,7 @@ require("regenerator-runtime");
 const restify = require("restify");
 const server = restify.createServer();
 const models = require("./src/models");
-const { loadConfiguration, getLogger } = require("./src/common");
+const { loadConfiguration, getLogger, setupApplications } = require("./src/common");
 const { setupRoutes } = require("./src/routes");
 const corsMiddleware = require("restify-cors-middleware");
 const log = getLogger();
@@ -53,9 +53,10 @@ const log = getLogger();
             maxFieldsSize: 2 * 1024 * 1024,
         })
     );
+    setupApplications({ applications: configuration.applications });
     setupRoutes({ server });
 
-    const app = server.listen(configuration.api.port, function () {
+    server.listen(configuration.api.port, function () {
         console.log("ready on %s", server.url);
     });
 })();

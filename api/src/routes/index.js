@@ -1,21 +1,14 @@
 // these endpoints will only return data they are responsible for
 //
-
-import { demandKnownApplication } from "./middleware";
+import { setupRoutes as setupUserRoutes } from "./user";
 
 export function setupRoutes({ server }) {
     server.get("/", (req, res, next) => {
         res.send({});
         next();
     });
-    // user mgt routes
-    server.get(
-        "/user",
-        route((req, res, next) => {})
-    );
-    // server.get("/user/:userId", 'return data for userId', { properties = [] });
-    // server.post('/user', 'create new user known to this application', { identifier, username, authenticationService })
-    // server.del('/user/:userId', 'delete user known to this application', { identifier, authenticationService })
+    setupUserRoutes({ server });
+
     // group mgt routes
     // server.get('/group', 'return group list', { page = 0, limit = 10})
     // server.get("/group/:groupId", 'return data for groupId', { properties = [] });
@@ -38,8 +31,4 @@ export function setupRoutes({ server }) {
     // server.get('/user/:userId/role/:roleId', 'does the user have the role')
     // server.put('/user/:userId/role/:roleId', 'associate role to the user')
     // server.del('/user/:userId/role/:roleId', 'disassociate user from the role')
-}
-
-function route(handler) {
-    return [demandKnownApplication, handler];
 }

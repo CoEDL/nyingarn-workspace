@@ -10,7 +10,7 @@
     "sourceType": "module",
     "plugins": ["jsdoc-route-plugin"],
     "opts": {
-        "readme": "./README.md",
+        "readme": "../README.md",
         "recurse": true,
         "destination": "../docs",
         "template": "node_modules/clean-jsdoc-theme",

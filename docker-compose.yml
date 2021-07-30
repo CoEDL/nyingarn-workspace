@@ -1,0 +1,47 @@
+version: "3.8"
+
+volumes:
+    api_node_modules:
+        driver: local
+    ui_node_modules:
+        driver: local
+
+services:
+    db:
+        image: postgres:13-alpine
+        hostname: db
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "development"
+            POSTGRES_DB: "describo"
+            POSTGRES_USER: "admin"
+            POSTGRES_PASSWORD: "admin"
+            PGDATA: /postgresql/data
+        # volumes:
+        #     - describo_online_db_test:/postgresql
+        ports:
+            - 5432:5432
+
+    api:
+        image: node:14-buster
+        hostname: api
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "development"
+            DB_HOST: "db"
+            DB_PORT: "5432"
+            DB_USER: "admin"
+            DB_PASSWORD: "admin"
+            DB_DATABASE: "describo"
+        volumes:
+            - api_node_modules:/srv/api/node_modules:delegated
+            - ./api:/srv/api:delegated
+            - ./.git:/srv/api/.git:delegated
+            - ./scripts/wait-for-it.sh:/wait-for-it.sh
+            - ./configuration:/srv/configuration
+        working_dir: /srv/api
+        command: ["/wait-for-it.sh", "db:5432", "--", "npm", "run", "develop"]
+        ports:
+            - 8080:8080

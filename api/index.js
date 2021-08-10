@@ -2,10 +2,19 @@ require("regenerator-runtime");
 const restify = require("restify");
 const server = restify.createServer();
 const models = require("./src/models");
-const { loadConfiguration, getLogger, setupApplications } = require("./src/common");
+const { loadConfiguration, getLogger } = require("./src/common");
 const { setupRoutes } = require("./src/routes");
 const corsMiddleware = require("restify-cors-middleware");
+const fetch = require("node-fetch");
 const log = getLogger();
+
+// DEVELOPER NOTE
+//
+//  Do not import fetch anywhere in your code. Use global.fetch
+//   instead.
+//
+//  This way, jest fetch mock will override fetch when you need it to.
+global.fetch = require("node-fetch");
 
 (async () => {
     let configuration;
@@ -53,7 +62,6 @@ const log = getLogger();
             maxFieldsSize: 2 * 1024 * 1024,
         })
     );
-    setupApplications({ applications: configuration.applications });
     setupRoutes({ server });
 
     server.listen(configuration.api.port, function () {

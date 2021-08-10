@@ -9,12 +9,33 @@ import { readJSON, writeJSON } from "fs-extra";
 // import Chance from "chance";
 // const chance = new Chance();
 
+const privateFields = ["clientSecret"];
+
 export async function loadConfiguration() {
     let configuration =
         process.env.NODE_ENV === "development"
             ? "/srv/configuration/development-configuration.json"
             : "/srv/configuration.json";
     configuration = await readJSON(configuration);
+    return configuration;
+}
+
+export function filterPrivateInformation({ configuration }) {
+    let services = Object.keys(configuration.api.services).map((service) => {
+        service = {
+            ...configuration.api.services[service],
+            name: service,
+        };
+        for (let privateField of privateFields) {
+            delete service[privateField];
+        }
+        return service;
+    });
+    configuration.api.services = {};
+    for (let service of services) {
+        configuration.api.services[service.name] = service;
+    }
+
     return configuration;
 }
 

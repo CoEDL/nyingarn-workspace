@@ -1,6 +1,7 @@
 // these endpoints will only return data they are responsible for
 //
 import { setupRoutes as setupUserRoutes } from "./user";
+import { loadConfiguration, filterPrivateInformation } from "../common";
 import { route } from "../middleware";
 
 export function setupRoutes({ server }) {
@@ -15,6 +16,12 @@ export function setupRoutes({ server }) {
     }
     server.get("/", (req, res, next) => {
         res.send({});
+        next();
+    });
+    server.get("/configuration", async (req, res, next) => {
+        let configuration = await loadConfiguration();
+        configuration = filterPrivateInformation({ configuration });
+        res.send({ services: configuration.api.services });
         next();
     });
     setupUserRoutes({ server });

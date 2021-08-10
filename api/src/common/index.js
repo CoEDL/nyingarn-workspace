@@ -1,2 +1,2 @@
-export { loadConfiguration } from "./load-configuration";
+export { loadConfiguration, filterPrivateInformation } from "./configuration";
 export { getLogger } from "./logger";

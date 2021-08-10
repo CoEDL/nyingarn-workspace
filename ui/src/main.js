@@ -19,26 +19,26 @@ const prefixer = prefix.noConflict();
 prefixer.reg(log);
 prefixer.apply(log);
 import { io } from "socket.io-client";
-// import HTTPService from "./components/http.service";
+import HTTPService from "./http.service";
 
 (async () => {
-    // let response = await fetch("/api/configuration");
-    // if (response.status === 200) {
-    // let { configuration } = await response.json();
+    let response = await fetch("/api/configuration");
+    if (response.status === 200) {
+        let { services } = await response.json();
+        store.commit("saveConfiguration", { services });
 
-    // Vue.prototype.$http = new HTTPService({ $auth: Vue.prototype.$auth });
-    Vue.prototype.$log = log;
-    // Vue.prototype.$socket = io();
+        Vue.prototype.$http = new HTTPService({ $auth: Vue.prototype.$auth });
+        Vue.prototype.$log = log;
+        Vue.prototype.$socket = io();
 
-    Vue.use(ElementUI, { locale });
+        Vue.use(ElementUI, { locale });
 
-    // store.commit("saveConfiguration", { configuration });
-    Vue.config.productionTip = false;
+        Vue.config.productionTip = false;
 
-    new Vue({
-        router,
-        store,
-        render: (h) => h(App),
-    }).$mount("#app");
-    // }
+        new Vue({
+            router,
+            store,
+            render: (h) => h(App),
+        }).$mount("#app");
+    }
 })();

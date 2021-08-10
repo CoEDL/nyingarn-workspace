@@ -25,7 +25,7 @@ const mutations = {
         state = cloneDeep(resetState());
     },
     saveConfiguration: (state, payload) => {
-        state.configuration = { ...payload.configuration };
+        state.configuration = { ...payload };
     },
     setTargetResource: (state, payload) => {
         state.session = { create: new Date() };
@@ -39,15 +39,7 @@ const mutations = {
     },
 };
 
-const actions = {
-    async loadConfiguration({ commit }) {
-        let response = await fetch("/api/configuration");
-        if (response.status === 200) {
-            let { configuration } = await response.json();
-            commit("saveConfiguration", { configuration });
-        }
-    },
-};
+const actions = {};
 
 export const store = new Vuex.Store({
     state: resetState(),

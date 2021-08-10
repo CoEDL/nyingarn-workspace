@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import ShellComponent from "@/components/Shell.component.vue";
 import LogoutComponent from "@/components/Logout.component.vue";
 import LoginComponent from "@/components/Login.component.vue";
+import CallbackGoogleLogin from "@/components/authentication/GoogleOauthCallback.component.vue";
 // import { isAuthenticated } from "./components/auth.service";
 
 Vue.use(VueRouter);
@@ -16,14 +17,6 @@ const routes = [
             requiresAuth: true,
         },
     },
-    // {
-    //     path: "/templates",
-    //     name: "templates",
-    //     component: TemplateListManagerComponent,
-    //     meta: {
-    //         requiresAuth: true,
-    //     },
-    // },
     {
         name: "login",
         path: "/login",
@@ -33,11 +26,15 @@ const routes = [
         name: "logout",
         path: "/logout",
         component: LogoutComponent,
+        meta: {
+            requiresAuth: true,
+        },
     },
-    // {
-    //     path: "/application",
-    //     component: ApplicationLoginComponent,
-    // },
+    {
+        name: "callback-google-login",
+        path: "/callback-google-login",
+        component: CallbackGoogleLogin,
+    },
 ];
 
 const router = new VueRouter({

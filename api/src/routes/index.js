@@ -1,6 +1,7 @@
 // these endpoints will only return data they are responsible for
 //
 import { setupRoutes as setupUserRoutes } from "./user";
+import { setupRoutes as setupAuthRoutes } from "./auth";
 import { loadConfiguration, filterPrivateInformation } from "../common";
 import { route } from "../middleware";
 
@@ -25,6 +26,7 @@ export function setupRoutes({ server }) {
         next();
     });
     setupUserRoutes({ server });
+    setupAuthRoutes({ server });
 
     // group mgt routes
     // server.get('/group', 'return group list', { page = 0, limit = 10})

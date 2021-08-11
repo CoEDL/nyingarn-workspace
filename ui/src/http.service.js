@@ -7,15 +7,15 @@ export default class HTTPService {
     async getHeaders() {
         // let accessToken = getSessionSID();
         let authorization = "";
-        if (accessToken) {
-            // authorization = `sid ${accessToken}`;
-        } else {
-            // let token = window.localStorage.getItem("okta-token-storage");
-            // if (token) {
-            //     token = JSON.parse(token).accessToken.accessToken;
-            //     authorization = `okta ${token}`;
-            // }
-        }
+        // if (accessToken) {
+        // authorization = `sid ${accessToken}`;
+        // } else {
+        // let token = window.localStorage.getItem("okta-token-storage");
+        // if (token) {
+        //     token = JSON.parse(token).accessToken.accessToken;
+        //     authorization = `okta ${token}`;
+        // }
+        // }
         return {
             authorization,
             "Content-Type": "application/json",

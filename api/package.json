@@ -26,6 +26,7 @@
         "copy-webpack-plugin": "^9.0.1",
         "debug": "^4.3.2",
         "jest": "^27.0.6",
+        "jest-fetch-mock": "^3.0.3",
         "jsdoc": "^3.6.7",
         "jsdoc-route-plugin": "^0.1.0",
         "nodemon": "^2.0.12",
@@ -35,6 +36,7 @@
     },
     "dependencies": {
         "fs-extra": "^10.0.0",
+        "jose": "^3.14.3",
         "lodash": "^4.17.20",
         "node-fetch": "^2.6.1",
         "pg": "^8.7.1",

@@ -1,12 +1,10 @@
 <template>
-    <div>
-        <div class="flex flex-row space-x-2" @click="login">
-            <div><img :src="imageFile" class="h-10" /></div>
-            <div class="text-gray-600 text-lg leading-relaxed pt-1">
-                {{ this.buttonText }}
-            </div>
+    <button class="flex-grow flex flex-row space-x-2" @click="login">
+        <div><img :src="imageFile" class="h-10" /></div>
+        <div class="text-gray-600 text-lg leading-relaxed pt-1">
+            {{ this.buttonText }}
         </div>
-    </div>
+    </button>
 </template>
 
 <script>
@@ -30,11 +28,13 @@ export default {
             configuration: this.$store.state.configuration.services[this.provider],
             scope: "openid profile email",
             imageFile: require(`@/assets/${this.image}`),
+            loggingIn: false,
         };
     },
     mounted() {},
     methods: {
         async login() {
+            this.loggingIn = true;
             let response = await this.$http.get({ route: `/auth/${this.provider}/login` });
             if (response.status !== 200) {
                 // disabled this login type for now

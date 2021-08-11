@@ -39,6 +39,7 @@
         "jose": "^3.14.3",
         "lodash": "^4.17.20",
         "node-fetch": "^2.6.1",
+        "openid-client": "^4.7.4",
         "pg": "^8.7.1",
         "pg-hstore": "^2.3.4",
         "regenerator-runtime": "^0.13.9",

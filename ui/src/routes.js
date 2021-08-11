@@ -3,7 +3,7 @@ import VueRouter from "vue-router";
 import ShellComponent from "@/components/Shell.component.vue";
 import LogoutComponent from "@/components/Logout.component.vue";
 import LoginComponent from "@/components/Login.component.vue";
-import CallbackGoogleLogin from "@/components/authentication/GoogleOauthCallback.component.vue";
+import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
 // import { isAuthenticated } from "./components/auth.service";
 
 Vue.use(VueRouter);
@@ -33,7 +33,12 @@ const routes = [
     {
         name: "callback-google-login",
         path: "/callback-google-login",
-        component: CallbackGoogleLogin,
+        component: CallbackOauthLogin,
+    },
+    {
+        name: "callback-aaf-login",
+        path: "/callback-aaf-login",
+        component: CallbackOauthLogin,
     },
 ];
 

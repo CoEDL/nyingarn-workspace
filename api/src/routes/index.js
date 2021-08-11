@@ -22,7 +22,7 @@ export function setupRoutes({ server }) {
     server.get("/configuration", async (req, res, next) => {
         let configuration = await loadConfiguration();
         configuration = filterPrivateInformation({ configuration });
-        res.send({ services: configuration.api.services });
+        res.send({ ui: configuration.ui, services: configuration.api.services });
         next();
     });
     setupUserRoutes({ server });

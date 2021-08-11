@@ -24,12 +24,12 @@ import HTTPService from "./http.service";
 (async () => {
     let response = await fetch("/api/configuration");
     if (response.status === 200) {
-        let { services } = await response.json();
-        store.commit("saveConfiguration", { services });
+        let { ui, services } = await response.json();
+        store.commit("saveConfiguration", { ui, services });
 
         Vue.prototype.$http = new HTTPService({ $auth: Vue.prototype.$auth });
         Vue.prototype.$log = log;
-        Vue.prototype.$socket = io();
+        // Vue.prototype.$socket = io();
 
         Vue.use(ElementUI, { locale });
 

@@ -12,6 +12,7 @@ export async function generateToken({ configuration, user }) {
         email: user.email,
         givenName: user.givenName,
         familyName: user.familyName,
+        administrator: user.administrator,
         expires,
     })
         .setProtectedHeader({ alg: "HS256" })

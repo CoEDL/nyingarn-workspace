@@ -35,6 +35,11 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
                 default: false,
             },
+            administrator: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                default: false,
+            },
         },
         {
             timestamps: true,

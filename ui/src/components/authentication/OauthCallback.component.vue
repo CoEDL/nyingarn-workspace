@@ -33,6 +33,8 @@ export default {
                 await this.$router.push("/login");
             } else {
                 let { token } = await response.json();
+                let userData = JSON.parse(atob(token.split(".")[1]));
+                this.$store.commit("setUserData", userData);
 
                 putLocalStorage({ key: tokenSessionKey, data: { token } });
                 await this.$router.push("/");

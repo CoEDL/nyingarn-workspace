@@ -3,10 +3,10 @@
         <div class="text-xl text-gray-600 pl-4">{{ siteName }}</div>
         <div class="flex-grow"></div>
         <div class="text-lg text-gray-600 flex flex-row space-x-2 mr-6">
-            <div v-show="user.administrator">
+            <div v-show="user.administrator" class="text-yellow-600">
                 <i class="fas fa-user-shield"></i>
             </div>
-            <div v-show="!user.administrator">
+            <div v-show="!user.administrator" class="text-blue-600">
                 <i class="fas fa-user"></i>
             </div>
             <div>

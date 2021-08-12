@@ -27,15 +27,8 @@ const mutations = {
     saveConfiguration: (state, payload) => {
         state.configuration = { ...payload };
     },
-    setTargetResource: (state, payload) => {
-        state.session = { create: new Date() };
-        state.target = { ...payload };
-    },
-    setActiveCollection(state, payload) {
-        state.collection = { ...payload };
-    },
-    setSelectedEntity(state, payload) {
-        state.selectedEntity = { ...payload };
+    setUserData(state, payload) {
+        state.userData = { ...payload };
     },
 };
 
@@ -51,15 +44,7 @@ export const store = new Vuex.Store({
 
 function resetState() {
     return {
-        session: {
-            create: new Date(),
-        },
         configuration: undefined,
-        target: {
-            resource: undefined,
-            folder: undefined,
-        },
-        collection: {},
-        selectedEntity: { id: "RootDataset" },
+        userData: {},
     };
 }

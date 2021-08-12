@@ -35,9 +35,11 @@
         "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
+        "date-fns": "^2.23.0",
         "fs-extra": "^10.0.0",
         "jose": "^3.14.3",
         "lodash": "^4.17.20",
+        "mockdate": "^3.0.5",
         "node-fetch": "^2.6.1",
         "openid-client": "^4.7.4",
         "pg": "^8.7.1",

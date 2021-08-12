@@ -32,8 +32,8 @@ let sequelize = new Sequelize(
 );
 
 let modules = [
-    require("./application.js"),
     require("./user.js"),
+    require("./session.js"),
     require("./group.js"),
     require("./role.js"),
     require("./user_role.js"),

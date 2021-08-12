@@ -1,0 +1,25 @@
+{
+    "ui": {
+        "siteName": "Nyingarn Platform workspace"
+    },
+    "api": {
+        "session": {
+            "lifetime": { "hours": 5 },
+            "secret": "{some secret - 32 characters or longer}"
+        },
+        "services": {
+            "google": {
+                "clientId": "{client id}",
+                "clientSecret": "{client secret}",
+                "redirectUri": "http://localhost:9000/callback-google-login",
+                "discover": "https://accounts.google.com"
+            },
+            "aaf": {
+                "clientId": "{client id}",
+                "clientSecret": "{client secret}",
+                "redirectUri": "http://localhost:9000/callback-aaf-login",
+                "discover": "https://central.test.aaf.edu.au"
+            }
+        }
+    }
+}

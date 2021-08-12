@@ -1,9 +1,10 @@
 import { BadRequestError } from "restify-errors";
 import { loadConfiguration } from "../common";
-import { URLSearchParams } from "url";
 import { jwtVerify } from "jose/jwt/verify";
 import { createRemoteJWKSet } from "jose/jwks/remote";
 import { Issuer, generators } from "openid-client";
+import { createUser } from "../lib/user";
+import { createSession } from "../lib/session";
 
 export function setupRoutes({ server }) {
     // user mgt routes
@@ -53,9 +54,11 @@ async function getOauthTokenRouteHandler(req, res, next) {
         configuration,
     });
     let userData = await extractUserDataFromIdToken({ configuration, provider, jwks, token });
-    console.log(userData);
 
-    res.send({});
+    let user = await createUser(userData);
+    let session = await createSession({ user });
+
+    res.send({ token: session.token });
     next();
 }
 
@@ -78,6 +81,6 @@ export async function extractUserDataFromIdToken({ configuration, provider, jwks
     let tokenData = await jwtVerify(token.id_token, JWKS, {
         audience: configuration.clientId,
     });
-    let { email, given_name, family_name, exp } = tokenData.payload;
-    return { provider, email, given_name, family_name, expiresAt: new Date(exp * 1000) };
+    let { email, given_name, family_name } = tokenData.payload;
+    return { provider, email, givenName: given_name, familyName: family_name };
 }

@@ -1,5 +1,7 @@
 // these endpoints will only return data they are responsible for
 //
+import models from "../models";
+import { UnauthorizedError } from "restify-errors";
 import { setupRoutes as setupUserRoutes } from "./user";
 import { setupRoutes as setupAuthRoutes } from "./auth";
 import { loadConfiguration, filterPrivateInformation } from "../common";
@@ -24,6 +26,21 @@ export function setupRoutes({ server }) {
         configuration = filterPrivateInformation({ configuration });
         res.send({ ui: configuration.ui, services: configuration.api.services });
         next();
+    });
+    server.get(
+        "/authenticated",
+        route(async (req, res, next) => {
+            res.send({});
+            next();
+        })
+    );
+    server.get("/logout", async (req, res, next) => {
+        let token = req.headers.authorization.split("Bearer ")[1];
+        if (token) {
+            let session = await models.session.findOne({ where: { token } });
+            await session.destroy();
+        }
+        next(new UnauthorizedError());
     });
     setupUserRoutes({ server });
     setupAuthRoutes({ server });

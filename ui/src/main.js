@@ -27,7 +27,7 @@ import HTTPService from "./http.service";
         let { ui, services } = await response.json();
         store.commit("saveConfiguration", { ui, services });
 
-        Vue.prototype.$http = new HTTPService({ $auth: Vue.prototype.$auth });
+        Vue.prototype.$http = new HTTPService();
         Vue.prototype.$log = log;
         // Vue.prototype.$socket = io();
 

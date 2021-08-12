@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import { loginSessionKey, putLocalStorage } from "@/components/storage";
+
 export default {
     props: {
         image: {
@@ -40,7 +42,7 @@ export default {
                 // disabled this login type for now
             }
             let { url, code_verifier } = await response.json();
-            window.localStorage.setItem("login-session-data", JSON.stringify({ code_verifier }));
+            putLocalStorage({ key: loginSessionKey, data: { code_verifier } });
             window.location.href = url;
         },
     },

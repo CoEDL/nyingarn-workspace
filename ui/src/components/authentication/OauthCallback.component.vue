@@ -3,6 +3,13 @@
 </template>
 
 <script>
+import {
+    loginSessionKey,
+    tokenSessionKey,
+    putLocalStorage,
+    getLocalStorage,
+    removeLocalStorage,
+} from "@/components/storage";
 export default {
     data() {
         return {
@@ -14,8 +21,8 @@ export default {
     },
     methods: {
         async login() {
-            let { code_verifier } = JSON.parse(window.localStorage.getItem("login-session-data"));
-            window.localStorage.removeItem("login-session-data");
+            let { code_verifier } = getLocalStorage({ key: loginSessionKey });
+            removeLocalStorage({ key: loginSessionKey });
             let response = await this.$http.post({
                 route: `/auth/${this.$route.query.state}/code`,
                 body: { code: this.$route.query.code, code_verifier },
@@ -25,7 +32,10 @@ export default {
                 await new Promise((resolve) => setTimeout(resolve, 2000));
                 await this.$router.push("/login");
             } else {
-                await this.$router.push("/login");
+                let { token } = await response.json();
+
+                putLocalStorage({ key: tokenSessionKey, data: { token } });
+                await this.$router.push("/");
             }
         },
     },

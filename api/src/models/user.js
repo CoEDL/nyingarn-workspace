@@ -10,17 +10,30 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
                 defaultValue: DataTypes.UUIDV4,
             },
-            identifier: {
+            email: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                // validate: {
-                //     isEmail: true,
-                // },
-                // unique: true,
+                validate: {
+                    isEmail: true,
+                },
+                unique: true,
             },
-            name: {
+            givenName: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            familyName: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            provider: {
                 type: DataTypes.STRING,
                 allowNull: false,
+            },
+            locked: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                default: false,
             },
         },
         {
@@ -28,7 +41,7 @@ module.exports = function (sequelize, DataTypes) {
         }
     );
     User.associate = function (models) {
-        User.belongsTo(models.application, { onDelete: "CASCADE" });
+        User.hasOne(models.session, { onDelete: "CASCADE" });
         User.belongsToMany(models.group, {
             through: models.group_user,
         });

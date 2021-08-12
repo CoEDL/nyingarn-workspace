@@ -20,7 +20,6 @@ module.exports = function (sequelize, DataTypes) {
         }
     );
     Group.associate = function (models) {
-        Group.belongsTo(models.application, { onDelete: "CASCADE" });
         Group.belongsToMany(models.user, {
             through: models.group_user,
         });

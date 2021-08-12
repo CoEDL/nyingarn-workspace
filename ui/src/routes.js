@@ -4,7 +4,7 @@ import ShellComponent from "@/components/Shell.component.vue";
 import LogoutComponent from "@/components/Logout.component.vue";
 import LoginComponent from "@/components/Login.component.vue";
 import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
-// import { isAuthenticated } from "./components/auth.service";
+import HTTPService from "./http.service";
 
 Vue.use(VueRouter);
 
@@ -47,19 +47,20 @@ const router = new VueRouter({
     base: "/",
     routes,
 });
-// router.beforeEach(onAuthRequired);
+router.beforeEach(onAuthRequired);
 
-// async function onAuthRequired(to, from, next) {
-//     if (to.meta?.requiresAuth) {
-//         let isAuthed;
-//         try {
-//             isAuthed = await isAuthenticated();
-//             if (!isAuthed && from.path !== "/login") return next({ path: "/login" });
-//         } catch (error) {
-//             if (!isAuthed && from.path !== "/login") return next({ path: "/login" });
-//         }
-//     }
-//     next();
-// }
+async function onAuthRequired(to, from, next) {
+    const httpService = new HTTPService();
+    if (to.meta?.requiresAuth) {
+        let isAuthed;
+        try {
+            isAuthed = await httpService.get({ route: "/authenticated" });
+            if (isAuthed.status === 401 && from.path !== "/login") return next({ path: "/login" });
+        } catch (error) {
+            if (from.path !== "/login") return next({ path: "/login" });
+        }
+    }
+    next();
+}
 
 export default router;

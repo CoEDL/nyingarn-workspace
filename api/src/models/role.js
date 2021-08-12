@@ -19,20 +19,7 @@ module.exports = function (sequelize, DataTypes) {
             timestamps: true,
         }
     );
-    Role.associate = function (models) {
-        Role.belongsTo(models.application, { onDelete: "CASCADE" });
-        // User.belongsToMany(models.group, {
-        //     through: models.group_user,
-        //     foreignKey: "userId",
-        //     otherKey: "groupId",
-        // });
-        // User.belongsToMany(models.role, {
-        //     through: models.role_user,
-        //     foreignKey: "userId",
-        //     otherKey: "roleId",
-        // });
-        // User.hasMany(models.template, { foreignKey: { allowNull: false }, onDelete: "CASCADE" });
-    };
+    Role.associate = function (models) {};
 
     return Role;
 };

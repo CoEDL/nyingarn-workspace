@@ -8,8 +8,7 @@
         "develop:server": "npm install && ./node_modules/.bin/nodemon --exec babel-node ./index.js",
         "test": "./node_modules/.bin/jest",
         "test:watch": "./node_modules/.bin/jest --watch",
-        "build:production": "./node_modules/.bin/webpack --config webpack.production.js",
-        "generate-docs": "./node_modules/.bin/jsdoc --configure jsdoc.json --verbose"
+        "build:production": "./node_modules/.bin/webpack --config webpack.production.js"
     },
     "author": "Marco La Rosa",
     "license": "GPL-3.0",
@@ -27,8 +26,6 @@
         "debug": "^4.3.2",
         "jest": "^27.0.6",
         "jest-fetch-mock": "^3.0.3",
-        "jsdoc": "^3.6.7",
-        "jsdoc-route-plugin": "^0.1.0",
         "nodemon": "^2.0.12",
         "webpack": "^5.47.1",
         "webpack-cli": "^4.7.2",

@@ -4,7 +4,7 @@ const models = require("../models");
 const chance = require("chance").Chance();
 const fetch = require("node-fetch");
 
-describe("User management route tests", () => {
+describe.skip("User management route tests", () => {
     let application;
     beforeAll(async () => {
         application = await models.application.create({

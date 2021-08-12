@@ -7,6 +7,7 @@
             "lifetime": { "hours": 5 },
             "secret": "{some secret - 32 characters or longer}"
         },
+        "administrators": ["{user@email.com}", "{other user@somewhere.else.com}"],
         "services": {
             "google": {
                 "clientId": "{client id}",

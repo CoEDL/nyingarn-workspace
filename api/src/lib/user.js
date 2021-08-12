@@ -1,4 +1,5 @@
 import models from "../models";
+import { loadConfiguration } from "../common";
 
 export async function getUsers({ page = 0, limit = 10 }) {
     let users = await models.user.findAll({
@@ -19,6 +20,7 @@ export async function getUser({ userId, email }) {
 }
 
 export async function createUser(data) {
+    const configuration = await loadConfiguration();
     if (!data.email) {
         throw new Error(`Email is a required property`);
     }
@@ -26,6 +28,7 @@ export async function createUser(data) {
         throw new Error(`Provider is a required property`);
     }
     if (!data.locked) data.locked = false;
+    data.administrator = configuration.api.administrators.includes(data.email);
     let user = await models.user.findOrCreate({
         where: { email: data.email },
         defaults: data,

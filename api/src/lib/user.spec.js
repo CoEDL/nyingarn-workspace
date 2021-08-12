@@ -11,6 +11,7 @@ describe("User management tests", () => {
             familyName: chance.word(),
             provider: chance.word(),
             locked: false,
+            administrator: true,
         };
         let user = await models.user.create(userDef);
 
@@ -56,6 +57,18 @@ describe("User management tests", () => {
         };
         let user = await createUser(userDef);
         expect(user.email).toEqual(userDef.email);
+        await user.destroy();
+    });
+    it("should be able to create an administrator", async () => {
+        const userDef = {
+            email: "m@lr.id.au",
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        let user = await createUser(userDef);
+        expect(user.email).toEqual(userDef.email);
+        expect(user.administrator).toEqual(true);
         await user.destroy();
     });
     it("should be able to disable / re-enable a user", async () => {

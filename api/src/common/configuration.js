@@ -21,9 +21,9 @@ export async function loadConfiguration() {
 }
 
 export function filterPrivateInformation({ configuration }) {
-    let services = Object.keys(configuration.api.services).map((service) => {
+    let services = Object.keys(configuration.api.authentication).map((service) => {
         service = {
-            ...configuration.api.services[service],
+            ...configuration.api.authentication[service],
             name: service,
         };
         for (let privateField of privateFields) {
@@ -31,9 +31,9 @@ export function filterPrivateInformation({ configuration }) {
         }
         return service;
     });
-    configuration.api.services = {};
+    configuration.api.authentication = {};
     for (let service of services) {
-        configuration.api.services[service.name] = service;
+        configuration.api.authentication[service.name] = service;
     }
 
     return configuration;

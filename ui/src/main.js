@@ -24,8 +24,8 @@ import HTTPService from "./http.service";
 (async () => {
     let response = await fetch("/api/configuration");
     if (response.status === 200) {
-        let { ui, services } = await response.json();
-        store.commit("saveConfiguration", { ui, services });
+        let { ui, authentication } = await response.json();
+        store.commit("saveConfiguration", { ui, authentication });
 
         Vue.prototype.$http = new HTTPService();
         Vue.prototype.$log = log;

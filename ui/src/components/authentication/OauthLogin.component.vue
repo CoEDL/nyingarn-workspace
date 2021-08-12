@@ -27,7 +27,7 @@ export default {
     },
     data() {
         return {
-            configuration: this.$store.state.configuration.services[this.provider],
+            configuration: this.$store.state.configuration.authentication[this.provider],
             scope: "openid profile email",
             imageFile: require(`@/assets/${this.image}`),
             loggingIn: false,

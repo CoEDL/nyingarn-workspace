@@ -8,7 +8,7 @@
             "secret": "{some secret - 32 characters or longer}"
         },
         "administrators": ["{user@email.com}", "{other user@somewhere.else.com}"],
-        "services": {
+        "authentication": {
             "google": {
                 "clientId": "{client id}",
                 "clientSecret": "{client secret}",

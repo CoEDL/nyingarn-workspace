@@ -31,7 +31,6 @@
 </template>
 
 <script>
-import { has } from "lodash";
 export default {
     components: {
         OauthLoginComponent: () => import("@/components/authentication/OauthLogin.component.vue"),
@@ -43,10 +42,10 @@ export default {
     },
     computed: {
         enableGoogleLogin() {
-            return has(this.$store.state.configuration.services, "google");
+            return this.$store.state.configuration.authentication.includes("google");
         },
         enableAafLogin() {
-            return has(this.$store.state.configuration.services, "aaf");
+            return this.$store.state.configuration.authentication.includes("aaf");
         },
     },
     mounted() {},

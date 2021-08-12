@@ -19,7 +19,7 @@ async function getLoginUrlRouteHandler(req, res, next) {
     const provider = req.params.provider;
 
     let configuration = await loadConfiguration();
-    configuration = configuration.api.services[provider];
+    configuration = configuration.api.authentication[provider];
     let issuer = await Issuer.discover(configuration.discover);
     const client = new issuer.Client({
         client_id: configuration.clientId,
@@ -63,7 +63,7 @@ async function getOauthTokenRouteHandler(req, res, next) {
 }
 
 async function getOauthToken({ provider, code, code_verifier, configuration }) {
-    configuration = configuration.api.services[provider];
+    configuration = configuration.api.authentication[provider];
     let issuer = await Issuer.discover(configuration.discover);
     const client = new issuer.Client({
         client_id: configuration.clientId,
@@ -76,7 +76,7 @@ async function getOauthToken({ provider, code, code_verifier, configuration }) {
 }
 
 export async function extractUserDataFromIdToken({ configuration, provider, jwks, token }) {
-    configuration = configuration.api.services[provider];
+    configuration = configuration.api.authentication[provider];
     const JWKS = createRemoteJWKSet(new URL(jwks));
     let tokenData = await jwtVerify(token.id_token, JWKS, {
         audience: configuration.clientId,

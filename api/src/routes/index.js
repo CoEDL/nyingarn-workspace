@@ -24,7 +24,10 @@ export function setupRoutes({ server }) {
     server.get("/configuration", async (req, res, next) => {
         let configuration = await loadConfiguration();
         configuration = filterPrivateInformation({ configuration });
-        res.send({ ui: configuration.ui, services: configuration.api.services });
+        res.send({
+            ui: configuration.ui,
+            authentication: Object.keys(configuration.api.authentication),
+        });
         next();
     });
     server.get(

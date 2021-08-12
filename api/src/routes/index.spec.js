@@ -10,7 +10,7 @@ describe("Test loading the configuration", () => {
         let response = await fetch(`http://localhost:8080/configuration`);
         expect(response.status).toEqual(200);
         let configuration = await response.json();
-        expect(configuration).toHaveProperty("services");
+        expect(configuration).toHaveProperty("authentication");
     });
 });
 

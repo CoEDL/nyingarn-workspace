@@ -61,7 +61,7 @@ describe("User management tests", () => {
     });
     it("should be able to create an administrator", async () => {
         const userDef = {
-            email: "m@lr.id.au",
+            email: "mlarosa@unimelb.edu.au",
             givenName: chance.word(),
             familyName: chance.word(),
             provider: chance.word(),

@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import { tokenSessionKey, removeLocalStorage } from "@/components/storage";
+
 export default {
     data() {
         return {
@@ -35,6 +37,7 @@ export default {
     methods: {
         async logout() {
             await this.$http.get({ route: "/logout" });
+            removeLocalStorage({ key: tokenSessionKey });
             this.$router.push("/login");
         },
     },

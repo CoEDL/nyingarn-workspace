@@ -31,9 +31,12 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from "vue";
 export default {
     components: {
-        OauthLoginComponent: () => import("@/components/authentication/OauthLogin.component.vue"),
+        OauthLoginComponent: defineAsyncComponent(() =>
+            import("@/components/authentication/OauthLogin.component.vue")
+        ),
     },
     data() {
         return {

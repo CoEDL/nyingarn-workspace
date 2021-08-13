@@ -1,7 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import ShellComponent from "@/components/Shell.component.vue";
-import LogoutComponent from "@/components/Logout.component.vue";
 import LoginComponent from "@/components/Login.component.vue";
 import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
 import HTTPService from "./http.service";
@@ -21,14 +20,6 @@ const routes = [
         name: "login",
         path: "/login",
         component: LoginComponent,
-    },
-    {
-        name: "logout",
-        path: "/logout",
-        component: LogoutComponent,
-        meta: {
-            requiresAuth: true,
-        },
     },
     {
         name: "callback-google-login",
@@ -51,10 +42,10 @@ router.beforeEach(onAuthRequired);
 
 async function onAuthRequired(to, from, next) {
     const httpService = new HTTPService();
+    let isAuthed = await httpService.get({ route: "/authenticated" });
+    if (isAuthed.status === 200 && to.path === "/login") return next({ path: "/" });
     if (to.meta?.requiresAuth) {
-        let isAuthed;
         try {
-            isAuthed = await httpService.get({ route: "/authenticated" });
             if (isAuthed.status === 401 && from.path !== "/login") return next({ path: "/login" });
         } catch (error) {
             if (from.path !== "/login") return next({ path: "/login" });

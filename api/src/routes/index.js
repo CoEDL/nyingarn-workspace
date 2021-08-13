@@ -41,7 +41,7 @@ export function setupRoutes({ server }) {
         let token = req.headers.authorization.split("Bearer ")[1];
         if (token) {
             let session = await models.session.findOne({ where: { token } });
-            await session.destroy();
+            if (session) await session.destroy();
         }
         next(new UnauthorizedError());
     });

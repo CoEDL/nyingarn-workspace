@@ -1,11 +1,8 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
 import ShellComponent from "@/components/Shell.component.vue";
 import LoginComponent from "@/components/Login.component.vue";
 import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
 import HTTPService from "./http.service";
-
-Vue.use(VueRouter);
+import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
     {
@@ -33,9 +30,8 @@ const routes = [
     },
 ];
 
-const router = new VueRouter({
-    mode: "history",
-    base: "/",
+const router = createRouter({
+    history: createWebHistory("/"),
     routes,
 });
 router.beforeEach(onAuthRequired);

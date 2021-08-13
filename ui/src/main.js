@@ -1,16 +1,16 @@
 import "regenerator-runtime";
 import "@/assets/tailwind.css";
-import "element-ui/lib/theme-chalk/index.css";
+import "element-plus/lib/theme-chalk/index.css";
+import "element-plus/lib/theme-chalk/index.css";
 import "@fortawesome/fontawesome-free/js/all";
 import { config } from "@fortawesome/fontawesome-svg-core";
 config.autoReplaceSvg = "nest";
 
-import Vue from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./routes";
 import { store } from "./store";
-import ElementUI from "element-ui";
-import locale from "element-ui/lib/locale/lang/en";
+import ElementPlus from "element-plus";
 import log from "loglevel";
 import prefix from "loglevel-plugin-prefix";
 const level = process.env.NODE_ENV === "development" ? "debug" : "warn";
@@ -27,18 +27,15 @@ import HTTPService from "./http.service";
         let { ui, authentication } = await response.json();
         store.commit("saveConfiguration", { ui, authentication });
 
-        Vue.prototype.$http = new HTTPService();
-        Vue.prototype.$log = log;
-        // Vue.prototype.$socket = io();
+        // Vue.config.productionTip = false;
 
-        Vue.use(ElementUI, { locale });
-
-        Vue.config.productionTip = false;
-
-        new Vue({
-            router,
-            store,
-            render: (h) => h(App),
-        }).$mount("#app");
+        const app = createApp(App);
+        app.use(store);
+        app.use(router);
+        app.use(ElementPlus);
+        app.config.globalProperties.$http = new HTTPService();
+        app.config.globalProperties.$log = log;
+        app.mount("#app");
+        // app.config.globalProperties.$socket = io();
     }
 })();

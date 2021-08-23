@@ -1,6 +1,7 @@
 <template>
     <div class="flex flex-col">
         <navigation-component />
+        <router-view />
     </div>
 </template>
 
@@ -12,6 +13,9 @@ export default {
     },
     data() {
         return {};
+    },
+    mounted() {
+        if (this.$route.path === "/") this.$router.push("/dashboard");
     },
 };
 </script>

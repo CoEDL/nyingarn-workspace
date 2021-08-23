@@ -1,0 +1,12 @@
+#!/bin/ash
+for file in $(ls /data/$TUS_ID*) ; do
+    itemId=$(cat /data/${TUS_ID}.info | jq .MetaData.itemId | sed -e 's/"//g')
+    if [ ! -z ${ENDPOINT_URL} ] ; then
+        aws --endpoint-url ${ENDPOINT_URL} s3 cp $file s3://uploads/${itemId}/
+    else 
+        aws s3 cp $file s3://uploads/${itemId}/
+    fi
+    if [ $? == 0 ] ; then
+        rm -f $file
+    fi
+done

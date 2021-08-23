@@ -1,6 +1,7 @@
 import ShellComponent from "@/components/Shell.component.vue";
 import LoginComponent from "@/components/Login.component.vue";
 import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
+import DashboardComponent from "@/components/dashboard/Shell.component.vue";
 import HTTPService from "./http.service";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -12,6 +13,7 @@ const routes = [
         meta: {
             requiresAuth: true,
         },
+        children: [{ name: "dashboard", path: "dashboard", component: DashboardComponent }],
     },
     {
         name: "login",

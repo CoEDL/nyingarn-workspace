@@ -1,0 +1,7 @@
+FROM tusproject/tusd
+USER root
+RUN apk update && apk add aws-cli jq bash
+RUN mkdir -p /root/.aws
+COPY tus/config ~/.aws/config
+COPY tus/post-finish /srv/tusd-hooks/post-finish
+RUN chmod +x /srv/tusd-hooks/post-finish

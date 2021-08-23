@@ -1,6 +1,7 @@
 {
     "ui": {
-        "siteName": "Nyingarn Platform workspace"
+        "siteName": "Nyingarn Platform workspace",
+        "tusEndpoint": "http://localhost:1080/files/"
     },
     "api": {
         "session": {

@@ -47,12 +47,12 @@ module.exports = function (sequelize, DataTypes) {
     );
     User.associate = function (models) {
         User.hasOne(models.session, { onDelete: "CASCADE" });
-        User.belongsToMany(models.group, {
-            through: models.group_user,
-        });
-        User.belongsToMany(models.role, {
-            through: models.user_role,
-        });
+        // User.belongsToMany(models.group, {
+        //     through: models.group_user,
+        // });
+        // User.belongsToMany(models.role, {
+        //     through: models.user_role,
+        // });
     };
 
     return User;

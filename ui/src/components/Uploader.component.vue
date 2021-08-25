@@ -1,7 +1,5 @@
 <template>
-    <div>
-        <dashboard :uppy="uppy" :props="props" v-if="show" />
-    </div>
+    <dashboard :uppy="uppy" :props="props" v-if="show" />
 </template>
 
 <script>
@@ -20,7 +18,7 @@ export default {
         Dashboard,
     },
     props: {
-        itemId: {
+        identifier: {
             type: String,
             required: true,
         },
@@ -33,7 +31,7 @@ export default {
             endpoint: store.state.configuration.ui.tusEndpoint,
             retryDelays: [0, 1000],
         });
-        uppy.setMeta({ itemId: props.itemId });
+        uppy.setMeta({ itemId: props.identifier });
         // uppy.on("upload-success", (data) => {
         //     console.log(JSON.stringify(data, null, 2));
         // });

@@ -1,6 +1,7 @@
 module.exports = {
     future: {},
-    purge: ["./src/**/*.html", "./src/**/*.vue", "./src/**/*.jsx"],
+    mode: "jit",
+    purge: ["./src/**/*.html", "./src/**/*.{js,jsx,ts,tsx,vue}"],
     theme: {
         extend: {},
     },

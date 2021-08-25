@@ -40,9 +40,6 @@ services:
             DB_USER: "root"
             DB_PASSWORD: ""
             DB_DATABASE: "nyingarn"
-            AWS_ACCESS_KEY_ID: minio
-            AWS_SECRET_ACCESS_KEY: minio_pass
-            AWS_DEFAULT_REGION: us-east-1
         volumes:
             - api_node_modules:/srv/api/node_modules:delegated
             - ./api:/srv/api:delegated
@@ -100,7 +97,7 @@ services:
             AWS_ACCESS_KEY_ID: minio
             AWS_SECRET_ACCESS_KEY: minio_pass
             AWS_DEFAULT_REGION: us-east-1
-            ENDPOINT_URL: http://minio:9000
+            S3_ENDPOINT_URL: http://minio:9000
         command: ["-hooks-dir", "/srv/tusd-hooks", "-upload-dir", "/data", "-verbose", "true"]
 
     edge:

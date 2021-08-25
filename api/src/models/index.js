@@ -34,11 +34,13 @@ let sequelize = new Sequelize(
 let modules = [
     require("./user.js"),
     require("./session.js"),
-    require("./group.js"),
+    // require("./group.js"),
     require("./role.js"),
-    require("./user_role.js"),
-    require("./group_role.js"),
-    require("./group_user.js"),
+    require("./item.js"),
+    require("./item_user.js"),
+    // require("./user_role.js"),
+    // require("./group_role.js"),
+    // require("./group_user.js"),
 ];
 
 // Initialize models

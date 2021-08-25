@@ -9,6 +9,7 @@ export async function generateToken({ configuration, user }) {
     const key = createSecretKey(Buffer.from(configuration.api.session.secret, "utf-8"));
     const expires = add(new Date(), configuration.api.session.lifetime);
     const token = await new SignJWT({
+        id: user.id,
         email: user.email,
         givenName: user.givenName,
         familyName: user.familyName,

@@ -14,12 +14,15 @@ async function demandAuthenticatedUser(req, res, next) {
     }
     const configuration = await loadConfiguration();
     try {
-        let data = await verifyToken({
+        let user = await verifyToken({
             token: req.headers.authorization.split("Bearer ")[1],
             configuration,
         });
+        req.session = {
+            user,
+        };
     } catch (error) {
-        throw next(new UnauthorizedError());
+        return next(new UnauthorizedError());
     }
     next();
 }

@@ -4,10 +4,11 @@ const { createUser } = require("../lib/user");
 import { generateToken } from "../lib/jwt";
 import { loadConfiguration } from "../common";
 const chance = require("chance").Chance();
+const host = `http://localhost:8080`;
 
 describe("Test loading the configuration", () => {
     test("it should be able to load the default configuration for the environment", async () => {
-        let response = await fetch(`http://localhost:8080/configuration`);
+        let response = await fetch(`${host}/configuration`);
         expect(response.status).toEqual(200);
         let configuration = await response.json();
         expect(configuration).toHaveProperty("authentication");
@@ -26,7 +27,7 @@ describe("Test the /authenticated endpoint", () => {
         let user = await createUser(userDef);
         let { token, expires } = await generateToken({ configuration, user });
 
-        let response = await fetch("http://localhost:8080/authenticated", {
+        let response = await fetch(`${host}/authenticated`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         expect(response.status).toBe(200);
@@ -34,7 +35,7 @@ describe("Test the /authenticated endpoint", () => {
         await user.destroy();
     });
     test("it should fail with unauthorised", async () => {
-        let response = await fetch("http://localhost:8080/authenticated", {
+        let response = await fetch(`${host}/authenticated`, {
             headers: { Authorization: `Bearer xxx` },
         });
         expect(response.status).toBe(401);

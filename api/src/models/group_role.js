@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = function (sequelize, DataTypes) {
-    var GroupRole = sequelize.define(
+    let GroupRole = sequelize.define(
         "group_role",
         {},
         {

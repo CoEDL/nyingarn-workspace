@@ -4,11 +4,21 @@
         "tusEndpoint": "http://localhost:1080/files/"
     },
     "api": {
+        "administrators": ["{user@email.com}", "{other user@somewhere.else.com}"],
         "session": {
             "lifetime": { "hours": 5 },
             "secret": "{some secret - 32 characters or longer}"
         },
-        "administrators": ["{user@email.com}", "{other user@somewhere.else.com}"],
+        "services": {
+            "aws": {
+                "endpointUrl": "http://minio:9000",
+                "forcePathStyle": true,
+                "bucket": "uploads",
+                "accessKeyId": "",
+                "secretAccessKey": "",
+                "region": "us-east-1"
+            }
+        },
         "authentication": {
             "google": {
                 "clientId": "{client id}",

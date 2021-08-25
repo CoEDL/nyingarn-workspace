@@ -1,8 +1,8 @@
 "use strict";
 
 module.exports = function (sequelize, DataTypes) {
-    let Session = sequelize.define(
-        "session",
+    let Item = sequelize.define(
+        "item",
         {
             id: {
                 primaryKey: true,
@@ -10,13 +10,10 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
                 defaultValue: DataTypes.UUIDV4,
             },
-            token: {
-                type: DataTypes.TEXT,
-                allowNull: true,
-            },
-            expires: {
-                type: DataTypes.DATE,
+            identifier: {
+                type: DataTypes.STRING,
                 allowNull: false,
+                unique: true,
             },
             data: {
                 type: DataTypes.JSON,
@@ -25,16 +22,13 @@ module.exports = function (sequelize, DataTypes) {
         },
         {
             timestamps: true,
-            indexes: [
-                {
-                    fields: ["token"],
-                },
-            ],
         }
     );
-    Session.associate = function (models) {
-        Session.belongsTo(models.user);
+    Item.associate = function (models) {
+        Item.belongsToMany(models.user, {
+            through: models.item_user,
+        });
     };
 
-    return Session;
+    return Item;
 };

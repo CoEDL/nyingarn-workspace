@@ -1,11 +1,9 @@
 <template>
-    <div></div>
+    <div class="flex flex-col p-2"></div>
 </template>
 
 <script>
 export default {
-    data() {
-        return {};
-    },
+    setup() {},
 };
 </script>

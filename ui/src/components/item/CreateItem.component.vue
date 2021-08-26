@@ -36,9 +36,7 @@
 </template>
 
 <script>
-import { ref, inject } from "vue";
 import HTTPService from "@/http.service";
-import { useRouter } from "vue-router";
 const httpService = new HTTPService();
 
 export default {
@@ -52,13 +50,13 @@ export default {
     methods: {
         async createItemEntry() {
             let response = await httpService.post({
-                route: "/item",
+                route: "/items",
                 body: { identifier: this.identifier },
             });
             if (response.status === 200) {
                 this.error = false;
                 this.createNewItem = false;
-                this.$router.push(`/item/${this.identifier}`);
+                this.$router.push(`/items/${this.identifier}`);
                 this.identifier = "";
             } else {
                 this.identifier = "";

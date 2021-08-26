@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row space-x-4 border-b border-solid py-4">
-        <router-link to="/dashboard" class="text-xl text-gray-600 pl-4">{{ siteName }}</router-link>
+        <router-link to="/dashboard" class="text-2xl">{{ siteName }}</router-link>
         <create-item-component />
         <div class="flex-grow"></div>
         <div class="text-lg text-gray-600 flex flex-row space-x-2 mr-6">

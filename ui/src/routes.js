@@ -16,7 +16,7 @@ const routes = [
         },
         children: [
             { name: "dashboard", path: "dashboard", component: DashboardComponent },
-            { name: "item/:identifier", path: "item/:identifier", component: EditItemComponent },
+            { name: "items/:identifier", path: "items/:identifier", component: EditItemComponent },
         ],
     },
     {

@@ -24,7 +24,7 @@ export default {
         UploaderComponent,
     },
     setup(props) {
-        let activeTab = ref("content");
+        let activeTab = ref("metadata");
         const route = useRoute();
         const identifier = route.params.identifier;
         return {

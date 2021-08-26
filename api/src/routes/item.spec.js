@@ -21,7 +21,7 @@ describe("Item management route tests", () => {
         let session = await createSession({ user });
 
         const identifier = chance.word();
-        let response = await fetch(`${host}/item`, {
+        let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
                 authorization: `Bearer ${session.token}`,
@@ -50,7 +50,7 @@ describe("Item management route tests", () => {
         let session = await createSession({ user });
 
         const identifier = chance.word();
-        let response = await fetch(`${host}/item`, {
+        let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
                 authorization: `Bearer ${session.token}`,
@@ -63,7 +63,7 @@ describe("Item management route tests", () => {
         expect(response.status).toEqual(200);
         let { item } = await response.json();
 
-        response = await fetch(`${host}/item`, {
+        response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
                 authorization: `Bearer ${session.token}`,
@@ -78,7 +78,6 @@ describe("Item management route tests", () => {
         await user.destroy();
         await deleteItem({ id: item.id });
     });
-
     it("should fail to create an item with the same identifier as another that isn't owned by this user", async () => {
         let user1 = {
             email: chance.email(),
@@ -100,7 +99,7 @@ describe("Item management route tests", () => {
 
         const identifier = chance.word();
 
-        let response = await fetch(`${host}/item`, {
+        let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
                 authorization: `Bearer ${user1Session.token}`,
@@ -113,7 +112,7 @@ describe("Item management route tests", () => {
         expect(response.status).toEqual(200);
         let { item } = await response.json();
 
-        response = await fetch(`${host}/item`, {
+        response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
                 authorization: `Bearer ${user2Session.token}`,
@@ -127,6 +126,45 @@ describe("Item management route tests", () => {
 
         await user1.destroy();
         await user2.destroy();
+        await deleteItem({ id: item.id });
+    });
+    it("should be able to get own items", async () => {
+        let user = {
+            email: chance.email(),
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+
+        let session = await createSession({ user });
+
+        const identifier = chance.word();
+        let response = await fetch(`${host}/items`, {
+            method: "POST",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                identifier,
+            }),
+        });
+        expect(response.status).toEqual(200);
+        let { item } = await response.json();
+
+        response = await fetch(`${host}/items`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(200);
+        let { total, items } = await response.json();
+        expect(total).toEqual(1);
+
+        await user.destroy();
         await deleteItem({ id: item.id });
     });
 });

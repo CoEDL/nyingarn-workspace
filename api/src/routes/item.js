@@ -1,13 +1,14 @@
 import { BadRequestError, ConflictError } from "restify-errors";
 import { loadConfiguration } from "../common";
 import { route } from "../middleware";
-import { createItem, linkItemToUser, lookupItemByIdentifier } from "../lib/item";
+import { createItem, linkItemToUser, lookupItemByIdentifier, getItems } from "../lib/item";
 
 export function setupRoutes({ server }) {
-    server.post("/item", route(createNewItem));
+    server.get("/items", route(getItemsHandler));
+    server.post("/items", route(createItemHandler));
 }
 
-async function createNewItem(req, res, next) {
+async function createItemHandler(req, res, next) {
     if (!req.body.identifier) {
         return next(new BadRequestError(`itemId not defined`));
     }
@@ -29,5 +30,16 @@ async function createNewItem(req, res, next) {
     }
 
     res.send({ item: item.get() });
+    next();
+}
+
+async function getItemsHandler(req, res, next) {
+    const userId = req.session.user.id;
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+    let { count, rows } = await getItems({ userId, offset, limit });
+    let items = rows.map((i) => i.identifier);
+
+    res.send({ total: count, items });
     next();
 }

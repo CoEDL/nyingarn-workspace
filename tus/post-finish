@@ -1,12 +1,24 @@
-#!/bin/ash
-for file in $(ls /data/$TUS_ID*) ; do
-    itemId=$(cat /data/${TUS_ID}.info | jq .MetaData.itemId | sed -e 's/"//g')
-    if [ ! -z ${S3_ENDPOINT_URL} ] ; then
-        aws --endpoint-url ${S3_ENDPOINT_URL} s3 cp $file s3://uploads/${itemId}/
-    else 
-        aws s3 cp $file s3://uploads/${itemId}/
-    fi
-    if [ $? == 0 ] ; then
-        rm -f $file
+#!/bin/bash
+for file in $(ls /data/${TUS_ID}*) ; do
+    # skip .info files
+    [[ "${file}" == "/data/${TUS_ID}.info" ]] && continue
+
+    # if data file extract filename and item id from .info
+    if [ "${file}" == "/data/${TUS_ID}" ] ; then
+        itemId=$(cat "/data/${TUS_ID}.info" | jq .MetaData.itemId | sed -e 's/"//g')
+        filename=$(cat "/data/${TUS_ID}.info" | jq .MetaData.filename | sed -e 's/"//g')
+
+        # copy to s3
+        if [ ! -z ${S3_ENDPOINT_URL} ] ; then
+            aws --endpoint-url "${S3_ENDPOINT_URL}" s3 cp "${file}" "s3://uploads/${itemId}/${filename}"
+        else
+            aws s3 cp "${file}" "s3://uploads/${itemId}/${filename}"
+        fi
+
+        # cleanup - remove data file and .info
+        if [ $? == 0 ] ; then
+            rm -f "${file}"
+            rm -f "${file}.info"
+        fi
     fi
 done

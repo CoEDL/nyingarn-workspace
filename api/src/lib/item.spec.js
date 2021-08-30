@@ -1,10 +1,13 @@
 require("regenerator-runtime");
+import { getS3Handle } from "../common";
+
 const {
     createItem,
     lookupItemByIdentifier,
     deleteItem,
     linkItemToUser,
     getItems,
+    getItemResources,
 } = require("./item");
 const { createUser } = require("./user");
 const chance = require("chance").Chance();
@@ -101,5 +104,20 @@ describe("Item management tests", () => {
 
         await item.destroy();
         await user.destroy();
+    });
+    it("should be able to list item resources in S3", async () => {
+        const identifier = chance.word();
+        let item = await createItem({ identifier });
+        expect(item.identifier).toEqual(identifier);
+
+        let { bucket } = await getS3Handle();
+        await bucket.upload({ json: { some: "thing" }, target: `${identifier}/file.json` });
+
+        let { resources } = await getItemResources({ identifier });
+        expect(resources.length).toEqual(1);
+        expect(resources[0].Key).toMatch(identifier);
+
+        await bucket.removeObjects({ keys: [`${identifier}/file.json`] });
+        await item.destroy();
     });
 });

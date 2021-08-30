@@ -1,5 +1,5 @@
 <template>
-    <dashboard :uppy="uppy" :props="props" v-if="show" />
+    <dashboard :uppy="uppy" :props="{}" v-if="show" />
 </template>
 
 <script>
@@ -26,7 +26,7 @@ export default {
     setup(props) {
         const store = useStore();
         let show = ref(true);
-        let uppy = new Uppy({ debug: true, autoProceed: false });
+        let uppy = new Uppy({ debug: false, autoProceed: false });
         uppy.use(Tus, {
             endpoint: store.state.configuration.ui.tusEndpoint,
             retryDelays: [0, 1000],

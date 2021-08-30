@@ -21,7 +21,7 @@ import HTTPService from "@/http.service";
 const httpService = new HTTPService();
 
 export default {
-    data() {
+    setup() {
         let items = ref([]);
         let page = ref(1);
         let limit = ref(10);

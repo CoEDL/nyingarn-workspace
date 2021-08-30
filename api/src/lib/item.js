@@ -1,6 +1,5 @@
 import models from "../models";
-import { loadConfiguration } from "../common";
-import { S3, Bucket } from "./s3";
+import { loadConfiguration, getS3Handle } from "../common";
 
 export async function lookupItemByIdentifier({ identifier }) {
     return await models.item.findOne({
@@ -32,6 +31,12 @@ export async function linkItemToUser({ itemId, userId }) {
         where: { itemId, userId },
         defaults: { itemId, userId },
     });
+}
+
+export async function getItemResources({ identifier }) {
+    let { bucket } = await getS3Handle();
+    let resources = await bucket.listObjects({ prefix: identifier });
+    return { resources: resources.Contents };
 }
 
 // export async function createItemLocationInObjectStore({ identifier }) {

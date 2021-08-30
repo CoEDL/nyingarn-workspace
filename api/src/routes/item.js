@@ -1,11 +1,18 @@
 import { BadRequestError, ConflictError } from "restify-errors";
 import { loadConfiguration } from "../common";
 import { route } from "../middleware";
-import { createItem, linkItemToUser, lookupItemByIdentifier, getItems } from "../lib/item";
+import {
+    createItem,
+    linkItemToUser,
+    lookupItemByIdentifier,
+    getItems,
+    getItemResources,
+} from "../lib/item";
 
 export function setupRoutes({ server }) {
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
+    server.get("/items/:identifier/resources", route(getItemResourcesHandler));
 }
 
 async function createItemHandler(req, res, next) {
@@ -41,5 +48,12 @@ async function getItemsHandler(req, res, next) {
     let items = rows.map((i) => i.identifier);
 
     res.send({ total: count, items });
+    next();
+}
+
+async function getItemResourcesHandler(req, res, next) {
+    let { resources } = await getItemResources({ identifier: req.params.identifier });
+    resources = resources.map((r) => r.Key.split(`${req.params.identifier}/`)[1]);
+    res.send({ resources });
     next();
 }

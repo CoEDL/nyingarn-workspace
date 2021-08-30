@@ -7,8 +7,20 @@
                 rendering of the content of the crate file...
             </el-tab-pane>
             <el-tab-pane label="Content" name="content">
-                <div class="my-4 text-gray-700">Upload data files to this item.</div>
-                <uploader-component :identifier="identifier" v-if="activeTab === 'content'" />
+                <div class="my-2 flex flex-col space-y-2" v-if="activeTab === 'content'">
+                    <div class="flex flex-row">
+                        <uploader-component
+                            class="w-1/2"
+                            :identifier="identifier"
+                            v-if="activeTab === 'content'"
+                        />
+                        <item-resources
+                            class="w-1/2 px-2"
+                            :identifier="identifier"
+                            v-if="activeTab === 'content'"
+                        />
+                    </div>
+                </div>
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -18,10 +30,12 @@
 import { useRoute } from "vue-router";
 import { ref } from "vue";
 import UploaderComponent from "@/components/Uploader.component.vue";
+import ItemResources from "./ItemResources.component.vue";
 
 export default {
     components: {
         UploaderComponent,
+        ItemResources,
     },
     setup(props) {
         let activeTab = ref("metadata");

@@ -17,9 +17,15 @@ export default class HTTPService {
         }
     }
 
+    encodeRoute(route, method) {
+        console.debug(`${method}: ${route}`);
+        return encodeURI(route);
+    }
+
     async get({ route }) {
         let headers = this.getHeaders();
-        let response = await fetch(`/api${route}`, {
+        route = this.encodeRoute(route, "GET");
+        let response = await fetch(`/api${encodeURIComponent(route)}`, {
             method: "GET",
             headers,
         });
@@ -27,6 +33,7 @@ export default class HTTPService {
     }
 
     async post({ route, body }) {
+        route = this.encodeRoute(route, "POST");
         let headers = this.getHeaders();
         let response = await fetch(`/api${route}`, {
             method: "POST",
@@ -37,6 +44,7 @@ export default class HTTPService {
     }
 
     async put({ route, body }) {
+        route = this.encodeRoute(route, "PUT");
         let response = await fetch(`/api${route}`, {
             method: "PUT",
             headers: this.getHeaders(),
@@ -46,6 +54,7 @@ export default class HTTPService {
     }
 
     async delete({ route }) {
+        route = this.encodeRoute(route, "DELETE");
         let response = await fetch(`/api${route}`, {
             method: "delete",
             headers: this.getHeaders(),

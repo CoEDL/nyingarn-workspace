@@ -1,7 +1,6 @@
 import "regenerator-runtime";
 import "@/assets/tailwind.css";
-import "element-plus/lib/theme-chalk/index.css";
-import "element-plus/lib/theme-chalk/index.css";
+import "element-plus/theme-chalk/index.css";
 import "@fortawesome/fontawesome-free/js/all";
 import { config } from "@fortawesome/fontawesome-svg-core";
 config.autoReplaceSvg = "nest";

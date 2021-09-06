@@ -53,7 +53,11 @@ async function getItemsHandler(req, res, next) {
 
 async function getItemResourcesHandler(req, res, next) {
     let { resources } = await getItemResources({ identifier: req.params.identifier });
-    resources = resources.map((r) => r.Key.split(`${req.params.identifier}/`)[1]);
+    if (resources) {
+        resources = resources.map((r) => r.Key.split(`${req.params.identifier}/`)[1]);
+    } else {
+        resources = [];
+    }
     res.send({ resources });
     next();
 }

@@ -25,8 +25,35 @@ export default {
     },
     setup(props) {
         const store = useStore();
+
         let show = ref(true);
-        let uppy = new Uppy({ debug: false, autoProceed: false });
+        let uppy = new Uppy({
+            debug: false,
+            autoProceed: false,
+
+            onBeforeFileAdded: (currentFile, files) => {
+                let regex = new RegExp(store.state.configuration.ui.filename.checkNameStructure);
+                if (!currentFile.name.match(regex)) {
+                    uppy.info(
+                        `Skipping file '${currentFile.name}' because the name is not in the expected format.`,
+                        "error",
+                        5000
+                    );
+                    return false;
+                }
+
+                regex = new RegExp(store.state.configuration.ui.filename.checkExtension);
+                if (!currentFile.name.match(regex)) {
+                    uppy.info(
+                        `Skipping file '${currentFile.name}' because the type is not an accepted type.`,
+                        "error",
+                        5000
+                    );
+                    return false;
+                }
+                return true;
+            },
+        });
         uppy.use(Tus, {
             endpoint: store.state.configuration.ui.tusEndpoint,
             retryDelays: [0, 1000],

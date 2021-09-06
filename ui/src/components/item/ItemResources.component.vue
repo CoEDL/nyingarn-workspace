@@ -35,7 +35,9 @@ export default {
         let interval = setInterval(getResources, 10000);
         onMounted(getResources);
         onBeforeUnmount(() => {
-            clearInterval(interval);
+            try {
+                clearInterval(interval);
+            } catch (error) {}
         });
 
         return {

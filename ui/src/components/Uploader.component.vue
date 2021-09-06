@@ -32,24 +32,29 @@ export default {
             autoProceed: false,
 
             onBeforeFileAdded: (currentFile, files) => {
-                let regex = new RegExp(store.state.configuration.ui.filename.checkNameStructure);
-                if (!currentFile.name.match(regex)) {
-                    uppy.info(
-                        `Skipping file '${currentFile.name}' because the name is not in the expected format.`,
-                        "error",
-                        5000
+                if (store.state.configuration.ui.filename?.checkNameStructure) {
+                    let regex = new RegExp(
+                        store.state.configuration.ui.filename.checkNameStructure
                     );
-                    return false;
+                    if (!currentFile.name.match(regex)) {
+                        uppy.info(
+                            `Skipping file '${currentFile.name}' because the name is not in the expected format.`,
+                            "error",
+                            5000
+                        );
+                        return false;
+                    }
                 }
-
-                regex = new RegExp(store.state.configuration.ui.filename.checkExtension);
-                if (!currentFile.name.match(regex)) {
-                    uppy.info(
-                        `Skipping file '${currentFile.name}' because the type is not an accepted type.`,
-                        "error",
-                        5000
-                    );
-                    return false;
+                if (store.state.configuration.ui.filename?.checkExtension) {
+                    regex = new RegExp(store.state.configuration.ui.filename.checkExtension);
+                    if (!currentFile.name.match(regex)) {
+                        uppy.info(
+                            `Skipping file '${currentFile.name}' because the type is not an accepted type.`,
+                            "error",
+                            5000
+                        );
+                        return false;
+                    }
                 }
                 return true;
             },

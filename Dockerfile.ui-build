@@ -1,2 +1,2 @@
-FROM nginx:latest   
-COPY ./ui/dist/ /usr/share/nginx/html
+FROM caddy:latest
+COPY ./ui/dist/ /srv/ui/

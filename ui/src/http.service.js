@@ -25,7 +25,7 @@ export default class HTTPService {
     async get({ route }) {
         let headers = this.getHeaders();
         route = this.encodeRoute(route, "GET");
-        let response = await fetch(`/api${encodeURIComponent(route)}`, {
+        let response = await fetch(`/api${route}`, {
             method: "GET",
             headers,
         });

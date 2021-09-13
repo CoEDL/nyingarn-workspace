@@ -43,6 +43,6 @@ if [ "$resp" == "y" ] ; then
     docker login
     docker push arkisto/workspace-api:latest
     docker push arkisto/workspace-api:${VERSION}
-    docker push arkistor/workspace-ui:latest
+    docker push arkisto/workspace-ui:latest
     docker push arkisto/workspace-ui:${VERSION}
 fi

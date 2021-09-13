@@ -46,7 +46,7 @@ export default {
                     }
                 }
                 if (store.state.configuration.ui.filename?.checkExtension) {
-                    regex = new RegExp(store.state.configuration.ui.filename.checkExtension);
+                    let regex = new RegExp(store.state.configuration.ui.filename.checkExtension);
                     if (!currentFile.name.match(regex)) {
                         uppy.info(
                             `Skipping file '${currentFile.name}' because the type is not an accepted type.`,

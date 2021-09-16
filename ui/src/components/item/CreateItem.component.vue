@@ -57,7 +57,7 @@ export default {
     },
     methods: {
         checkNameStructure() {
-            if (store.state.configuration.ui.itemName?.checkNameStructure) {
+            if (this.$store.state.configuration.ui.itemName?.checkNameStructure) {
                 let regex = new RegExp(
                     this.$store.state.configuration.ui.itemName.checkNameStructure
                 );

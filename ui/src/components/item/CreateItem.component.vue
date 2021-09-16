@@ -2,7 +2,7 @@
     <div>
         <div>
             <el-button @click="createNewItem = !createNewItem" size="small">
-                <i class="fas fa-plus "></i> Create a new item
+                <i class="fas fa-plus"></i> Create a new item
             </el-button>
         </div>
         <el-dialog title="Create a new Item" v-model="createNewItem" width="80%" destroy-on-close>
@@ -18,13 +18,20 @@
                         </div>
                     </div>
                     <div class="w-full">
-                        <el-input placeholder="item identifier" v-model="identifier"></el-input>
+                        <el-input
+                            placeholder="item identifier"
+                            v-model="identifier"
+                            @input="checkNameStructure"
+                        ></el-input>
+                    </div>
+                    <div class="text-xs text-gray-600" :class="{ 'text-red-600': error }">
+                        {{ help }}
                     </div>
                     <div>
                         <el-button
                             type="primary"
                             @click="createItemEntry"
-                            :disabled="!identifier.length"
+                            :disabled="!identifier.length || error"
                         >
                             Create this item
                         </el-button>
@@ -45,9 +52,18 @@ export default {
             identifier: "",
             createNewItem: false,
             error: false,
+            help: this.$store.state.configuration.ui.itemName.help,
         };
     },
     methods: {
+        checkNameStructure() {
+            let regex = new RegExp(this.$store.state.configuration.ui.itemName.checkNameStructure);
+            if (!this.identifier.match(regex)) {
+                this.error = true;
+            } else {
+                this.error = false;
+            }
+        },
         async createItemEntry() {
             let response = await httpService.post({
                 route: "/items",

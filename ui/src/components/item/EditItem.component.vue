@@ -8,6 +8,15 @@
             </el-tab-pane>
             <el-tab-pane label="Content" name="content">
                 <div class="my-2 flex flex-col space-y-2" v-if="activeTab === 'content'">
+                    <div class="bg-yellow-200 p-2 rounded flex flex-row">
+                        <div class="text-4xl p-4 text-gray-600">
+                            <i class="far fa-lightbulb"></i>
+                        </div>
+                        <ul class="text-gray-600 list-disc pl-10">
+                            <li>{{ helpFilenameStructure }}</li>
+                            <li>{{ helpFileExtension }}</li>
+                        </ul>
+                    </div>
                     <div class="flex flex-row">
                         <uploader-component
                             class="w-1/2"
@@ -28,6 +37,7 @@
 
 <script>
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 import { ref } from "vue";
 import UploaderComponent from "@/components/Uploader.component.vue";
 import ItemResources from "./ItemResources.component.vue";
@@ -38,10 +48,15 @@ export default {
         ItemResources,
     },
     setup(props) {
-        let activeTab = ref("metadata");
+        const store = useStore();
+        const helpFilenameStructure = store.state.configuration.ui?.filename?.helpName;
+        const helpFileExtension = store.state.configuration.ui?.filename?.helpExtension;
+        let activeTab = ref("content");
         const route = useRoute();
         const identifier = route.params.identifier;
         return {
+            helpFilenameStructure,
+            helpFileExtension,
             activeTab,
             identifier,
         };

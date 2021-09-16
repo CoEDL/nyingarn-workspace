@@ -17,6 +17,13 @@ export default class HTTPService {
         }
     }
 
+    getToken() {
+        try {
+            let { token } = getLocalStorage({ key: tokenSessionKey });
+            return token;
+        } catch (error) {}
+    }
+
     encodeRoute(route, method) {
         console.debug(`${method}: ${route}`);
         return encodeURI(route);

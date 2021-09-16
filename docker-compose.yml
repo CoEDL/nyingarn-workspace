@@ -86,7 +86,7 @@ services:
             retries: 3
 
     tus:
-        image: arkisto/workspace-tusd
+        image: arkisto/workspace-tusd:latest
         restart: always
         ports:
             - 1080:1080
@@ -98,7 +98,14 @@ services:
             AWS_SECRET_ACCESS_KEY: k9imrMZnOoy+UYyrwEBAxEevSiDrIAKx9SZepyMg
             AWS_DEFAULT_REGION: us-east-1
             S3_ENDPOINT_URL: http://minio:9000
-        command: ["-hooks-dir", "/srv/tusd-hooks", "-upload-dir", "/data", "-verbose", "true"]
+            API_ENDPOINT_URL: http://api:8080
+        entrypoint: [
+            "/usr/local/bin/tusd",
+            "-verbose", 
+            "-hooks-enabled-events", "pre-create,post-finish",
+            "-upload-dir", "/data", 
+            "-hooks-dir", "/srv/tusd-hooks", 
+        ]
 
     edge:
         image: nginx:latest

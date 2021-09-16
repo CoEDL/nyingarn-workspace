@@ -46,6 +46,13 @@ export function setupRoutes({ server }) {
         }
         next(new UnauthorizedError());
     });
+    server.get(
+        "/tus",
+        route(async (req, res, next) => {
+            res.send({});
+            next();
+        })
+    );
     setupUserRoutes({ server });
     setupAuthRoutes({ server });
     setupItemRoutes({ server });

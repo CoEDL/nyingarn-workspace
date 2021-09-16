@@ -12,6 +12,8 @@ import "@uppy/dashboard/dist/style.css";
 import Uppy from "@uppy/core";
 import { ref } from "vue";
 import { useStore } from "vuex";
+import HTTPService from "@/http.service";
+const httpService = new HTTPService();
 
 export default {
     components: {
@@ -61,9 +63,10 @@ export default {
         });
         uppy.use(Tus, {
             endpoint: store.state.configuration.ui.tusEndpoint,
-            retryDelays: [0, 1000],
+            // retryDelays: null,
         });
-        uppy.setMeta({ itemId: props.identifier });
+        const token = httpService.getToken();
+        uppy.setMeta({ itemId: props.identifier, token });
         // uppy.on("upload-success", (data) => {
         //     console.log(JSON.stringify(data, null, 2));
         // });

@@ -57,11 +57,15 @@ export default {
     },
     methods: {
         checkNameStructure() {
-            let regex = new RegExp(this.$store.state.configuration.ui.itemName.checkNameStructure);
-            if (!this.identifier.match(regex)) {
-                this.error = true;
-            } else {
-                this.error = false;
+            if (store.state.configuration.ui.itemName?.checkNameStructure) {
+                let regex = new RegExp(
+                    this.$store.state.configuration.ui.itemName.checkNameStructure
+                );
+                if (!this.identifier.match(regex)) {
+                    this.error = true;
+                } else {
+                    this.error = false;
+                }
             }
         },
         async createItemEntry() {

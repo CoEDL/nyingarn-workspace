@@ -13,7 +13,6 @@ module.exports = function (sequelize, DataTypes) {
             identifier: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
             },
             data: {
                 type: DataTypes.JSON,

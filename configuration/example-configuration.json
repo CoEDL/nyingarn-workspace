@@ -1,7 +1,7 @@
 {
     "ui": {
         "siteName": "Nyingarn Platform workspace",
-        "tusEndpoint": "http://localhost:1080/files/",
+        "tusEndpoint": "http://tus.nyingarn.net/files/",
         "itemName": {
             "help": "Must consist only of alphanumeric characters and must start with a letter.",
             "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9]+$"

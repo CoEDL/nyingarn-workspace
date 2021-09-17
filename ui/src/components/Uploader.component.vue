@@ -58,6 +58,14 @@ export default {
                         return false;
                     }
                 }
+                if (currentFile.name.split("-")[0] !== props.identifier) {
+                    uppy.info(
+                        `Skipping file '${currentFile.name}' because the name doesn't match the item name.`,
+                        "error",
+                        5000
+                    );
+                    return false;
+                }
                 return true;
             },
         });

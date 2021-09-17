@@ -58,7 +58,8 @@ export default {
                         return false;
                     }
                 }
-                if (currentFile.name.split("-")[0] !== props.identifier) {
+                let regex = new RegExp(`^${props.identifier}-.*`);
+                if (!currentFile.name.match(regex)) {
                     uppy.info(
                         `Skipping file '${currentFile.name}' because the name doesn't match the item name.`,
                         "error",

@@ -1,0 +1,91 @@
+version: "3.7"
+
+volumes:
+    api_node_modules:
+        driver: local
+    ui_node_modules:
+        driver: local
+
+services:
+    db:
+        image: postgres:13-alpine
+        hostname: db
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "development"
+            POSTGRES_DB: "nyingarn"
+            POSTGRES_USER: "root"
+            POSTGRES_PASSWORD: "{SET THIS PASSWORD}"
+            POSTGRES_HOST_AUTH_METHOD: "trust"
+            PGDATA: /postgresql/data
+        volumes:
+            - /srv/postgres:/postgresql
+    minio:
+        image: minio/minio:latest
+        restart: always
+        entrypoint: sh
+        ports:
+            - 10000:9000
+            - 10001:10001
+        environment:
+            MINIO_ROOT_USER: root 
+            MINIO_ROOT_PASSWORD: "{SET THIS PASSWORD}"
+            MINIO_BROWSER_REDIRECT_URL: https://s3-console.nyingarn.net
+        entrypoint:
+            bash -c 'mkdir -p /data/uploads && /opt/bin/minio server /data --console-address ":10001"'
+        volumes:
+            - /srv/s3:/data
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:10001/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
+    tus:
+        image: arkisto/workspace-tusd
+        restart: always
+        ports:
+            - 1080:1080
+        volumes:
+            - /srv/tus:/data
+        user: root
+        environment:
+            AWS_ACCESS_KEY_ID: "{SET THIS KEY AFTER CREATING A SERVICE ACCOUNT}"
+            AWS_SECRET_ACCESS_KEY: "{SET THIS SECRET AFTER CREATING A SERVICE ACCOUNT}"
+            AWS_DEFAULT_REGION: us-east-1
+            S3_ENDPOINT_URL: http://minio:9000
+        command: [
+          "-verbose",
+          "-hooks-dir", "/srv/tusd-hooks", 
+          "-upload-dir", "/data", 
+          "-behind-proxy", "true", "-expose-metrics", "false" ]
+    nyingarn_api:
+        image: arkisto/workspace-api:latest
+        hostname: api
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            DB_HOST: "db"
+            DB_PORT: "5432"
+            DB_USER: "root"
+            DB_PASSWORD: "{SET THIS TO THE DB PASSWORD}"
+            DB_DATABASE: "nyingarn"
+        volumes:
+            - ./configuration.json:/srv/configuration.json
+    nyingarn_ui:
+        image: arkisto/workspace-ui:latest
+        hostname: ui
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "development"
+        volumes:
+          - ./letsencrypt:/srv/letsencrypt
+          - ./dhparams.pem:/etc/nginx/dhparams.pem
+          - ./nginx-tus.conf:/etc/nginx/conf.d/nginx-tus.conf
+          - ./nginx-workspace.conf:/etc/nginx/conf.d/nginx-workspace.conf
+          - ./nginx-s3.conf:/etc/nginx/conf.d/nginx-s3.conf
+          - ./nginx-s3-console.conf:/etc/nginx/conf.d/nginx-s3-console.conf
+        ports:
+            - 80:80
+            - 443:443

@@ -3,8 +3,7 @@
         <div class="text-xl my-4">Item: {{ identifier }}</div>
         <el-tabs v-model="activeTab">
             <el-tab-pane label="Metadata" name="metadata">
-                Not yet implemented but there will probably be a link to Describo here and a
-                rendering of the content of the crate file...
+                <describo-frame-component :style="setFrameDimensions" />
             </el-tab-pane>
             <el-tab-pane label="Content" name="content">
                 <div class="my-2 flex flex-col space-y-2" v-if="activeTab === 'content'">
@@ -38,27 +37,36 @@
 <script>
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import UploaderComponent from "@/components/Uploader.component.vue";
 import ItemResources from "./ItemResources.component.vue";
+import DescriboFrameComponent from "./DescriboFrame.component.vue";
 
 export default {
     components: {
         UploaderComponent,
         ItemResources,
+        DescriboFrameComponent,
     },
     setup(props) {
         const store = useStore();
         const helpFilenameStructure = store.state.configuration.ui?.filename?.helpName;
         const helpFileExtension = store.state.configuration.ui?.filename?.helpExtension;
-        let activeTab = ref("content");
+        let activeTab = ref("metadata");
         const route = useRoute();
         const identifier = route.params.identifier;
+        let setFrameDimensions = computed(() => {
+            return {
+                width: `${window.innerWidth - 20}px`,
+                height: `${window.innerHeight - 200}px`,
+            };
+        });
         return {
             helpFilenameStructure,
             helpFileExtension,
             activeTab,
             identifier,
+            setFrameDimensions,
         };
     },
 };

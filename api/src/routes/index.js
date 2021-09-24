@@ -5,6 +5,7 @@ import { UnauthorizedError } from "restify-errors";
 import { setupRoutes as setupUserRoutes } from "./user";
 import { setupRoutes as setupAuthRoutes } from "./auth";
 import { setupRoutes as setupItemRoutes } from "./item";
+import { setupRoutes as setupDescriboRoutes } from "./describo";
 import { loadConfiguration, filterPrivateInformation } from "../common";
 import { route } from "../middleware";
 
@@ -56,6 +57,7 @@ export function setupRoutes({ server }) {
     setupUserRoutes({ server });
     setupAuthRoutes({ server });
     setupItemRoutes({ server });
+    setupDescriboRoutes({ server });
 
     // group mgt routes
     // server.get('/group', 'return group list', { page = 0, limit = 10})

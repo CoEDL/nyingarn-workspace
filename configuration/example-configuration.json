@@ -24,23 +24,33 @@
                 "endpointUrl": "http://minio:9000",
                 "forcePathStyle": true,
                 "bucket": "uploads",
-                "accessKeyId": "",
-                "secretAccessKey": "",
+                "awsAccessKeyId": "{ aws access key }",
+                "awsSecretAccessKey": "{ aws secret key }",
                 "region": "us-east-1"
+            },
+            "describo": {
+                "authorization": "{shared secret set in describo applications}",
+                "provider": "Minio",
+                "url": "https://s3.nyingarn.net",
+                "bucket": "uploads",
+                "awsAccessKeyId": "{ aws access key }",
+                "awsSecretAccessKey": "{ aws secret key }",
+                "region": "us-east-1",
+                "describoUrl": "https://describo.nyingarn.net"
             }
         },
         "authentication": {
             "google": {
                 "clientId": "{client id}",
                 "clientSecret": "{client secret}",
-                "redirectUri": "http://localhost:9000/callback-google-login",
+                "redirectUri": "http://{your host}/callback-google-login",
                 "discover": "https://accounts.google.com"
             },
             "aaf": {
                 "clientId": "{client id}",
                 "clientSecret": "{client secret}",
-                "redirectUri": "http://localhost:9000/callback-aaf-login",
-                "discover": "https://central.test.aaf.edu.au"
+                "redirectUri": "http://{your host}/callback-aaf-login",
+                "discover": "https://central.aaf.edu.au"
             }
         }
     }

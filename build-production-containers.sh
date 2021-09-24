@@ -25,6 +25,14 @@ fi
 
 read -p '>> Build the containers? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
+    cd api
+    npm version --no-git-tag-version ${VERSION}
+    cd ../ui
+    npm version --no-git-tag-version ${VERSION}
+    cd ..
+    git tag v${VERSION}
+    git commit -a -m "tag and bump version"
+
     echo "Building API container"
     docker tag arkisto/workspace-api:latest arkisto/workspace-api:${VERSION}
     # docker rmi $(docker images | grep none | awk '{print $3}')

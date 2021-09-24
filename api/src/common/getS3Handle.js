@@ -7,8 +7,8 @@ export async function getS3Handle() {
 
     let params = {
         bucket: aws.bucket,
-        accessKeyId: aws.accessKeyId,
-        secretAccessKey: aws.secretAccessKey,
+        accessKeyId: aws.awsAccessKeyId,
+        secretAccessKey: aws.awsSecretAccessKey,
         region: aws.region,
     };
     if (aws.endpointUrl && aws.forcePathStyle) {

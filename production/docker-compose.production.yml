@@ -80,12 +80,13 @@ services:
             TERM: "xterm-256color"
             NODE_ENV: "development"
         volumes:
-          - ./letsencrypt:/srv/letsencrypt
-          - ./dhparams.pem:/etc/nginx/dhparams.pem
-          - ./nginx-tus.conf:/etc/nginx/conf.d/nginx-tus.conf
-          - ./nginx-workspace.conf:/etc/nginx/conf.d/nginx-workspace.conf
-          - ./nginx-s3.conf:/etc/nginx/conf.d/nginx-s3.conf
-          - ./nginx-s3-console.conf:/etc/nginx/conf.d/nginx-s3-console.conf
+            - ./letsencrypt:/srv/letsencrypt
+            - ./dhparams.pem:/etc/nginx/dhparams.pem
+            - ./nginx-tus.conf:/etc/nginx/conf.d/nginx-tus.conf
+            - ./nginx-workspace.conf:/etc/nginx/conf.d/nginx-workspace.conf
+            - ./nginx-s3.conf:/etc/nginx/conf.d/nginx-s3.conf
+            - ./nginx-s3-console.conf:/etc/nginx/conf.d/nginx-s3-console.conf
+            - ./nginx-describo.conf:/etc/nginx/conf.d/nginx-describo.conf
         ports:
             - 80:80
             - 443:443

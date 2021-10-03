@@ -59,7 +59,10 @@ export default {
                     }
                 }
                 let regex = new RegExp(`^${props.identifier}-.*`);
-                if (!currentFile.name.match(regex)) {
+                if (
+                    !currentFile.name.match(regex) &&
+                    store.state.configuration.ui.filename?.matchItemName
+                ) {
                     uppy.info(
                         `Skipping file '${currentFile.name}' because the name doesn't match the item name.`,
                         "error",

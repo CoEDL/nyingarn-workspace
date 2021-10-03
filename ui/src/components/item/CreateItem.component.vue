@@ -1,9 +1,7 @@
 <template>
     <div>
-        <div>
-            <el-button @click="createNewItem = !createNewItem" size="small">
-                <i class="fas fa-plus"></i> Create a new item
-            </el-button>
+        <div @click="createNewItem = !createNewItem" class="cursor-pointer">
+            <i class="fas fa-plus"></i> Create a new item
         </div>
         <el-dialog title="Create a new Item" v-model="createNewItem" width="80%" destroy-on-close>
             <div class="text-gray-600">

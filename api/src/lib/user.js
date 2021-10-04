@@ -1,12 +1,16 @@
 import models from "../models";
 import { loadConfiguration } from "../common";
 
-export async function getUsers({ page = 0, limit = 10 }) {
-    let users = await models.user.findAll({
-        offset: page,
+export async function getUsers({ offset = 0, limit = 10 }) {
+    let users = await models.user.findAndCountAll({
+        offset,
         limit,
+        order: [
+            ["givenName", "ASC"],
+            ["familyName", "ASC"],
+        ],
     });
-    return { users };
+    return { total: users.count, users: users.rows.map((u) => u.get()) };
 }
 
 export async function getUser({ userId, email }) {

@@ -3,7 +3,7 @@
         <div v-show="user.administrator" class="text-yellow-600">
             <i class="fas fa-user-shield"></i>
         </div>
-        <div v-show="!user.administrator" class="text-blue-600">
+        <div v-show="!user.administrator" class="text-white">
             <i class="fas fa-user"></i>
         </div>
         <div>

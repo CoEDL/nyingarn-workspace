@@ -1,6 +1,5 @@
-import { BadRequestError, ConflictError } from "restify-errors";
-import { loadConfiguration } from "../common";
-import { route } from "../middleware";
+import { BadRequestError } from "restify-errors";
+import { route } from "../common";
 import {
     createItem,
     linkItemToUser,

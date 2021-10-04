@@ -1,8 +1,7 @@
 import "regenerator-runtime";
 import fetch from "node-fetch";
 const { createUser } = require("../lib/user");
-import { generateToken } from "../lib/jwt";
-import { loadConfiguration } from "../common";
+import { loadConfiguration, generateToken } from "../common";
 const chance = require("chance").Chance();
 const host = `http://localhost:8080`;
 

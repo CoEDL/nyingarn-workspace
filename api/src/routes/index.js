@@ -6,8 +6,7 @@ import { setupRoutes as setupUserRoutes } from "./user";
 import { setupRoutes as setupAuthRoutes } from "./auth";
 import { setupRoutes as setupItemRoutes } from "./item";
 import { setupRoutes as setupDescriboRoutes } from "./describo";
-import { loadConfiguration, filterPrivateInformation } from "../common";
-import { route } from "../middleware";
+import { loadConfiguration, filterPrivateInformation, route, routeAdmin } from "../common";
 
 export function setupRoutes({ server }) {
     if (process.env.NODE_ENV === "development") {
@@ -35,6 +34,13 @@ export function setupRoutes({ server }) {
     server.get(
         "/authenticated",
         route(async (req, res, next) => {
+            res.send({});
+            next();
+        })
+    );
+    server.get(
+        "/admin",
+        routeAdmin(async (req, res, next) => {
             res.send({});
             next();
         })

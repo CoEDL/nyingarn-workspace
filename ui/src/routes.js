@@ -3,6 +3,8 @@ import LoginComponent from "@/components/Login.component.vue";
 import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
 import DashboardComponent from "@/components/dashboard/Shell.component.vue";
 import EditItemComponent from "@/components/item/EditItem.component.vue";
+import AdminComponent from "@/components/admin/Shell.component.vue";
+import AdminUsersComponent from "@/components/admin/users/Shell.component.vue";
 import HTTPService from "./http.service";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -17,6 +19,19 @@ const routes = [
         children: [
             { name: "dashboard", path: "dashboard", component: DashboardComponent },
             { name: "items/:identifier", path: "items/:identifier", component: EditItemComponent },
+            {
+                name: "admin",
+                path: "admin",
+                component: AdminComponent,
+                children: [
+                    {
+                        name: "admin.users",
+                        path: "users",
+                        component: AdminUsersComponent,
+                        meta: { name: "manage users" },
+                    },
+                ],
+            },
         ],
     },
     {

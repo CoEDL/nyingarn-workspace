@@ -5,7 +5,7 @@ volumes:
         driver: local
     ui_node_modules:
         driver: local
-    MINIO_VOLUME:
+    MINIO_DATA_VOLUME:
         driver: local
     TUS_VOLUME:
         driver: local
@@ -73,12 +73,12 @@ services:
             - 10000:9000
             - 10001:10001
         environment:
-            MINIO_ROOT_USER: minio
-            MINIO_ROOT_PASSWORD: minio_pass
+            MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+            MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
         entrypoint:
             bash -c 'mkdir -p /data/uploads && /opt/bin/minio server /data --console-address ":10001"'
         volumes:
-            - MINIO_VOLUME:/data
+            - MINIO_DATA_VOLUME:/data
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:10001/minio/health/live"]
             interval: 30s
@@ -94,10 +94,10 @@ services:
             - TUS_VOLUME:/data
         user: root
         environment:
-            AWS_ACCESS_KEY_ID: LJL4W7DZSGRV043B3UG1
-            AWS_SECRET_ACCESS_KEY: k9imrMZnOoy+UYyrwEBAxEevSiDrIAKx9SZepyMg
+            AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+            AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
             AWS_DEFAULT_REGION: us-east-1
-            S3_ENDPOINT_URL: http://minio:9000
+            S3_ENDPOINT_URL: "${S3_ENDPOINT_URL}"
             API_ENDPOINT_URL: http://api:8080
         entrypoint: [
             "/usr/local/bin/tusd",

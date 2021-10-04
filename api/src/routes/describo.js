@@ -1,5 +1,5 @@
 import { loadConfiguration } from "../common";
-import { route } from "../middleware";
+import { route } from "../common";
 import { BadRequestError } from "restify-errors";
 import fetch from "node-fetch";
 

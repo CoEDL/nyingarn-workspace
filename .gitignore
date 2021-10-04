@@ -1,6 +1,7 @@
 node_modules
 dist
 coverage
+.env
 
 configuration.json
 development-configuration.json

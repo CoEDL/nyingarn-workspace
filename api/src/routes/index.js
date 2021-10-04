@@ -53,13 +53,6 @@ export function setupRoutes({ server }) {
         }
         next(new UnauthorizedError());
     });
-    server.get(
-        "/tus",
-        route(async (req, res, next) => {
-            res.send({});
-            next();
-        })
-    );
     server.post("/recaptcha", async (req, res, next) => {
         let configuration = await loadConfiguration();
         const body = {

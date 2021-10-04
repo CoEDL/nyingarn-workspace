@@ -20,20 +20,21 @@ async function createItemHandler(req, res, next) {
         return next(new BadRequestError(`itemId not defined`));
     }
     // is that identifier already in use?
-    let item = await lookupItemByIdentifier({ identifier: req.body.identifier });
+    let item = await lookupItemByIdentifier({
+        identifier: req.body.identifier,
+        userId: req.session.user.id,
+    });
     if (!item) {
         // no - create the item
-        item = await createItem({ identifier: req.body.identifier });
-
-        // and link the item to the user
-        await linkItemToUser({ itemId: item.id, userId: req.session.user.id });
-    } else {
-        // the identifier is already taken
-        let users = item.users.map((u) => u.id);
-        if (!users.includes(req.session.user.id)) {
-            // the item exists but does not belong to the user
-            return next(new ConflictError(`That identifier is taken`));
-        }
+        item = await createItem({ identifier: req.body.identifier, userId: req.session.user.id });
+        // } else {
+        //     // the identifier is already taken
+        //     console.log(item.get());
+        //     let users = item.users.map((u) => u.id);
+        //     if (!users.includes(req.session.user.id)) {
+        //         // the item exists but does not belong to the user
+        //         return next(new ConflictError(`That identifier is taken`));
+        //     }
     }
 
     res.send({ item: item.get() });

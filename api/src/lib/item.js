@@ -1,10 +1,10 @@
 import models from "../models";
 import { loadConfiguration, getS3Handle } from "../common";
 
-export async function lookupItemByIdentifier({ identifier }) {
+export async function lookupItemByIdentifier({ identifier, userId }) {
     return await models.item.findOne({
         where: { identifier },
-        include: [{ model: models.user, attributes: ["id"], raw: true }],
+        include: [{ model: models.user, where: { id: userId }, attributes: ["id"], raw: true }],
     });
 }
 
@@ -18,8 +18,10 @@ export async function getItems({ userId, offset = 0, limit = 10 }) {
     });
 }
 
-export async function createItem({ identifier }) {
-    return await models.item.create({ identifier });
+export async function createItem({ identifier, userId }) {
+    let item = await models.item.create({ identifier });
+    await linkItemToUser({ itemId: item.id, userId });
+    return item;
 }
 
 export async function deleteItem({ id }) {

@@ -17,12 +17,12 @@
                     </div>
                 </div>
                 <div class="w-1/2 pl-4 flex flex-col space-y-4">
-                    <div
+                    <!-- <div
                         ref="recaptcha"
                         :data-sitekey="recaptchaSiteKey"
                         :data-callback="handleRecaptcha"
                         v-if="!enableAuthenticationMethods"
-                    ></div>
+                    ></div> -->
                     <span v-if="enableAuthenticationMethods">
                         <oauth-login-component
                             v-if="enableAafLogin"
@@ -72,7 +72,7 @@ export default {
         return {
             siteName: this.$store.state.configuration.ui.siteName,
             recaptchaSiteKey: this.$store.state.configuration.ui.recaptcha.siteKey,
-            enableAuthenticationMethods: false,
+            enableAuthenticationMethods: true,
         };
     },
     computed: {
@@ -84,21 +84,21 @@ export default {
         },
     },
     mounted() {
-        this.initRecaptcha();
+        // this.initRecaptcha();
     },
     methods: {
-        initRecaptcha() {
-            grecaptcha.render(this.$refs.recaptcha, {
-                sitekey: this.recaptchaSiteKey,
-                callback: this.handleRecaptcha,
-            });
-        },
-        async handleRecaptcha(token) {
-            let response = await httpService.post({ route: "/recaptcha", body: { token } });
-            if (response.status === 200) {
-                this.enableAuthenticationMethods = true;
-            }
-        },
+        // initRecaptcha() {
+        //     grecaptcha.render(this.$refs.recaptcha, {
+        //         sitekey: this.recaptchaSiteKey,
+        //         callback: this.handleRecaptcha,
+        //     });
+        // },
+        // async handleRecaptcha(token) {
+        //     let response = await httpService.post({ route: "/recaptcha", body: { token } });
+        //     if (response.status === 200) {
+        //         this.enableAuthenticationMethods = true;
+        //     }
+        // },
     },
 };
 </script>

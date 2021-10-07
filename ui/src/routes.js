@@ -4,7 +4,8 @@ import CallbackOauthLogin from "@/components/authentication/OauthCallback.compon
 import DashboardComponent from "@/components/dashboard/Shell.component.vue";
 import EditItemComponent from "@/components/item/EditItem.component.vue";
 import AdminComponent from "@/components/admin/Shell.component.vue";
-import AdminUsersComponent from "@/components/admin/users/Shell.component.vue";
+import AdminManageUsersComponent from "@/components/admin/users/ManageUsers.component.vue";
+import AdminWhitelistUsersComponent from "@/components/admin/users/WhitelistUsers.component.vue";
 import HTTPService from "./http.service";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -25,9 +26,15 @@ const routes = [
                 component: AdminComponent,
                 children: [
                     {
-                        name: "admin.users",
+                        name: "admin.users.invite",
+                        path: "users/whitelist",
+                        component: AdminWhitelistUsersComponent,
+                        meta: { name: "whitelist users" },
+                    },
+                    {
+                        name: "admin.users.manage",
                         path: "users",
-                        component: AdminUsersComponent,
+                        component: AdminManageUsersComponent,
                         meta: { name: "manage users" },
                     },
                 ],

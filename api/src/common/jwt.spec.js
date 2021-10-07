@@ -1,21 +1,31 @@
 require("regenerator-runtime");
-const { createUser } = require("./user");
+import { createUser } from "../lib/user";
 import { generateToken, verifyToken } from "./jwt";
 import { loadConfiguration } from "../common";
 const chance = require("chance").Chance();
-const MockDate = require("mockdate");
-const { copy, move, readJSON, writeJSON } = require("fs-extra");
+import MockDate from "mockdate";
+import { copy, move, readJSON, writeJSON } from "fs-extra";
+import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "./";
 
 describe("JWT tests", () => {
+    let users, configuration;
+    const userEmail = chance.email();
+    const adminEmail = chance.email();
+    beforeAll(async () => {
+        configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
+    });
+    beforeEach(async () => {
+        users = await setupBeforeEach({ emails: [userEmail] });
+    });
+    afterEach(async () => {
+        await teardownAfterEach({ users });
+    });
+    afterAll(async () => {
+        await teardownAfterAll(configuration);
+    });
     it("should be able to create a jwt", async () => {
-        const userDef = {
-            email: chance.email(),
-            givenName: chance.word(),
-            familyName: chance.word(),
-            provider: chance.word(),
-        };
+        let user = users[0];
         let configuration = await loadConfiguration();
-        let user = await createUser(userDef);
         let { token, expires } = await generateToken({ configuration, user });
         expect(token).toBeDefined;
         expect(expires).toBeDefined;
@@ -23,31 +33,18 @@ describe("JWT tests", () => {
         await user.destroy();
     });
     it("should be able to verify a jwt", async () => {
-        const userDef = {
-            email: chance.email(),
-            givenName: chance.word(),
-            familyName: chance.word(),
-            provider: chance.word(),
-        };
+        let user = users[0];
         let configuration = await loadConfiguration();
-        let user = await createUser(userDef);
-
         let { token, expires } = await generateToken({ configuration, user });
 
         let data = await verifyToken({ token, configuration });
-        expect(data.email).toEqual(userDef.email);
+        expect(data.email).toEqual(user.email);
 
         await user.destroy();
     });
     it("should throw because the jwt is expired", async () => {
-        const userDef = {
-            email: chance.email(),
-            givenName: chance.word(),
-            familyName: chance.word(),
-            provider: chance.word(),
-        };
+        let user = users[0];
         let configuration = await loadConfiguration();
-        let user = await createUser(userDef);
 
         MockDate.set("2000-11-22");
         let { token, expires } = await generateToken({ configuration, user });
@@ -62,15 +59,8 @@ describe("JWT tests", () => {
         await user.destroy();
     });
     it("should throw because the jwt is unverified", async () => {
-        const userDef = {
-            email: chance.email(),
-            givenName: chance.word(),
-            familyName: chance.word(),
-            provider: chance.word(),
-        };
+        let user = users[0];
         let configuration = await loadConfiguration();
-        let user = await createUser(userDef);
-
         let { token, expires } = await generateToken({ configuration, user });
 
         await copy(

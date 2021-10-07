@@ -10,13 +10,15 @@
             <div class="border-b border-white pt-20"></div>
             <div class="flex flex-col space-y-4 pl-4">
                 <div>Administrators</div>
-                <div
-                    @click="$router.push('/admin/users')"
-                    class="cursor-pointer"
-                    :class="{ 'text-green-400': current === '/admin/users' }"
-                >
-                    <i class="fas fa-users"></i>
-                    Manage Users
+                <div v-for="(control, idx) of adminControls" :key="idx">
+                    <div
+                        @click="$router.push(control.path)"
+                        class="cursor-pointer"
+                        :class="{ 'text-green-400': current === control.path }"
+                    >
+                        <i :class="control.icon"></i>
+                        {{ control.name }}
+                    </div>
                 </div>
             </div>
         </span>
@@ -46,6 +48,14 @@ export default {
     data() {
         return {
             siteName: this.$store.state.configuration.ui.siteName,
+            adminControls: [
+                {
+                    name: "Whitelist Users",
+                    path: "/admin/users/whitelist",
+                    icon: "fas fa-user-tag",
+                },
+                { name: "Manage Users", path: "/admin/users", icon: "fas fa-users" },
+            ],
         };
     },
     computed: {

@@ -1,10 +1,11 @@
-import { BadRequestError } from "restify-errors";
+import { BadRequestError, UnauthorizedError } from "restify-errors";
 import { loadConfiguration } from "../common";
 import { jwtVerify } from "jose/jwt/verify";
 import { createRemoteJWKSet } from "jose/jwks/remote";
 import { Issuer, generators } from "openid-client";
 import { createUser } from "../lib/user";
 import { createSession } from "../lib/session";
+import models from "../models";
 
 export function setupRoutes({ server }) {
     // user mgt routes
@@ -55,7 +56,14 @@ async function getOauthTokenRouteHandler(req, res, next) {
     });
     let userData = await extractUserDataFromIdToken({ configuration, provider, jwks, token });
 
-    let user = await createUser(userData);
+    let user = await models.user.findOne({ where: { email: userData.email } });
+    if (!user?.provider || !user.givenName) {
+        try {
+            user = await createUser(userData);
+        } catch (error) {
+            return next(new UnauthorizedError());
+        }
+    }
     let session = await createSession({ user });
 
     res.send({ token: session.token });

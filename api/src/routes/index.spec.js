@@ -1,9 +1,15 @@
 import "regenerator-runtime";
 import fetch from "node-fetch";
-const { createUser } = require("../lib/user");
+import { createUser } from "../lib/user";
 import { loadConfiguration, generateToken } from "../common";
 const chance = require("chance").Chance();
-const host = `http://localhost:8080`;
+import {
+    host,
+    setupBeforeAll,
+    setupBeforeEach,
+    teardownAfterAll,
+    teardownAfterEach,
+} from "../common";
 
 describe("Test loading the configuration", () => {
     test("it should be able to load the default configuration for the environment", async () => {
@@ -15,23 +21,30 @@ describe("Test loading the configuration", () => {
 });
 
 describe("Test the /authenticated endpoint", () => {
+    let users, configuration;
+    const userEmail = chance.email();
+    const adminEmail = chance.email();
+    beforeAll(async () => {
+        configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
+    });
+    beforeEach(async () => {
+        users = await setupBeforeEach({ emails: [userEmail] });
+    });
+    afterEach(async () => {
+        await teardownAfterEach({ users });
+    });
+    afterAll(async () => {
+        await teardownAfterAll(configuration);
+    });
     test("it should be ok", async () => {
-        const userDef = {
-            email: chance.email(),
-            givenName: chance.word(),
-            familyName: chance.word(),
-            provider: chance.word(),
-        };
         let configuration = await loadConfiguration();
-        let user = await createUser(userDef);
+        let user = users[0];
         let { token, expires } = await generateToken({ configuration, user });
 
         let response = await fetch(`${host}/authenticated`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         expect(response.status).toBe(200);
-
-        await user.destroy();
     });
     test("it should fail with unauthorised", async () => {
         let response = await fetch(`${host}/authenticated`, {

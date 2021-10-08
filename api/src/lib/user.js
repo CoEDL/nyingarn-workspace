@@ -34,13 +34,14 @@ export async function createUser(data) {
     }
 
     // deny access if the user is not an admin and we don't
-    //  have an entry for them as a result of admin invitation.
+    //  have an entry for them as a result of an admin invitation.
     let user = await models.user.findOne({ where: { email: data.email } });
     if (!user && !configuration.api.administrators.includes(data.email)) {
         throw new Error(`Unauthorised`);
     }
 
     if (!user && configuration.api.administrators.includes(data.email)) {
+        // no user account found but email in admin list
         data.locked = false;
         data.upload = true;
         data.administrator = true;
@@ -51,6 +52,7 @@ export async function createUser(data) {
             })
         )[0];
     } else if (user && !configuration.api.administrators.includes(data.email)) {
+        // user account found and not admin
         user.locked = false;
         user.upload = false;
         user.administrator = false;

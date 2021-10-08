@@ -20,8 +20,8 @@ export default {
             if (isAuthed.status === 200) {
                 let { token } = getLocalStorage({ key: tokenSessionKey });
 
-                let userData = JSON.parse(atob(token.split(".")[1]));
-                this.$store.commit("setUserData", userData);
+                let user = JSON.parse(atob(token.split(".")[1]));
+                this.$store.commit("setUserData", user);
             }
         },
     },

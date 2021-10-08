@@ -19,7 +19,7 @@ export default {
     },
     computed: {
         user: function () {
-            return this.$store.state.userData;
+            return this.$store.state.user;
         },
     },
     mounted() {},

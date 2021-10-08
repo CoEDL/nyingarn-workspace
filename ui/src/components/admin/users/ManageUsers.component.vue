@@ -77,7 +77,7 @@ export default {
             total: 0,
             offset: 0,
             limit: 10,
-            loggedInUser: this.$store.state.userData,
+            loggedInUser: this.$store.state.user,
         };
     },
     mounted() {

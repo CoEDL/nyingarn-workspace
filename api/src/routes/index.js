@@ -39,6 +39,16 @@ export function setupRoutes({ server }) {
         })
     );
     server.get(
+        "/tus",
+        route(async (req, res, next) => {
+            if (!req.session.user.upload) {
+                return next(new UnauthorizedError());
+            }
+            res.send({});
+            next();
+        })
+    );
+    server.get(
         "/admin",
         routeAdmin(async (req, res, next) => {
             res.send({});

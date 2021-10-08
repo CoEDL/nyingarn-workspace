@@ -30,7 +30,7 @@ const mutations = {
         state.configuration = { ...payload };
     },
     setUserData(state, payload) {
-        state.userData = { ...payload };
+        state.user = { ...payload };
     },
 };
 
@@ -47,6 +47,6 @@ export const store = new createStore({
 function resetState() {
     return {
         configuration: undefined,
-        userData: {},
+        user: {},
     };
 }

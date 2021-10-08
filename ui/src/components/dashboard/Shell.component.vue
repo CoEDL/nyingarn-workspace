@@ -1,13 +1,24 @@
 <template>
-    <div class="flex flex-col p-2"><my-items-component /></div>
+    <div class="">
+        <div class="flex flex-col p-2" v-if="canUpload">
+            <my-items-component />
+        </div>
+        <div v-else><terms-and-conditions-component /></div>
+    </div>
 </template>
 
 <script>
 import MyItemsComponent from "@/components/item/MyItems.component.vue";
+import TermsAndConditionsComponent from "./TermsAndConditions.component.vue";
 export default {
     components: {
         MyItemsComponent,
+        TermsAndConditionsComponent,
     },
-    setup() {},
+    computed: {
+        canUpload() {
+            return this.$store.state.user.upload;
+        },
+    },
 };
 </script>

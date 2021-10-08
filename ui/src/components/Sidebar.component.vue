@@ -3,7 +3,7 @@
         <div class="text-center py-6">
             <router-link to="/dashboard" class="text-2xl text-white">{{ siteName }}</router-link>
         </div>
-        <div class="flex flex-col space-y-4 pl-4">
+        <div class="flex flex-col space-y-4 pl-4" v-if="canUpload">
             <create-item-component />
         </div>
         <span v-if="user.administrator">
@@ -59,6 +59,9 @@ export default {
         };
     },
     computed: {
+        canUpload() {
+            return this.$store.state.user.upload;
+        },
         user: function () {
             return this.$store.state.user;
         },

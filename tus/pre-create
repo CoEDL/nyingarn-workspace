@@ -1,9 +1,10 @@
 #!/bin/bash
 
 token=$(jq .Upload.MetaData.token | sed 's/"//g')
-response=$(curl --silent --header "authorization: Bearer ${token}" ${API_ENDPOINT_URL}/authenticated)
+response=$(curl --silent --header "authorization: Bearer ${token}" ${API_ENDPOINT_URL}/tus)
 response=$(echo $response | jq .code | sed 's/"//g')
 if [ $response == "Unauthorized" ] ; then
+        echo "User access to upload not permitted"
         exit -1
 fi
 exit 0

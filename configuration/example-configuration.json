@@ -2,6 +2,7 @@
     "ui": {
         "siteName": "Nyingarn Platform workspace",
         "tusEndpoint": "http://tus.nyingarn.net/files/",
+        "termsAndConditionsOfUse": "https://nyingarn.net/nyingarn-workspace-terms-and-conditions-of-use/",
         "itemName": {
             "help": "Must consist only of alphanumeric characters and must start with a letter.",
             "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9]+$"

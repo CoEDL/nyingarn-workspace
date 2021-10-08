@@ -8,12 +8,8 @@ import { createSession } from "../lib/session";
 import models from "../models";
 
 export function setupRoutes({ server }) {
-    // user mgt routes
     server.get("/auth/:provider/login", getLoginUrlRouteHandler);
     server.post("/auth/:provider/code", getOauthTokenRouteHandler);
-    // server.get("/user/:userId", 'return data for userId', { properties = [] });
-    // server.post('/user', 'create new user known to this application', { identifier, username, authenticationService })
-    // server.del('/user/:userId', 'delete user known to this application', { identifier, authenticationService })
 }
 
 async function getLoginUrlRouteHandler(req, res, next) {
@@ -57,7 +53,12 @@ async function getOauthTokenRouteHandler(req, res, next) {
     let userData = await extractUserDataFromIdToken({ configuration, provider, jwks, token });
 
     let user = await models.user.findOne({ where: { email: userData.email } });
+    if (user?.locked) {
+        // user account exists but user is locked
+        return next(new UnauthorizedError());
+    }
     if (!user?.provider || !user.givenName) {
+        // user account looks like a stub account - create it properly
         try {
             user = await createUser(userData);
         } catch (error) {

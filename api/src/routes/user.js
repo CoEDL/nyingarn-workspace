@@ -1,14 +1,18 @@
 import { InternalServerError } from "restify-errors";
-import { routeAdmin } from "../common";
+import { routeAdmin, route } from "../common";
 import {
     getUsers,
     deleteUser,
     toggleUserCapability,
     createAllowedUserStubAccounts,
 } from "../lib/user";
+import { createSession } from "../lib/session";
 
 export function setupRoutes({ server }) {
-    // user mgt routes
+    // user routes
+    server.put("/users/:userId/upload", route(putUsersUploadCapabilityRouteHandler));
+
+    // admin user routes
     server.get("/admin/users", routeAdmin(getUsersRouteHandler));
     server.post("/admin/users", routeAdmin(postInviteUsersRouteHandler));
     server.put("/admin/users/:userId/:capability", routeAdmin(putUserToggleCapabilityRouteHandler));
@@ -57,5 +61,22 @@ async function deleteUserRouteHandler(req, res, next) {
         return next(new InternalServerError(error.message));
     }
     res.send({});
+    next();
+}
+
+async function putUsersUploadCapabilityRouteHandler(req, res, next) {
+    let userId = req.session.user.id;
+    let user;
+    try {
+        user = await toggleUserCapability({
+            userId,
+            capability: "upload",
+        });
+    } catch (error) {
+        return next(new InternalServerError(error.message));
+    }
+
+    let session = await createSession({ user });
+    res.send({ token: session.token });
     next();
 }

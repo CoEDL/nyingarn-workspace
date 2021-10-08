@@ -1,6 +1,6 @@
 FROM tusproject/tusd
 USER root
-RUN apk update && apk add aws-cli jq bash
+RUN apk update && apk add aws-cli jq bash curl
 RUN mkdir -p /root/.aws
 COPY tus/config ~/.aws/config
 COPY tus/post-finish /srv/tusd-hooks/post-finish

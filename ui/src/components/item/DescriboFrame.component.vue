@@ -1,7 +1,6 @@
 <template>
     <div>
-        <iframe :src="url" class="w-full h-full" />
-        <el-button @click="init">init</el-button>
+        <iframe :src="url" class="h-full" :style="frameStyle" />
     </div>
 </template>
 
@@ -13,7 +12,13 @@ export default {
     data() {
         return {
             url: undefined,
+            frameStyle: undefined,
         };
+    },
+    computed: {
+        frameStyle() {
+            return { width: "1000px" };
+        },
     },
     mounted() {
         this.init();

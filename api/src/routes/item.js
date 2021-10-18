@@ -1,4 +1,4 @@
-import { BadRequestError } from "restify-errors";
+import { BadRequestError, ForbiddenError } from "restify-errors";
 import { route } from "../common";
 import {
     createItem,
@@ -21,19 +21,19 @@ async function createItemHandler(req, res, next) {
     // is that identifier already in use?
     let item = await lookupItemByIdentifier({
         identifier: req.body.identifier,
-        userId: req.session.user.id,
     });
     if (!item) {
-        // no - create the item
+        // identifier not in use so create the item
         item = await createItem({ identifier: req.body.identifier, userId: req.session.user.id });
-        // } else {
-        //     // the identifier is already taken
-        //     console.log(item.get());
-        //     let users = item.users.map((u) => u.id);
-        //     if (!users.includes(req.session.user.id)) {
-        //         // the item exists but does not belong to the user
-        //         return next(new ConflictError(`That identifier is taken`));
-        //     }
+    } else {
+        // item with that identifier exists but does it belong that user?
+        item = await lookupItemByIdentifier({
+            identifier: req.body.identifier,
+            userId: req.session.user.id,
+        });
+        if (!item) {
+            return next(new ForbiddenError());
+        }
     }
 
     res.send({ item: item.get() });

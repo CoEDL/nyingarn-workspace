@@ -1,11 +1,18 @@
 import models from "../models";
-import { loadConfiguration, getS3Handle } from "../common";
+import { loadConfiguration, getS3Handle, getUserTempLocation } from "../common";
+import path from "path";
+import { writeJson, remove } from "fs-extra";
 
 export async function lookupItemByIdentifier({ identifier, userId }) {
-    return await models.item.findOne({
+    let clause = {
         where: { identifier },
-        include: [{ model: models.user, where: { id: userId }, attributes: ["id"], raw: true }],
-    });
+    };
+    if (userId) {
+        clause.include = [
+            { model: models.user, where: { id: userId }, attributes: ["id"], raw: true },
+        ];
+    }
+    return await models.item.findOne(clause);
 }
 
 export async function getItems({ userId, offset = 0, limit = 10 }) {
@@ -19,8 +26,14 @@ export async function getItems({ userId, offset = 0, limit = 10 }) {
 }
 
 export async function createItem({ identifier, userId }) {
-    let item = await models.item.create({ identifier });
+    let item = await models.item.findOne({ where: { identifier } });
+    if (item) {
+        throw new Error("An item with that identifier already exists.");
+    }
+
+    item = await models.item.create({ identifier });
     await linkItemToUser({ itemId: item.id, userId });
+    await createItemLocationInObjectStore({ identifier, userId });
     return item;
 }
 
@@ -41,24 +54,40 @@ export async function getItemResources({ identifier }) {
     return { resources: resources.Contents };
 }
 
-// export async function createItemLocationInObjectStore({ identifier }) {
-//     const configuration = await loadConfiguration();
-//     const aws = configuration.api.services.aws;
-//     console.log(aws);
+export async function createItemLocationInObjectStore({ identifier, userId }) {
+    let { bucket } = await getS3Handle();
 
-//     let params = {
-//         bucket: aws.bucket,
-//         accessKeyId: aws.accessKeyId,
-//         secretAccessKey: aws.secretAccessKey,
-//         region: aws.region,
-//     };
-//     if (aws.endpointUrl && aws.forcePathStyle) {
-//         params.endpoint = aws.endpointUrl;
-//         params.forcePathStyle = aws.forcePathStyle;
-//     }
-//     let bucket = new Bucket(params);
-
-//     console.log(identifier);
-//     let pathExists = await bucket.pathExists({ path: identifier });
-//     console.log(pathExists);
-// }
+    let pathExists = await bucket.pathExists({ path: identifier });
+    if (!pathExists) {
+        // create stub ro-crate file
+        let context = ["https://w3id.org/ro/crate/1.1/context"];
+        let graph = [
+            {
+                "@id": "ro-crate-metadata.json",
+                "@type": "CreativeWork",
+                conformsTo: {
+                    "@id": "https://w3id.org/ro/crate/1.1/context",
+                },
+                about: {
+                    "@id": "./",
+                },
+            },
+            {
+                "@id": "./",
+                "@type": "Dataset, RepositoryObject",
+                name: identifier,
+            },
+        ];
+        let tempdir = await getUserTempLocation({ userId });
+        let crateFile = path.join(tempdir, "ro-crate-metadata.json");
+        await writeJson(crateFile, {
+            "@context": context,
+            "@graph": graph,
+        });
+        await bucket.upload({
+            localPath: crateFile,
+            target: path.join(identifier, "ro-crate-metadata.json"),
+        });
+        await remove(tempdir);
+    }
+}

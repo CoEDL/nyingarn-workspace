@@ -14,11 +14,12 @@ import {
 } from "../common";
 
 describe("Item management route tests", () => {
-    let configuration, users;
+    let configuration, users, bucket;
     const userEmail = chance.email();
     const adminEmail = chance.email();
     beforeAll(async () => {
         configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
+        ({ bucket } = await getS3Handle());
     });
     beforeEach(async () => {
         users = await setupBeforeEach({ emails: [userEmail] });
@@ -57,6 +58,7 @@ describe("Item management route tests", () => {
 
         await deleteItem({ id: item.id });
         await user.destroy();
+        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to create a new item as a normal user", async () => {
         let user = {
@@ -85,6 +87,7 @@ describe("Item management route tests", () => {
         expect(item.identifier).toEqual(identifier);
 
         await deleteItem({ id: item.id });
+        await bucket.removeObjects({ prefix: identifier });
     });
     it("should succeed if the new item exists and is already associated to this user", async () => {
         let user = {
@@ -124,6 +127,7 @@ describe("Item management route tests", () => {
         expect(response.status).toEqual(200);
 
         await deleteItem({ id: item.id });
+        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get own items", async () => {
         let user = {
@@ -162,6 +166,7 @@ describe("Item management route tests", () => {
         expect(total).toEqual(1);
 
         await deleteItem({ id: item.id });
+        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get item resources", async () => {
         let user = {
@@ -200,7 +205,7 @@ describe("Item management route tests", () => {
         });
         expect(response.status).toEqual(200);
         response = await response.json();
-        expect(response.resources.length).toEqual(1);
+        expect(response.resources.length).toEqual(2);
 
         await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });

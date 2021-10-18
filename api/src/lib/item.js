@@ -74,7 +74,7 @@ export async function createItemLocationInObjectStore({ identifier, userId }) {
             },
             {
                 "@id": "./",
-                "@type": "Dataset, RepositoryObject",
+                "@type": "Dataset",
                 name: identifier,
             },
         ];

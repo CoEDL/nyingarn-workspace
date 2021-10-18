@@ -10,9 +10,9 @@ for file in $(ls /data/${TUS_ID}*) ; do
 
         # copy to s3
         if [ ! -z ${S3_ENDPOINT_URL} ] ; then
-            aws --endpoint-url "${S3_ENDPOINT_URL}" s3 cp "${file}" "s3://uploads/${itemId}/${filename}"
+            aws --endpoint-url "${S3_ENDPOINT_URL}" s3 cp "${file}" "s3://${S3_BUCKET}/${itemId}/${filename}"
         else
-            aws s3 cp "${file}" "s3://uploads/${itemId}/${filename}"
+            aws s3 cp "${file}" "s3://${S3_BUCKET}/${itemId}/${filename}"
         fi
 
         # cleanup - remove data file and .info

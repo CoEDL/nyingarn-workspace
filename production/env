@@ -1,0 +1,16 @@
+NYINGARN_DB=nyingarn
+DESCRIBO_DB=describo
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+POSTGRES_USER=root
+POSTGRES_PASSWORD={set a password here to access the db}
+MINIO_ROOT_USER=root
+MINIO_ROOT_PASSWORD={set a password here to access minio console as root user}
+MINIO_BROWSER_REDIRECT_URL=https://s3-console.nyingarn.net
+AWS_ACCESS_KEY_ID={aws access key - same as in the config files}
+AWS_SECRET_ACCESS_KEY={aws secret key - same as in the config files}
+AWS_DEFAULT_REGION=us-east-1
+S3_ENDPOINT_URL=https://s3.nyingarn.net
+S3_BUCKET=production
+WORKSPACE_API_ENDPOINT_URL=http://workspace-api:8080
+

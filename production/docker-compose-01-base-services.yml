@@ -1,0 +1,54 @@
+version: "3.7"
+
+networks:
+  default:
+    external:
+      name: workspace_default
+
+volumes:
+    api_node_modules:
+        driver: local
+    ui_node_modules:
+        driver: local
+
+services:
+    workspace_db:
+        image: postgres:13-alpine
+        hostname: db
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            POSTGRES_USER: "${POSTGRES_USER}"
+            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+            POSTGRES_HOST_AUTH_METHOD: "trust"
+            PGDATA: /postgresql/data
+        volumes:
+            - /srv/workspace-data/postgres:/postgresql
+    minio:
+        image: minio/minio:latest
+        restart: always
+        entrypoint: sh
+        ports:
+            - 10000:9000
+            - 10001:10001
+        environment:
+            MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+            MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+            MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
+        entrypoint:
+            bash -c '/opt/bin/minio server /data --console-address ":10001"'
+        volumes:
+            - /srv/workspace-data/s3:/data
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:10001/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
+    dozzle:
+        container_name: dozzle
+        image: amir20/dozzle:latest
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+           - 9999:8080
+

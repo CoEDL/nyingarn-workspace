@@ -1,0 +1,58 @@
+{
+    "ui": {
+        "siteName": "Nyingarn Platform workspace",
+        "tusEndpoint": "https://tus.nyingarn.net/files/",
+        "itemName": {
+            "help": "Must consist start with a letter and can have the following characters only: a-z, A-Z, 0-9 and _.",
+            "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9,_]+$"
+        },
+        "filename": {
+            "matchItemName": true,
+            "helpName": "Filenames must match the form {item identifier}-{sequence number}. {item identifier} must consist only of alphanumeric characters and must start with a letter.",
+            "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9,_]+-0*[1-9]*\\..*$",
+            "helpExtension": "Accepted file types: jpg, jpeg, png, tif, pdf",
+            "checkExtension": ".*\\.(jpg|JPG|jpeg|JPEG|pdf|PDF|tif|TIF|png|PNG)$"
+        }
+    },
+    "api": {
+        "administrators": ["{email of an administrator}"],
+        "session": {
+            "lifetime": { "hours": 5 },
+            "secret": "{some secret}"
+        },
+        "services": {
+            "aws": {
+                "endpointUrl": "http://minio:9000",
+                "forcePathStyle": true,
+                "bucket": "production",
+                "awsAccessKeyId": "{access key to access a bucket}",
+                "awsSecretAccessKey": "{secret key to access a bucket}",
+                "region": "us-east-1"
+            },
+            "describo": {
+                "authorization": "{this is the shared secret define in the describo configuration}",
+                "provider": "Minio",
+                "url": "https://s3.nyingarn.net",
+                "bucket": "production",
+                "awsAccessKeyId": "{access key to access a bucket as above}",
+                "awsSecretAccessKey": "{secret key to access a bucket as above}",
+                "region": "us-east-1",
+                "describoUrl": "https://describo.nyingarn.net"
+            }
+        },
+        "authentication": {
+            "google": {
+                "clientId": "{client identifier}.apps.googleusercontent.com",
+                "clientSecret": "{client secret}",
+                "redirectUri": "https://workspace.nyingarn.net/callback-google-login",
+                "discover": "https://accounts.google.com"
+            },
+            "aaf": {
+                "clientId": "{client identifier}",
+                "clientSecret": "{client secret}",
+                "redirectUri": "https://workspace.nyingarn.net/callback-aaf-login",
+                "discover": "https://central.aaf.edu.au"
+            }
+        }
+    }
+}

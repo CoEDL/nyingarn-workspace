@@ -1,0 +1,24 @@
+{
+    "ui": {
+        "siteName": "Arkisto Platform - Describo",
+        "logo": "http://www.researchobject.org/ro-crate/assets/img/ro-crate.svg",
+        "login": "",
+        "services": {
+            "s3": false
+        },
+        "maxSessionLifetime": "86400",
+        "maxEntitiesPerTemplate": "100"
+    },
+    "api": {
+        "port": 8080,
+        "periodicProcessInterval": 300,
+        "services": {},
+        "applications": [
+            {
+                "name": "workspace.nyingarn.net",
+                "url": "workspace.nyingarn.net",
+                "secret": "{set a secret here}"
+            }
+        ]
+    }
+}

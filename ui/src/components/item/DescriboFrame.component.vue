@@ -12,7 +12,6 @@ export default {
     data() {
         return {
             url: undefined,
-            frameStyle: undefined,
         };
     },
     computed: {

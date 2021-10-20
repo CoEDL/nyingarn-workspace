@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-col space-y-2">
-        <iframe :src="termsUrl" class="w-full pt-1" style="height: 800px"></iframe>
+        <iframe :src="termsUrl" class="w-full pt-1" :style="frameStyle"></iframe>
         <div class="flex flex-row space-x-2">
-            <div class="text-lg">
+            <div class="text-lg pl-6">
                 To use the workspace you agree to abide by the terms and conditions of use.
             </div>
             <div><el-button @click="agree" type="success" size="small">I agree</el-button></div>
@@ -27,6 +27,11 @@ export default {
             termsUrl: this.$store.state.configuration.ui.termsAndConditionsOfUse,
             user: this.$store.state.user,
         };
+    },
+    computed: {
+        frameStyle() {
+            return { height: `${window.innerHeight - 60}px` };
+        },
     },
     methods: {
         async agree() {

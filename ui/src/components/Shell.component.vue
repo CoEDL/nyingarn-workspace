@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-row">
-        <sidebar-component class="bg-gray-800 w-1/3 lg:w-1/5 h-screen" />
-        <div class="flex flex-col p-2 w-2/3 lg:w-4/5">
+        <sidebar-component class="bg-gray-800 w-2/6 xl:w-1/6 h-screen" />
+        <div class="w-4/6 xl:w-5/6">
             <router-view />
         </div>
     </div>

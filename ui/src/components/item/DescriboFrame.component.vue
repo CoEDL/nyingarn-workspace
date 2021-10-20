@@ -16,7 +16,11 @@ export default {
     },
     computed: {
         frameStyle() {
-            return { width: "1000px" };
+            if (window.innerWidth <= 1100) {
+                return { width: `${window.innerWidth * (4 / 6) - 60}px` };
+            } else {
+                return { width: `${window.innerWidth * (5 / 6) - 40}px` };
+            }
         },
     },
     mounted() {

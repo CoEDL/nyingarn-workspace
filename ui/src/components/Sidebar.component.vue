@@ -1,7 +1,7 @@
 <template>
     <div class="text-white flex flex-col space-y-2 h-screen text-lg">
         <div class="text-center py-6">
-            <router-link to="/dashboard" class="text-2xl text-white">{{ siteName }}</router-link>
+            <router-link to="/dashboard" class="text-xl text-white">{{ siteName }}</router-link>
         </div>
         <div class="flex flex-col space-y-4 pl-4" v-if="canUpload">
             <create-item-component />

@@ -2,11 +2,11 @@
     <div class="flex flex-col px-4">
         <div class="text-xl my-4">Item: {{ identifier }}</div>
         <el-tabs v-model="activeTab">
-            <el-tab-pane label="Metadata" name="metadata">
+            <el-tab-pane label="Item Metadata" name="metadata">
                 <metadata-component />
             </el-tab-pane>
-            <el-tab-pane label="Content" name="content">
-                <content-component v-if="activeTab === 'content'" />
+            <el-tab-pane label="Upload Data" name="upload">
+                <content-component v-if="activeTab === 'upload'" />
             </el-tab-pane>
             <el-tab-pane label="Data Processing" name="dataprocessing">
                 <data-processing-component v-if="activeTab === 'dataprocessing'" />

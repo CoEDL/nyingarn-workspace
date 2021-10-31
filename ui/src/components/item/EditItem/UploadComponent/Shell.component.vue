@@ -10,20 +10,17 @@
             </ul>
         </div>
         <div class="flex flex-row">
-            <uploader-component class="w-1/2" :identifier="identifier" />
-            <item-resources class="w-1/2 px-2" :identifier="identifier" />
+            <uploader-component class="w-full" :identifier="identifier" />
         </div>
     </div>
 </template>
 
 <script>
 import UploaderComponent from "./Uploader.component.vue";
-import ItemResources from "./ItemResources.component.vue";
 
 export default {
     components: {
         UploaderComponent,
-        ItemResources,
     },
     data() {
         return {

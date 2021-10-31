@@ -1,5 +1,5 @@
 import { loadConfiguration } from ".";
-import { S3, Bucket } from "../lib/s3";
+import { S3, Bucket } from "./s3";
 
 export async function getS3Handle() {
     const configuration = await loadConfiguration();

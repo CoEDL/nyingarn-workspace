@@ -18,7 +18,6 @@ export async function processImagesRouteHandler(req, res, next) {
         return next(new ForbiddenError(`You don't have access to that item`));
     }
 
-    // get item images
     let { bucket } = await getS3Handle();
     let response = await bucket.listObjects({ prefix: req.params.identifier });
     let files = response.Contents.map((c) => c.Key);
@@ -31,10 +30,22 @@ export async function processImagesRouteHandler(req, res, next) {
                 text: `Create image thumbnails`,
                 data: { files: [file] },
             });
-            global.rabbit.publish("nyingarn", {
-                type: "CreateImageThumbnail",
-                body: { identifier: req.params.identifier, files: [file], taskId: task.id },
-            });
+
+            const height = 300;
+            let filename = path.basename(file).split(".")[0];
+            let extension = path.basename(file).split(".")[1];
+            let thumbnail = `${filename}_thumbnail_h${height}.${extension}`;
+            let exists = await bucket.stat({ path: path.join(req.params.identifier, thumbnail) });
+            if (!exists) {
+                global.rabbit.publish("nyingarn", {
+                    type: "CreateImageThumbnail",
+                    body: {
+                        identifier: req.params.identifier,
+                        files: [{ source: file, target: thumbnail, height }],
+                        taskId: task.id,
+                    },
+                });
+            }
         }
     }
 

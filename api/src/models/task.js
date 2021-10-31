@@ -1,8 +1,8 @@
 "use strict";
 
 module.exports = function (sequelize, DataTypes) {
-    let Item = sequelize.define(
-        "item",
+    let Task = sequelize.define(
+        "task",
         {
             id: {
                 primaryKey: true,
@@ -10,10 +10,13 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
                 defaultValue: DataTypes.UUIDV4,
             },
-            identifier: {
+            status: {
+                type: DataTypes.ENUM("in progress", "done", "failed"),
+                defaultValue: "in progress",
+            },
+            text: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
             },
             data: {
                 type: DataTypes.JSON,
@@ -24,12 +27,9 @@ module.exports = function (sequelize, DataTypes) {
             timestamps: true,
         }
     );
-    Item.associate = function (models) {
-        Item.belongsToMany(models.user, {
-            through: models.item_user,
-        });
-        Item.hasMany(models.task);
+    Task.associate = function (models) {
+        Task.belongsTo(models.item);
     };
 
-    return Item;
+    return Task;
 };

@@ -1,5 +1,5 @@
 import { BadRequestError, ForbiddenError } from "restify-errors";
-import { route } from "../common";
+import { route, logEvent, getLogger } from "../common";
 import {
     createItem,
     linkItemToUser,
@@ -7,6 +7,7 @@ import {
     getItems,
     getItemResources,
 } from "../lib/item";
+const log = getLogger();
 
 export function setupRoutes({ server }) {
     server.get("/items", route(getItemsHandler));
@@ -24,6 +25,11 @@ async function createItemHandler(req, res, next) {
     });
     if (!item) {
         // identifier not in use so create the item
+        await logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `Creating new item with identifier ${req.body.identifier}`,
+        });
         item = await createItem({ identifier: req.body.identifier, userId: req.session.user.id });
     } else {
         // item with that identifier exists but does it belong that user?
@@ -32,7 +38,12 @@ async function createItemHandler(req, res, next) {
             userId: req.session.user.id,
         });
         if (!item) {
-            return next(new ForbiddenError());
+            await logEvent({
+                level: "error",
+                owner: req.session.user.email,
+                text: `Creating new item with identifier ${req.body.identifier} failed. Item belongs to someone else.`,
+            });
+            return next(new ForbiddenError(`That identifier is already taken`));
         }
     }
 

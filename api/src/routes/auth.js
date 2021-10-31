@@ -1,11 +1,12 @@
 import { BadRequestError, UnauthorizedError } from "restify-errors";
-import { loadConfiguration } from "../common";
+import { loadConfiguration, getLogger } from "../common";
 import { jwtVerify } from "jose/jwt/verify";
 import { createRemoteJWKSet } from "jose/jwks/remote";
 import { Issuer, generators } from "openid-client";
 import { createUser } from "../lib/user";
 import { createSession } from "../lib/session";
 import models from "../models";
+const log = getLogger();
 
 export function setupRoutes({ server }) {
     server.get("/auth/:provider/login", getLoginUrlRouteHandler);
@@ -51,20 +52,49 @@ async function getOauthTokenRouteHandler(req, res, next) {
         configuration,
     });
     let userData = await extractUserDataFromIdToken({ configuration, provider, jwks, token });
+    let user;
 
-    let user = await models.user.findOne({ where: { email: userData.email } });
-    if (user?.locked) {
-        // user account exists but user is locked
-        return next(new UnauthorizedError());
-    }
-    if (!user?.provider || !user.givenName) {
-        // user account looks like a stub account - create it properly
+    if (configuration.api.administrators.includes(userData.email)) {
+        // admin account - set it up and login
         try {
             user = await createUser(userData);
         } catch (error) {
             return next(new UnauthorizedError());
         }
+    } else {
+        // normal user account - are we alloing access
+        user = await models.user.findOne({ where: { email: userData.email } });
+        if (!user) {
+            // no user found with that email - not whitelisted so deny access
+            log.info(`The account for '${userData.email}' is not whitelisted. Denying user login.`);
+            return next(new UnauthorizedError());
+        }
+        if (user?.locked) {
+            log.info(`The account for '${user.email}' is locked. Denying user login.`);
+            await logEvent({
+                level: "info",
+                owner: user.email,
+                text: `The account is locked. Denying user login.`,
+            });
+            // user account exists but user is locked
+            return next(new UnauthorizedError());
+        }
+        if (!user?.provider || !user.givenName) {
+            // user account looks like a stub account - create it properly
+            log.info(`The account for '${user.email}' is being setup.`);
+            await logEvent({
+                level: "info",
+                owner: user.email,
+                text: `The account is being setup.`,
+            });
+            try {
+                user = await createUser(userData);
+            } catch (error) {
+                return next(new UnauthorizedError());
+            }
+        }
     }
+    log.debug(`Creating session for ${user.email}`);
     let session = await createSession({ user });
 
     res.send({ token: session.token });

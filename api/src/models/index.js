@@ -38,7 +38,8 @@ let modules = [
     require("./role.js"),
     require("./item.js"),
     require("./item_user.js"),
-    // require("./user_role.js"),
+    require("./task.js"),
+    require("./log.js"),
     // require("./group_role.js"),
     // require("./group_user.js"),
 ];

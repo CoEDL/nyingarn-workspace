@@ -1,5 +1,5 @@
 {
-    "name": "api",
+    "name": "tasks",
     "version": "0.4.1",
     "description": "",
     "main": "index.js",
@@ -38,19 +38,13 @@
         "date-fns": "^2.23.0",
         "foo-foo-mq": "^7.0.0",
         "fs-extra": "^10.0.0",
-        "jose": "^3.14.3",
         "lodash": "^4.17.20",
-        "mockdate": "^3.0.5",
         "node-fetch": "^2.6.1",
-        "openid-client": "^4.7.4",
         "pg": "^8.7.1",
         "pg-hstore": "^2.3.4",
         "regenerator-runtime": "^0.13.9",
-        "restify": "^8.5.1",
-        "restify-cors-middleware": "^1.1.1",
-        "restify-errors": "^8.0.2",
         "sequelize": "^6.6.5",
-        "uuid": "^8.3.2",
+        "sharp": "^0.29.2",
         "winston": "^3.3.3"
     }
 }

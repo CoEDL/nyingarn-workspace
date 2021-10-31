@@ -7,6 +7,7 @@ const { setupRoutes } = require("./src/routes");
 const corsMiddleware = require("restify-cors-middleware");
 const fetch = require("node-fetch");
 const log = getLogger();
+const rabbit = require("foo-foo-mq");
 
 // DEVELOPER NOTE
 //
@@ -25,6 +26,7 @@ global.fetch = require("node-fetch");
         process.exit();
     }
     await models.sequelize.sync();
+    global.rabbit = await initialiseRabbit({ configuration });
 
     const cors = corsMiddleware({
         preflightMaxAge: 5, //Optional
@@ -68,3 +70,21 @@ global.fetch = require("node-fetch");
         console.log("ready on %s", server.url);
     });
 })();
+
+async function initialiseRabbit({ configuration }) {
+    await rabbit.configure({
+        connection: {
+            name: "default",
+            user: configuration.api.services.rabbit.user,
+            pass: configuration.api.services.rabbit.pass,
+            host: configuration.api.services.rabbit.host,
+            port: configuration.api.services.rabbit.port,
+            vhost: "%2f",
+            replyQueue: "customReplyQueue",
+        },
+        exchanges: configuration.api.services.rabbit.exchanges,
+        queues: configuration.api.services.rabbit.queues,
+        bindings: configuration.api.services.rabbit.bindings,
+    });
+    return rabbit;
+}

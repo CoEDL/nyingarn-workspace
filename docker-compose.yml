@@ -28,6 +28,82 @@ services:
         #ports:
         #    - 5432:5432
 
+    tus:
+        image: arkisto/workspace-tusd:latest
+        restart: always
+        ports:
+            - 1080:1080
+        volumes:
+            - TUS_VOLUME:/data
+        user: root
+        environment:
+            AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+            AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+            AWS_DEFAULT_REGION: us-east-1
+            S3_ENDPOINT_URL: "${S3_ENDPOINT_URL}"
+            S3_BUCKET: "${S3_BUCKET}"
+            API_ENDPOINT_URL: http://api:8080
+        entrypoint:
+            [
+                "/usr/local/bin/tusd",
+                "-verbose",
+                "-hooks-enabled-events",
+                "pre-create,post-finish",
+                "-upload-dir",
+                "/data",
+                "-hooks-dir",
+                "/srv/tusd-hooks",
+            ]
+
+    rabbit:
+        image: rabbitmq:3-management
+        hostname: rabbit
+        restart: always
+        ports:
+            - 5672:5672
+            - 15672:15672
+
+    rabbit-worker1:
+        image: node:14-buster
+        hostname: worker1
+        restart: always
+        working_dir: /srv/tasks
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "development"
+            DB_HOST: "db"
+            DB_PORT: "5432"
+            DB_USER: "root"
+            DB_PASSWORD: ""
+            DB_DATABASE: "nyingarn"
+        volumes:
+            - api_node_modules:/srv/api/node_modules:delegated
+            - ./tasks:/srv/tasks:delegated
+            - ./api:/srv/api:delegated
+            - ./.git:/srv/api/.git:delegated
+            - ./configuration:/srv/configuration
+        command: ["npm", "run", "develop"]
+
+    # rabbit-worker2:
+    #     image: node:14-buster
+    #     hostname: worker2
+    #     restart: always
+    #     working_dir: /srv/tasks
+    #     environment:
+    #         TERM: "xterm-256color"
+    #         NODE_ENV: "development"
+    #         DB_HOST: "db"
+    #         DB_PORT: "5432"
+    #         DB_USER: "root"
+    #         DB_PASSWORD: ""
+    #         DB_DATABASE: "nyingarn"
+    #     volumes:
+    #         - api_node_modules:/srv/api/node_modules:delegated
+    #         - ./tasks:/srv/tasks:delegated
+    #         - ./.git:/srv/api/.git:delegated
+    #         - ./configuration:/srv/configuration
+    #     command: ["npm", "run", "develop"]
+
     api:
         image: node:14-buster
         hostname: api
@@ -84,33 +160,6 @@ services:
     #         interval: 30s
     #         timeout: 20s
     #         retries: 3
-
-    tus:
-        image: arkisto/workspace-tusd:latest
-        restart: always
-        ports:
-            - 1080:1080
-        volumes:
-            - TUS_VOLUME:/data
-        user: root
-        environment:
-            AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-            AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-            AWS_DEFAULT_REGION: us-east-1
-            S3_ENDPOINT_URL: "${S3_ENDPOINT_URL}"
-            S3_BUCKET: "${S3_BUCKET}"
-            API_ENDPOINT_URL: http://api:8080
-        entrypoint:
-            [
-                "/usr/local/bin/tusd",
-                "-verbose",
-                "-hooks-enabled-events",
-                "pre-create,post-finish",
-                "-upload-dir",
-                "/data",
-                "-hooks-dir",
-                "/srv/tusd-hooks",
-            ]
 
     edge:
         image: nginx:latest

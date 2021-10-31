@@ -22,7 +22,20 @@
             "secret": "{some secret - 32 characters or longer}"
         },
         "services": {
-            "aws": {
+            "rabbit": {
+                "host": "rabbit",
+                "user": "guest",
+                "pass": "guest",
+                "port": "5672",
+                "exchanges": [
+                    { "name": "nyingarn", "type": "fanout", "autoDelete": true, "persistent": true }
+                ],
+                "queues": [
+                    { "name": "nyingarn_tasks", "autoDelete": true, "subscribe": true, "limit": 1 }
+                ],
+                "bindings": [{ "exchange": "nyingarn", "target": "nyingarn_tasks", "keys": [] }]
+            },
+            "s3": {
                 "endpointUrl": "http://minio:9000",
                 "forcePathStyle": true,
                 "bucket": "uploads",
@@ -32,13 +45,7 @@
             },
             "describo": {
                 "authorization": "{shared secret set in describo applications}",
-                "provider": "Minio",
-                "url": "https://s3.nyingarn.net",
-                "bucket": "uploads",
-                "awsAccessKeyId": "{ aws access key }",
-                "awsSecretAccessKey": "{ aws secret key }",
-                "region": "us-east-1",
-                "describoUrl": "https://describo.nyingarn.net"
+                "url": "https://describo.nyingarn.net"
             }
         },
         "authentication": {

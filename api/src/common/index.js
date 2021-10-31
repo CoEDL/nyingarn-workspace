@@ -1,7 +1,7 @@
 import path from "path";
 import { ensureDir } from "fs-extra";
 export { loadConfiguration, filterPrivateInformation } from "./configuration";
-export { getLogger } from "./logger";
+export { getLogger, logEvent, registerTask } from "./logger";
 export { getS3Handle } from "./getS3Handle";
 export { route, routeAdmin, demandAuthenticatedUser, demandAdministrator } from "./middleware";
 export { generateToken, verifyToken } from "./jwt";

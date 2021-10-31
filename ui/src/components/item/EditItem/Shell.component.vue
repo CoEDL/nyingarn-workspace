@@ -6,7 +6,7 @@
                 <metadata-component />
             </el-tab-pane>
             <el-tab-pane label="Upload Data" name="upload">
-                <content-component v-if="activeTab === 'upload'" />
+                <upload-component v-if="activeTab === 'upload'" />
             </el-tab-pane>
             <el-tab-pane label="Data Processing" name="dataprocessing">
                 <data-processing-component v-if="activeTab === 'dataprocessing'" />
@@ -17,12 +17,12 @@
 
 <script>
 import MetadataComponent from "./MetadataComponent/Shell.component.vue";
-import ContentComponent from "./ContentComponent/Shell.component.vue";
+import UploadComponent from "./UploadComponent/Shell.component.vue";
 import DataProcessingComponent from "./DataProcessing/Shell.component.vue";
 
 export default {
     components: {
-        ContentComponent,
+        UploadComponent,
         MetadataComponent,
         DataProcessingComponent,
     },

@@ -1,5 +1,5 @@
 import { InternalServerError } from "restify-errors";
-import { routeAdmin, route } from "../common";
+import { routeAdmin, route, logEvent, getLogger } from "../common";
 import {
     getUsers,
     deleteUser,
@@ -7,6 +7,7 @@ import {
     createAllowedUserStubAccounts,
 } from "../lib/user";
 import { createSession } from "../lib/session";
+const log = getLogger();
 
 export function setupRoutes({ server }) {
     // user routes
@@ -34,6 +35,12 @@ async function getUsersRouteHandler(req, res, next) {
 async function postInviteUsersRouteHandler(req, res, next) {
     try {
         await createAllowedUserStubAccounts({ emails: req.body.emails });
+        logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `Admin invited users to the workspace.`,
+            data: { emails: req.body.emails },
+        });
     } catch (error) {
         return next(new InternalServerError(error.message));
     }
@@ -47,6 +54,11 @@ async function putUserToggleCapabilityRouteHandler(req, res, next) {
             userId: req.params.userId,
             capability: req.params.capability,
         });
+        logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `Admin toggled capability '${req.params.capability}' for user '${req.params.userId}'.`,
+        });
     } catch (error) {
         return next(new InternalServerError(error.message));
     }
@@ -57,6 +69,11 @@ async function putUserToggleCapabilityRouteHandler(req, res, next) {
 async function deleteUserRouteHandler(req, res, next) {
     try {
         await deleteUser({ userId: req.params.userId });
+        logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `Admin deleted user '${req.params.userId}'.`,
+        });
     } catch (error) {
         return next(new InternalServerError(error.message));
     }
@@ -71,6 +88,11 @@ async function putUsersUploadCapabilityRouteHandler(req, res, next) {
         user = await toggleUserCapability({
             userId,
             capability: "upload",
+        });
+        logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `User accepted terms and conditions of use. Enabling upload capability.`,
         });
     } catch (error) {
         return next(new InternalServerError(error.message));

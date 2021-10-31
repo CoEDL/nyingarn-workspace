@@ -2,7 +2,7 @@ import ShellComponent from "@/components/Shell.component.vue";
 import LoginComponent from "@/components/Login.component.vue";
 import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
 import DashboardComponent from "@/components/dashboard/Shell.component.vue";
-import EditItemComponent from "@/components/item/EditItem.component.vue";
+import EditItemComponent from "@/components/item/EditItem/Shell.component.vue";
 import AdminComponent from "@/components/admin/Shell.component.vue";
 import AdminManageUsersComponent from "@/components/admin/users/ManageUsers.component.vue";
 import AdminWhitelistUsersComponent from "@/components/admin/users/WhitelistUsers.component.vue";

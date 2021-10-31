@@ -12,18 +12,28 @@ export default {
     data() {
         return {
             url: undefined,
+            windowWidth: window.innerWidth,
         };
     },
     computed: {
-        frameStyle() {
-            if (window.innerWidth <= 1100) {
-                return { width: `${window.innerWidth * (4 / 6) - 60}px` };
+        frameStyle: function () {
+            if (this.windowWidth <= 1100) {
+                return {
+                    width: `${this.windowWidth * (4 / 6) - 60}px`,
+                    height: `${window.innerHeight - 130}px`,
+                };
             } else {
-                return { width: `${window.innerWidth * (5 / 6) - 40}px` };
+                return {
+                    width: `${this.windowWidth * (5 / 6) - 40}px`,
+                    height: `${window.innerHeight - 130}px`,
+                };
             }
         },
     },
     mounted() {
+        window.addEventListener("resize", () => {
+            this.windowWidth = window.innerWidth;
+        });
         this.init();
     },
     methods: {
@@ -32,6 +42,7 @@ export default {
                 route: "/describo",
                 body: { folder: this.$route.params.identifier },
             });
+            console.log(this.url);
             this.url = (await response.json()).url;
         },
     },

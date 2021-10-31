@@ -1,16 +1,12 @@
 import sharp from "sharp";
 import path from "path";
 
-const height = 300;
-
 export async function createImageThumbnail({ directory, files }) {
     for (let file of files) {
-        let source = path.join(directory, file);
-        let dirname = path.dirname(file);
-        let filename = path.basename(file).split(".")[0];
-        let extension = path.basename(file).split(".")[1];
-        let target = path.join(directory, dirname, `${filename}_thumbnail_h${height}.${extension}`);
-        await sharp(source).resize({ height }).toFile(target);
+        let source = path.join(directory, file.source);
+        let dirname = path.dirname(file.source);
+        let target = path.join(directory, dirname, file.target);
+        await sharp(source).resize({ height: file.height }).toFile(target);
     }
 }
 

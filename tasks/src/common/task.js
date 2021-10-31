@@ -13,7 +13,7 @@ export async function prepare({ files }) {
 
     for (let file of files) {
         await bucket.downloadFileToFolder({
-            file,
+            file: file.source,
             localPath: directory,
         });
     }

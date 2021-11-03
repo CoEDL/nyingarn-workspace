@@ -91,3 +91,8 @@ export async function createItemLocationInObjectStore({ identifier, userId }) {
         await remove(tempdir);
     }
 }
+
+export async function getItemResourceLink({ identifier, resource }) {
+    let { bucket } = await getS3Handle();
+    return await bucket.getPresignedUrl({ target: path.join(identifier, resource) });
+}

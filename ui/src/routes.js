@@ -2,7 +2,8 @@ import ShellComponent from "@/components/Shell.component.vue";
 import LoginComponent from "@/components/Login.component.vue";
 import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
 import DashboardComponent from "@/components/dashboard/Shell.component.vue";
-import EditItemComponent from "@/components/item/EditItem/Shell.component.vue";
+import ViewItemComponent from "@/components/item/ViewItem/Shell.component.vue";
+import ViewResourceComponent from "@/components/item/ViewResource/Shell.component.vue";
 import AdminComponent from "@/components/admin/Shell.component.vue";
 import AdminManageUsersComponent from "@/components/admin/users/ManageUsers.component.vue";
 import AdminWhitelistUsersComponent from "@/components/admin/users/WhitelistUsers.component.vue";
@@ -19,7 +20,35 @@ const routes = [
         },
         children: [
             { name: "dashboard", path: "dashboard", component: DashboardComponent },
-            { name: "items/:identifier", path: "items/:identifier", component: EditItemComponent },
+            {
+                name: "items/:identifier",
+                path: "items/:identifier",
+                component: ViewItemComponent,
+                props: true,
+                children: [
+                    { path: "view", name: "items/:identifier/view", component: ViewItemComponent },
+                    {
+                        path: "metadata",
+                        name: "items/:identifier/metadata",
+                        component: ViewItemComponent,
+                    },
+                    {
+                        path: "upload",
+                        name: "items/:identifier/upload",
+                        component: ViewItemComponent,
+                    },
+                    {
+                        path: "processing",
+                        name: "items/:identifier/processing",
+                        component: ViewItemComponent,
+                    },
+                ],
+            },
+            {
+                name: "resource/:identifier/:resource",
+                path: "resource/:identifier/:resource",
+                component: ViewResourceComponent,
+            },
             {
                 name: "admin",
                 path: "admin",

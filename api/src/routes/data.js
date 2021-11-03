@@ -23,20 +23,19 @@ export async function processImagesRouteHandler(req, res, next) {
     let files = response.Contents.map((c) => c.Key);
     for (let file of files) {
         let extension = path.extname(file).replace(/^\./, "");
-        if (imageExtensions.includes(extension) && !file.match(/_thumbnail_/)) {
-            let task = await registerTask({
-                itemId: item.id,
-                status: "in progress",
-                text: `Create image thumbnails`,
-                data: { files: [file] },
-            });
-
+        if (imageExtensions.includes(extension) && !file.match(/-ADMIN_thumbnail_/)) {
             const height = 300;
             let filename = path.basename(file).split(".")[0];
             let extension = path.basename(file).split(".")[1];
-            let thumbnail = `${filename}_thumbnail_h${height}.${extension}`;
+            let thumbnail = `${filename}-ADMIN_thumbnail_h${height}.${extension}`;
             let exists = await bucket.stat({ path: path.join(req.params.identifier, thumbnail) });
             if (!exists) {
+                let task = await registerTask({
+                    itemId: item.id,
+                    status: "in progress",
+                    text: `Create image thumbnails`,
+                    data: { files: [file] },
+                });
                 global.rabbit.publish("nyingarn", {
                     type: "CreateImageThumbnail",
                     body: {

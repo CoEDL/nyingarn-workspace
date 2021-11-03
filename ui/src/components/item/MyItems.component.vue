@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col rounded border border-gray-200 p-2">
+    <div class="flex flex-col">
         <div class="text-lg">Your items:</div>
         <el-pagination
             layout="prev, pager, next"

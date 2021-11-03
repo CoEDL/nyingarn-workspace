@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <div class="flex flex-col p-2" v-if="canUpload">
+        <div class="flex flex-col" v-if="canUpload">
             <my-items-component />
         </div>
         <div v-else><terms-and-conditions-component /></div>

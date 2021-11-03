@@ -6,6 +6,7 @@ import {
     lookupItemByIdentifier,
     getItems,
     getItemResources,
+    getItemResourceLink,
 } from "../lib/item";
 const log = getLogger();
 
@@ -13,6 +14,7 @@ export function setupRoutes({ server }) {
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
     server.get("/items/:identifier/resources", route(getItemResourcesHandler));
+    server.get("/items/:identifier/resources/:resource/link", route(getItemResourceLinkHandler));
 }
 
 async function createItemHandler(req, res, next) {
@@ -70,5 +72,14 @@ async function getItemResourcesHandler(req, res, next) {
         resources = [];
     }
     res.send({ resources });
+    next();
+}
+
+async function getItemResourceLinkHandler(req, res, next) {
+    let link = await getItemResourceLink({
+        identifier: req.params.identifier,
+        resource: req.params.resource,
+    });
+    res.send({ link });
     next();
 }

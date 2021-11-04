@@ -21,6 +21,26 @@
             "lifetime": { "hours": 5 },
             "secret": "{some secret - 32 characters or longer}"
         },
+        "processing": [
+            {
+                "name": "Create Image Thumbnails",
+                "description": "Create image thumbnails",
+                "route": "/process/thumbnails",
+                "automatic": true
+            },
+            {
+                "name": "Create Image Web Formats",
+                "description": "Create image versions suitable for display on the web",
+                "route": "/process/webformats",
+                "automatic": true
+            },
+            {
+                "name": "Run OCR",
+                "description": "Pass the images through Tesseract OCR to try to extract the text",
+                "route": "/process/ocr",
+                "automatic": true
+            }
+        ],
         "services": {
             "rabbit": {
                 "host": "rabbit",

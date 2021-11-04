@@ -28,6 +28,7 @@ export function setupRoutes({ server }) {
         configuration = filterPrivateInformation({ configuration });
         res.send({
             ui: configuration.ui,
+            processing: configuration.api.processing,
             authentication: Object.keys(configuration.api.authentication),
         });
         next();

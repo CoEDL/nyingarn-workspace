@@ -6,3 +6,4 @@ coverage
 configuration.json
 development-configuration.json
 production-configuration.json
+eng.traineddata

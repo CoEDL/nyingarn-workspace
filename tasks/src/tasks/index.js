@@ -1,1 +1,1 @@
-export { createImageThumbnail } from "./image-processing";
+export { createImageThumbnail, createWebFormats, runOCR } from "./image-processing";

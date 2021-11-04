@@ -3,7 +3,13 @@ import { ensureDir } from "fs-extra";
 export { loadConfiguration, filterPrivateInformation } from "./configuration";
 export { getLogger, logEvent, registerTask } from "./logger";
 export { getS3Handle } from "./getS3Handle";
-export { route, routeAdmin, demandAuthenticatedUser, demandAdministrator } from "./middleware";
+export {
+    route,
+    routeAdmin,
+    demandAuthenticatedUser,
+    demandAdministrator,
+    requireIdentifierAccess,
+} from "./middleware";
 export { generateToken, verifyToken } from "./jwt";
 export {
     host,

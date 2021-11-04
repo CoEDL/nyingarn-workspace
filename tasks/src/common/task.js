@@ -5,7 +5,7 @@ import crypto from "crypto";
 import path from "path";
 const log = getLogger();
 
-export async function prepare({ files }) {
+export async function prepare({ identifier, files }) {
     let { bucket } = await getS3Handle();
     let id = crypto.randomBytes(20).toString("hex");
     let directory = await ensureDir(path.join("/tmp", id));
@@ -13,7 +13,7 @@ export async function prepare({ files }) {
 
     for (let file of files) {
         await bucket.downloadFileToFolder({
-            file: file.source,
+            file: path.join(identifier, file.source),
             localPath: directory,
         });
     }
@@ -28,6 +28,7 @@ export async function cleanup({ directory, identifier }) {
     if (await pathExists(directory)) {
         await remove(directory);
     }
+    log.debug(`Task in ${directory} complete.`);
 }
 
 export async function cleanupAfterFailure({ directory, identifier }) {

@@ -116,7 +116,7 @@ export async function processOcrRouteHandler(req, res, next) {
         } else {
             source = images.pop();
         }
-        let filename = path.basename(source).split(".")[0];
+        let filename = path.basename(source).split(".")[0].split("-ADMIN")[0];
         let target = `${filename}-ADMIN_tesseract_ocr`;
         let exists = (await bucket.stat({ path: path.join(identifier, `${target}.out`) }))
             ? true

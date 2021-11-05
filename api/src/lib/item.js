@@ -48,7 +48,7 @@ export async function linkItemToUser({ itemId, userId }) {
     });
 }
 
-export async function getItemResources({ identifier }) {
+export async function listItemResources({ identifier }) {
     let { bucket } = await getS3Handle();
     let resources = await bucket.listObjects({ prefix: identifier });
     return { resources: resources.Contents };
@@ -92,7 +92,22 @@ export async function createItemLocationInObjectStore({ identifier, userId }) {
     }
 }
 
+export async function getItemResource({ identifier, resource }) {
+    let { bucket } = await getS3Handle();
+    let target = path.join(identifier, resource);
+    if (!(await bucket.stat({ path: target }))) {
+        throw new Error("Not found");
+    } else {
+        return await bucket.download({ target });
+    }
+}
+
 export async function getItemResourceLink({ identifier, resource }) {
     let { bucket } = await getS3Handle();
-    return await bucket.getPresignedUrl({ target: path.join(identifier, resource) });
+    let target = path.join(identifier, resource);
+    if (!(await bucket.stat({ path: target }))) {
+        throw new Error("Not found");
+    } else {
+        return await bucket.getPresignedUrl({ target });
+    }
 }

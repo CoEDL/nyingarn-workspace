@@ -1,11 +1,12 @@
-import { BadRequestError, ForbiddenError } from "restify-errors";
+import { BadRequestError, ForbiddenError, NotFoundError } from "restify-errors";
 import { route, logEvent, getLogger } from "../common";
 import {
     createItem,
     linkItemToUser,
     lookupItemByIdentifier,
     getItems,
-    getItemResources,
+    listItemResources,
+    getItemResource,
     getItemResourceLink,
 } from "../lib/item";
 const log = getLogger();
@@ -14,6 +15,7 @@ export function setupRoutes({ server }) {
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
     server.get("/items/:identifier/resources", route(getItemResourcesHandler));
+    server.get("/items/:identifier/resources/:resource", route(getItemResourceHandler));
     server.get("/items/:identifier/resources/:resource/link", route(getItemResourceLinkHandler));
 }
 
@@ -65,7 +67,7 @@ async function getItemsHandler(req, res, next) {
 }
 
 async function getItemResourcesHandler(req, res, next) {
-    let { resources } = await getItemResources({ identifier: req.params.identifier });
+    let { resources } = await listItemResources({ identifier: req.params.identifier });
     if (resources) {
         resources = resources.map((r) => r.Key.split(`${req.params.identifier}/`)[1]);
     } else {
@@ -75,11 +77,28 @@ async function getItemResourcesHandler(req, res, next) {
     next();
 }
 
+async function getItemResourceHandler(req, res, next) {
+    try {
+        let content = await getItemResource({
+            identifier: req.params.identifier,
+            resource: req.params.resource,
+        });
+        res.send({ content });
+        next();
+    } catch (error) {
+        return next(new NotFoundError());
+    }
+}
+
 async function getItemResourceLinkHandler(req, res, next) {
-    let link = await getItemResourceLink({
-        identifier: req.params.identifier,
-        resource: req.params.resource,
-    });
-    res.send({ link });
-    next();
+    try {
+        let link = await getItemResourceLink({
+            identifier: req.params.identifier,
+            resource: req.params.resource,
+        });
+        res.send({ link });
+        next();
+    } catch (error) {
+        return next(new NotFoundError());
+    }
 }

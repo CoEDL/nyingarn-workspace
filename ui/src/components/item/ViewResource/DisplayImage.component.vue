@@ -1,10 +1,14 @@
 <template>
-    <div><img :srcset="srcset" :src="src" /></div>
+    <div class="flex flex-col justify-around p-2">
+        <img ref="image" :srcset="srcset" :src="src" :style="maxHeight" />
+    </div>
 </template>
 
 <script>
 import HTTPService from "@/http.service";
 const httpService = new HTTPService();
+import ImageViewer from "iv-viewer";
+import "iv-viewer/dist/iv-viewer.css";
 
 export default {
     props: {
@@ -15,10 +19,16 @@ export default {
     },
     data() {
         return {
+            identifier: this.$route.params.identifier,
             imageFormats: "jpe?g|webp|avif|png",
             srcset: [],
             src: undefined,
         };
+    },
+    computed: {
+        maxHeight: function () {
+            return { height: `${window.innerHeight - 60}px` };
+        },
     },
     mounted() {
         this.getImageUrls();
@@ -33,7 +43,7 @@ export default {
                 });
             for (let image of images) {
                 let response = await httpService.get({
-                    route: `/items/${this.$route.params.identifier}/resources/${image}/link`,
+                    route: `/items/${this.identifier}/resources/${image}/link`,
                 });
                 if (response.status !== 200) {
                     // can't get link right now
@@ -45,6 +55,7 @@ export default {
                     this.srcset.push(link);
                 }
             }
+            const viewer = new ImageViewer(this.$refs.image, {});
         },
     },
 };

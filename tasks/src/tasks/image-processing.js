@@ -33,9 +33,17 @@ export async function runOCR({ directory, identifier, files }) {
         let source = path.join(directory, identifier, file.source);
         let target = path.join(directory, identifier, file.target);
         let text = await worker.recognize(source);
-        await writeFile(`${target}.out`, JSON.stringify(text));
-        await writeFile(`${target}.txt`, text.data.text);
-        await writeFile(`${target}.hocr`, text.data.hocr);
+        await writeToFile(identifier, `${target}.txt`, text.data.text);
+        await writeToFile(identifier, `${target}.html`, text.data.hocr);
+        // await writeToFile(identifier, `${target}.out`, JSON.stringify(text));
     }
     await worker.terminate();
+
+    async function writeToFile(identifier, file, content) {
+        try {
+            await writeFile(file, content);
+        } catch (error) {
+            console.log(`Error writing OCR output for '${identifier}' to: ${file}`);
+        }
+    }
 }

@@ -6,7 +6,9 @@ import {
     deleteItem,
     linkItemToUser,
     getItems,
-    getItemResources,
+    listItemResources,
+    getItemResource,
+    getItemResourceLink,
 } from "./item";
 const chance = require("chance").Chance();
 import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "../common";
@@ -114,18 +116,65 @@ describe("Item management tests", () => {
         await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to list item resources in S3", async () => {
-        let user = users[0];
-        const identifier = chance.word();
-        let item = await createItem({ identifier, userId: user.id });
-        expect(item.identifier).toEqual(identifier);
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
-        await bucket.upload({ json: { some: "thing" }, target: `${identifier}/file.json` });
-
-        let { resources } = await getItemResources({ identifier });
+        let { resources } = await listItemResources({ identifier });
         expect(resources.length).toEqual(2);
         expect(resources[0].Key).toMatch(identifier);
 
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
+    it("should be able to get an item resource from S3", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        let data = await getItemResource({ identifier, resource: "file.json" });
+        expect(data).toEqual(JSON.stringify({ some: "thing" }));
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should fail to get an item resource from S3", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        try {
+            let data = await getItemResource({ identifier, resource: "notfound.json" });
+        } catch (error) {
+            expect(error.message).toEqual("Not found");
+        }
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to get an item resource link", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        let data = await getItemResourceLink({ identifier, resource: "file.json" });
+        expect(data).toMatch("https://s3.nyingarn.net");
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should fail to get an item resource link", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        try {
+            let data = await getItemResourceLink({ identifier, resource: "notfound.json" });
+        } catch (error) {
+            expect(error.message).toEqual("Not found");
+        }
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
 });
+
+async function setupTestItem({ user, bucket }) {
+    const identifier = chance.word();
+    let item = await createItem({ identifier, userId: user.id });
+    expect(item.identifier).toEqual(identifier);
+
+    await bucket.upload({ json: { some: "thing" }, target: `${identifier}/file.json` });
+
+    return { item, identifier };
+}

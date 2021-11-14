@@ -1,7 +1,14 @@
 <template>
-    <div class="flex flex-row">
-        <display-image-component class="w-1/2" :data="data" v-if="data.length" />
-        <display-transcription-component class="w-1/2" :data="data" v-if="data.length" />
+    <div class="flex flex-col">
+        <div class="text-xl mb-2 flex flex-row space-x-4">
+            <router-link link :to="itemUrl">item: {{ identifier }}</router-link>
+            <div>resource: {{ resource }}</div>
+        </div>
+
+        <div class="flex flex-row">
+            <display-image-component class="w-1/2" :data="data" v-if="data.length" />
+            <display-transcription-component class="w-1/2" :data="data" v-if="data.length" />
+        </div>
     </div>
 </template>
 
@@ -20,6 +27,11 @@ export default {
             resource: this.$route.params.resource,
             data: [],
         };
+    },
+    computed: {
+        itemUrl: function () {
+            return `/items/${this.identifier}/view`;
+        },
     },
     mounted() {
         this.init();

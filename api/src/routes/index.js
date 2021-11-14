@@ -8,6 +8,7 @@ import { setupRoutes as setupItemRoutes } from "./item";
 import { setupRoutes as setupDescriboRoutes } from "./describo";
 import { setupRoutes as setupDataRoutes } from "./data";
 import { loadConfiguration, filterPrivateInformation, route, routeAdmin } from "../common";
+import { readJSON } from "fs-extra";
 
 export function setupRoutes({ server }) {
     if (process.env.NODE_ENV === "development") {
@@ -29,6 +30,7 @@ export function setupRoutes({ server }) {
         res.send({
             ui: configuration.ui,
             processing: configuration.api.processing,
+            teiMarkupControls: await readJSON(configuration.api.teiMarkupControls),
             authentication: Object.keys(configuration.api.authentication),
         });
         next();

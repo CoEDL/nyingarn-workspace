@@ -17,6 +17,7 @@
     },
     "api": {
         "administrators": ["{user@email.com}", "{other user@somewhere.else.com}"],
+        "teiMarkupControls": "/srv/configuration/tei-markup-controls.json",
         "session": {
             "lifetime": { "hours": 5 },
             "secret": "{some secret - 32 characters or longer}"

@@ -1,5 +1,7 @@
 import {
+    loadConfiguration,
     getS3Handle,
+    getLogger,
     registerTask,
     requireIdentifierAccess,
     demandAuthenticatedUser,
@@ -7,10 +9,11 @@ import {
 import { lookupItemByIdentifier } from "../lib/item";
 import { groupBy } from "lodash";
 import path from "path";
+const log = getLogger();
 
-const imageExtensions = ["jpg", "jpeg", "png", "tif", "tiff"];
+const imageExtensions = ["jpe?g", "png", "tif{1,2}"];
 const thumbnailHeight = 300;
-const webFormats = ["jpg", "avif", "webp"];
+const webFormats = [{ ext: "jpg", match: "jpe?g" }, "avif", "webp"];
 
 function routeProcessing(handler) {
     return [demandAuthenticatedUser, requireIdentifierAccess, handler];
@@ -33,28 +36,43 @@ async function getItem(req) {
 export async function processThumbnailsRouteHandler(req, res, next) {
     const identifier = req.body.identifier;
     const item = await getItem(req);
-    let { files, bucket } = await getFiles({ identifier });
-    let imageFiles = getImageFiles(files);
-    let source;
-    for (let sequenceNumber in imageFiles) {
-        let images = imageFiles[sequenceNumber];
-        if (images.length > 1) {
-            source = images.filter((i) => i.match(/\.tif+/i)).pop();
-            if (!source) source = images.filter((i) => i.match(/\.jpe?g/i)).pop();
-        } else {
-            source = images.pop();
+    const { files, bucket, configuration } = await getFiles({ identifier });
+
+    for (let resource in files) {
+        // does this resource have a thumbnail?
+        const resourceFiles = files[resource];
+        const thumbnail = resourceFiles.filter((f) => f.name.match(/thumbnail/));
+        if (thumbnail.length) continue;
+
+        // no thumbnail - let's generate one
+
+        //  get images and pick out a source image to use
+        let images = resourceFiles.filter((f) => f.type === "image");
+
+        let source;
+        if (images.length) {
+            source = images.filter((i) => i.name.match(/\.tif{1,2}/i)).pop();
+            if (!source) source = images.filter((i) => i.name.match(/\.jpe?g/i)).pop();
         }
-        let filename = path.basename(source).split(".")[0];
-        let thumbnail = `${filename}-ADMIN_thumbnail_h${thumbnailHeight}.jpg`;
+
+        if (!source) {
+            log.error(
+                `processThumbnailsRouteHandler: Unable to find a suitable source image: ${identifier}-${resource}`
+            );
+            continue;
+        }
+
+        thumbnail = `${source.basename}.thumbnail_h${thumbnailHeight}.jpg`;
         let exists = (await bucket.stat({ path: path.join(identifier, thumbnail) })) ? true : false;
         if (!exists) {
+            log.debug(`processThumbnailsRouteHandler submit task`);
             submitTask({
                 name: "CreateImageThumbnail",
                 item,
                 body: {
                     files: [
                         {
-                            source: path.basename(source),
+                            source: source.name,
                             target: thumbnail,
                             height: thumbnailHeight,
                         },
@@ -70,30 +88,41 @@ export async function processThumbnailsRouteHandler(req, res, next) {
 export async function processWebformatsRouteHandler(req, res, next) {
     const identifier = req.body.identifier;
     const item = await getItem(req);
-    let { files, bucket } = await getFiles({ identifier });
-    let imageFiles = getImageFiles(files);
-    let source;
-    for (let sequenceNumber in imageFiles) {
-        let images = imageFiles[sequenceNumber];
-        if (images.length > 1) {
-            source = images.filter((i) => i.match(/\.tif+/i)).pop();
-            if (!source) source = images.filter((i) => i.match(/\.jpe?g/i)).pop();
-        } else {
-            source = images.pop();
+    let { files, bucket, configuration } = await getFiles({ identifier });
+
+    for (let resource in files) {
+        const resourceFiles = files[resource];
+        const images = resourceFiles
+            .filter((f) => f.type === "image")
+            .filter((f) => !f.name.match("thumbnail"));
+
+        let source;
+        if (images.length) {
+            source = images.filter((i) => i.name.match(/\.tif{1,2}/i)).pop();
+            if (!source) source = images.filter((i) => i.name.match(/\.jpe?g/i)).pop();
+        }
+        if (!source) {
+            log.error(
+                `processWebFormatsRouteHandler: Unable to find a suitable source image: ${identifier}-${resource}`
+            );
+            continue;
         }
 
         for (let format of webFormats) {
-            let filename = path.basename(source).split(".")[0];
-            let target = `${filename}-ADMIN.${format}`;
+            if (source.ext.match(format.match ? format.match : format)) continue;
+
+            // let filename = path.basename(source).split(".")[0];
+            let target = `${source.basename}.${format.ext ? format.ext : format}`;
             let exists = (await bucket.stat({ path: path.join(identifier, target) }))
                 ? true
                 : false;
             if (!exists) {
+                log.debug(`createWebFormatsRouteHandler submit task`);
                 submitTask({
                     name: "CreateWebFormats",
                     item,
                     body: {
-                        files: [{ source: path.basename(source), target }],
+                        files: [{ source: source.name, target }],
                     },
                 });
             }
@@ -106,27 +135,36 @@ export async function processWebformatsRouteHandler(req, res, next) {
 export async function processOcrRouteHandler(req, res, next) {
     const identifier = req.body.identifier;
     const item = await getItem(req);
-    let { files, bucket } = await getFiles({ identifier });
-    let imageFiles = getImageFiles(files);
-    let source;
-    for (let sequenceNumber in imageFiles) {
-        let images = imageFiles[sequenceNumber];
-        if (images.length > 1) {
-            source = images.filter((i) => i.match(/\.jpe?g/i)).pop();
-        } else {
-            source = images.pop();
+    let { files, bucket, configuration } = await getFiles({ identifier });
+
+    for (let resource in files) {
+        const resourceFiles = files[resource];
+        let images = resourceFiles
+            .filter((f) => f.type === "image")
+            .filter((f) => !f.name.match("thumbnail"));
+
+        let source;
+        if (images.length) {
+            source = images.filter((i) => i.name.match(/\.jpe?g/i)).pop();
         }
-        let filename = path.basename(source).split(".")[0].split("-ADMIN")[0];
-        let target = `${filename}-ADMIN_tesseract_ocr`;
-        let exists = (await bucket.stat({ path: path.join(identifier, `${target}.out`) }))
+        if (!source) {
+            log.error(
+                `processOcrRouteHandler: Unable to find a suitable source image: ${identifier}-${resource}`
+            );
+            continue;
+        }
+
+        let target = `${source.basename}.tesseract_ocr-${configuration.api.filenaming.adminTag}`;
+        let exists = (await bucket.stat({ path: path.join(identifier, `${target}.txt`) }))
             ? true
             : false;
         if (!exists) {
+            log.debug(`processOcrRouteHandler submit task`);
             submitTask({
                 name: "RunOCR",
                 item,
                 body: {
-                    files: [{ source: path.basename(source), target }],
+                    files: [{ source: source.name, target }],
                 },
             });
         }
@@ -136,22 +174,13 @@ export async function processOcrRouteHandler(req, res, next) {
 }
 
 async function getFiles({ identifier }) {
+    let configuration = await loadConfiguration();
+
     let { bucket } = await getS3Handle();
     let files = (await bucket.listObjects({ prefix: identifier })).Contents.map((c) => c.Key);
-    return { files, bucket };
-}
 
-function getImageFiles(files) {
-    let imageFiles = files
-        .filter((file) => {
-            let extension = path.extname(file).replace(/^\./, "");
-            return imageExtensions.includes(extension);
-        })
-        .filter((file) => !file.match(/-ADMIN_thumbnail_/));
-    imageFiles = groupBy(imageFiles, (file) => {
-        return file.split("/").pop().split(".").shift().split("-")[1];
-    });
-    return imageFiles;
+    ({ files } = groupFilesByResource({ files, naming: configuration.api.filenaming }));
+    return { files, bucket, configuration };
 }
 
 async function submitTask({ item, name, body }) {
@@ -165,4 +194,47 @@ async function submitTask({ item, name, body }) {
         type: name,
         body: { ...body, identifier: item.identifier, task: name, taskId: task.id },
     });
+}
+
+export function groupFilesByResource({ files, naming }) {
+    let exclusions = ["ro-crate-metadata.json"];
+    let resources = [];
+    for (let file of files) {
+        let [filepath, filename] = file.split("/");
+        if (exclusions.includes(filename)) continue;
+
+        let ext = path.extname(filename).replace(".", "");
+        let basename = path.basename(filename, `.${ext}`);
+        let identifierSegments = basename
+            .split(`-${naming.adminTag}`)[0]
+            .split(naming.resourceQualifierSeparator)[0]
+            .split("-");
+
+        let adminLabel = path.basename(filename, ext).split(naming.adminTag)[1];
+
+        let type;
+        imageExtensions.forEach((t) => {
+            let re = new RegExp(t);
+            type = ext.match(re) ? "image" : type;
+        });
+
+        let data = naming.identifierSegments[identifierSegments.length]
+            .map((segmentName, i) => ({
+                [segmentName]: identifierSegments[i],
+            }))
+            .reduce((acc, cv) => ({ ...acc, ...cv }));
+
+        resources.push({
+            file,
+            basename,
+            name: filename,
+            path: filepath,
+            ext,
+            adminLabel,
+            type,
+            ...data,
+        });
+    }
+
+    return { files: groupBy(resources, "resourceId") };
 }

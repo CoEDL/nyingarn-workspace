@@ -22,6 +22,14 @@
             "lifetime": { "hours": 5 },
             "secret": "{some secret - 32 characters or longer}"
         },
+        "filenaming": {
+            "adminTag": "ADMIN",
+            "resourceQualifierSeparator": ".",
+            "identifierSegments": {
+                "2": ["itemId", "resourceId"],
+                "3": ["collectionId", "itemId", "resourceId"]
+            }
+        },
         "processing": [
             {
                 "name": "Create Image Thumbnails",

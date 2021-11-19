@@ -1,10 +1,22 @@
 #!/bin/bash
 
+
+if [ -z ${PRE_CREATE} ] ; then
+    echo "PRE_CREATE env variable not set so can't check access. Access denied by default."
+    exit -1
+fi
+
 token=$(jq .Upload.MetaData.token | sed 's/"//g')
-response=$(curl --silent --header "authorization: Bearer ${token}" ${API_ENDPOINT_URL}/tus)
+
+if [ -z ${token} ] ; then
+    echo "Can't get user token from metadata. Access denied by default."
+    exit -1
+fi
+
+response=$(curl --silent --header "authorization: Bearer ${token}" ${PRE_CREATE})
 response=$(echo $response | jq .code | sed 's/"//g')
 if [ $response == "Unauthorized" ] ; then
-        echo "User access to upload not permitted"
-        exit -1
+    echo "User access to upload not permitted"
+    exit -1
 fi
 exit 0

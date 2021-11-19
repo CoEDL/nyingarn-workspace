@@ -1,6 +1,6 @@
 const rabbit = require("foo-foo-mq");
 const { loadConfiguration } = require("./src/common");
-const { setupHandlers } = require("./src/task-routing");
+const { setupHandlers } = require("./src/routing");
 const models = require("/srv/api/src/models");
 setupHandlers({ rabbit });
 

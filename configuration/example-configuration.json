@@ -30,26 +30,33 @@
                 "3": ["collectionId", "itemId", "resourceId"]
             }
         },
-        "processing": [
-            {
-                "name": "Create Image Thumbnails",
-                "description": "Create image thumbnails",
-                "route": "/process/thumbnails",
-                "automatic": true
+        "processing": {
+            "exchange": "nyingarn",
+            "stages": {
+                "/process/thumbnails": [],
+                "/process/webformats": ["/process/ocr"]
             },
-            {
-                "name": "Create Image Web Formats",
-                "description": "Create image versions suitable for display on the web",
-                "route": "/process/webformats",
-                "automatic": true
-            },
-            {
-                "name": "Run OCR",
-                "description": "Pass the images through Tesseract OCR to try to extract the text",
-                "route": "/process/ocr",
-                "automatic": true
-            }
-        ],
+            "controls": [
+                {
+                    "name": "Create Image Thumbnails",
+                    "description": "Create image thumbnails",
+                    "route": "/process/thumbnails",
+                    "automatic": true
+                },
+                {
+                    "name": "Create Image Web Formats",
+                    "description": "Create image versions suitable for display on the web",
+                    "route": "/process/webformats",
+                    "automatic": true
+                },
+                {
+                    "name": "Run OCR",
+                    "description": "Pass the images through Tesseract OCR to try to extract the text",
+                    "route": "/process/ocr",
+                    "automatic": true
+                }
+            ]
+        },
         "services": {
             "rabbit": {
                 "host": "rabbit",

@@ -17,7 +17,7 @@ const httpService = new HTTPService();
 export default {
     data() {
         return {
-            processing: this.$store.state.configuration.processing,
+            processing: this.$store.state.configuration.processing.controls,
         };
     },
     methods: {

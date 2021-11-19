@@ -30,7 +30,7 @@ export default {
     },
     methods: {
         async getImageThumbnailUrl() {
-            let image = this.data.filter((image) => image.match("-ADMIN_thumbnail"));
+            let image = this.data.filter((image) => image.match("thumbnail"));
             let response = await httpService.get({
                 route: `/items/${this.$route.params.identifier}/resources/${image}/link`,
             });

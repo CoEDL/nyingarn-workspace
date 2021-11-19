@@ -42,7 +42,8 @@ services:
             AWS_DEFAULT_REGION: us-east-1
             S3_ENDPOINT_URL: "${S3_ENDPOINT_URL}"
             S3_BUCKET: "${S3_BUCKET}"
-            API_ENDPOINT_URL: http://api:8080
+            PRE_CREATE: "http://api:8080/upload/pre-create"
+            POST_FINISH: "http://api:8080/upload/post-finish"
         entrypoint:
             [
                 "/usr/local/bin/tusd",
@@ -76,6 +77,7 @@ services:
             DB_USER: "root"
             DB_PASSWORD: ""
             DB_DATABASE: "nyingarn"
+            POST_FINISH: "http://api:8080/process/post-finish"
         volumes:
             - api_node_modules:/srv/api/node_modules:delegated
             - ./tasks:/srv/tasks:delegated
@@ -97,6 +99,7 @@ services:
     #         DB_USER: "root"
     #         DB_PASSWORD: ""
     #         DB_DATABASE: "nyingarn"
+    #         POST_FINISH: "http://api:8080/process/post-finish"
     #     volumes:
     #         - api_node_modules:/srv/api/node_modules:delegated
     #         - ./tasks:/srv/tasks:delegated

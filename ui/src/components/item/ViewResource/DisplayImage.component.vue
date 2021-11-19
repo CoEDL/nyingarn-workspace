@@ -36,7 +36,7 @@ export default {
     methods: {
         async getImageUrls() {
             let images = this.data
-                .filter((image) => !image.match("-ADMIN_thumbnail"))
+                .filter((image) => !image.match("thumbnail"))
                 .filter((image) => {
                     const re = new RegExp(this.imageFormats, "i");
                     return re.exec(image);

@@ -102,6 +102,18 @@ export async function getItemResource({ identifier, resource }) {
     }
 }
 
+export async function putItemResource({
+    identifier,
+    resource,
+    localPath = undefined,
+    content = undefined,
+    json,
+}) {
+    let { bucket } = await getS3Handle();
+    let target = path.join(identifier, resource);
+    return await bucket.upload({ target, localPath, content, json });
+}
+
 export async function getItemResourceLink({ identifier, resource }) {
     let { bucket } = await getS3Handle();
     let target = path.join(identifier, resource);

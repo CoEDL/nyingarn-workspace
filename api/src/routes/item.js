@@ -1,13 +1,13 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from "restify-errors";
-import { route, logEvent, getLogger } from "../common";
+import { route, logEvent, getLogger, getS3Handle } from "../common";
 import {
     createItem,
-    linkItemToUser,
     lookupItemByIdentifier,
     getItems,
     listItemResources,
     getItemResource,
     getItemResourceLink,
+    putItemResource,
 } from "../lib/item";
 const log = getLogger();
 
@@ -17,6 +17,10 @@ export function setupRoutes({ server }) {
     server.get("/items/:identifier/resources", route(getItemResourcesHandler));
     server.get("/items/:identifier/resources/:resource", route(getItemResourceHandler));
     server.get("/items/:identifier/resources/:resource/link", route(getItemResourceLinkHandler));
+    server.put(
+        "/items/:identifier/resources/:resource/saveTranscription",
+        route(saveItemTranscriptionHandler)
+    );
 }
 
 async function createItemHandler(req, res, next) {
@@ -101,4 +105,12 @@ async function getItemResourceLinkHandler(req, res, next) {
     } catch (error) {
         return next(new NotFoundError());
     }
+}
+
+async function saveItemTranscriptionHandler(req, res, next) {
+    const { identifier, resource, datafiles, document } = req.params;
+    let file = `${resource}.tei.xml`;
+    await putItemResource({ identifier, resource: file, content: document });
+    res.send({});
+    next();
 }

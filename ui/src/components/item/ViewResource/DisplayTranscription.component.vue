@@ -48,6 +48,7 @@ export default {
             ...this.$route.params,
             transcription: "",
             debouncedLog: debounce(console.log, 1000),
+            debouncedSave: debounce(this.save, 1000),
             tei: this.$store.state.configuration.teiMarkupControls.controls,
         };
     },
@@ -61,10 +62,10 @@ export default {
     },
     methods: {
         async loadTranscription() {
-            let masterTranscription = `${this.resource}.master_transcription-ADMIN.xml`;
+            let masterTranscription = `${this.resource}.tei.xml`;
             let tesseractTranscription = `${this.resource}.tesseract_ocr-ADMIN.txt`;
             if (this.data.includes(masterTranscription)) {
-                this.transcription = "";
+                this.transcription = await this.getTranscription({ file: masterTranscription });
             } else if (this.data.includes(tesseractTranscription)) {
                 this.transcription = await this.getTranscription({ file: tesseractTranscription });
             } else {
@@ -75,6 +76,8 @@ export default {
             this.codemirror.setOption("mode", "text/xml");
             this.codemirror.setOption("theme", "blackboard");
             this.codemirror.setValue(this.transcription);
+            this.codemirror.on("change", this.debouncedSave);
+            this.save();
         },
         async getTranscription({ file }) {
             let response = await httpService.get({
@@ -84,9 +87,14 @@ export default {
                 // can't get link right now
             }
             let transcription = (await response.json()).content;
-            // return `<TEI xml:lang="en" xmlns="http://www.tei-c.org/ns/1.0">${transcription}\n
-            // </TEI>`;
-            return transcription;
+            let image = this.data
+                .filter((f) => f.match(/jpe?g/))
+                .filter((f) => !f.match(/thumbnail/))[0];
+            if (!transcription.match(/^\<pb facs=/)) {
+                return `<pb facs="${image}">\n${transcription}\n</pb>`;
+            } else {
+                return transcription;
+            }
         },
         addElement(t) {
             let text = this.codemirror.getSelection();
@@ -113,6 +121,14 @@ export default {
         },
         clearHistory() {
             this.codemirror.clearHistory();
+        },
+        async save() {
+            const { identifier, resource } = this.$route.params;
+
+            await httpService.put({
+                route: `/items/${identifier}/resources/${resource}/saveTranscription`,
+                body: { datafiles: this.data, document: this.codemirror.getValue() },
+            });
         },
     },
 };

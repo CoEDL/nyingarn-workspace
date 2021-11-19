@@ -61,8 +61,8 @@ export default {
     },
     methods: {
         async loadTranscription() {
-            let masterTranscription = `${this.resource}-ADMIN_master_transcription.txt`;
-            let tesseractTranscription = `${this.resource}-ADMIN_tesseract_ocr.txt`;
+            let masterTranscription = `${this.resource}.master_transcription-ADMIN.xml`;
+            let tesseractTranscription = `${this.resource}.tesseract_ocr-ADMIN.txt`;
             if (this.data.includes(masterTranscription)) {
                 this.transcription = "";
             } else if (this.data.includes(tesseractTranscription)) {
@@ -92,7 +92,7 @@ export default {
             let text = this.codemirror.getSelection();
             let attributes;
             if (t?.attributes && t.attributes.length) {
-                attributes = t?.attributes.map((a) => `${a}=""`).join(" ");
+                attributes = " " + t?.attributes.map((a) => `${a}=""`).join(" ");
             } else {
                 attributes = "";
             }

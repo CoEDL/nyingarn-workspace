@@ -1,4 +1,4 @@
-import { BadRequestError, UnauthorizedError } from "restify-errors";
+import { BadRequestError, UnauthorizedError, ServiceUnavailableError } from "restify-errors";
 import { loadConfiguration, getLogger } from "../common";
 import { jwtVerify } from "jose/jwt/verify";
 import { createRemoteJWKSet } from "jose/jwks/remote";
@@ -18,6 +18,10 @@ async function getLoginUrlRouteHandler(req, res, next) {
 
     let configuration = await loadConfiguration();
     configuration = configuration.api.authentication[provider];
+    try {
+    } catch (error) {
+        return next(new ServiceUnavailableError());
+    }
     let issuer = await Issuer.discover(configuration.discover);
     const client = new issuer.Client({
         client_id: configuration.clientId,

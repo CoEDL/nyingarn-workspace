@@ -31,6 +31,7 @@
             }
         },
         "processing": {
+            "requiredStages": ["thumbnails", "webformats", "ocr"],
             "exchange": "nyingarn",
             "stages": {
                 "/process/thumbnails": [],

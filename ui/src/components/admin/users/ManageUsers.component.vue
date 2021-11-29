@@ -65,9 +65,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
-
 export default {
     data() {
         return {
@@ -88,7 +85,7 @@ export default {
             this.getUsers();
         },
         async getUsers() {
-            let response = await httpService.get({
+            let response = await this.$http.get({
                 route: `/admin/users?offset=${this.offset}&limit=${this.limit}`,
             });
             if (response.status !== 200) {
@@ -106,14 +103,14 @@ export default {
             let response;
             switch (action) {
                 case "lock":
-                    response = await httpService.put({ route: `/admin/users/${user.id}/lock` });
+                    response = await this.$http.put({ route: `/admin/users/${user.id}/lock` });
                     if (response.status !== 200) {
                         this.error = true;
                         return;
                     }
                     break;
                 case "upload":
-                    response = await httpService.put({
+                    response = await this.$http.put({
                         route: `/admin/users/${user.id}/upload`,
                     });
                     if (response.status !== 200) {
@@ -122,7 +119,7 @@ export default {
                     }
                     break;
                 case "admin":
-                    response = await httpService.put({
+                    response = await this.$http.put({
                         route: `/admin/users/${user.id}/admin`,
                     });
                     if (response.status !== 200) {
@@ -134,7 +131,7 @@ export default {
             this.done = true;
         },
         async deleteUser({ user }) {
-            let response = await httpService.delete({
+            let response = await this.$http.delete({
                 route: `/admin/users/${user.id}`,
             });
             if (response.status !== 200) {

@@ -5,9 +5,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
-
 export default {
     data() {
         return {
@@ -38,11 +35,10 @@ export default {
     },
     methods: {
         async init() {
-            let response = await httpService.post({
+            let response = await this.$http.post({
                 route: "/describo",
                 body: { folder: this.$route.params.identifier },
             });
-            console.log(this.url);
             this.url = (await response.json()).url;
         },
     },

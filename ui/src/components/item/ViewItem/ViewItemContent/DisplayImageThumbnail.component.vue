@@ -11,9 +11,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
-
 export default {
     props: {
         data: {
@@ -31,7 +28,7 @@ export default {
     methods: {
         async getImageThumbnailUrl() {
             let image = this.data.filter((image) => image.match("thumbnail"));
-            let response = await httpService.get({
+            let response = await this.$http.get({
                 route: `/items/${this.$route.params.identifier}/resources/${image}/link`,
             });
             if (response.status !== 200) {

@@ -1,7 +1,10 @@
 import { tokenSessionKey, getLocalStorage } from "@/components/storage";
 
 export default class HTTPService {
-    constructor() {}
+    constructor({ router, loginPath = "/login" }) {
+        this.router = router;
+        this.loginPath = loginPath;
+    }
 
     getHeaders() {
         try {
@@ -29,17 +32,19 @@ export default class HTTPService {
         return encodeURI(route);
     }
 
-    async get({ route }) {
-        let headers = this.getHeaders();
+    async get({ route, headers = null }) {
+        if (!headers) headers = await this.getHeaders();
         route = this.encodeRoute(route, "GET");
         let response = await fetch(`/api${route}`, {
             method: "GET",
             headers,
         });
+        this.checkAuthorised({ status: response.status });
         return response;
     }
 
     async post({ route, body }) {
+        if (!headers) headers = await this.getHeaders();
         route = this.encodeRoute(route, "POST");
         let headers = this.getHeaders();
         let response = await fetch(`/api${route}`, {
@@ -47,25 +52,36 @@ export default class HTTPService {
             headers,
             body: JSON.stringify(body),
         });
+        this.checkAuthorised({ status: response.status });
         return response;
     }
 
     async put({ route, body }) {
+        if (!headers) headers = await this.getHeaders();
         route = this.encodeRoute(route, "PUT");
         let response = await fetch(`/api${route}`, {
             method: "PUT",
             headers: this.getHeaders(),
             body: JSON.stringify(body),
         });
+        this.checkAuthorised({ status: response.status });
         return response;
     }
 
     async delete({ route }) {
+        if (!headers) headers = await this.getHeaders();
         route = this.encodeRoute(route, "DELETE");
         let response = await fetch(`/api${route}`, {
             method: "delete",
             headers: this.getHeaders(),
         });
+        this.checkAuthorised({ status: response.status });
         return response;
+    }
+
+    checkAuthorised({ status }) {
+        if (status === 401) {
+            this.router.push(this.loginPath);
+        }
     }
 }

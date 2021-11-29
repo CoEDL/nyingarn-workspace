@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
 import {
     loginSessionKey,
     tokenSessionKey,
@@ -35,7 +33,7 @@ export default {
     },
     methods: {
         async agree() {
-            let response = await httpService.put({
+            let response = await this.$http.put({
                 route: `/users/${this.user.id}/upload`,
             });
             if (response.status === 200) {

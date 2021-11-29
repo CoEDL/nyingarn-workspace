@@ -41,9 +41,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
-
 export default {
     data() {
         return {
@@ -67,7 +64,7 @@ export default {
             }
         },
         async createItemEntry() {
-            let response = await httpService.post({
+            let response = await this.$http.post({
                 route: "/items",
                 body: { identifier: this.identifier },
             });

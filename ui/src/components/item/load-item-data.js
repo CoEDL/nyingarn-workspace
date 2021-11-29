@@ -4,12 +4,10 @@
 // test-001-ADMIN_content.txt
 // test-001-ADMIN_content_tei.xml
 
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
 import { groupBy } from "lodash";
 
-export async function getItemResources({ identifier }) {
-    let response = await httpService.get({ route: `/items/${identifier}/resources` });
+export async function getItemResources({ $http, identifier }) {
+    let response = await $http.get({ route: `/items/${identifier}/resources` });
     if (response.status !== 200) {
         console.error(`Error getting item resources`, response.status, await response.json());
     }
@@ -19,7 +17,7 @@ export async function getItemResources({ identifier }) {
     return { resources };
 }
 
-export async function getResourceObjects({ identifier, resource }) {
-    let resources = (await getItemResources({ identifier })).resources;
+export async function getResourceObjects({ $http, identifier, resource }) {
+    let resources = (await getItemResources({ $http, identifier })).resources;
     return { objects: resources[resource] };
 }

@@ -10,8 +10,6 @@
 
 <script>
 // import { ref, onMounted, onBeforeUnmount } from "vue";
-// import HTTPService from "@/http.service";
-// const httpService = new HTTPService();
 
 // export default {
 //     props: {

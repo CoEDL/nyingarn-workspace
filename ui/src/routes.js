@@ -93,18 +93,47 @@ const router = createRouter({
 });
 router.beforeEach(onAuthRequired);
 
+// async function onAuthRequired(to, from, next) {
+//     const httpService = new HTTPService({ router });
+//     let isAuthed = await httpService.get({ route: "/authenticated" });
+//     if (isAuthed.status === 200 && to.path === "/login") return next({ path: "/" });
+//     if (to.meta?.requiresAuth) {
+//         try {
+//             if (isAuthed.status === 401 && from.path !== "/login") return next({ path: "/login" });
+//         } catch (error) {
+//             if (from.path !== "/login") return next({ path: "/login" });
+//         }
+//     }
+//     next();
+// }
+
 async function onAuthRequired(to, from, next) {
-    const httpService = new HTTPService();
-    let isAuthed = await httpService.get({ route: "/authenticated" });
-    if (isAuthed.status === 200 && to.path === "/login") return next({ path: "/" });
     if (to.meta?.requiresAuth) {
+        let isAuthed;
         try {
-            if (isAuthed.status === 401 && from.path !== "/login") return next({ path: "/login" });
+            isAuthed = await isAuthenticated();
+            if (!isAuthed && from.name !== "login") return next({ path: "/login" });
+            return next();
         } catch (error) {
-            if (from.path !== "/login") return next({ path: "/login" });
+            if (!isAuthed && from.name !== "login") return next({ path: "/login" });
         }
+    } else {
+        next();
     }
-    next();
+}
+
+export async function isAuthenticated() {
+    try {
+        const httpService = new HTTPService({ router });
+        let response = await httpService.get({ route: "/authenticated" });
+        if (response.status === 200) {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.log("isAuthenticated failure", error);
+        return false;
+    }
 }
 
 export default router;

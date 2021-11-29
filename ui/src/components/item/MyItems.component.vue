@@ -4,50 +4,94 @@
         <el-pagination
             layout="prev, pager, next"
             :page-size="limit"
-            hide-on-single-page
             :total="total"
             @current-change="loadItems"
         >
         </el-pagination>
-        <div v-for="(item, idx) of items" :key="idx" class="my-1 text-yellow-500">
-            <router-link :to="item.link">{{ item.name }}</router-link>
-        </div>
+        <el-table :data="items" style="width: 100%">
+            <el-table-column prop="name" label="Name" width="450">
+                <template #default="scope">
+                    <router-link :to="scope.row.link">{{ scope.row.name }}</router-link>
+                </template>
+            </el-table-column>
+            <el-table-column prop="thumbnails" label="Thumbnails" width="120">
+                <template #default="scope">
+                    <span v-show="scope.row.thumbnails" class="text-green-600">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span v-show="!scope.row.thumbnails" class="text-red-600">
+                        <i class="fas fa-times"></i>
+                    </span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="webformats" label="Webformats" width="120">
+                <template #default="scope">
+                    <span v-show="scope.row.webformats" class="text-green-600">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span v-show="!scope.row.webformats" class="text-red-600">
+                        <i class="fas fa-times"></i>
+                    </span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="ocr" label="OCR" width="120">
+                <template #default="scope">
+                    <span v-show="scope.row.ocr" class="text-green-600">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span v-show="!scope.row.ocr" class="text-red-600">
+                        <i class="fas fa-times"></i>
+                    </span>
+                </template>
+            </el-table-column>
+        </el-table>
     </div>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
 import HTTPService from "@/http.service";
 const httpService = new HTTPService();
 
 export default {
-    setup() {
-        let items = ref([]);
-        let page = ref(1);
-        let limit = ref(10);
-        let total = ref(0);
-        const loadItems = async (p) => {
-            page.value = p ? p : page.value;
-            let offset = (page.value - 1) * limit.value;
+    data() {
+        return {
+            page: 1,
+            limit: 10,
+            total: 0,
+            items: [],
+        };
+    },
+    mounted() {
+        this.loadItems();
+    },
+    methods: {
+        async loadItems(p) {
+            if (p) this.page = p;
+            let offset = (this.page - 1) * this.limit;
             let response = await httpService.get({
-                route: `/items?offset=${offset}&limit=${limit.value}`,
+                route: `/items?offset=${offset}&limit=${this.limit}`,
             });
             if (response.status !== 200) {
-                // handle the error
+                return;
             }
             response = await response.json();
-            items.value = response.items.map((item) => ({ name: item, link: `/items/${item}` }));
-            total.value = response.total;
-        };
-
-        onMounted(loadItems);
-        return {
-            items,
-            page,
-            limit,
-            total,
-            loadItems,
-        };
+            this.total = response.total;
+            let items = response.items.map((i) => ({ name: i }));
+            let itemData = [];
+            for (let item of items) {
+                response = await httpService.get({ route: `/items/${item.name}/status` });
+                if (response.status == 200) {
+                    item = {
+                        ...item,
+                        ...(await response.json()),
+                        link: `/items/${item.name}`,
+                    };
+                    itemData.push(item);
+                }
+            }
+            this.items = itemData;
+            console.log(JSON.stringify(this.items, null, 2));
+        },
     },
 };
 </script>

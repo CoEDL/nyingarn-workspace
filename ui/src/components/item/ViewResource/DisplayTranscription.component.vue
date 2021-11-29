@@ -29,8 +29,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/blackboard.css";
@@ -80,7 +78,7 @@ export default {
             this.save();
         },
         async getTranscription({ file }) {
-            let response = await httpService.get({
+            let response = await this.$http.get({
                 route: `/items/${this.identifier}/resources/${file}`,
             });
             if (response.status !== 200) {
@@ -125,7 +123,7 @@ export default {
         async save() {
             const { identifier, resource } = this.$route.params;
 
-            await httpService.put({
+            await this.$http.put({
                 route: `/items/${identifier}/resources/${resource}/saveTranscription`,
                 body: { datafiles: this.data, document: this.codemirror.getValue() },
             });

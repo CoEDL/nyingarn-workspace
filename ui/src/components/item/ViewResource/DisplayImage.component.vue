@@ -5,8 +5,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
 import ImageViewer from "iv-viewer";
 import "iv-viewer/dist/iv-viewer.css";
 
@@ -42,7 +40,7 @@ export default {
                     return re.exec(image);
                 });
             for (let image of images) {
-                let response = await httpService.get({
+                let response = await this.$http.get({
                     route: `/items/${this.identifier}/resources/${image}/link`,
                 });
                 if (response.status !== 200) {

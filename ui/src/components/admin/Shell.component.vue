@@ -10,8 +10,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
 export default {
     data() {
         return {
@@ -23,7 +21,7 @@ export default {
     },
     methods: {
         async checkAdminAccess() {
-            let response = await httpService.get({ route: "/admin" });
+            let response = await this.$http.get({ route: "/admin" });
             if (response.status !== 200) {
                 this.$router.push("/dashboard").catch(() => {});
                 return;

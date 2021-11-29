@@ -32,7 +32,7 @@ import HTTPService from "./http.service";
         app.use(store);
         app.use(router);
         app.use(ElementPlus);
-        app.config.globalProperties.$http = new HTTPService();
+        app.config.globalProperties.$http = new HTTPService({ router });
         app.config.globalProperties.$log = log;
         app.mount("#app");
         // app.config.globalProperties.$socket = io();

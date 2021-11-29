@@ -49,9 +49,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
-
 export default {
     data() {
         return {
@@ -68,7 +65,7 @@ export default {
         async loadItems(p) {
             if (p) this.page = p;
             let offset = (this.page - 1) * this.limit;
-            let response = await httpService.get({
+            let response = await this.$http.get({
                 route: `/items?offset=${offset}&limit=${this.limit}`,
             });
             if (response.status !== 200) {
@@ -79,7 +76,7 @@ export default {
             let items = response.items.map((i) => ({ name: i }));
             let itemData = [];
             for (let item of items) {
-                response = await httpService.get({ route: `/items/${item.name}/status` });
+                response = await this.$http.get({ route: `/items/${item.name}/status` });
                 if (response.status == 200) {
                     item = {
                         ...item,
@@ -90,7 +87,6 @@ export default {
                 }
             }
             this.items = itemData;
-            console.log(JSON.stringify(this.items, null, 2));
         },
     },
 };

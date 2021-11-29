@@ -30,7 +30,9 @@ export default {
     },
     methods: {
         async init() {
-            this.resources = (await getItemResources({ identifier: this.identifier })).resources;
+            this.resources = (
+                await getItemResources({ $http: this.$http, identifier: this.identifier })
+            ).resources;
         },
         viewResource(resource) {
             this.$router.push(`/resource/${this.identifier}/${resource}`);

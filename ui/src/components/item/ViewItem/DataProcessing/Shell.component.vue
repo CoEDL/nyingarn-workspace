@@ -12,8 +12,6 @@
 </template>
 
 <script>
-import HTTPService from "@/http.service";
-const httpService = new HTTPService();
 export default {
     data() {
         return {
@@ -22,7 +20,7 @@ export default {
     },
     methods: {
         async triggerProcessing(process) {
-            await httpService.post({
+            await this.$http.post({
                 route: process.route,
                 body: { identifier: this.$route.params.identifier },
             });

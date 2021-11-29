@@ -1,5 +1,5 @@
 import { createImageThumbnail, createWebFormats, runOCR } from "./tasks";
-import { prepare, cleanup, cleanupAfterFailure, getLogger, updateTask } from "./common";
+import { prepare, cleanup, cleanupAfterFailure, getLogger, updateTask, deleteTask } from "./common";
 const log = getLogger();
 import fetch from "node-fetch";
 
@@ -44,13 +44,17 @@ export async function runTask(msg) {
             });
         }
         if (msg.body.taskId) {
-            await updateTask({ taskId: msg.body.taskId, status: "done" });
+            await deleteTask({ taskId: msg.body.taskId });
         }
     } catch (error) {
         log.error(`runTask ERROR: ${error.message}`);
         await cleanupAfterFailure({ identifier: msg.body.identifier, directory });
         if (msg.body.taskId) {
-            await updateTask({ taskId: msg.body.taskId, status: "failed" });
+            await updateTask({
+                taskId: msg.body.taskId,
+                data: { error: error.message },
+                status: "failed",
+            });
         }
     }
     msg.ack();

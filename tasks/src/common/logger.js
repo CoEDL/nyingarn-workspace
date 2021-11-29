@@ -31,3 +31,7 @@ export async function updateTask({ taskId, status, text, data }) {
         log.error(`Couldn't update tasks table: ${taskId}: ${status}`);
     }
 }
+
+export async function deleteTask({ taskId }) {
+    await models.task.destroy({ where: { id: taskId } });
+}

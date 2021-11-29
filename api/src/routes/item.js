@@ -1,5 +1,5 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from "restify-errors";
-import { route, logEvent, getLogger, getS3Handle } from "../common";
+import { route, logEvent, getLogger, loadConfiguration } from "../common";
 import {
     createItem,
     lookupItemByIdentifier,
@@ -9,11 +9,13 @@ import {
     getItemResourceLink,
     putItemResource,
 } from "../lib/item";
+import path from "path";
 const log = getLogger();
 
 export function setupRoutes({ server }) {
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
+    server.get("/items/:identifier/status", route(getItemProcessingStatusHandler));
     server.get("/items/:identifier/resources", route(getItemResourcesHandler));
     server.get("/items/:identifier/resources/:resource", route(getItemResourceHandler));
     server.get("/items/:identifier/resources/:resource/link", route(getItemResourceLinkHandler));
@@ -21,6 +23,17 @@ export function setupRoutes({ server }) {
         "/items/:identifier/resources/:resource/saveTranscription",
         route(saveItemTranscriptionHandler)
     );
+}
+
+async function getItemsHandler(req, res, next) {
+    const userId = req.session.user.id;
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+    let { count, rows } = await getItems({ userId, offset, limit });
+    let items = rows.map((i) => i.identifier);
+
+    res.send({ total: count, items });
+    next();
 }
 
 async function createItemHandler(req, res, next) {
@@ -59,14 +72,30 @@ async function createItemHandler(req, res, next) {
     next();
 }
 
-async function getItemsHandler(req, res, next) {
-    const userId = req.session.user.id;
-    const offset = req.query.offset;
-    const limit = req.query.limit;
-    let { count, rows } = await getItems({ userId, offset, limit });
-    let items = rows.map((i) => i.identifier);
-
-    res.send({ total: count, items });
+async function getItemProcessingStatusHandler(req, res, next) {
+    const configuration = await loadConfiguration();
+    let { resources } = await listItemResources({ identifier: req.params.identifier });
+    if (resources) {
+        resources = resources.map((r) => r.Key.split(`${req.params.identifier}/`)[1]);
+    }
+    let completed = {};
+    for (let stage of configuration.api.processing.requiredStages) {
+        switch (stage) {
+            case "thumbnails":
+                completed.thumbnails = resources.filter((r) => r.match("thumbnail")).length
+                    ? true
+                    : false;
+            case "webformats":
+                let jpeg = resources.filter((r) => r.match(/\.jpe?g/)).length ? true : false;
+                let webp = resources.filter((r) => r.match(/\.webp/)).length ? true : false;
+                let avif = resources.filter((r) => r.match(/\.avif/)).length ? true : false;
+                completed.webformats = jpeg && webp && avif ? true : false;
+            case "ocr":
+                completed.ocr =
+                    resources.filter((r) => r.match(/.tesseract_ocr/)).length === 2 ? true : false;
+        }
+    }
+    res.send(completed);
     next();
 }
 

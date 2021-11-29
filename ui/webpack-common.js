@@ -30,6 +30,14 @@ module.exports = {
                 loader: "vue-loader",
             },
             {
+                test: /\.mjs$/,
+                resolve: {
+                    fullySpecified: false,
+                },
+                include: /node_modules/,
+                type: "javascript/auto",
+            },
+            {
                 test: /\.js$/,
                 loader: "babel-loader",
                 exclude: /node_modules/,

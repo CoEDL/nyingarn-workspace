@@ -3,6 +3,7 @@ import { log } from "./";
 import { loadConfiguration } from "../../common";
 import { lookupItemByIdentifier } from "../../lib/item";
 import { processThumbnails, processOcr, processWebFormats } from "../../lib/data";
+import { compact } from "lodash";
 
 export async function authenticateTusRequest(req, res, next) {
     if (!req.session.user.upload) {
@@ -31,14 +32,19 @@ export async function triggerProcessing(req, res, next) {
     log.debug(`trigger processing for ${identifier}: ${configuration.api.processing.actions}`);
 
     let stages = req.body?.stages;
-    if (!stages) stages = Object.keys(configuration.api.processing.stages);
+    if (!stages) {
+        stages = Object.keys(configuration.api.processing.stages).map((stage) => {
+            return configuration.api.processing.stages[stage]?.order === 0 ? stage : null;
+        });
+        stages = compact(stages);
+    }
     for (let stage of stages) {
         switch (stage) {
             case "/process/thumbnails":
                 await processThumbnails({
                     userId: req.session.user.id,
                     identifier: identifier,
-                    stages: configuration.api.processing.stages[stage],
+                    stages: configuration.api.processing.stages[stage].subtasks,
                     headers,
                 });
                 break;
@@ -46,7 +52,7 @@ export async function triggerProcessing(req, res, next) {
                 await processWebFormats({
                     userId: req.session.user.id,
                     identifier: identifier,
-                    stages: configuration.api.processing.stages[stage],
+                    stages: configuration.api.processing.stages[stage].subtasks,
                     headers,
                 });
                 break;
@@ -54,7 +60,7 @@ export async function triggerProcessing(req, res, next) {
                 await processOcr({
                     userId: req.session.user.id,
                     identifier: identifier,
-                    stages: configuration.api.processing.stages[stage],
+                    stages: configuration.api.processing.stages[stage].subtasks,
                     headers,
                 });
                 break;

@@ -10,8 +10,6 @@ import "@uppy/core/dist/style.css";
 import "@uppy/dashboard/dist/style.css";
 
 import Uppy from "@uppy/core";
-import { ref } from "vue";
-import { useStore } from "vuex";
 
 export default {
     components: {
@@ -34,6 +32,7 @@ export default {
     },
     methods: {
         init() {
+            const identifier = this.identifier;
             const configuration = this.$store.state.configuration;
             let uppy = new Uppy({
                 debug: false,
@@ -62,7 +61,7 @@ export default {
                             return false;
                         }
                     }
-                    let regex = new RegExp(`^${props.identifier}-.*`);
+                    let regex = new RegExp(`^${identifier}-.*`);
                     if (
                         !currentFile.name.match(regex) &&
                         configuration.ui.filename?.matchItemName

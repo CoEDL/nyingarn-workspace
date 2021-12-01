@@ -5,7 +5,7 @@ import path from "path";
 
 export const imageExtensions = ["jpe?g", "png", "tif{1,2}"];
 export const thumbnailHeight = 300;
-export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "avif", "webp"];
+export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
 
 export { processThumbnails } from "./process-thumbnails";
 export { processOcr } from "./process-ocr";

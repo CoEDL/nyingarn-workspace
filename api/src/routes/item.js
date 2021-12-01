@@ -88,8 +88,8 @@ async function getItemProcessingStatusHandler(req, res, next) {
             case "webformats":
                 let jpeg = resources.filter((r) => r.match(/\.jpe?g/)).length ? true : false;
                 let webp = resources.filter((r) => r.match(/\.webp/)).length ? true : false;
-                let avif = resources.filter((r) => r.match(/\.avif/)).length ? true : false;
-                completed.webformats = jpeg && webp && avif ? true : false;
+                // let avif = resources.filter((r) => r.match(/\.avif/)).length ? true : false;
+                completed.webformats = jpeg && webp ? true : false;
             case "ocr":
                 completed.ocr =
                     resources.filter((r) => r.match(/.tesseract_ocr/)).length === 2 ? true : false;

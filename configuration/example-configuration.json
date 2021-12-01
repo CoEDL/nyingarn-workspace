@@ -34,8 +34,9 @@
             "requiredStages": ["thumbnails", "webformats", "ocr"],
             "exchange": "nyingarn",
             "stages": {
-                "/process/thumbnails": [],
-                "/process/webformats": ["/process/ocr"]
+                "/process/thumbnails": { "order": 0 },
+                "/process/webformats": { "order": 0, "subtasks": ["/process/ocr"] },
+                "/process/ocr": []
             },
             "controls": [
                 {

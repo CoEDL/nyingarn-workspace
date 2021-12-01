@@ -8,10 +8,7 @@
         },
         { "name": "Underline", "element": "u", "icon": "fas fa-underline" },
         { "name": "Strike through", "element": "s", "icon": "fas fa-strikethrough" },
-        { "name": "Superscript", "element": "sup", "icon": "fas fa-superscript" },
-        { "name": "Document Header", "element": "head" },
         { "name": "Unclear", "element": "unclear" },
-        { "name": "Page break", "element": "pb", "attributes": ["facs"] },
         { "name": "Line break", "element": "lb" },
         { "name": "Language", "element": "language", "attributes": ["ident"] },
         { "name": "Person", "open": "[[", "close": "]]", "icon": "fas fa-user" }

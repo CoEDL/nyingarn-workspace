@@ -8,6 +8,7 @@ import {
     getItemResource,
     getItemResourceLink,
     putItemResource,
+    itemResourceExists,
 } from "../lib/item";
 import path from "path";
 const log = getLogger();
@@ -17,6 +18,10 @@ export function setupRoutes({ server }) {
     server.post("/items", route(createItemHandler));
     server.get("/items/:identifier/status", route(getItemProcessingStatusHandler));
     server.get("/items/:identifier/resources", route(getItemResourcesHandler));
+    server.get(
+        "/items/:identifier/resources/:resource/transcription",
+        route(getItemTranscriptionHandler)
+    );
     server.get("/items/:identifier/resources/:resource", route(getItemResourceHandler));
     server.get("/items/:identifier/resources/:resource/link", route(getItemResourceLinkHandler));
     server.put(
@@ -116,6 +121,46 @@ async function getItemResourceHandler(req, res, next) {
             identifier: req.params.identifier,
             resource: req.params.resource,
         });
+        res.send({ content });
+        next();
+    } catch (error) {
+        return next(new NotFoundError());
+    }
+}
+
+async function getItemTranscriptionHandler(req, res, next) {
+    let masterTranscription = `${req.params.resource}.tei.xml`;
+    let tesseractTranscription = `${req.params.resource}.tesseract_ocr-ADMIN.txt`;
+
+    let content;
+    let resource = masterTranscription;
+    let exists = await itemResourceExists({
+        identifier: req.params.identifier,
+        resource,
+    });
+    if (exists) {
+        content = await getItemResource({
+            identifier: req.params.identifier,
+            resource,
+        });
+    } else {
+        resource = tesseractTranscription;
+        exists = await itemResourceExists({
+            identifier: req.params.identifier,
+            resource,
+        });
+
+        if (exists) {
+            content = await getItemResource({
+                identifier: req.params.identifier,
+                resource,
+            });
+        } else {
+            content = "";
+        }
+    }
+
+    try {
         res.send({ content });
         next();
     } catch (error) {

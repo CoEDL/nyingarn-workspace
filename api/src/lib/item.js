@@ -92,6 +92,13 @@ export async function createItemLocationInObjectStore({ identifier, userId }) {
     }
 }
 
+export async function itemResourceExists({ identifier, resource }) {
+    let { bucket } = await getS3Handle();
+    let target = path.join(identifier, resource);
+    let stat = await bucket.stat({ path: target });
+    return stat;
+}
+
 export async function getItemResource({ identifier, resource }) {
     let { bucket } = await getS3Handle();
     let target = path.join(identifier, resource);

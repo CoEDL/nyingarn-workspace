@@ -25,6 +25,7 @@
                 </div>
             </div>
         </div>
+        <el-button @click="getTranscription">get transcription</el-button>
     </div>
 </template>
 
@@ -60,15 +61,7 @@ export default {
     },
     methods: {
         async loadTranscription() {
-            let masterTranscription = `${this.resource}.tei.xml`;
-            let tesseractTranscription = `${this.resource}.tesseract_ocr-ADMIN.txt`;
-            if (this.data.includes(masterTranscription)) {
-                this.transcription = await this.getTranscription({ file: masterTranscription });
-            } else if (this.data.includes(tesseractTranscription)) {
-                this.transcription = await this.getTranscription({ file: tesseractTranscription });
-            } else {
-                this.transcription = "";
-            }
+            this.transcription = await this.getTranscription();
             this.codemirror = CodeMirror.fromTextArea(this.$refs.textarea, {});
             this.codemirror.setSize("100%", "100%");
             this.codemirror.setOption("mode", "text/xml");
@@ -77,12 +70,12 @@ export default {
             this.codemirror.on("change", this.debouncedSave);
             this.save();
         },
-        async getTranscription({ file }) {
+        async getTranscription() {
             let response = await this.$http.get({
-                route: `/items/${this.identifier}/resources/${file}`,
+                route: `/items/${this.identifier}/resources/${this.resource}/transcription`,
             });
             if (response.status !== 200) {
-                // can't get link right now
+                // can't get item content
             }
             let transcription = (await response.json()).content;
             let image = this.data

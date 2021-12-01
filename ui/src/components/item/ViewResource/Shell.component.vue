@@ -40,6 +40,7 @@ export default {
         async init() {
             this.data = (
                 await getResourceObjects({
+                    $http: this.$http,
                     identifier: this.identifier,
                     resource: this.resource,
                 })

@@ -12,6 +12,10 @@ if [ "$resp" == "y" ] ; then
     docker build --rm -t arkisto/workspace-api:latest -f Dockerfile.api-build .
     echo
 
+    echo '>> Building the TASKS code'
+    docker build --rm -t arkisto/workspace-task-runner:latest -f Dockerfile.tasks-build .
+    echo
+
     echo '>> Building the UI code'
     cd ui
     # npm run build
@@ -27,6 +31,8 @@ read -p '>> Build the containers? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
     cd api
     npm version --no-git-tag-version ${VERSION}
+    cd ../tasks
+    npm version --no-git-tag-version ${VERSION}
     cd ../ui
     npm version --no-git-tag-version ${VERSION}
     cd ..
@@ -35,7 +41,9 @@ if [ "$resp" == "y" ] ; then
 
     echo "Building API container"
     docker tag arkisto/workspace-api:latest arkisto/workspace-api:${VERSION}
-    # docker rmi $(docker images | grep none | awk '{print $3}')
+
+    echo "Building TASK Runner container"
+    docker tag arkisto/workspace-task-runner:latest arkisto/workspace-task-runner:${VERSION}
 
     echo "Building UI container"
     docker build --rm -t arkisto/workspace-ui:latest -f Dockerfile.ui-build .
@@ -51,6 +59,8 @@ if [ "$resp" == "y" ] ; then
     docker login
     docker push arkisto/workspace-api:latest
     docker push arkisto/workspace-api:${VERSION}
+    docker push arkisto/workspace-task-runner:latest
+    docker push arkisto/workspace-task-runner:${VERSION}
     docker push arkisto/workspace-ui:latest
     docker push arkisto/workspace-ui:${VERSION}
 fi

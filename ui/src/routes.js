@@ -93,20 +93,6 @@ const router = createRouter({
 });
 router.beforeEach(onAuthRequired);
 
-// async function onAuthRequired(to, from, next) {
-//     const httpService = new HTTPService({ router });
-//     let isAuthed = await httpService.get({ route: "/authenticated" });
-//     if (isAuthed.status === 200 && to.path === "/login") return next({ path: "/" });
-//     if (to.meta?.requiresAuth) {
-//         try {
-//             if (isAuthed.status === 401 && from.path !== "/login") return next({ path: "/login" });
-//         } catch (error) {
-//             if (from.path !== "/login") return next({ path: "/login" });
-//         }
-//     }
-//     next();
-// }
-
 async function onAuthRequired(to, from, next) {
     if (to.meta?.requiresAuth) {
         let isAuthed;
@@ -115,7 +101,7 @@ async function onAuthRequired(to, from, next) {
             if (!isAuthed && from.name !== "login") return next({ path: "/login" });
             return next();
         } catch (error) {
-            if (!isAuthed && from.name !== "login") return next({ path: "/login" });
+            if (from.name !== "login") return next({ path: "/login" });
         }
     } else {
         next();

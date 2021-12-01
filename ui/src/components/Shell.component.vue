@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { tokenSessionKey, getLocalStorage } from "@/components/storage";
 import SidebarComponent from "./Sidebar.component.vue";
 export default {
     components: {
@@ -17,7 +18,18 @@ export default {
         return {};
     },
     mounted() {
-        if (this.$route.path === "/") this.$router.push("/dashboard");
+        this.init();
+    },
+    methods: {
+        async init() {
+            let response = await this.$http.get({ route: "/authenticated" });
+            if (response.status === 200) {
+                let { token } = getLocalStorage({ key: tokenSessionKey });
+                let user = JSON.parse(atob(token.split(".")[1]));
+                this.$store.commit("setUserData", user);
+            }
+            if (this.$route.path === "/") this.$router.push("/dashboard");
+        },
     },
 };
 </script>

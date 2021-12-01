@@ -25,7 +25,6 @@
                 </div>
             </div>
         </div>
-        <el-button @click="getTranscription">get transcription</el-button>
     </div>
 </template>
 

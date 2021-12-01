@@ -66,7 +66,7 @@ async function getOauthTokenRouteHandler(req, res, next) {
             return next(new UnauthorizedError());
         }
     } else {
-        // normal user account - are we alloing access
+        // normal user account - are we allowing access
         user = await models.user.findOne({ where: { email: userData.email } });
         if (!user) {
             // no user found with that email - not whitelisted so deny access

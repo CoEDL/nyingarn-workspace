@@ -24,9 +24,9 @@ if [ "$resp" == "y" ] ; then
         -v $PWD:/srv/ui \
         -v ui_node_modules:/srv/ui/node_modules \
         -w /srv/ui node:14-buster bash -l -c "npm run build"
+    cd -
     docker build --rm -t arkisto/workspace-ui:latest -f Dockerfile.ui-build .
     docker tag arkisto/workspace-ui:latest arkisto/workspace-ui:${VERSION}
-    cd -
     echo
 fi
 

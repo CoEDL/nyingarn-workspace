@@ -29,7 +29,6 @@ export async function triggerProcessing(req, res, next) {
     // look up tasks table for a processing job on this identifier that is in progress
     //   if one exists return immediately
     let configuration = await loadConfiguration();
-    log.debug(`trigger processing for ${identifier}: ${configuration.api.processing.actions}`);
 
     let stages = req.body?.stages;
     if (!stages) {
@@ -38,6 +37,7 @@ export async function triggerProcessing(req, res, next) {
         });
         stages = compact(stages);
     }
+    log.info(`trigger processing for ${identifier}: ${stages}`);
     for (let stage of stages) {
         switch (stage) {
             case "/process/thumbnails":

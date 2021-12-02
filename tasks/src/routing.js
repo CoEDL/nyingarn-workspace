@@ -13,45 +13,45 @@ export async function runTask(msg) {
     // if (process.env.NODE_ENV === "development") msg.ack();
     let directory;
 
-    const { task } = msg.body;
+    const { task, identifier, taskId, headers, stages } = msg.body;
     try {
         directory = await prepare({ ...msg.body });
 
         switch (task) {
             case "create-thumbnails":
-                log.debug(`Running '/process/thumbnails' task in ${directory}`);
+                log.info(`Running 'create-thumbnails' task for '${identifier}' in ${directory}`);
                 await createImageThumbnail({ directory, ...msg.body });
                 break;
             case "create-web-formats":
-                log.debug(`Running 'createWebFormats' task in ${directory}`);
+                log.info(`Running 'create-web-formats' task for '${identifier}' in ${directory}`);
                 await createWebFormats({ directory, ...msg.body });
                 break;
             case "run-ocr":
-                log.debug(`Running 'runOCR' task in ${directory}`);
+                log.info(`Running 'run-ocr' task for '${identifier}' in ${directory}`);
                 await runOCR({ directory, ...msg.body });
                 break;
         }
 
-        await cleanup({ identifier: msg.body.identifier, directory });
+        await cleanup({ identifier, directory });
 
-        if (msg.body.stages && process.env.POST_FINISH) {
-            log.debug("next stages to run", msg.body.stages);
-            let url = `${process.env.POST_FINISH}/${msg.body.identifier}`;
+        if (stages && process.env.POST_FINISH) {
+            log.info("next stages to run", stages);
+            let url = `${process.env.POST_FINISH}/${identifier}`;
             await fetch(url, {
                 method: "POST",
-                headers: msg.body.headers,
-                body: JSON.stringify({ stages: msg.body.stages }),
+                headers: headers,
+                body: JSON.stringify({ stages }),
             });
         }
-        if (msg.body.taskId) {
-            await deleteTask({ taskId: msg.body.taskId });
+        if (taskId) {
+            await deleteTask({ taskId });
         }
     } catch (error) {
         log.error(`runTask ERROR: ${error.message}`);
         await cleanupAfterFailure({ identifier: msg.body.identifier, directory });
-        if (msg.body.taskId) {
+        if (taskId) {
             await updateTask({
-                taskId: msg.body.taskId,
+                taskId,
                 data: { error: error.message },
                 status: "failed",
             });

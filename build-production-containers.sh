@@ -29,15 +29,19 @@ fi
 
 read -p '>> Build the containers? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
-    cd api
-    npm version --no-git-tag-version ${VERSION}
-    cd ../tasks
-    npm version --no-git-tag-version ${VERSION}
-    cd ../ui
-    npm version --no-git-tag-version ${VERSION}
-    cd ..
-    git tag v${VERSION}
-    git commit -a -m "tag and bump version"
+
+    read -p '>> Tag the repo (select N if you are still testing the builds)? [y|N] ' resp
+    if [ "$resp" == "y" ] ; then
+        cd api
+        npm version --no-git-tag-version ${VERSION}
+        cd ../tasks
+        npm version --no-git-tag-version ${VERSION}
+        cd ../ui
+        npm version --no-git-tag-version ${VERSION}
+        cd ..
+        git tag v${VERSION}
+        git commit -a -m "tag and bump version"
+    fi
 
     echo "Building API container"
     docker tag arkisto/workspace-api:latest arkisto/workspace-api:${VERSION}

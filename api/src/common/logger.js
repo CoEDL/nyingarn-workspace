@@ -8,7 +8,7 @@ export function getLogger() {
         return `${timestamp} ${level.toUpperCase()}: ${message}`;
     });
     const logger = createLogger({
-        level: process.env.NODE_ENV === "development" ? "debug" : "info",
+        level: process.env?.LOG_LEVEL ? process.env.LOG_LEVEL : "debug",
         format: combine(timestamp(), myFormat),
         transports: [new transports.Console()],
     });

@@ -20,24 +20,86 @@
             "lifetime": { "hours": 5 },
             "secret": "{some secret}"
         },
+        "teiMarkupControls": "/srv/tei-markup-controls.json",
+        "filenaming": {
+            "adminTag": "ADMIN",
+            "resourceQualifierSeparator": ".",
+            "identifierSegments": {
+                "2": ["itemId", "resourceId"],
+                "3": ["collectionId", "itemId", "resourceId"]
+            }
+        },
+        "processing": {
+            "requiredStages": ["thumbnails", "webformats", "ocr"],
+            "exchange": "nyingarn",
+            "stages": {
+                "/process/thumbnails": { "order": 0 },
+                "/process/webformats": { "order": 0, "subtasks": ["/process/ocr"] },
+                "/process/ocr": []
+            },
+            "controls": [
+                {
+                    "name": "Create Image Thumbnails",
+                    "description": "Create image thumbnails",
+                    "route": "/process/thumbnails",
+                    "automatic": true
+                },
+                {
+                    "name": "Create Image Web Formats",
+                    "description": "Create image versions suitable for display on the web",
+                    "route": "/process/webformats",
+                    "automatic": true
+                },
+                {
+                    "name": "Run OCR",
+                    "description": "Pass the images through Tesseract OCR to try to extract the text",
+                    "route": "/process/ocr",
+                    "automatic": true
+                }
+            ]
+        },
         "services": {
-            "aws": {
-                "endpointUrl": "http://minio:9000",
+            "rabbit": {
+                "host": "rabbit",
+                "user": "guest",
+                "pass": "guest",
+                "port": "5672",
+                "exchanges": [
+                    {
+                        "name": "nyingarn",
+                        "type": "fanout",
+                        "autoDelete": false,
+                        "persistent": false
+                    }
+                ],
+                "queues": [
+                    {
+                        "name": "nyingarn_tasks",
+                        "autoDelete": true,
+                        "subscribe": true,
+                        "limit": 1
+                    }
+                ],
+                "bindings": [
+                    {
+                        "exchange": "nyingarn",
+                        "target": "nyingarn_tasks",
+                        "keys": []
+                    }
+                ]
+            },
+            "s3": {
+                "provider": "Minio",
+                "endpointUrl": "https://s3.nyingarn.net",
                 "forcePathStyle": true,
-                "bucket": "production",
+                "bucket": "development",
                 "awsAccessKeyId": "{access key to access a bucket}",
                 "awsSecretAccessKey": "{secret key to access a bucket}",
                 "region": "us-east-1"
             },
             "describo": {
-                "authorization": "{this is the shared secret define in the describo configuration}",
-                "provider": "Minio",
-                "url": "https://s3.nyingarn.net",
-                "bucket": "production",
-                "awsAccessKeyId": "{access key to access a bucket as above}",
-                "awsSecretAccessKey": "{secret key to access a bucket as above}",
-                "region": "us-east-1",
-                "describoUrl": "https://describo.nyingarn.net"
+                "authorization": "{ describo secret }",
+                "url": "https://describo.nyingarn.net"
             }
         },
         "authentication": {

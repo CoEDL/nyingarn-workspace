@@ -1,0 +1,18 @@
+FROM node:14-buster AS tasks-builder
+COPY tasks /srv/tasks
+COPY api /srv/api
+WORKDIR /srv/tasks
+RUN npm install
+RUN npm run build:production
+
+FROM node:14-buster AS tasks-module-install
+WORKDIR /srv
+COPY --from=tasks-builder /srv/tasks/dist/ /srv/
+COPY --from=tasks-builder /srv/tasks/package.json /srv/package.json
+RUN npm install
+
+FROM node:14-buster-slim
+WORKDIR /srv
+RUN apt-get update && apt-get install -y ca-certificates
+COPY --from=tasks-module-install /srv/ /srv/
+CMD [ "node", "./server.bundle.js" ]  

@@ -27,7 +27,6 @@ services:
     minio:
         image: minio/minio:latest
         restart: always
-        entrypoint: sh
         ports:
             - 10000:9000
             - 10001:10001

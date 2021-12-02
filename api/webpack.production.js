@@ -11,6 +11,9 @@ module.exports = {
         path: path.resolve(__dirname, "dist"),
         filename: "server.bundle.js",
     },
+    optimization: {
+        nodeEnv: false,
+    },
     externals: [nodeExternals()],
     plugins: [
         new CleanWebpackPlugin(),

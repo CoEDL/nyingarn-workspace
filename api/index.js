@@ -22,7 +22,7 @@ global.fetch = require("node-fetch");
     try {
         configuration = await loadConfiguration();
     } catch (error) {
-        console.error("configuration.json not found - stopping now");
+        log.error("configuration.json not found - stopping now");
         process.exit();
     }
     await models.sequelize.sync();
@@ -40,7 +40,7 @@ global.fetch = require("node-fetch");
     });
     server.pre(cors.preflight);
     server.use(cors.actual);
-    if (process.env.NODE_ENV === "development") {
+    if (process.env?.LOG_LEVEL === "debug") {
         server.use((req, res, next) => {
             log.debug(`${req.route.method}: ${req.route.path}`);
             return next();
@@ -67,7 +67,7 @@ global.fetch = require("node-fetch");
     setupRoutes({ server });
 
     server.listen("8080", function () {
-        console.log("ready on %s", server.url);
+        log.info("ready on %s", server.url);
     });
 })();
 

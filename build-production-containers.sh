@@ -6,60 +6,46 @@ if [ "$#" != 1 ] ; then
 fi
 VERSION="${1}"
 
-read -p '>> Build the code? [y|N] ' resp
+read -p '>> Build the containers? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
-    echo '>> Building the API code'
+    echo ">> Building the API Container"
     docker build --rm -t arkisto/workspace-api:latest -f Dockerfile.api-build .
+    docker tag arkisto/workspace-api:latest arkisto/workspace-api:${VERSION}
     echo
 
-    echo '>> Building the TASKS code'
+    echo ">> Building the TASK Runner container"
     docker build --rm -t arkisto/workspace-task-runner:latest -f Dockerfile.tasks-build .
+    docker tag arkisto/workspace-task-runner:latest arkisto/workspace-task-runner:${VERSION}
     echo
 
-    echo '>> Building the UI code'
-    cd ui
-    # npm run build
+    echo ">> Building the UI container"
+    cd ui   
     docker run -it --rm \
         -v $PWD:/srv/ui \
         -v ui_node_modules:/srv/ui/node_modules \
         -w /srv/ui node:14-buster bash -l -c "npm run build"
+    docker build --rm -t arkisto/workspace-ui:latest -f Dockerfile.ui-build .
+    docker tag arkisto/workspace-ui:latest arkisto/workspace-ui:${VERSION}
     cd -
     echo
 fi
 
-read -p '>> Build the containers? [y|N] ' resp
+read -p '>> Tag the repo (select N if you are still testing the builds)? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
-
-    read -p '>> Tag the repo (select N if you are still testing the builds)? [y|N] ' resp
-    if [ "$resp" == "y" ] ; then
-        cd api
-        npm version --no-git-tag-version ${VERSION}
-        cd ../tasks
-        npm version --no-git-tag-version ${VERSION}
-        cd ../ui
-        npm version --no-git-tag-version ${VERSION}
-        cd ..
-        git tag v${VERSION}
-        git commit -a -m "tag and bump version"
-    fi
-
-    echo "Building API container"
-    docker tag arkisto/workspace-api:latest arkisto/workspace-api:${VERSION}
-
-    echo "Building TASK Runner container"
-    docker tag arkisto/workspace-task-runner:latest arkisto/workspace-task-runner:${VERSION}
-
-    echo "Building UI container"
-    docker build --rm -t arkisto/workspace-ui:latest -f Dockerfile.ui-build .
-    docker tag arkisto/workspace-ui:latest arkisto/workspace-ui:${VERSION}
-
-    # docker rmi $(docker images | grep none | awk '{print $3}')
-    echo
+    cd api
+    npm version --no-git-tag-version ${VERSION}
+    cd ../tasks
+    npm version --no-git-tag-version ${VERSION}
+    cd ../ui
+    npm version --no-git-tag-version ${VERSION}
+    cd ..
+    git tag v${VERSION}
+    git commit -a -m "tag and bump version"
 fi
 
 read -p '>> Push the containers to docker hub? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
-    echo "Pushing built containers to docker hub"
+    echo ">> Pushing built containers to docker hub"
     docker login
     docker push arkisto/workspace-api:latest
     docker push arkisto/workspace-api:${VERSION}

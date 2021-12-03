@@ -67,7 +67,7 @@ global.fetch = require("node-fetch");
     setupRoutes({ server });
 
     server.listen("8080", function () {
-        log.info("ready on %s", server.url);
+        log.info(`ready on ${server.url}`);
     });
 })();
 

@@ -57,14 +57,13 @@ export default class HTTPService {
         return response;
     }
 
-    async post({ route, params, body }) {
+    async post({ route, params, headers = null, body }) {
         let queryString;
         if (!headers) headers = await this.getHeaders();
         if (params) {
             queryString = this.assembleQueryString(params);
         }
         route = this.encodeRoute(route, queryString, "POST");
-        let headers = this.getHeaders();
         let response = await fetch(`/api${route}`, {
             method: "POST",
             headers,
@@ -74,7 +73,7 @@ export default class HTTPService {
         return response;
     }
 
-    async put({ route, params, body }) {
+    async put({ route, params, headers = null, body }) {
         let queryString;
         if (!headers) headers = await this.getHeaders();
         if (params) {
@@ -90,7 +89,7 @@ export default class HTTPService {
         return response;
     }
 
-    async delete({ route, params }) {
+    async delete({ route, headers = null, params }) {
         let queryString;
         if (!headers) headers = await this.getHeaders();
         if (params) {

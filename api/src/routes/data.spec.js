@@ -1,6 +1,6 @@
 import "regenerator-runtime";
 import { loadConfiguration } from "../common";
-import { groupFilesByResource } from "./data";
+import { groupFilesByResource } from "../lib/data";
 
 describe("Test data processing functions", () => {
     test("test resource file handling", async () => {

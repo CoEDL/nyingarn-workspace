@@ -66,7 +66,8 @@ export default {
             if (p) this.page = p;
             let offset = (this.page - 1) * this.limit;
             let response = await this.$http.get({
-                route: `/items?offset=${offset}&limit=${this.limit}`,
+                route: `/items`,
+                params: { offset, limit: this.limit },
             });
             if (response.status !== 200) {
                 return;

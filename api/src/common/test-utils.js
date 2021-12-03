@@ -2,6 +2,8 @@ import { loadConfiguration } from "../common";
 import { writeJSON } from "fs-extra";
 import { cloneDeep } from "lodash";
 import models from "../models";
+const chance = require("chance").Chance();
+import { range } from "lodash";
 
 export const host = `http://localhost:8080`;
 
@@ -42,4 +44,16 @@ export async function teardownAfterAll(configuration) {
         spaces: 4,
     });
     models.sequelize.close();
+}
+
+export async function generateLogs(info, warn, error) {
+    for (let i in range(info)) {
+        await models.log.create({ level: "info", owner: chance.email(), text: chance.sentence() });
+    }
+    for (let i in range(warn)) {
+        await models.log.create({ level: "warn", owner: chance.email(), text: chance.sentence() });
+    }
+    for (let i in range(error)) {
+        await models.log.create({ level: "error", owner: chance.email(), text: chance.sentence() });
+    }
 }

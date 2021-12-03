@@ -7,6 +7,7 @@ import ViewResourceComponent from "@/components/item/ViewResource/Shell.componen
 import AdminComponent from "@/components/admin/Shell.component.vue";
 import AdminManageUsersComponent from "@/components/admin/users/ManageUsers.component.vue";
 import AdminWhitelistUsersComponent from "@/components/admin/users/WhitelistUsers.component.vue";
+import AdminLogsComponent from "@/components/admin/Logs.component.vue";
 import HTTPService from "./http.service";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -65,6 +66,12 @@ const routes = [
                         path: "users",
                         component: AdminManageUsersComponent,
                         meta: { name: "manage users" },
+                    },
+                    {
+                        name: "admin.logs",
+                        path: "logs",
+                        component: AdminLogsComponent,
+                        meta: { name: "view system logs" },
                     },
                 ],
             },

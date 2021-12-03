@@ -27,14 +27,28 @@ export default class HTTPService {
         } catch (error) {}
     }
 
-    encodeRoute(route, method) {
+    encodeRoute(route, queryString, method) {
+        route = encodeURI(route);
+        route = queryString ? `${route}?${queryString}` : route;
         console.debug(`${method}: ${route}`);
-        return encodeURI(route);
+        return route;
     }
 
-    async get({ route, headers = null }) {
+    assembleQueryString(params) {
+        let queryString = "";
+        Object.keys(params).forEach(
+            (p) => (queryString += `${p}=${encodeURIComponent(params[p])}&`)
+        );
+        return queryString.slice(0, -1);
+    }
+
+    async get({ route, params, headers = null }) {
+        let queryString;
         if (!headers) headers = await this.getHeaders();
-        route = this.encodeRoute(route, "GET");
+        if (params) {
+            queryString = this.assembleQueryString(params);
+        }
+        route = this.encodeRoute(route, queryString, "GET");
         let response = await fetch(`/api${route}`, {
             method: "GET",
             headers,
@@ -44,8 +58,12 @@ export default class HTTPService {
     }
 
     async post({ route, body }) {
+        let queryString;
         if (!headers) headers = await this.getHeaders();
-        route = this.encodeRoute(route, "POST");
+        if (params) {
+            queryString = this.assembleQueryString(params);
+        }
+        route = this.encodeRoute(route, queryString, "POST");
         let headers = this.getHeaders();
         let response = await fetch(`/api${route}`, {
             method: "POST",
@@ -57,8 +75,12 @@ export default class HTTPService {
     }
 
     async put({ route, body }) {
+        let queryString;
         if (!headers) headers = await this.getHeaders();
-        route = this.encodeRoute(route, "PUT");
+        if (params) {
+            queryString = this.assembleQueryString(params);
+        }
+        route = this.encodeRoute(route, queryString, "PUT");
         let response = await fetch(`/api${route}`, {
             method: "PUT",
             headers: this.getHeaders(),
@@ -69,8 +91,12 @@ export default class HTTPService {
     }
 
     async delete({ route }) {
+        let queryString;
         if (!headers) headers = await this.getHeaders();
-        route = this.encodeRoute(route, "DELETE");
+        if (params) {
+            queryString = this.assembleQueryString(params);
+        }
+        route = this.encodeRoute(route, queryString, "DELETE");
         let response = await fetch(`/api${route}`, {
             method: "delete",
             headers: this.getHeaders(),

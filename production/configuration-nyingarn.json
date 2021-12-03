@@ -2,6 +2,7 @@
     "ui": {
         "siteName": "Nyingarn Platform workspace",
         "tusEndpoint": "https://tus.nyingarn.net/files/",
+        "termsAndConditionsOfUse": "https://nyingarn.net/nyingarn-workspace-terms-and-conditions-of-use/",
         "itemName": {
             "help": "Must consist start with a letter and can have the following characters only: a-z, A-Z, 0-9 and _.",
             "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9,_]+$"

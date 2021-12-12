@@ -57,7 +57,7 @@ export default {
         return {
             logs: [],
             total: 0,
-            limit: 4,
+            limit: 20,
             offset: 0,
             currentPage: 1,
             datetimerange: [],

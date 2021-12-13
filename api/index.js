@@ -4,7 +4,6 @@ const server = restify.createServer();
 const models = require("./src/models");
 const { loadConfiguration, getLogger } = require("./src/common");
 const { setupRoutes } = require("./src/routes");
-const corsMiddleware = require("restify-cors-middleware");
 const fetch = require("node-fetch");
 const log = getLogger();
 const rabbit = require("foo-foo-mq");
@@ -28,18 +27,6 @@ global.fetch = require("node-fetch");
     await models.sequelize.sync();
     global.rabbit = await initialiseRabbit({ configuration });
 
-    const cors = corsMiddleware({
-        preflightMaxAge: 5, //Optional
-        origins: ["*"],
-        allowHeaders: [
-            "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization",
-        ],
-        exposeHeaders: [
-            "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization",
-        ],
-    });
-    server.pre(cors.preflight);
-    server.use(cors.actual);
     if (process.env?.LOG_LEVEL === "debug") {
         server.use((req, res, next) => {
             log.debug(`${req.route.method}: ${req.route.path}`);

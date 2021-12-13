@@ -1,7 +1,6 @@
 import { BadRequestError, UnauthorizedError, ServiceUnavailableError } from "restify-errors";
 import { loadConfiguration, getLogger, logEvent } from "../common";
-import { jwtVerify } from "jose/jwt/verify";
-import { createRemoteJWKSet } from "jose/jwks/remote";
+import { jwtVerify, createRemoteJWKSet } from "jose";
 import { Issuer, generators } from "openid-client";
 import { createUser } from "../lib/user";
 import { createSession } from "../lib/session";

@@ -1,9 +1,9 @@
 <template>
-    <dashboard :uppy="uppy" :props="{}" v-if="uppy && show" />
+    <div ref="dashboard"></div>
 </template>
 
 <script>
-import { Dashboard } from "@uppy/vue";
+import Dashboard from "@uppy/dashboard";
 import Tus from "@uppy/tus";
 
 import "@uppy/core/dist/style.css";
@@ -75,6 +75,10 @@ export default {
                     }
                     return true;
                 },
+            });
+            uppy.use(Dashboard, {
+                target: this.$refs.dashboard,
+                inline: true,
             });
             uppy.use(Tus, {
                 endpoint: configuration.ui.tusEndpoint,

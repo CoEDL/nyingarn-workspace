@@ -1,5 +1,4 @@
-import { SignJWT } from "jose/jwt/sign";
-import { jwtVerify } from "jose/jwt/verify";
+import { SignJWT, jwtVerify } from "jose";
 import { createSecretKey } from "crypto";
 import add from "date-fns/add";
 import isAfter from "date-fns/isAfter";

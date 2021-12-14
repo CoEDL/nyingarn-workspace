@@ -5,7 +5,10 @@
                 <i class="far fa-lightbulb"></i>
             </div>
             <ul class="text-gray-600 list-disc pl-10">
-                <li>{{ helpFilenameStructure }}</li>
+                <li>
+                    Item names must match the form {{ this.identifier }}-{sequence number} where
+                    sequence number can be any sequence of digits followed by letters (a-z,A-Z) or _
+                </li>
                 <li>{{ helpFileExtension }}</li>
             </ul>
         </div>
@@ -24,7 +27,6 @@ export default {
     },
     data() {
         return {
-            helpFilenameStructure: this.$store.state.configuration.ui?.filename?.helpName,
             helpFileExtension: this.$store.state.configuration.ui?.filename?.helpExtension,
             identifier: this.$route.params.identifier,
         };

@@ -23,6 +23,7 @@ export default {
     },
     data() {
         return {
+            specialFileNameChecks: ["digivol_transcription.csv", "ftp_tei.xml"],
             show: true,
             uppy: undefined,
         };
@@ -39,28 +40,7 @@ export default {
                 autoProceed: false,
 
                 onBeforeFileAdded: (currentFile, files) => {
-                    if (configuration.ui.filename?.checkNameStructure) {
-                        let regex = new RegExp(configuration.ui.filename.checkNameStructure);
-                        if (!currentFile.name.match(regex)) {
-                            uppy.info(
-                                `Skipping file '${currentFile.name}' because the name is not in the expected format.`,
-                                "error",
-                                5000
-                            );
-                            return false;
-                        }
-                    }
-                    if (configuration.ui.filename?.checkExtension) {
-                        let regex = new RegExp(configuration.ui.filename.checkExtension);
-                        if (!currentFile.name.match(regex)) {
-                            uppy.info(
-                                `Skipping file '${currentFile.name}' because the type is not an accepted type.`,
-                                "error",
-                                5000
-                            );
-                            return false;
-                        }
-                    }
+                    // does the first part of the file match the identifier
                     let regex = new RegExp(`^${identifier}-.*`);
                     if (
                         !currentFile.name.match(regex) &&
@@ -73,6 +53,39 @@ export default {
                         );
                         return false;
                     }
+
+                    // is it a special file
+                    for (let specialFileNameCheck of this.specialFileNameChecks) {
+                        let regex = new RegExp(specialFileNameCheck, "i");
+                        if (currentFile.name.match(regex)) {
+                            return true;
+                        }
+                    }
+
+                    if (configuration.ui.filename?.checkNameStructure) {
+                        let regex = new RegExp(configuration.ui.filename.checkNameStructure);
+                        console.log(currentFile.name);
+                        if (!currentFile.name.match(regex)) {
+                            uppy.info(
+                                `Skipping file '${currentFile.name}' because the name is not in the expected format.`,
+                                "error",
+                                5000
+                            );
+                            return false;
+                        }
+                    }
+                    if (configuration.ui.filename?.checkExtension) {
+                        let regex = new RegExp(configuration.ui.filename.checkExtension, "i");
+                        if (!currentFile.name.match(regex)) {
+                            uppy.info(
+                                `Skipping file '${currentFile.name}' because the type is not an accepted type.`,
+                                "error",
+                                5000
+                            );
+                            return false;
+                        }
+                    }
+
                     return true;
                 },
             });

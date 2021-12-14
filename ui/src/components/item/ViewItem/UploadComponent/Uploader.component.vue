@@ -23,7 +23,7 @@ export default {
     },
     data() {
         return {
-            specialFileNameChecks: ["digivol_transcription.csv", "ftp_tei.xml"],
+            specialFileNameChecks: ["digivol.csv", "ftp.xml"],
             show: true,
             uppy: undefined,
         };

@@ -23,7 +23,7 @@
                     <div class="text-base py-2">
                         To upload Digivol transcriptions ensure the file is named '{{
                             identifier
-                        }}-digivol_transcription.csv'
+                        }}-digivol.csv'
                     </div>
                 </div>
                 <div class="bg-indigo-100 p-2 rounded flex flex-row">
@@ -32,7 +32,7 @@
                     </div>
                     <div class="text-base py-2">
                         To upload FromThePage (FTP) transcriptions ensure you are uploading the TEI
-                        XML output from FTP and the file is named '{{ identifier }}-ftp_tei.xml'
+                        XML output from FTP and the file is named '{{ identifier }}-ftp.xml'
                     </div>
                 </div>
             </div>

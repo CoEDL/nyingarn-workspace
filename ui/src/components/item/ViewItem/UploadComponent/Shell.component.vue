@@ -13,7 +13,29 @@
             </ul>
         </div>
         <div class="flex flex-row">
-            <uploader-component class="w-full" :identifier="identifier" />
+            <uploader-component class="w-2/3" :identifier="identifier" />
+
+            <div class="flex flex-col space-y-2 pl-2">
+                <div class="bg-indigo-100 p-2 rounded flex flex-row">
+                    <div class="text-3xl p-4 text-gray-600">
+                        <i class="far fa-lightbulb"></i>
+                    </div>
+                    <div class="text-base py-2">
+                        To upload Digivol transcriptions ensure the file is named '{{
+                            identifier
+                        }}-digivol_transcription.csv'
+                    </div>
+                </div>
+                <div class="bg-indigo-100 p-2 rounded flex flex-row">
+                    <div class="text-3xl p-4 text-gray-600">
+                        <i class="far fa-lightbulb"></i>
+                    </div>
+                    <div class="text-base py-2">
+                        To upload FromThePage (FTP) transcriptions ensure you are uploading the TEI
+                        XML output from FTP and the file is named '{{ identifier }}-ftp_tei.xml'
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>

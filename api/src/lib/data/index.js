@@ -3,7 +3,7 @@ export const log = getLogger();
 import { groupBy } from "lodash";
 import path from "path";
 
-export const imageExtensions = ["jpe?g", "png", "tif{1,2}"];
+export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const thumbnailHeight = 300;
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
 

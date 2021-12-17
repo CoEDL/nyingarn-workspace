@@ -15,7 +15,7 @@
 export default {
     props: {
         property: { type: String, required: true },
-        value: { type: Boolean, required: true },
+        value: { type: Boolean },
     },
     data() {
         return {};

@@ -119,8 +119,8 @@ describe("Item management tests", () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
         let { resources } = await listItemResources({ identifier });
-        expect(resources.length).toEqual(2);
-        expect(resources[0].Key).toMatch(identifier);
+        expect(resources.length).toEqual(1);
+        expect(resources[0]).toMatch("file.json");
 
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });

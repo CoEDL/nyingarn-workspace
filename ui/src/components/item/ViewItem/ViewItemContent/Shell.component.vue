@@ -1,13 +1,19 @@
 <template>
-    <div class="flex flex-row space-x-2 flex-wrap">
-        <view-item-component
-            class="cursor-pointer"
-            @click="viewResource(resource)"
-            v-for="(item, resource, idx) in resources"
-            :key="idx"
-            :resource="resource"
-            :data="item"
-        />
+    <div class="flex flex-col">
+        <div>
+            <el-button @click="init"><i class="fas fa-sync-alt"></i>&nbsp;refresh</el-button>
+        </div>
+
+        <div class="flex flex-row flex-wrap">
+            <view-item-component
+                class="cursor-pointer m-2"
+                @click="viewResource(resource)"
+                v-for="(item, resource, idx) in resources"
+                :key="idx"
+                :resource="resource"
+                :data="item"
+            />
+        </div>
     </div>
 </template>
 

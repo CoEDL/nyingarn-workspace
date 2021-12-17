@@ -5,18 +5,18 @@ import crypto from "crypto";
 import path from "path";
 const log = getLogger();
 
-export async function prepare({ identifier, files }) {
+export async function prepare({ task, identifier, resource }) {
     let { bucket } = await getS3Handle();
-    let id = crypto.randomBytes(20).toString("hex");
-    let directory = await ensureDir(path.join("/tmp", id));
+    // let id = crypto.randomBytes(20).toString("hex");
+    const directory = await ensureDir(path.join("/tmp", task.id));
     log.debug(`Setting up task to run in directory: ${directory}.`);
 
-    for (let file of files) {
-        await bucket.downloadFileToFolder({
-            file: path.join(identifier, file.source),
-            localPath: directory,
-        });
-    }
+    // for (let file of files) {
+    await bucket.downloadFileToFolder({
+        file: path.join(identifier, resource),
+        localPath: directory,
+    });
+    // }
     return directory;
 }
 

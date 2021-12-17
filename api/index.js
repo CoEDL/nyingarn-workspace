@@ -4,7 +4,6 @@ const server = restify.createServer();
 const models = require("./src/models");
 const { loadConfiguration, getLogger } = require("./src/common");
 const { setupRoutes } = require("./src/routes");
-const fetch = require("node-fetch");
 const log = getLogger();
 const rabbit = require("foo-foo-mq");
 

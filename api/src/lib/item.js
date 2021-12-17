@@ -132,15 +132,20 @@ export async function getItemResourceLink({ identifier, resource }) {
 export async function listItemResources({ identifier, groupByResource = false }) {
     let configuration = await loadConfiguration();
     let { bucket } = await getS3Handle();
-    let files = (await bucket.listObjects({ prefix: identifier })).Contents.map(
-        (c) => c.Key.split(`${identifier}/`)[1]
-    ).filter((file) => {
-        let matches = specialFiles.map((sf) => {
-            let re = new RegExp(sf);
-            return file.match(re) ? true : false;
+    let files;
+    try {
+        files = (await bucket.listObjects({ prefix: identifier })).Contents.map(
+            (c) => c.Key.split(`${identifier}/`)[1]
+        ).filter((file) => {
+            let matches = specialFiles.map((sf) => {
+                let re = new RegExp(sf);
+                return file.match(re) ? true : false;
+            });
+            return file ? !matches.includes(true) : null;
         });
-        return file ? !matches.includes(true) : null;
-    });
+    } catch (error) {
+        files = [];
+    }
     files = compact(files);
     if (groupByResource) {
         ({ files } = groupFilesByResource({

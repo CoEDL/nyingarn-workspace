@@ -53,4 +53,5 @@ if [ "$resp" == "y" ] ; then
     docker push arkisto/workspace-task-runner:${VERSION}
     docker push arkisto/workspace-ui:latest
     docker push arkisto/workspace-ui:${VERSION}
+    docker push arkisto/workspace-tusd:latest
 fi

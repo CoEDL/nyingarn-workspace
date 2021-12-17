@@ -180,7 +180,7 @@ describe("Item management route tests", () => {
         });
         expect(response.status).toEqual(200);
         response = await response.json();
-        expect(response.resources.length).toEqual(2);
+        expect(response.resources.length).toEqual(1);
 
         await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });

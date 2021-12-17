@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 a {
-    @apply text-green-500 text-lg tracking-wide;
+    @apply text-blue-600 text-lg tracking-wide;
 }

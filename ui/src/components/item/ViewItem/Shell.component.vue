@@ -1,20 +1,24 @@
 <template>
     <div class="flex flex-col">
-        <div class="text-xl mb-2">Item: {{ identifier }}</div>
-        <el-tabs v-model="activeTab" @tab-click="updateRouteOnTabSelect">
-            <el-tab-pane label="View Item Content" name="view">
-                <view-item-content-component v-if="activeTab === 'view'" />
-            </el-tab-pane>
-            <el-tab-pane label="Item Metadata" name="metadata">
-                <metadata-component />
-            </el-tab-pane>
-            <el-tab-pane label="Upload Data" name="upload">
-                <upload-component v-if="activeTab === 'upload'" />
-            </el-tab-pane>
-            <el-tab-pane label="Data Processing" name="processing">
-                <data-processing-component v-if="activeTab === 'processing'" />
-            </el-tab-pane>
-        </el-tabs>
+        <div class="text-xl mb-2 bg-indigo-200 p-4">
+            {{ identifier }}
+        </div>
+        <div class="p-4">
+            <el-tabs v-model="activeTab" @tab-click="updateRouteOnTabSelect">
+                <el-tab-pane label="View Item Content" name="view">
+                    <view-item-content-component v-if="activeTab === 'view'" />
+                </el-tab-pane>
+                <el-tab-pane label="Item Metadata" name="metadata">
+                    <metadata-component />
+                </el-tab-pane>
+                <el-tab-pane label="Upload Data" name="upload">
+                    <upload-component v-if="activeTab === 'upload'" />
+                </el-tab-pane>
+                <el-tab-pane label="Data Processing" name="processing">
+                    <data-processing-component v-if="activeTab === 'processing'" />
+                </el-tab-pane>
+            </el-tabs>
+        </div>
     </div>
 </template>
 

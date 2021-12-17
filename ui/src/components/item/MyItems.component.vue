@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col">
+    <div class="flex flex-col p-4">
         <div class="text-lg">Your items:</div>
         <el-pagination
             layout="prev, pager, next"
@@ -49,7 +49,7 @@ export default {
             response = await response.json();
             this.total = response.total;
             let items = response.items.map((i) => ({ name: i }));
-            this.items = items.map((i) => ({ name: i.name, link: `/items/${i.name}` }));
+            this.items = items.map((i) => ({ name: i.name, link: `/items/${i.name}/view` }));
 
             items = [];
             for (let item of this.items) {

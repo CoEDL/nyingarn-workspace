@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col p-2">
+    <div class="flex flex-col p-4">
         <div class="text-2xl text-gray-800 tracking-wider border-b border-solid mb-10 py-2">
             <i class="text-yellow-600 fas fa-user-shield"></i>
             Administrator: {{ $route.meta.name }}

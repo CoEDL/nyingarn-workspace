@@ -1,9 +1,7 @@
 import { ForbiddenError } from "restify-errors";
 import { log } from "./";
-import { loadConfiguration } from "../../common";
+import { submitTask } from "../../common";
 import { lookupItemByIdentifier } from "../../lib/item";
-import { processThumbnails, processOcr, processWebFormats } from "../../lib/data";
-import { compact } from "lodash";
 
 export async function authenticateTusRequest(req, res, next) {
     if (!req.session.user.upload) {
@@ -15,7 +13,9 @@ export async function authenticateTusRequest(req, res, next) {
 
 export async function triggerProcessing(req, res, next) {
     // await new Promise((resolve) => setTimeout(resolve, 15000));
+
     const identifier = req.params.identifier;
+    const resource = req.params.resource;
     const headers = {
         "content-type": "application/json",
         authorization: req.headers.authorization,
@@ -26,47 +26,25 @@ export async function triggerProcessing(req, res, next) {
         return next(new ForbiddenError());
     }
 
-    // look up tasks table for a processing job on this identifier that is in progress
-    //   if one exists return immediately
-    let configuration = await loadConfiguration();
-
-    let stages = req.body?.stages;
-    if (!stages) {
-        stages = Object.keys(configuration.api.processing.stages).map((stage) => {
-            return configuration.api.processing.stages[stage]?.order === 0 ? stage : null;
+    log.info(`Process: ${identifier}/${resource}`);
+    if (resource.match(/digivol\.csv/)) {
+        // process digivol file
+        submitTask({
+            name: "process-digivol",
+            item,
+            body: { resource },
         });
-        stages = compact(stages);
-    }
-    log.info(`trigger processing for ${identifier}: ${stages}`);
-    for (let stage of stages) {
-        switch (stage) {
-            case "/process/thumbnails":
-                await processThumbnails({
-                    userId: req.session.user.id,
-                    identifier: identifier,
-                    stages: configuration.api.processing.stages[stage].subtasks,
-                    headers,
-                });
-                break;
-            case "/process/webformats":
-                await processWebFormats({
-                    userId: req.session.user.id,
-                    identifier: identifier,
-                    stages: configuration.api.processing.stages[stage].subtasks,
-                    headers,
-                });
-                break;
-            case "/process/ocr":
-                await processOcr({
-                    userId: req.session.user.id,
-                    identifier: identifier,
-                    stages: configuration.api.processing.stages[stage].subtasks,
-                    headers,
-                });
-                break;
-        }
+    } else if (resource.match(/ftp\.xml/)) {
+        // process ftp xml file
+    } else {
+        // process uploaded image
+        submitTask({
+            name: "process-image",
+            item,
+            body: { resource },
+        });
     }
 
     res.send({});
-    next();
+    return next();
 }

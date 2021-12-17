@@ -2,6 +2,10 @@ import models from "../models";
 import { loadConfiguration, getS3Handle, getUserTempLocation } from "../common";
 import path from "path";
 import { writeJson, remove } from "fs-extra";
+import { compact, groupBy } from "lodash";
+const specialFiles = ["ro-crate-metadata.json", "digivol.csv", "ftp.xml"];
+export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
+export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
 
 export async function lookupItemByIdentifier({ identifier, userId }) {
     let clause = {
@@ -46,12 +50,6 @@ export async function linkItemToUser({ itemId, userId }) {
         where: { itemId, userId },
         defaults: { itemId, userId },
     });
-}
-
-export async function listItemResources({ identifier }) {
-    let { bucket } = await getS3Handle();
-    let resources = await bucket.listObjects({ prefix: identifier });
-    return { resources: resources.Contents };
 }
 
 export async function createItemLocationInObjectStore({ identifier, userId }) {
@@ -129,4 +127,66 @@ export async function getItemResourceLink({ identifier, resource }) {
     } else {
         return await bucket.getPresignedUrl({ target });
     }
+}
+
+export async function listItemResources({ identifier, groupByResource = false }) {
+    let configuration = await loadConfiguration();
+    let { bucket } = await getS3Handle();
+    let files = (await bucket.listObjects({ prefix: identifier })).Contents.map(
+        (c) => c.Key.split(`${identifier}/`)[1]
+    ).filter((file) => {
+        let matches = specialFiles.map((sf) => {
+            let re = new RegExp(sf);
+            return file.match(re) ? true : false;
+        });
+        return file ? !matches.includes(true) : null;
+    });
+    files = compact(files);
+    if (groupByResource) {
+        ({ files } = groupFilesByResource({
+            identifier,
+            files,
+            naming: configuration.api.filenaming,
+        }));
+    }
+    return { resources: files };
+}
+
+export function groupFilesByResource({ identifier, files, naming }) {
+    let resources = [];
+    for (let filename of files) {
+        let ext = path.extname(filename).replace(".", "");
+        let basename = path.basename(filename, `.${ext}`);
+        let identifierSegments = basename
+            .split(`-${naming.adminTag}`)[0]
+            .split(naming.resourceQualifierSeparator)[0]
+            .split("-");
+
+        let adminLabel = path.basename(filename, ext).split(naming.adminTag)[1];
+
+        let type;
+        imageExtensions.forEach((t) => {
+            let re = new RegExp(t);
+            type = ext.match(re) ? "image" : type;
+        });
+
+        let data = naming.identifierSegments[identifierSegments.length]
+            .map((segmentName, i) => ({
+                [segmentName]: identifierSegments[i],
+            }))
+            .reduce((acc, cv) => ({ ...acc, ...cv }));
+
+        resources.push({
+            file: path.join(identifier, filename),
+            basename,
+            name: filename,
+            path: identifier,
+            ext,
+            adminLabel,
+            type,
+            ...data,
+        });
+    }
+
+    return { files: groupBy(resources, "resourceId") };
 }

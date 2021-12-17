@@ -8,43 +8,17 @@
             @current-change="loadItems"
         >
         </el-pagination>
-        <el-table :data="items" style="width: 100%">
-            <el-table-column prop="name" label="Name" width="450">
-                <template #default="scope">
-                    <router-link :to="scope.row.link">{{ scope.row.name }}</router-link>
-                </template>
-            </el-table-column>
-            <el-table-column prop="thumbnails" label="Thumbnails" width="120">
-                <template #default="scope">
-                    <span v-show="scope.row.thumbnails" class="text-green-600">
-                        <i class="fas fa-check"></i>
-                    </span>
-                    <span v-show="!scope.row.thumbnails" class="text-red-600">
-                        <i class="fas fa-times"></i>
-                    </span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="webformats" label="Webformats" width="120">
-                <template #default="scope">
-                    <span v-show="scope.row.webformats" class="text-green-600">
-                        <i class="fas fa-check"></i>
-                    </span>
-                    <span v-show="!scope.row.webformats" class="text-red-600">
-                        <i class="fas fa-times"></i>
-                    </span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="ocr" label="OCR" width="120">
-                <template #default="scope">
-                    <span v-show="scope.row.ocr" class="text-green-600">
-                        <i class="fas fa-check"></i>
-                    </span>
-                    <span v-show="!scope.row.ocr" class="text-red-600">
-                        <i class="fas fa-times"></i>
-                    </span>
-                </template>
-            </el-table-column>
-        </el-table>
+        <div class="w-full lg:w-3/5">
+            <el-table :data="items">
+                <el-table-column prop="name" label="Name">
+                    <template #default="scope">
+                        <router-link :to="scope.row.link">{{ scope.row.name }}</router-link>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="resourceTotal" label="Resources" width="100">
+                </el-table-column>
+            </el-table>
+        </div>
     </div>
 </template>
 
@@ -75,19 +49,21 @@ export default {
             response = await response.json();
             this.total = response.total;
             let items = response.items.map((i) => ({ name: i }));
-            let itemData = [];
-            for (let item of items) {
+            this.items = items.map((i) => ({ name: i.name, link: `/items/${i.name}` }));
+
+            items = [];
+            for (let item of this.items) {
                 response = await this.$http.get({ route: `/items/${item.name}/status` });
                 if (response.status == 200) {
+                    let { statistics } = await response.json();
                     item = {
                         ...item,
-                        ...(await response.json()),
-                        link: `/items/${item.name}`,
+                        ...statistics,
                     };
-                    itemData.push(item);
+                    items.push(item);
                 }
+                this.items = [...items];
             }
-            this.items = itemData;
         },
     },
 };

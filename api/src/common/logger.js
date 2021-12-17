@@ -29,19 +29,3 @@ export async function logEvent({ level, owner, text, data }) {
         log.error(`Couldn't update logs table: ${level}: ${text}`);
     }
 }
-
-export async function registerTask({ itemId, status, text, data }) {
-    const statuses = ["in progress", "done", "failed"];
-    if (!status || !statuses.includes(status)) {
-        throw new Error(`'status' is required and must be one of '${statuses}'`);
-    }
-    if (!itemId) {
-        throw new Error(`'itemId' is required`);
-    }
-    try {
-        return (await models.task.create({ itemId, status, text, data })).get();
-    } catch (error) {
-        console.log(error);
-        log.error(`Couldn't update tasks table: ${status}: ${text}`);
-    }
-}

@@ -2,21 +2,19 @@ import { route, getLogger, requireIdentifierAccess, demandAuthenticatedUser } fr
 export const log = getLogger();
 
 import { authenticateTusRequest, triggerProcessing } from "./upload";
-import {
-    processThumbnailsRouteHandler,
-    processOcrRouteHandler,
-    processWebFormatsRouteHandler,
-} from "./process";
+
+function routeProcessingAction(req, res, next) {
+    req.body.stages = [req.path()];
+    next();
+}
 
 function routeProcessing(handler) {
-    return [demandAuthenticatedUser, requireIdentifierAccess, handler];
+    return [demandAuthenticatedUser, requireIdentifierAccess, routeProcessingAction, handler];
 }
 
 export function setupRoutes({ server }) {
     server.get("/upload/pre-create", route(authenticateTusRequest));
-    server.get("/upload/post-finish/:identifier", route(triggerProcessing));
-    server.post("/process/post-finish/:identifier", route(triggerProcessing));
-    server.post("/process/thumbnails", routeProcessing(processThumbnailsRouteHandler));
-    server.post("/process/webformats", routeProcessing(processWebFormatsRouteHandler));
-    server.post("/process/ocr", routeProcessing(processOcrRouteHandler));
+    server.get("/upload/post-finish/:identifier/:resource", route(triggerProcessing));
+    server.post("/process/post-finish/:identifier/:resource", route(triggerProcessing));
+    server.post("/process/*", routeProcessing(triggerProcessing));
 }

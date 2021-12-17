@@ -43,7 +43,7 @@ if [ -f "${file}" ] ; then
     fi
 
     if [ ! -z "${POST_FINISH}" ] ; then
-        curl --silent --header "authorization: Bearer ${token}" "${POST_FINISH}/${itemId}"
+        curl --silent --header "authorization: Bearer ${token}" "${POST_FINISH}/${itemId}/${filename}"
     fi
     cleanup ${file}
 

@@ -16,8 +16,12 @@ const log = getLogger();
 export function setupRoutes({ server }) {
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
-    server.get("/items/:identifier/status", route(getItemProcessingStatusHandler));
+    server.get("/items/:identifier/status", route(getItemStatisticsHandler));
     server.get("/items/:identifier/resources", route(getItemResourcesHandler));
+    server.get(
+        "/items/:identifier/resources/:resource/status",
+        route(getResourceProcessingStatusHandler)
+    );
     server.get(
         "/items/:identifier/resources/:resource/transcription",
         route(getItemTranscriptionHandler)
@@ -77,38 +81,48 @@ async function createItemHandler(req, res, next) {
     next();
 }
 
-async function getItemProcessingStatusHandler(req, res, next) {
-    const configuration = await loadConfiguration();
-    let { resources } = await listItemResources({ identifier: req.params.identifier });
-    if (resources) {
-        resources = resources.map((r) => r.Key.split(`${req.params.identifier}/`)[1]);
-    }
+async function getItemStatisticsHandler(req, res, next) {
+    let { resources } = await listItemResources({
+        identifier: req.params.identifier,
+        groupByResource: true,
+    });
+    let statistics = {
+        resourceTotal: Object.keys(resources).length,
+    };
+    res.send({ statistics });
+    next();
+}
+
+async function getResourceProcessingStatusHandler(req, res, next) {
     let completed = {};
-    for (let stage of configuration.api.processing.requiredStages) {
-        switch (stage) {
-            case "thumbnails":
-                completed.thumbnails = resources.filter((r) => r.match("thumbnail")).length
-                    ? true
-                    : false;
-            case "webformats":
-                let jpeg = resources.filter((r) => r.match(/\.jpe?g/)).length ? true : false;
-                let webp = resources.filter((r) => r.match(/\.webp/)).length ? true : false;
-                // let avif = resources.filter((r) => r.match(/\.avif/)).length ? true : false;
-                completed.webformats = jpeg && webp ? true : false;
-            case "ocr":
-                completed.ocr =
-                    resources.filter((r) => r.match(/.tesseract_ocr/)).length === 2 ? true : false;
-        }
-    }
-    res.send(completed);
+    const identifier = req.params.identifier;
+    const resource = req.params.resource.split(".").shift().split("-").pop();
+    let { resources } = await listItemResources({
+        identifier,
+        groupByResource: true,
+    });
+    let files = resources[resource];
+
+    completed[resource] = {};
+    completed[resource].thumbnail = files.filter((f) => f.name.match(/thumbnail/)).length
+        ? true
+        : false;
+    completed[resource].webformats = (() => {
+        let jpeg = files.filter((f) => f.name.match(/\.jpe?g/)).length ? true : false;
+        let webp = files.filter((f) => f.name.match(/\.webp/)).length ? true : false;
+        return jpeg && webp ? true : false;
+    })();
+    completed[resource].tesseract =
+        files.filter((f) => f.name.match(/\.tesseract_ocr/)).length === 2 ? true : false;
+    completed[resource].tei =
+        files.filter((f) => f.name.match(/\.tei\.xml/)).length === 1 ? true : false;
+    res.send({ completed: completed[resource] });
     next();
 }
 
 async function getItemResourcesHandler(req, res, next) {
     let { resources } = await listItemResources({ identifier: req.params.identifier });
-    if (resources) {
-        resources = resources.map((r) => r.Key.split(`${req.params.identifier}/`)[1]);
-    } else {
+    if (!resources) {
         resources = [];
     }
     res.send({ resources });

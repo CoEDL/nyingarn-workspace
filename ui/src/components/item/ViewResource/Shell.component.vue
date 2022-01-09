@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-col">
-        <div class="text-xl mb-2 flex flex-row space-x-4">
-            <router-link link :to="itemUrl">item: {{ identifier }}</router-link>
-            <div>resource: {{ resource }}</div>
+        <div class="text-xl mb-2 bg-indigo-200 p-4 flex flex-row space-x-4">
+            <router-link link :to="itemUrl">{{ identifier }}:</router-link>
+            <div class="text-lg">{{ resource }}</div>
         </div>
 
         <div class="flex flex-row">

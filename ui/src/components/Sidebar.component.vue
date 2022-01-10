@@ -56,6 +56,7 @@ export default {
                 },
                 { name: "Manage Users", path: "/admin/users", icon: "fas fa-users" },
                 { name: "System Logs", path: "/admin/logs", icon: "fas fa-clipboard-list" },
+                { name: "Workspace Items", path: "/admin/items", icon: "fas fa-file-image" },
             ],
         };
     },

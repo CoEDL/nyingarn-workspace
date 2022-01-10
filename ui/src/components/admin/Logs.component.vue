@@ -6,7 +6,6 @@
                     v-model="selectedLevel"
                     placeholder="Select"
                     clearable
-                    size="mini"
                     @change="changeLevel"
                 >
                     <el-option
@@ -21,7 +20,6 @@
 
             <el-date-picker
                 v-model="datetimerange"
-                size="mini"
                 type="datetimerange"
                 start-placeholder="Start Date"
                 end-placeholder="End Date"

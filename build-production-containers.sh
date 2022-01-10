@@ -28,6 +28,10 @@ if [ "$resp" == "y" ] ; then
     docker build --rm -t arkisto/workspace-ui:latest -f Dockerfile.ui-build .
     docker tag arkisto/workspace-ui:latest arkisto/workspace-ui:${VERSION}
     echo
+    
+    echo ">> Building the tusd container"
+    docker build -t arkisto/workspace-tusd -f Dockerfile.tus-build .
+    echo
 fi
 
 read -p '>> Tag the repo (select N if you are still testing the builds)? [y|N] ' resp

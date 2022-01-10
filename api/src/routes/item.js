@@ -4,7 +4,8 @@ import {
     NotFoundError,
     InternalServerError,
 } from "restify-errors";
-import { route, logEvent, getLogger, getS3Handle } from "../common";
+import { route, routeAdmin, logEvent, getLogger, getS3Handle } from "../common";
+import { orderBy } from "lodash";
 import {
     createItem,
     lookupItemByIdentifier,
@@ -16,11 +17,13 @@ import {
     itemResourceExists,
     deleteItem,
     deleteItemResource,
+    linkItemToUser,
 } from "../lib/item";
 import path from "path";
 const log = getLogger();
 
 export function setupRoutes({ server }) {
+    // user routes
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
     server.del("/items/:identifier", route(deleteItemHandler));
@@ -41,6 +44,10 @@ export function setupRoutes({ server }) {
         "/items/:identifier/resources/:resource/saveTranscription",
         route(saveItemTranscriptionHandler)
     );
+
+    // admin routes
+    server.get("/admin/items", routeAdmin(getAdminItemsHandler));
+    server.put("/admin/items/:identifier/connect-user", routeAdmin(putAdminItemUserHandler));
 }
 
 async function getItemsHandler(req, res, next) {
@@ -242,6 +249,25 @@ async function saveItemTranscriptionHandler(req, res, next) {
     const { identifier, resource, datafiles, document } = req.params;
     let file = `${resource}.tei.xml`;
     await putItemResource({ identifier, resource: file, content: document });
+    res.send({});
+    next();
+}
+
+// admin route handlers
+async function getAdminItemsHandler(req, res, next) {
+    let { bucket } = await getS3Handle();
+    let resources = await bucket.listObjects({});
+    let items = resources.Contents.filter((r) => r.Key.match("ro-crate-metadata.json")).map(
+        (r) => ({ name: r.Key.split("/").shift() })
+    );
+    items = orderBy(items, "name");
+    res.send({ items });
+    next();
+}
+
+async function putAdminItemUserHandler(req, res, next) {
+    let item = await lookupItemByIdentifier({ identifier: req.params.identifier });
+    await linkItemToUser({ itemId: item.id, userId: req.session.user.id });
     res.send({});
     next();
 }

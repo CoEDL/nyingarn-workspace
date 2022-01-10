@@ -267,7 +267,11 @@ async function getAdminItemsHandler(req, res, next) {
 
 async function putAdminItemUserHandler(req, res, next) {
     let item = await lookupItemByIdentifier({ identifier: req.params.identifier });
-    await linkItemToUser({ itemId: item.id, userId: req.session.user.id });
+    if (item) {
+        await linkItemToUser({ itemId: item.id, userId: req.session.user.id });
+    } else {
+        item = await createItem({ identifier: req.params.identifier, userId: req.session.user.id });
+    }
     res.send({});
     next();
 }

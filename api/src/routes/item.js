@@ -1,5 +1,10 @@
-import { BadRequestError, ForbiddenError, NotFoundError } from "restify-errors";
-import { route, logEvent, getLogger, loadConfiguration } from "../common";
+import {
+    BadRequestError,
+    ForbiddenError,
+    NotFoundError,
+    InternalServerError,
+} from "restify-errors";
+import { route, logEvent, getLogger, getS3Handle } from "../common";
 import {
     createItem,
     lookupItemByIdentifier,
@@ -9,6 +14,8 @@ import {
     getItemResourceLink,
     putItemResource,
     itemResourceExists,
+    deleteItem,
+    deleteItemResource,
 } from "../lib/item";
 import path from "path";
 const log = getLogger();
@@ -16,6 +23,7 @@ const log = getLogger();
 export function setupRoutes({ server }) {
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
+    server.del("/items/:identifier", route(deleteItemHandler));
     server.get("/items/:identifier/status", route(getItemStatisticsHandler));
     server.get("/items/:identifier/resources", route(getItemResourcesHandler));
     server.get(
@@ -27,6 +35,7 @@ export function setupRoutes({ server }) {
         route(getItemTranscriptionHandler)
     );
     server.get("/items/:identifier/resources/:resource", route(getItemResourceHandler));
+    server.del("/items/:identifier/resources/:resource", route(deleteItemResourceHandler));
     server.get("/items/:identifier/resources/:resource/link", route(getItemResourceLinkHandler));
     server.put(
         "/items/:identifier/resources/:resource/saveTranscription",
@@ -78,6 +87,27 @@ async function createItemHandler(req, res, next) {
     }
 
     res.send({ item: item.get() });
+    next();
+}
+
+async function deleteItemHandler(req, res, next) {
+    let item = await lookupItemByIdentifier({
+        identifier: req.params.identifier,
+        userId: req.session.user.id,
+    });
+    if (!item) {
+        return next(new ForbiddenError(`You don't have permission to delete that item`));
+    }
+    try {
+        await deleteItem({ id: item.id });
+        let { bucket } = await getS3Handle();
+        await bucket.removeObjects({ prefix: req.params.identifier });
+    } catch (error) {
+        log.error(`Error deleting item with id: ${req.params.identifier}`);
+        console.error(error);
+        return next(new InternalServerError());
+    }
+    res.send({});
     next();
 }
 
@@ -140,6 +170,19 @@ async function getItemResourceHandler(req, res, next) {
     } catch (error) {
         return next(new NotFoundError());
     }
+}
+
+async function deleteItemResourceHandler(req, res, next) {
+    const { identifier, resource } = req.params;
+    try {
+        await deleteItemResource({ identifier, resource });
+    } catch (error) {
+        log.error(`Error deleting item resource: ${identifier}/${resource}`);
+        console.error(error);
+        return next(new InternalServerError());
+    }
+    res.send({});
+    next();
 }
 
 async function getItemTranscriptionHandler(req, res, next) {

@@ -107,6 +107,12 @@ export async function getItemResource({ identifier, resource }) {
     }
 }
 
+export async function deleteItemResource({ identifier, resource }) {
+    let { bucket } = await getS3Handle();
+    let target = path.join(identifier, resource);
+    await bucket.removeObjects({ prefix: target });
+}
+
 export async function putItemResource({
     identifier,
     resource,

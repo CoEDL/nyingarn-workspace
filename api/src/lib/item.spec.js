@@ -9,6 +9,7 @@ import {
     listItemResources,
     getItemResource,
     getItemResourceLink,
+    deleteItemResource,
 } from "./item";
 const chance = require("chance").Chance();
 import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "../common";
@@ -125,7 +126,29 @@ describe("Item management tests", () => {
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
+
     it("should be able to get an item resource from S3", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        let data = await getItemResource({ identifier, resource: "file.json" });
+        expect(data).toEqual(JSON.stringify({ some: "thing" }));
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to delete an item resource", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        let { resources } = await listItemResources({ identifier });
+        expect(resources.length).toEqual(1);
+        expect(resources[0]).toMatch("file.json");
+        await deleteItemResource({ identifier, resource: "file.json" });
+        ({ resources } = await listItemResources({ identifier }));
+        expect(resources.length).toEqual(0);
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to delete an item resource in S3", async () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
         let data = await getItemResource({ identifier, resource: "file.json" });

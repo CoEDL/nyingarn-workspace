@@ -8,7 +8,7 @@
             @current-change="loadItems"
         >
         </el-pagination>
-        <div class="w-full lg:w-3/5">
+        <div class="w-full xl:w-3/5">
             <el-table :data="items">
                 <el-table-column prop="name" label="Name">
                     <template #default="scope">
@@ -17,12 +17,28 @@
                 </el-table-column>
                 <el-table-column prop="resourceTotal" label="Resources" width="100">
                 </el-table-column>
+                <el-table-column label="Actions" width="200">
+                    <template #default="scope">
+                        <el-popconfirm
+                            title="Are you sure you want to delete this item? All data will be removed and this can't be undone."
+                            @confirm="deleteItem(scope.row)"
+                        >
+                            <template #reference>
+                                <el-button type="danger">
+                                    <i class="fas fa-trash"></i>
+                                </el-button>
+                            </template>
+                        </el-popconfirm>
+                    </template>
+                </el-table-column>
             </el-table>
         </div>
     </div>
 </template>
 
 <script>
+import { ElMessage } from "element-plus";
+
 export default {
     data() {
         return {
@@ -63,6 +79,16 @@ export default {
                     items.push(item);
                 }
                 this.items = [...items];
+            }
+        },
+        async deleteItem(item) {
+            try {
+                await this.$http.delete({
+                    route: `/items/${item.name}`,
+                });
+                this.loadItems();
+            } catch (error) {
+                ElMessage.error(`Something went wrong deleting this item`);
             }
         },
     },

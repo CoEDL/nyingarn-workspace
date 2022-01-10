@@ -7,11 +7,11 @@
         <div class="flex flex-row flex-wrap">
             <view-item-component
                 class="cursor-pointer m-2"
-                @click="viewResource(resource)"
                 v-for="(item, resource, idx) in resources"
                 :key="idx"
                 :resource="resource"
                 :data="item"
+                @refresh-item="init"
             />
         </div>
     </div>
@@ -39,9 +39,6 @@ export default {
             this.resources = (
                 await getItemResources({ $http: this.$http, identifier: this.identifier })
             ).resources;
-        },
-        viewResource(resource) {
-            this.$router.push(`/resource/${this.identifier}/${resource}`);
         },
     },
 };

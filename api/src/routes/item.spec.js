@@ -89,6 +89,40 @@ describe("Item management route tests", () => {
         await deleteItem({ id: item.id });
         await bucket.removeObjects({ prefix: identifier });
     });
+    it("should be able to delete own item as a user", async () => {
+        let user = {
+            email: userEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+
+        let session = await createSession({ user });
+
+        const identifier = chance.word();
+        let response = await fetch(`${host}/items`, {
+            method: "POST",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                identifier,
+            }),
+        });
+        expect(response.status).toEqual(200);
+
+        response = await fetch(`${host}/items/${identifier}`, {
+            method: "DELETE",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ identifier }),
+        });
+        expect(response.status).toEqual(200);
+    });
     it("should succeed if the new item exists and is already associated to this user", async () => {
         let user = {
             email: userEmail,
@@ -198,6 +232,50 @@ describe("Item management route tests", () => {
         expect(response.status).toEqual(200);
 
         await bucket.removeObjects({ prefix: identifier });
+        await deleteItem({ id: item.id });
+    });
+    it("should be able to delete an item resource", async () => {
+        let { user, identifier, item, session } = await setupTestItem({ email: userEmail });
+
+        let response = await fetch(`${host}/items/${identifier}/resources/file.json`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(200);
+
+        response = await fetch(`${host}/items/${identifier}/resources`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        let { resources } = await response.json();
+        expect(resources.length).toBe(1);
+
+        response = await fetch(`${host}/items/${identifier}/resources/file.json`, {
+            method: "DELETE",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(200);
+
+        response = await fetch(`${host}/items/${identifier}/resources`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        ({ resources } = await response.json());
+        expect(resources.length).toBe(0);
+
+        // await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should fail to get an item resource - not found", async () => {

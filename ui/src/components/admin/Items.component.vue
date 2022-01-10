@@ -36,6 +36,7 @@ export default {
         },
         async connectItem(item) {
             await this.$http.put({ route: `/admin/items/${item.name}/connect-user` });
+            this.$router.push(`/items/${item.name}/view`);
         },
     },
 };

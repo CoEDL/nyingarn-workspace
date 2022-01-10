@@ -5,6 +5,7 @@ import { createSession } from "../lib/session";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";
 import { getS3Handle } from "../common";
+import models from "../models";
 import {
     host,
     setupBeforeAll,
@@ -322,6 +323,57 @@ describe("Item management route tests", () => {
 
         await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
+    });
+    it("should be able to get a list of all items in the space", async () => {
+        let identifiers = [];
+        let items = [];
+        let { identifier, item, session } = await setupTestItem({ email: userEmail });
+        identifiers.push(identifier);
+        items.push(item);
+        ({ identifier, item, session } = await setupTestItem({ email: adminEmail }));
+        identifiers.push(identifier);
+        items.push(item);
+
+        let response = await fetch(`${host}/admin/items`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        response = await response.json();
+        expect(response.items.length).toBeGreaterThanOrEqual(2);
+
+        for (let identifier of identifiers) {
+            await bucket.removeObjects({ prefix: identifier });
+        }
+        await models.user.destroy({ where: {} });
+        await models.item.destroy({ where: {} });
+    });
+    it("should be able to attach an item to the admin user", async () => {
+        let identifiers = [];
+        let items = [];
+        let { identifier, item, session } = await setupTestItem({ email: userEmail });
+        identifiers.push(identifier);
+        items.push(item);
+        ({ identifier, item, session } = await setupTestItem({ email: adminEmail }));
+        identifiers.push(identifier);
+        items.push(item);
+
+        let response = await fetch(`${host}/admin/items/${identifiers[0]}/connect-user`, {
+            method: "PUT",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(200);
+
+        for (let identifier of identifiers) {
+            await bucket.removeObjects({ prefix: identifier });
+        }
+        await models.user.destroy({ where: {} });
+        await models.item.destroy({ where: {} });
     });
 });
 

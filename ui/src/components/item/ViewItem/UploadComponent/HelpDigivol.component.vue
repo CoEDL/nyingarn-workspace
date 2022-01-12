@@ -7,8 +7,8 @@
             <div class="text-base py-2">
                 <ol class="pl-2 list-decimal">
                     <li>Upload the DigiVol CSV</li>
-                    <li>Upload the image files</li>
                     <li>Ensure the image filenames match the names in the CSV file</li>
+                    <li>Upload the image files</li>
                 </ol>
             </div>
         </div>

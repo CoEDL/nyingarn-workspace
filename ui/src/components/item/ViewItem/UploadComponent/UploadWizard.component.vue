@@ -1,6 +1,13 @@
 <template>
     <div>
-        <el-dialog v-model="dialogVisible" title="" :show-close="false" width="90%">
+        <el-dialog
+            v-model="dialogVisible"
+            title=""
+            :show-close="false"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            width="90%"
+        >
             <div
                 class="grid grid-flow-col auto-cols-max gap-4 place-content-center text-lg text-center"
             >

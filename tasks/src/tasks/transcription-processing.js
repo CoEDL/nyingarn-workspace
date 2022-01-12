@@ -40,3 +40,5 @@ export async function processDigivolTranscription({ directory, identifier, resou
         }
     }
 }
+
+export async function processFtpTeiTranscription({ directory, identifier, resource }) {}

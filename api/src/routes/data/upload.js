@@ -27,23 +27,22 @@ export async function triggerProcessing(req, res, next) {
     }
 
     log.info(`Process: ${identifier}/${resource}`);
+    let name;
     if (resource.match(/digivol\.csv/)) {
         // process digivol file
-        submitTask({
-            name: "process-digivol",
-            item,
-            body: { resource },
-        });
+        name = "process-digivol";
     } else if (resource.match(/ftp\.xml/)) {
         // process ftp xml file
+        name = "process-ftp-tei";
     } else {
         // process uploaded image
-        submitTask({
-            name: "process-image",
-            item,
-            body: { resource },
-        });
+        name = "process-image";
     }
+    submitTask({
+        name,
+        item,
+        body: { resource },
+    });
 
     res.send({});
     return next();

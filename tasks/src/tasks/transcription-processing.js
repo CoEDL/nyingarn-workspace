@@ -27,7 +27,8 @@ export async function processDigivolTranscription({ directory, identifier, resou
 
     let { bucket } = await getS3Handle();
     for (let record of data) {
-        if (record.externalIdentifier) {
+        const re = new RegExp(`^${identifier}-.*`);
+        if (record.externalIdentifier && record.externalIdentifier.match(re)) {
             let filename = `${record.externalIdentifier.split(".").shift()}.tei.xml`;
             let teiFile = path.join(identifier, filename);
             let exists = await bucket.pathExists({ path: teiFile });

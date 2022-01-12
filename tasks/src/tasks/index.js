@@ -1,5 +1,8 @@
 export { createImageThumbnail, createWebFormats, runOCR } from "./image-processing";
-export { processDigivolTranscription } from "./transcription-processing";
+export {
+    processDigivolTranscription,
+    processFtpTeiTranscription,
+} from "./transcription-processing";
 
 import { groupBy } from "lodash";
 import path from "path";

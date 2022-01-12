@@ -1,13 +1,13 @@
 <template>
     <div class="flex flex-col space-y-2">
         <div class="bg-yellow-100 p-2 rounded flex flex-row">
-            <div class="text-3xl p-4 text-gray-600">
+            <div class="text-3xl p-4 text-red-600">
                 <i class="fas fa-exclamation-circle"></i>
             </div>
             <div class="text-base py-2">
-                <ul class="pl-2 list-disc">
+                <ol class="pl-2 list-decimal">
                     <li>Upload the image files</li>
-                </ul>
+                </ol>
             </div>
         </div>
         <div class="bg-indigo-100 p-2 rounded flex flex-row">

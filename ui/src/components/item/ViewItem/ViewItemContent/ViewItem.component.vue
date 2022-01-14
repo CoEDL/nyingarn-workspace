@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-row space-x-2 border border-gray-400 p-4">
         <display-image-thumbnail-component
-            class="w-40 cursor-pointer"
+            class="w-36 cursor-pointer"
             :data="data"
             @click="viewResource(resource)"
         />

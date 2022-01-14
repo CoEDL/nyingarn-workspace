@@ -24,7 +24,7 @@
         "clean-webpack-plugin": "^4.0.0-alpha.0",
         "copy-webpack-plugin": "^9.0.1",
         "debug": "^4.3.2",
-        "jest": "^27.0.6",
+        "jest": "^27.4.7",
         "jest-fetch-mock": "^3.0.3",
         "nodemon": "^2.0.12",
         "webpack": "^5.47.1",
@@ -47,6 +47,8 @@
         "sequelize": "^6.6.5",
         "sharp": "^0.29.2",
         "tesseract.js": "^2.1.5",
-        "winston": "^3.3.3"
+        "winston": "^3.3.3",
+        "xmldom": "^0.6.0",
+        "xmlserializer": "^0.6.1"
     }
 }

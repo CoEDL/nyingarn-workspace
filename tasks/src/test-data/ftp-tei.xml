@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd" xml:lang="EN" xml:id="export">
+
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title type="full">
+                    <title type="main">Archive</title>
+                    <title type="desc"></title>
+                </title>
+                <author>
+                    <persName></persName>
+                </author>
+            </titleStmt>
+
+            <publicationStmt>
+                <publisher>Dynamic TEI export from FromThePage (version 21.1)</publisher>
+                <availability>
+                    <p></p>
+                </availability>
+                <date when="2022-01-12T23:17:04+00:00">January 12, 2022</date>
+            </publicationStmt>
+
+            <editionStmt>
+                <edition>Edition created from new transcripts of this manuscript.</edition>
+                <respStmt xml:id="AU6">
+                    <resp>Initial upload of this work&#39;s facsimile images and metadata to FromThePage for editing</resp>
+                    <persName>yellow</persName>
+                </respStmt>
+
+                <respStmt xml:id="OU6">
+                    <resp>Adminstrator of the Bates transcription project on FromThePage</resp>
+                    <persName>yellow</persName>
+                </respStmt>
+            </editionStmt>
+
+            <sourceDesc>
+                <msDesc>
+                    <msIdentifier>
+                        <collection>Bates</collection>
+                    </msIdentifier>
+                    <physDesc>
+                        <p></p>
+                    </physDesc>
+                    <history>
+                        <origin>
+                            <placeName></placeName>
+                        </origin>
+                        <provenance></provenance>
+                    </history>
+                </msDesc>
+
+                <listPerson>
+                    <person xml:id="S9">
+                        <persName>X</persName>
+                        <note type="categorization">
+                  Categories:
+                            <ab>
+                                <ptr ana="#category #leaf #root" target="#C11">People</ptr>
+                            </ab>
+                        </note>
+                    </person>
+                    <person xml:id="S10">
+                        <persName>Y</persName>
+                        <note type="categorization">
+                  Categories:
+                            <ab>
+                                <ptr ana="#category #leaf #root" target="#C11">People</ptr>
+                            </ab>
+                        </note>
+                    </person>
+                </listPerson>
+
+                <listPlace>
+                    <place xml:id="S11">
+                        <placeName>A</placeName>
+                        <note type="categorization">
+                  Categories:
+                            <ab>
+                                <ptr ana="#category #leaf #root" target="#C10">Places</ptr>
+                            </ab>
+                        </note>
+                    </place>
+                </listPlace>
+            </sourceDesc>
+        </fileDesc>
+
+        <profileDesc>
+            <langUsage>
+                <language ident="eng">English</language>
+            </langUsage>
+        </profileDesc>
+
+        <revisionDesc>
+            <listChange ordered="true">
+                <change xml:id="CHG55" who="U6" when="2021-12-13T00:37:43Z" target="#P228">
+          Version 20 of page "35-128T":
+            Changes to page transcript.
+                </change>
+            </listChange>
+        </revisionDesc>
+    </teiHeader>
+
+    <text>
+        <body>
+            <pb xml:id="F225" n="1" facs="https://fromthepage.nyingarn.net/image-service/225/full/full/0/native.jpg"/>
+            <div xml:id="OTP225">
+                <fw type="pageNum">Bates35-125T</fw>
+                <p xml:id='OTP225P0'>XI, 1, C &amp; d &amp; e
+                </p>
+
+
+            </div>
+            <pb xml:id="F226" n="2" facs="https://fromthepage.nyingarn.net/image-service/226/full/full/0/native.jpg"/>
+            <div xml:id="OTP226">
+                <fw type="pageNum">Bates35-126T</fw>
+                <p xml:id='OTP226P0'>XI  1d<lb/>
+                <hi rend='underline'>CORROBOREES, SONGS, etc.</hi>
+                <lb/>
+                <hi rend='underline'>Broome and N.W West Aust. </hi>
+            </p>
+            <note resp="#U6">How do you do underline text? </note>
+        </div>
+        <pb xml:id="F232" n="8" facs="https://fromthepage.nyingarn.net/image-service/232/full/full/0/native.jpg"/>
+        <div xml:id="OTP232">
+            <fw type="pageNum">Bates35-132T</fw>
+            <p xml:id='OTP232P0'>35/132<lb/>
+4<lb/>
+        <hi rend='underline'>Billingee</hi>
+        <lb/>
+Notebook 11b, P.27<lb/>
+Song the men sing when they wear the joorda-joorda :-
+    </p>
+
+    <p xml:id='OTP232P1'>Joordoo joorda<lb/>
+Yarda boolgarra
+    </p>
+
+
+</div>
+</body>
+</text>
+</TEI>

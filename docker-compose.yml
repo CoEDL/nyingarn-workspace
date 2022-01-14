@@ -83,6 +83,7 @@ services:
             - api_node_modules:/srv/api/node_modules:delegated
             - ./tasks:/srv/tasks:delegated
             - ./api:/srv/api:delegated
+            - ./.git:/srv/tasks/.git:delegated
             - ./.git:/srv/api/.git:delegated
             - ./configuration:/srv/configuration
         command: ["npm", "run", "develop"]

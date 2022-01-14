@@ -1,15 +1,13 @@
 <template>
-    <div class="flex flex-col">
-        <div class="flex flex-row flex-wrap">
-            <view-item-component
-                class="cursor-pointer m-2"
-                v-for="(item, resource, idx) in resources"
-                :key="idx"
-                :resource="resource"
-                :data="item"
-                @refresh-item="init"
-            />
-        </div>
+    <div class="flex flex-row flex-wrap overflow-scroll" :style="{ height: panelHeight }">
+        <view-item-component
+            class="cursor-pointer m-2"
+            v-for="(item, resource, idx) in resources"
+            :key="idx"
+            :resource="resource"
+            :data="item"
+            @refresh-item="init"
+        />
     </div>
 </template>
 
@@ -25,6 +23,7 @@ export default {
         return {
             identifier: this.$route.params.identifier,
             resources: [],
+            panelHeight: `${window.innerHeight - 150}px`,
         };
     },
     mounted() {

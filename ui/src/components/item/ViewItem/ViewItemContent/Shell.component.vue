@@ -1,9 +1,5 @@
 <template>
     <div class="flex flex-col">
-        <div>
-            <el-button @click="init"><i class="fas fa-sync-alt"></i>&nbsp;refresh</el-button>
-        </div>
-
         <div class="flex flex-row flex-wrap">
             <view-item-component
                 class="cursor-pointer m-2"

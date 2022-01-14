@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col">
+    <div class="flex flex-col h-screen">
         <div class="text-xl mb-2 bg-indigo-200 p-4">
             {{ identifier }}
         </div>

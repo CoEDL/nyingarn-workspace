@@ -77,14 +77,7 @@ export default {
                 // can't get item content
             }
             let transcription = (await response.json()).content;
-            let image = this.data
-                .filter((f) => f.match(/jpe?g/))
-                .filter((f) => !f.match(/thumbnail/))[0];
-            if (!transcription.match(/^\<pb facs=/)) {
-                return `<pb facs="${image}">\n${transcription}\n</pb>`;
-            } else {
-                return transcription;
-            }
+            return transcription;
         },
         addElement(t) {
             let text = this.codemirror.getSelection();

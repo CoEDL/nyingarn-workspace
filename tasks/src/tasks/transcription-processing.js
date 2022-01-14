@@ -37,8 +37,8 @@ export async function processDigivolTranscription({ directory, identifier, resou
 
             if (!exists) {
                 filename = path.join(directory, identifier, filename);
-                await writeFile(filename, `<pb facs="${record.externalIdentifier}"/>`);
-                await writeFile(filename, record.occurrenceRemarks);
+                await writeFile(filename, `<pb facs="${record.externalIdentifier}"/>\n`);
+                await appendFile(filename, record.occurrenceRemarks);
             }
         }
     }
@@ -76,7 +76,7 @@ export async function processFtpTeiTranscription({ directory, identifier, resour
 
         if (!exists) {
             filename = path.join(directory, identifier, filename);
-            await writeFile(filename, `<pb facs="${pageIdentifier}"/>\n`);
+            await writeFile(filename, `<pb facs="${pageIdentifier}.jpg"/>\n`);
             for (let p of paragraphs) {
                 p.removeAttribute("xml:id");
                 await appendFile(

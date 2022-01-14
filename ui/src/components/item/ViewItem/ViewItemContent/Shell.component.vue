@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-row flex-wrap overflow-scroll" :style="{ height: panelHeight }">
         <view-item-component
-            class="cursor-pointer m-2"
+            class="cursor-pointer m-2 h-80"
             v-for="(item, resource, idx) in resources"
             :key="idx"
             :resource="resource"
@@ -23,7 +23,7 @@ export default {
         return {
             identifier: this.$route.params.identifier,
             resources: [],
-            panelHeight: `${window.innerHeight - 150}px`,
+            panelHeight: `${window.innerHeight - 180}px`,
         };
     },
     mounted() {

@@ -10,7 +10,7 @@
         "filename": {
             "matchItemName": true,
             "helpName": "Must match the form {item identifier}-{sequence number}. {item identifier} must consist only of alphanumeric characters and must start with a letter.",
-            "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9]+-0*[1-9]*\\..*$",
+            "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9]+-[0-9]*\\..*$",
             "helpExtension": "Accepted file types: jpg, jpeg, png, tif, pdf",
             "checkExtension": ".*\\.(jpg|JPG|jpeg|JPEG|pdf|PDF|tif|TIF|png|PNG)$"
         }

@@ -11,6 +11,12 @@
                     <i class="fas fa-redo"></i>
                 </el-button>
             </div>
+            <div>
+                <div v-if="saved" class="text-green-400 mx-4">
+                    <i class="fas fa-check"></i>
+                    saved
+                </div>
+            </div>
         </div>
         <div class="flex flex-row">
             <textarea ref="textarea" class="w-full"></textarea>
@@ -48,6 +54,7 @@ export default {
             debouncedLog: debounce(console.log, 1000),
             debouncedSave: debounce(this.save, 1000),
             tei: this.$store.state.configuration.teiMarkupControls.controls,
+            saved: false,
         };
     },
     computed: {
@@ -112,6 +119,11 @@ export default {
                 route: `/items/${identifier}/resources/${resource}/saveTranscription`,
                 body: { datafiles: this.data, document: this.codemirror.getValue() },
             });
+
+            this.saved = true;
+            setTimeout(() => {
+                this.saved = false;
+            }, 1500);
         },
     },
 };

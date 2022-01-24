@@ -98,10 +98,12 @@ export async function runOCR({ directory, identifier, resource }) {
 
     source = path.join(directory, identifier, source.name);
     log.debug(`Running OCR on '${source}'`);
-    let text = await worker.recognize(source);
-    await writeToFile(identifier, `${target}.txt`, text.data.text);
-    await writeToFile(identifier, `${target}.html`, text.data.hocr);
-    await worker.terminate();
+
+    try {
+        let text = await recognize({ worker, source });
+        await writeToFile(identifier, `${target}.txt`, text.data.text);
+        await writeToFile(identifier, `${target}.html`, text.data.hocr);
+    } catch (error) {}
 
     async function writeToFile(identifier, file, content) {
         try {
@@ -109,5 +111,19 @@ export async function runOCR({ directory, identifier, resource }) {
         } catch (error) {
             console.log(`Error writing OCR output for '${identifier}' to: ${file}`);
         }
+    }
+
+    async function recognize({ worker, source }) {
+        return new Promise(async (resolve, reject) => {
+            let timeout = setTimeout(async () => {
+                log.debug(`Killing the OCR job - 5 minutes have passed.`);
+                await worker.terminate();
+                reject();
+            }, 300000);
+            let text = await worker.recognize(source);
+            await worker.terminate();
+            clearTimeout(timeout);
+            resolve(text);
+        });
     }
 }

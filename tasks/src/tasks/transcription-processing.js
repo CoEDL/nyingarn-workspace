@@ -2,10 +2,10 @@ import path from "path";
 import { readFile, pathExists, createReadStream, writeFile, appendFile } from "fs-extra";
 import { parse } from "csv-parse";
 import { zipObject, isEmpty } from "lodash";
-import { getS3Handle } from "../common";
-import { getFiles } from "./";
+import { getS3Handle, getLogger } from "../common";
 let { DOMParser } = require("xmldom");
 import xmlserializer from "xmlserializer";
+const log = getLogger();
 
 export async function processDigivolTranscription({ directory, identifier, resource }) {
     let file = path.join(directory, identifier, resource);
@@ -38,7 +38,13 @@ export async function processDigivolTranscription({ directory, identifier, resou
             if (!exists) {
                 filename = path.join(directory, identifier, filename);
                 await writeFile(filename, `<pb facs="${record.externalIdentifier}"/>\n`);
-                await appendFile(filename, record.occurrenceRemarks);
+                if (!record.occurrenceRemarks) {
+                    log.error(
+                        `'occurrenceRemarks' column not found for record '${record.externalIdentifier}'- no transcription`
+                    );
+                } else {
+                    await appendFile(filename, record.occurrenceRemarks);
+                }
             }
         }
     }

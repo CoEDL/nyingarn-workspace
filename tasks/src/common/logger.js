@@ -25,6 +25,7 @@ export async function updateTask({ taskId, status, text, data }) {
     try {
         let task = await models.task.findOne({ where: { id: taskId } });
         task.status = status;
+        task.data = data;
         await task.save();
     } catch (error) {
         console.log(error);

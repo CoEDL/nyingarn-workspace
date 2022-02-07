@@ -69,7 +69,7 @@ export default {
         async loadTranscription() {
             this.transcription = await this.getTranscription();
             this.codemirror = CodeMirror.fromTextArea(this.$refs.textarea, {});
-            this.codemirror.setSize("100%", "100%");
+            this.codemirror.setSize("100%", window.innerHeight - 200);
             this.codemirror.setOption("mode", "text/xml");
             this.codemirror.setOption("theme", "blackboard");
             this.codemirror.setValue(this.transcription);

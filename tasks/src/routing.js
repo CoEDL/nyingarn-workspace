@@ -48,10 +48,10 @@ export async function runTask(msg) {
             });
         }
     } catch (error) {
-        log.error(`runTask ERROR: ${error.message}`);
+        log.error(`runTask ERROR: Task in ${directory}`);
         try {
             await cleanupAfterFailure({ directory, identifier });
-            if (taskId) {
+            if (task.id) {
                 await updateTask({
                     taskId: task.id,
                     data: { error: error.message },

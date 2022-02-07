@@ -2,7 +2,7 @@ import sharp from "sharp";
 import path from "path";
 import { getLogger, loadConfiguration } from "../common";
 import { createWorker } from "tesseract.js";
-import { writeFile } from "fs-extra";
+import { writeFile, remove } from "fs-extra";
 const log = getLogger();
 import { getFiles, thumbnailHeight, webFormats } from "./";
 
@@ -45,7 +45,12 @@ export async function createImageThumbnail({ directory, identifier, resource }) 
     let target = path.join(directory, identifier, thumbnail);
 
     log.debug(`Creating '${target}' from '${source}'`);
-    await sharp(source).resize({ height: thumbnailHeight }).toFile(target);
+    try {
+        await sharp(source).resize({ height: thumbnailHeight }).toFile(target);
+    } catch (error) {
+        await remove(target);
+        throw new Error(error.message);
+    }
 }
 
 export async function createWebFormats({ directory, identifier, resource }) {
@@ -71,7 +76,12 @@ export async function createWebFormats({ directory, identifier, resource }) {
         source = path.join(directory, identifier, source.name);
         target = path.join(directory, identifier, target);
         log.debug(`Creating '${target}' from '${source}'`);
-        await sharp(source).toFile(target);
+        try {
+            await sharp(source).toFile(target);
+        } catch (error) {
+            await remove(target);
+            throw new Error(error.message);
+        }
     }
 }
 

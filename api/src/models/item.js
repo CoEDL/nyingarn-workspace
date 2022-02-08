@@ -28,7 +28,7 @@ module.exports = function (sequelize, DataTypes) {
         Item.belongsToMany(models.user, {
             through: models.item_user,
         });
-        Item.hasMany(models.task);
+        Item.hasMany(models.task, { onDelete: "cascade", hooks: true });
     };
 
     return Item;

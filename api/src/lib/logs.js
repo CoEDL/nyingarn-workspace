@@ -11,6 +11,11 @@ export async function getLogs({ limit = 10, offset = 0, level, dateFrom, dateTo 
             [Op.between]: [dateFrom, dateTo],
         };
     }
-    let entries = await models.log.findAndCountAll({ offset, limit, where });
+    let entries = await models.log.findAndCountAll({
+        offset,
+        limit,
+        where,
+        order: [["createdAt", "DESC"]],
+    });
     return entries;
 }

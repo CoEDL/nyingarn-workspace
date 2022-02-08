@@ -41,7 +41,11 @@
                     {{ props.row.data }}
                 </template>
             </el-table-column>
-            <el-table-column prop="createdAt" label="Date" width="220" />
+            <el-table-column prop="createdAt" label="Date" width="220">
+                <template #default="props">
+                    {{ formatDate(props.row.createdAt) }}
+                </template>
+            </el-table-column>
             <el-table-column prop="level" label="Level" width="80" />
             <el-table-column prop="owner" label="Owner" width="250" />
             <el-table-column prop="text" label="Text" width="800" />
@@ -50,6 +54,7 @@
 </template>
 
 <script>
+import { format, parseISO } from "date-fns";
 export default {
     data() {
         return {
@@ -100,6 +105,9 @@ export default {
             } else {
                 await this.getLogs({});
             }
+        },
+        formatDate(date) {
+            return format(parseISO(date), "PPpp");
         },
     },
 };

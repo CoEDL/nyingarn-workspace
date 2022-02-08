@@ -14,6 +14,10 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.ENUM("in progress", "done", "failed"),
                 defaultValue: "in progress",
             },
+            resource: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
             name: {
                 type: DataTypes.STRING,
                 allowNull: false,

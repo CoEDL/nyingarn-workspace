@@ -1,9 +1,18 @@
 <template>
     <div class="my-2 flex flex-col space-y-2">
         <div class="flex flex-row">
-            <uploader-component class="w-2/3" :identifier="identifier" />
+            <uploader-component
+                :identifier="identifier"
+                @file-uploaded="fileUploaded"
+                @file-removed="fileRemoved"
+            />
+            <processing-status-component
+                class="flex-grow"
+                :uploads="uploads"
+                v-if="uploads.length"
+            />
 
-            <div class="px-2">
+            <div class="px-2" v-if="!uploads.length">
                 <digi-vol-help-component v-if="help === 'digivol'" />
                 <ftp-help-component v-if="help === 'ftp'" />
                 <image-help-component v-if="help === 'images'" />
@@ -19,6 +28,8 @@ import UploadWizardComponent from "./UploadWizard.component.vue";
 import DigiVolHelpComponent from "./HelpDigivol.component.vue";
 import FtpHelpComponent from "./HelpFTP.component.vue";
 import ImageHelpComponent from "./HelpImages.component.vue";
+import ProcessingStatusComponent from "./ProcessingStatus.component.vue";
+import { uniqBy } from "lodash";
 
 export default {
     components: {
@@ -27,17 +38,25 @@ export default {
         DigiVolHelpComponent,
         FtpHelpComponent,
         ImageHelpComponent,
+        ProcessingStatusComponent,
     },
     data() {
         return {
             helpFileExtension: this.$store.state.configuration.ui?.filename?.helpExtension,
             identifier: this.$route.params.identifier,
             help: undefined,
+            uploads: [],
         };
     },
     methods: {
         showHelp({ type }) {
             this.help = type;
+        },
+        fileUploaded(data) {
+            this.uploads = uniqBy([...this.uploads, data], "resource");
+        },
+        fileRemoved(data) {
+            this.uploads = this.uploads.filter((r) => r.resource !== data.resource);
         },
     },
 };

@@ -1,8 +1,10 @@
 import models from "../models";
+import { Op } from "sequelize";
 import { loadConfiguration, getS3Handle, getUserTempLocation } from "../common";
 import path from "path";
 import { writeJson, remove } from "fs-extra";
 import { compact, groupBy } from "lodash";
+import { sub } from "date-fns";
 const specialFiles = ["ro-crate-metadata.json", "digivol.csv", "ftp.xml"];
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
@@ -200,4 +202,21 @@ export function groupFilesByResource({ identifier, files, naming }) {
     }
 
     return { files: groupBy(resources, "resourceId") };
+}
+
+export async function getResourceProcessingStatus({ identifier, resources }) {
+    let dateTo = new Date();
+    let dateFrom = sub(dateTo, { minutes: 10 });
+    return await models.task.findAll({
+        where: {
+            [Op.and]: {
+                itemId: identifier,
+                updatedAt: {
+                    [Op.between]: [dateFrom, dateTo],
+                },
+                [Op.or]: { resource: resources },
+            },
+        },
+        order: [["updatedAt", "DESC"]],
+    });
 }

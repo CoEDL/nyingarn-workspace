@@ -99,9 +99,12 @@ export default {
             });
             const token = this.$http.getToken();
             uppy.setMeta({ itemId: this.identifier, token });
-            // uppy.on("upload-success", (data) => {
-            //     console.log(JSON.stringify(data, null, 2));
-            // });
+            uppy.on("upload-success", (data) => {
+                this.$emit("file-uploaded", { itemId: this.identifier, resource: data.name });
+            });
+            uppy.on("file-removed", ({ data }) => {
+                this.$emit("file-removed", { resource: data.name });
+            });
             this.uppy = uppy;
         },
     },

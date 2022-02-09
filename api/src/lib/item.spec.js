@@ -126,7 +126,6 @@ describe("Item management tests", () => {
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
-
     it("should be able to get an item resource from S3", async () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 

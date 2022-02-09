@@ -28,7 +28,7 @@ describe("Log management tests", () => {
         let page1 = await getLogs({});
 
         await generateLogs(1, 0, 0);
-        let page2 = await getLogs({ offset: 1 });
+        let page2 = await getLogs({ offset: 0 });
         expect(page1.rows[0].id).not.toEqual(page2.rows[0].id);
     });
     test("it should be able to get logs in a given date range", async () => {

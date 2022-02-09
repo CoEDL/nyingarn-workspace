@@ -50,7 +50,7 @@ describe("Log management tests", () => {
         let logs1 = (await response.json()).logs;
 
         await generateLogs(1, 0, 0);
-        response = await fetch(`${host}/admin/logs?offset=1`, {
+        response = await fetch(`${host}/admin/logs?offset=0`, {
             headers: {
                 authorization: `Bearer ${session.token}`,
                 "Content-Type": "application/json",

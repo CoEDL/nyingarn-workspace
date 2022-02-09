@@ -7,7 +7,7 @@
                 @file-removed="fileRemoved"
             />
             <processing-status-component
-                class="flex-grow"
+                class="px-2 flex-grow"
                 :uploads="uploads"
                 v-if="uploads.length"
             />

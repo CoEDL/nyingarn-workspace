@@ -64,7 +64,6 @@ export default {
 
                     if (configuration.ui.filename?.checkNameStructure) {
                         let regex = new RegExp(configuration.ui.filename.checkNameStructure);
-                        console.log(currentFile.name);
                         if (!currentFile.name.match(regex)) {
                             uppy.info(
                                 `Skipping file '${currentFile.name}' because the name is not in the expected format.`,

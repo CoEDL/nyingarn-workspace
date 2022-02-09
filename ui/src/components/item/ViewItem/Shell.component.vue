@@ -14,9 +14,9 @@
                 <el-tab-pane label="Upload Data" name="upload">
                     <upload-component v-if="activeTab === 'upload'" />
                 </el-tab-pane>
-                <el-tab-pane label="Data Processing" name="processing">
+                <!-- <el-tab-pane label="Data Processing" name="processing">
                     <data-processing-component v-if="activeTab === 'processing'" />
-                </el-tab-pane>
+                </el-tab-pane> -->
             </el-tabs>
         </div>
     </div>

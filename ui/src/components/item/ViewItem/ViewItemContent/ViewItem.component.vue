@@ -12,7 +12,7 @@
                 property="Webformats"
                 :value="completed.webformats"
             />
-            <display-status-property-component property="OCR" :value="completed.tesseract" />
+            <display-status-property-component property="OCR" :value="completed.textract" />
             <display-status-property-component property="TEI" :value="completed.tei" />
             <div class="flex flex-grow"></div>
             <div class="flex flex-row">

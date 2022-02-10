@@ -171,6 +171,8 @@ async function getResourceProcessingStatusHandler(req, res, next) {
     })();
     completed[resource].tesseract =
         files.filter((f) => f.name.match(/\.tesseract_ocr/)).length === 2 ? true : false;
+    completed[resource].textract =
+        files.filter((f) => f.name.match(/\.textract_ocr/)).length === 1 ? true : false;
     completed[resource].tei =
         files.filter((f) => f.name.match(/\.tei\.xml/)).length === 1 ? true : false;
     res.send({ completed: completed[resource] });

@@ -20,7 +20,7 @@ export async function runTesseractOCR({ directory, identifier, resource }) {
     await worker.load();
     await worker.loadLanguage("eng");
     await worker.initialize("eng");
-    let source = images.filter((i) => i.ext === "jpg").pop();
+    let source = images.filter((i) => i.ext.match("jpe?g")).pop();
     let target = path.join(
         directory,
         identifier,
@@ -72,7 +72,7 @@ export async function runTextractOCR({ directory, identifier, resource }) {
         region: configuration.api.services.aws.region,
     };
 
-    let source = images.filter((i) => i.ext === "jpg").pop();
+    let source = images.filter((i) => i.ext.match("jpe?g")).pop();
     let target = path.join(
         directory,
         identifier,

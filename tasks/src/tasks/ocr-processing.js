@@ -78,10 +78,11 @@ export async function runTextractOCR({ directory, identifier, resource }) {
         identifier,
         `${source.basename}.textract_ocr-${configuration.api.filenaming.adminTag}.json`
     );
+    source = path.join(directory, identifier, source.name);
+    log.debug(`Running Textract OCR on '${source}'`);
 
-    // const file = "BM1648A72-0004.jpg";
     const client = new TextractClient(awsConfiguration);
-    let data = await readFile(path.join(directory, identifier, source.name));
+    let data = await readFile(source);
     const params = {
         Document: {
             Bytes: data,

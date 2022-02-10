@@ -241,43 +241,56 @@ async function getItemTranscriptionHandler(req, res, next) {
     if (!item) {
         return next(new ForbiddenError(`You don't have permission to access this endpoint`));
     }
-    let masterTranscription = `${req.params.resource}.tei.xml`;
-    let tesseractTranscription = `${req.params.resource}.tesseract_ocr-ADMIN.txt`;
-
     let content;
-    let resource = masterTranscription;
     let exists = await itemResourceExists({
         identifier: req.params.identifier,
-        resource,
+        resource: `${req.params.resource}.tei.xml`,
+    });
+    // try to get the master transcription
+    if (exists) {
+        content = await getItemResource({
+            identifier: req.params.identifier,
+            resource: `${req.params.resource}.tei.xml`,
+        });
+
+        res.send({ content });
+        return next();
+    }
+
+    // otherwise try to get the textract transcription
+    exists = await itemResourceExists({
+        identifier: req.params.identifier,
+        resource: `${req.params.resource}.textract_ocr-ADMIN.json`,
     });
     if (exists) {
         content = await getItemResource({
             identifier: req.params.identifier,
-            resource,
+            resource: `${req.params.resource}.textract_ocr-ADMIN.json`,
         });
-    } else {
-        resource = tesseractTranscription;
-        exists = await itemResourceExists({
-            identifier: req.params.identifier,
-            resource,
-        });
-
-        if (exists) {
-            content = await getItemResource({
-                identifier: req.params.identifier,
-                resource,
-            });
-        } else {
-            content = "";
-        }
-    }
-
-    try {
+        content = JSON.parse(content)
+            .Blocks.filter((b) => b.BlockType === "LINE")
+            .map((b) => b.Text)
+            .join("\n");
         res.send({ content });
-        next();
-    } catch (error) {
-        return next(new NotFoundError());
+        return next();
     }
+
+    // otherwise try to get the tesseract transcription
+    exists = await itemResourceExists({
+        identifier: req.params.identifier,
+        resource: `${req.params.resource}.tesseract_ocr-ADMIN.txt`,
+    });
+    if (exists) {
+        content = await getItemResource({
+            identifier: req.params.identifier,
+            resource: `${req.params.resource}.tesseract_ocr-ADMIN.txt`,
+        });
+        res.send({ content });
+        return next();
+    }
+
+    res.send({ content: "" });
+    return next();
 }
 
 async function getItemResourceLinkHandler(req, res, next) {

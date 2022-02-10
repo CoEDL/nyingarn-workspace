@@ -37,9 +37,9 @@ services:
             - TUS_VOLUME:/data
         user: root
         environment:
-            AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-            AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
             AWS_DEFAULT_REGION: us-east-1
+            AWS_ACCESS_KEY_ID: "${S3_ACCESS_KEY_ID}"
+            AWS_SECRET_ACCESS_KEY: "${S3_SECRET_ACCESS_KEY}"
             S3_ENDPOINT_URL: "${S3_ENDPOINT_URL}"
             S3_BUCKET: "${S3_BUCKET}"
             PRE_CREATE: "http://api:8080/upload/pre-create"

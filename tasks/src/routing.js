@@ -1,7 +1,8 @@
 import {
     createImageThumbnail,
     createWebFormats,
-    runOCR,
+    runTesseractOCR,
+    runTextractOCR,
     processDigivolTranscription,
     processFtpTeiTranscription,
 } from "./tasks";
@@ -35,7 +36,8 @@ export async function runTask(msg) {
                 log.info(`Running 'process-image' task for '${identifier}' in ${directory}`);
                 await createImageThumbnail({ directory, identifier, resource });
                 await createWebFormats({ directory, identifier, resource });
-                await runOCR({ directory, identifier, resource });
+                // await runTesseractOCR({ directory, identifier, resource });
+                await runTextractOCR({ directory, identifier, resource });
                 break;
         }
 

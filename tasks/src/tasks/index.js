@@ -1,4 +1,5 @@
-export { createImageThumbnail, createWebFormats, runOCR } from "./image-processing";
+export { createImageThumbnail, createWebFormats } from "./image-processing";
+export { runTesseractOCR, runTextractOCR } from "./ocr-processing";
 export {
     processDigivolTranscription,
     processFtpTeiTranscription,
@@ -63,4 +64,21 @@ export function groupFilesByResource({ files, naming }) {
     }
 
     return { files: groupBy(resources, "resourceId") };
+}
+
+export async function getResourceImages({ identifier, resource }) {
+    let { files } = await getFiles({ identifier });
+
+    for (let resourceId of Object.keys(files)) {
+        let re = new RegExp(resourceId);
+        if (resource.match(re)) {
+            resource = files[resourceId];
+            break;
+        }
+    }
+
+    let images = resource
+        .filter((f) => f.type === "image")
+        .filter((f) => !f.name.match(/thumbnail/));
+    return { resource, images };
 }

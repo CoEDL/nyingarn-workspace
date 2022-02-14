@@ -55,11 +55,11 @@ export async function createWebFormats({ directory, identifier, resource }) {
         let target = `${source.basename}.${format.ext ? format.ext : format}`;
 
         // let filename = path.basename(source).split(".")[0];
-        source = path.join(directory, identifier, source.name);
+        const sourceImage = path.join(directory, identifier, source.name);
         target = path.join(directory, identifier, target);
-        log.debug(`Creating '${target}' from '${source}'`);
+        log.debug(`Creating '${target}' from '${sourceImage}'`);
         try {
-            await sharp(source).toFile(target);
+            await sharp(sourceImage).toFile(target);
         } catch (error) {
             await remove(target);
             throw new Error(error.message);

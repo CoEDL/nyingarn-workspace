@@ -7,23 +7,19 @@ const log = getLogger();
 
 export async function prepare({ task, identifier, resource }) {
     let { bucket } = await getS3Handle();
-    // let id = crypto.randomBytes(20).toString("hex");
     const directory = await ensureDir(path.join("/tmp", task.id));
     log.debug(`Setting up task to run in directory: ${directory}.`);
 
-    // for (let file of files) {
     await bucket.downloadFileToFolder({
         file: path.join(identifier, resource),
         localPath: directory,
     });
-    // }
     return directory;
 }
 
 export async function cleanup({ directory, identifier }) {
-    log.debug(`Task in ${directory} completed successfully. Sync'ing back to bucket.`);
-    let { bucket } = await getS3Handle();
-    await bucket.syncLocalPathToBucket({ localPath: path.join(directory, identifier) });
+    log.debug(`Task in ${directory} completed successfully.`);
+    await syncToBucket({ directory, identifier });
 
     if (await pathExists(directory)) {
         await remove(directory);
@@ -33,10 +29,15 @@ export async function cleanup({ directory, identifier }) {
 
 export async function cleanupAfterFailure({ directory, identifier }) {
     log.debug(`Task in ${directory} failed. Cleaning up.`);
-    let { bucket } = await getS3Handle();
-    await bucket.syncLocalPathToBucket({ localPath: path.join(directory, identifier) });
+    await syncToBucket({ directory, identifier });
 
     if (await pathExists(directory)) {
         await remove(directory);
     }
+}
+
+export async function syncToBucket({ directory, identifier }) {
+    log.debug(`Sync'ing back to bucket.`);
+    let { bucket } = await getS3Handle();
+    await bucket.syncLocalPathToBucket({ localPath: path.join(directory, identifier) });
 }

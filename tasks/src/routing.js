@@ -6,7 +6,15 @@ import {
     processDigivolTranscription,
     processFtpTeiTranscription,
 } from "./tasks";
-import { prepare, cleanup, cleanupAfterFailure, getLogger, updateTask, deleteTask } from "./common";
+import {
+    prepare,
+    cleanup,
+    syncToBucket,
+    cleanupAfterFailure,
+    getLogger,
+    updateTask,
+    deleteTask,
+} from "./common";
 const log = getLogger();
 
 export function setupHandlers({ rabbit }) {
@@ -36,7 +44,7 @@ export async function runTask(msg) {
                 log.info(`Running 'process-image' task for '${identifier}' in ${directory}`);
                 await createImageThumbnail({ directory, identifier, resource });
                 await createWebFormats({ directory, identifier, resource });
-                // await runTesseractOCR({ directory, identifier, resource });
+                await syncToBucket({ directory, identifier });
                 await runTextractOCR({ directory, identifier, resource });
                 break;
         }

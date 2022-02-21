@@ -159,6 +159,10 @@ async function getResourceProcessingStatusHandler(req, res, next) {
         groupByResource: true,
     });
     let files = resources[resource];
+    if (!files) {
+        res.send({ completed: (completed[resource] = {}) });
+        return next();
+    }
 
     completed[resource] = {};
     completed[resource].thumbnail = files.filter((f) => f.name.match(/thumbnail/)).length

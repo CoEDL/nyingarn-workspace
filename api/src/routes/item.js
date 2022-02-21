@@ -355,14 +355,28 @@ async function postResourceProcessingStatus(req, res, next) {
 
 // admin route handlers
 async function getAdminItemsHandler(req, res, next) {
+    let items = [];
     let { bucket } = await getS3Handle();
-    let resources = await bucket.listObjects({});
-    let items = resources.Contents.filter((r) => r.Key.match("ro-crate-metadata.json")).map(
-        (r) => ({ name: r.Key.split("/").shift() })
-    );
+
+    let resources = await loadItems({});
+    items = resources
+        .filter((r) => r.Key.match("ro-crate-metadata.json"))
+        .map((r) => ({ name: r.Key.split("/").shift() }));
     items = orderBy(items, "name");
     res.send({ items });
     next();
+
+    async function loadItems({ continuationToken }) {
+        let resources = await bucket.listObjects({ continuationToken });
+        if (resources.NextContinuationToken) {
+            return [
+                ...resources.Contents,
+                ...(await loadItems({ continuationToken: resources.NextContinuationToken })),
+            ];
+        } else {
+            return resources.Contents;
+        }
+    }
 }
 
 async function putAdminItemUserHandler(req, res, next) {

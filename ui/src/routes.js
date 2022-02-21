@@ -58,9 +58,9 @@ const routes = [
                 children: [
                     {
                         name: "admin.users.invite",
-                        path: "users/whitelist",
+                        path: "users/permitted",
                         component: AdminWhitelistUsersComponent,
-                        meta: { name: "whitelist users" },
+                        meta: { name: "permitted users" },
                     },
                     {
                         name: "admin.users.manage",

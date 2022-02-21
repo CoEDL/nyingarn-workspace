@@ -50,8 +50,8 @@ export default {
             siteName: this.$store.state.configuration.ui.siteName,
             adminControls: [
                 {
-                    name: "Whitelist Users",
-                    path: "/admin/users/whitelist",
+                    name: "Permitted Users",
+                    path: "/admin/users/permitted",
                     icon: "fas fa-user-tag",
                 },
                 { name: "Manage Users", path: "/admin/users", icon: "fas fa-users" },

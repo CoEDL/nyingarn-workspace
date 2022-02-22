@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import { getResourceObjects } from "@/components/item/load-item-data";
 import DisplayImageComponent from "./DisplayImage.component.vue";
 import DisplayTranscriptionComponent from "./DisplayTranscription.component.vue";
 export default {
@@ -38,13 +37,12 @@ export default {
     },
     methods: {
         async init() {
-            this.data = (
-                await getResourceObjects({
-                    $http: this.$http,
-                    identifier: this.identifier,
-                    resource: this.resource,
-                })
-            ).objects;
+            let response = await this.$http.get({
+                route: `/items/${this.identifier}/resources/${this.resource}/files`,
+            });
+            if (response.status === 200) {
+                this.data = (await response.json()).files;
+            }
         },
     },
 };

@@ -15,6 +15,7 @@ import {
     getItemResourceLink,
     putItemResource,
     itemResourceExists,
+    listItemResourceFiles,
     deleteItem,
     deleteItemResource,
     linkItemToUser,
@@ -30,6 +31,7 @@ export function setupRoutes({ server }) {
     server.del("/items/:identifier", route(deleteItemHandler));
     server.get("/items/:identifier/status", route(getItemStatisticsHandler));
     server.get("/items/:identifier/resources", route(getItemResourcesHandler));
+    server.get("/items/:identifier/resources/:resource/files", route(getResourceFilesListHandler));
     server.get(
         "/items/:identifier/resources/:resource/status",
         route(getResourceProcessingStatusHandler)
@@ -38,9 +40,9 @@ export function setupRoutes({ server }) {
         "/items/:identifier/resources/:resource/transcription",
         route(getItemTranscriptionHandler)
     );
-    server.get("/items/:identifier/resources/:resource", route(getItemResourceHandler));
+    server.get("/items/:identifier/resources/:resource", route(getItemResourceFileHandler));
+    server.get("/items/:identifier/resources/:file/link", route(getItemResourceFileLinkHandler));
     server.del("/items/:identifier/resources/:resource", route(deleteItemResourceHandler));
-    server.get("/items/:identifier/resources/:resource/link", route(getItemResourceLinkHandler));
     server.put(
         "/items/:identifier/resources/:resource/saveTranscription",
         route(saveItemTranscriptionHandler)
@@ -153,32 +155,26 @@ async function getResourceProcessingStatusHandler(req, res, next) {
     }
     let completed = {};
     const identifier = req.params.identifier;
-    const resource = req.params.resource.split(".").shift().split("-").pop();
-    let { resources } = await listItemResources({
-        identifier,
-        groupByResource: true,
-    });
-    let files = resources[resource];
+    const resource = req.params.resource;
+    let files = (await listItemResourceFiles({ identifier, resource })).files;
     if (!files) {
         res.send({ completed: (completed[resource] = {}) });
         return next();
     }
 
     completed[resource] = {};
-    completed[resource].thumbnail = files.filter((f) => f.name.match(/thumbnail/)).length
-        ? true
-        : false;
+    completed[resource].thumbnail = files.filter((f) => f.match(/thumbnail/)).length ? true : false;
     completed[resource].webformats = (() => {
-        let jpeg = files.filter((f) => f.name.match(/\.jpe?g/)).length ? true : false;
-        let webp = files.filter((f) => f.name.match(/\.webp/)).length ? true : false;
+        let jpeg = files.filter((f) => f.match(/\.jpe?g/)).length ? true : false;
+        let webp = files.filter((f) => f.match(/\.webp/)).length ? true : false;
         return jpeg && webp ? true : false;
     })();
     completed[resource].tesseract =
-        files.filter((f) => f.name.match(/\.tesseract_ocr/)).length === 2 ? true : false;
+        files.filter((f) => f.match(/\.tesseract_ocr/)).length === 2 ? true : false;
     completed[resource].textract =
-        files.filter((f) => f.name.match(/\.textract_ocr/)).length === 1 ? true : false;
+        files.filter((f) => f.match(/\.textract_ocr/)).length === 1 ? true : false;
     completed[resource].tei =
-        files.filter((f) => f.name.match(/\.tei\.xml/)).length === 1 ? true : false;
+        files.filter((f) => f.match(/\.tei\.xml/)).length === 1 ? true : false;
     res.send({ completed: completed[resource] });
     next();
 }
@@ -191,15 +187,38 @@ async function getItemResourcesHandler(req, res, next) {
     if (!item) {
         return next(new ForbiddenError(`You don't have permission to access this endpoint`));
     }
-    let { resources } = await listItemResources({ identifier: req.params.identifier });
+
+    let query = {
+        identifier: req.params.identifier,
+    };
+    if (req.query.offset) query.offset = parseInt(req.query.offset);
+    if (req.query.limit) query.limit = parseInt(req.query.limit);
+    let { resources, total } = await listItemResources(query);
     if (!resources) {
         resources = [];
+        total = 0;
     }
-    res.send({ resources });
+    res.send({ resources, total });
     next();
 }
 
-async function getItemResourceHandler(req, res, next) {
+async function getResourceFilesListHandler(req, res, next) {
+    let item = await lookupItemByIdentifier({
+        identifier: req.params.identifier,
+        userId: req.session.user.id,
+    });
+    if (!item) {
+        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
+    }
+    let { files } = await listItemResourceFiles({
+        identifier: req.params.identifier,
+        resource: req.params.resource,
+    });
+    res.send({ files });
+    next();
+}
+
+async function getItemResourceFileHandler(req, res, next) {
     let item = await lookupItemByIdentifier({
         identifier: req.params.identifier,
         userId: req.session.user.id,
@@ -299,7 +318,7 @@ async function getItemTranscriptionHandler(req, res, next) {
     return next();
 }
 
-async function getItemResourceLinkHandler(req, res, next) {
+async function getItemResourceFileLinkHandler(req, res, next) {
     let item = await lookupItemByIdentifier({
         identifier: req.params.identifier,
         userId: req.session.user.id,
@@ -310,7 +329,7 @@ async function getItemResourceLinkHandler(req, res, next) {
     try {
         let link = await getItemResourceLink({
             identifier: req.params.identifier,
-            resource: req.params.resource,
+            resource: req.params.file,
         });
         res.send({ link });
         next();

@@ -19,6 +19,7 @@ export {
     teardownAfterAll,
     teardownAfterEach,
     generateLogs,
+    setupTestItem,
 } from "./test-utils";
 
 export async function getUserTempLocation({ userId }) {

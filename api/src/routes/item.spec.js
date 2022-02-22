@@ -1,6 +1,6 @@
 require("regenerator-runtime");
 import { createUser } from "../lib/user";
-import { deleteItem } from "../lib/item";
+import { deleteItem, createItem } from "../lib/item";
 import { createSession } from "../lib/session";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";
@@ -12,10 +12,11 @@ import {
     setupBeforeEach,
     teardownAfterAll,
     teardownAfterEach,
+    setupTestItem,
 } from "../common";
 
 describe("Item management route tests", () => {
-    let configuration, users, bucket;
+    let configuration, users, bucket, session, user;
     const userEmail = chance.email();
     const adminEmail = chance.email();
     beforeAll(async () => {
@@ -23,7 +24,8 @@ describe("Item management route tests", () => {
         ({ bucket } = await getS3Handle());
     });
     beforeEach(async () => {
-        users = await setupBeforeEach({ emails: [userEmail] });
+        users = await setupBeforeEach({ emails: [userEmail], adminEmails: [adminEmail] });
+        session = await createSession({ user: users[0] });
     });
     afterEach(async () => {
         await teardownAfterEach({ users });
@@ -31,6 +33,7 @@ describe("Item management route tests", () => {
     afterAll(async () => {
         await teardownAfterAll(configuration);
     });
+
     it("should be able to create a new item as an administrator", async () => {
         let user = {
             email: adminEmail,
@@ -204,7 +207,7 @@ describe("Item management route tests", () => {
         await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get item resources", async () => {
-        let { user, identifier, item, session } = await setupTestItem({ email: userEmail });
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
         let response = await fetch(`${host}/items/${identifier}/resources`, {
             method: "GET",
@@ -215,15 +218,15 @@ describe("Item management route tests", () => {
         });
         expect(response.status).toEqual(200);
         response = await response.json();
-        expect(response.resources.length).toEqual(1);
+        expect(response.resources.length).toEqual(2);
 
         await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should be able to get an item resource", async () => {
-        let { user, identifier, item, session } = await setupTestItem({ email: userEmail });
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
-        let response = await fetch(`${host}/items/${identifier}/resources/file.json`, {
+        let response = await fetch(`${host}/items/${identifier}/resources/${identifier}-01.json`, {
             method: "GET",
             headers: {
                 authorization: `Bearer ${session.token}`,
@@ -235,29 +238,10 @@ describe("Item management route tests", () => {
         await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
-    it("should be able to delete an item resource", async () => {
-        let { user, identifier, item, session } = await setupTestItem({ email: userEmail });
+    it("should be able to delete an item resource file", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
-        let response = await fetch(`${host}/items/${identifier}/resources/file.json`, {
-            method: "GET",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
-        });
-        expect(response.status).toEqual(200);
-
-        response = await fetch(`${host}/items/${identifier}/resources`, {
-            method: "GET",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
-        });
-        let { resources } = await response.json();
-        expect(resources.length).toBe(1);
-
-        response = await fetch(`${host}/items/${identifier}/resources/file.json`, {
+        response = await fetch(`${host}/items/${identifier}/resources/${identifier}-01.json`, {
             method: "DELETE",
             headers: {
                 authorization: `Bearer ${session.token}`,
@@ -266,21 +250,21 @@ describe("Item management route tests", () => {
         });
         expect(response.status).toEqual(200);
 
-        response = await fetch(`${host}/items/${identifier}/resources`, {
+        let response = await fetch(`${host}/items/${identifier}/resources/${identifier}-01/files`, {
             method: "GET",
             headers: {
                 authorization: `Bearer ${session.token}`,
                 "Content-Type": "application/json",
             },
         });
-        ({ resources } = await response.json());
-        expect(resources.length).toBe(0);
+        let { files } = await response.json();
+        expect(files.length).toBe(1);
 
-        // await bucket.removeObjects({ prefix: identifier });
+        await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should fail to get an item resource - not found", async () => {
-        let { user, identifier, item, session } = await setupTestItem({ email: userEmail });
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
         let response = await fetch(`${host}/items/${identifier}/resources/notfound.json`, {
             method: "GET",
@@ -295,22 +279,25 @@ describe("Item management route tests", () => {
         await deleteItem({ id: item.id });
     });
     it("should be able to get a presigned link to an item resource", async () => {
-        let { user, identifier, item, session } = await setupTestItem({ email: userEmail });
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
-        let response = await fetch(`${host}/items/${identifier}/resources/file.json/link`, {
-            method: "GET",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
-        });
+        let response = await fetch(
+            `${host}/items/${identifier}/resources/${identifier}-01.json/link`,
+            {
+                method: "GET",
+                headers: {
+                    authorization: `Bearer ${session.token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
         expect(response.status).toEqual(200);
 
         await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should fail to get a presigned link to an item resource - not found", async () => {
-        let { user, identifier, item, session } = await setupTestItem({ email: userEmail });
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
         let response = await fetch(`${host}/items/${identifier}/resources/notfound.json/link`, {
             method: "GET",
@@ -327,12 +314,15 @@ describe("Item management route tests", () => {
     it("should be able to get a list of all items in the space", async () => {
         let identifiers = [];
         let items = [];
-        let { identifier, item, session } = await setupTestItem({ email: userEmail });
+        //  setup as a normal user
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
         identifiers.push(identifier);
         items.push(item);
-        ({ identifier, item, session } = await setupTestItem({ email: adminEmail }));
-        identifiers.push(identifier);
-        items.push(item);
+
+        // setup and connect as an admin
+        // ({ identifier, item } = await setupTestItem({ user: users[1], bucket }));
+        session = await createSession({ user: users[1] });
 
         let response = await fetch(`${host}/admin/items`, {
             method: "GET",
@@ -353,12 +343,13 @@ describe("Item management route tests", () => {
     it("should be able to attach an item to the admin user", async () => {
         let identifiers = [];
         let items = [];
-        let { identifier, item, session } = await setupTestItem({ email: userEmail });
+        //  setup as a normal user
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
         identifiers.push(identifier);
         items.push(item);
-        ({ identifier, item, session } = await setupTestItem({ email: adminEmail }));
-        identifiers.push(identifier);
-        items.push(item);
+
+        // connect as an admin
+        session = await createSession({ user: users[1] });
 
         let response = await fetch(`${host}/admin/items/${identifiers[0]}/connect-user`, {
             method: "PUT",
@@ -376,33 +367,3 @@ describe("Item management route tests", () => {
         await models.item.destroy({ where: {} });
     });
 });
-
-async function setupTestItem({ email }) {
-    let user = {
-        email,
-        givenName: chance.word(),
-        familyName: chance.word(),
-        provider: chance.word(),
-    };
-    user = await createUser(user);
-
-    let session = await createSession({ user });
-
-    const identifier = chance.word();
-    let response = await fetch(`${host}/items`, {
-        method: "POST",
-        headers: {
-            authorization: `Bearer ${session.token}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            identifier,
-        }),
-    });
-    expect(response.status).toEqual(200);
-    let { item } = await response.json();
-
-    let { bucket } = await getS3Handle();
-    await bucket.upload({ json: { some: "thing" }, target: `${identifier}/file.json` });
-    return { user, identifier, item, session };
-}

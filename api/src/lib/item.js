@@ -3,7 +3,7 @@ import { Op } from "sequelize";
 import { loadConfiguration, getS3Handle, getUserTempLocation } from "../common";
 import path from "path";
 import { writeJson, remove } from "fs-extra";
-import { compact, groupBy } from "lodash";
+import { compact, groupBy, uniq } from "lodash";
 import { sub } from "date-fns";
 const specialFiles = ["ro-crate-metadata.json", "digivol.csv", "ftp.xml"];
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
@@ -137,14 +137,14 @@ export async function getItemResourceLink({ identifier, resource }) {
     }
 }
 
-export async function listItemResources({ identifier, groupByResource = false }) {
+export async function listItemResources({ identifier, offset = 0, limit = 10 }) {
     let configuration = await loadConfiguration();
     let { bucket } = await getS3Handle();
     let files;
     try {
-        files = (await bucket.listObjects({ prefix: identifier })).Contents.map(
-            (c) => c.Key.split(`${identifier}/`)[1]
-        ).filter((file) => {
+        files = await loadResources({ bucket, prefix: identifier });
+        files = files.map((c) => c.Key.split(`${identifier}/`).pop());
+        files = files.filter((file) => {
             let matches = specialFiles.map((sf) => {
                 let re = new RegExp(sf);
                 return file.match(re) ? true : false;
@@ -155,14 +155,52 @@ export async function listItemResources({ identifier, groupByResource = false })
         files = [];
     }
     files = compact(files);
-    if (groupByResource) {
-        ({ files } = groupFilesByResource({
-            identifier,
-            files,
-            naming: configuration.api.filenaming,
-        }));
+    let resources = getResourceNames({ identifier, files, naming: configuration.api.filenaming });
+    let total = resources.length;
+    return { resources: resources.slice(offset, offset + limit), total };
+}
+
+export async function listItemResourceFiles({ identifier, resource }) {
+    let { bucket } = await getS3Handle();
+    let files;
+    try {
+        files = await loadResources({ bucket, prefix: `${identifier}/${resource}` });
+        files = files.map((c) => c.Key.split(`${identifier}/`).pop());
+    } catch (error) {
+        files = [];
     }
-    return { resources: files };
+    return { files };
+}
+
+async function loadResources({ bucket, prefix, continuationToken }) {
+    let resources = await bucket.listObjects({ bucket, prefix, continuationToken });
+    if (resources.NextContinuationToken) {
+        return [
+            ...resources.Contents,
+            ...(await loadResources({
+                prefix,
+                continuationToken: resources.NextContinuationToken,
+            })),
+        ];
+    } else {
+        return resources.Contents;
+    }
+}
+
+export function getResourceNames({ identifier, files, naming }) {
+    let resources = [];
+    for (let filename of files) {
+        let ext = path.extname(filename).replace(".", "");
+        let basename = path.basename(filename, `.${ext}`);
+        let identifierSegments = basename
+            .split(`-${naming.adminTag}`)[0]
+            .split(naming.resourceQualifierSeparator)[0]
+            .split("-");
+        resources.push(identifierSegments.pop());
+    }
+    return uniq(resources)
+        .map((r) => `${identifier}-${r}`)
+        .sort();
 }
 
 export function groupFilesByResource({ identifier, files, naming }) {

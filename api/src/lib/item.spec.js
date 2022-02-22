@@ -1,5 +1,5 @@
 require("regenerator-runtime");
-import { getS3Handle } from "../common";
+import { getS3Handle, setupTestItem } from "../common";
 import {
     createItem,
     lookupItemByIdentifier,
@@ -10,6 +10,7 @@ import {
     getItemResource,
     getItemResourceLink,
     deleteItemResource,
+    listItemResourceFiles,
 } from "./item";
 const chance = require("chance").Chance();
 import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "../common";
@@ -119,17 +120,28 @@ describe("Item management tests", () => {
     it("should be able to list item resources in S3", async () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
-        let { resources } = await listItemResources({ identifier });
-        expect(resources.length).toEqual(1);
-        expect(resources[0]).toMatch("file.json");
+        let { resources, total } = await listItemResources({ identifier });
+        expect(resources.length).toEqual(2);
+        expect(total).toEqual(2);
+        expect(resources[0]).toEqual(`${identifier}-01`);
+        expect(resources[1]).toEqual(`${identifier}-02`);
 
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
-    it("should be able to get an item resource from S3", async () => {
+    it("should be able to list item resource files from S3", async () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
-        let data = await getItemResource({ identifier, resource: "file.json" });
+        let { files } = await listItemResourceFiles({ identifier, resource: `${identifier}-01` });
+        expect(files.length).toEqual(2);
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to get a resource file from S3", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        let data = await getItemResource({ identifier, resource: `${identifier}-01.json` });
         expect(data).toEqual(JSON.stringify({ some: "thing" }));
 
         await item.destroy();
@@ -139,20 +151,11 @@ describe("Item management tests", () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
         let { resources } = await listItemResources({ identifier });
-        expect(resources.length).toEqual(1);
-        expect(resources[0]).toMatch("file.json");
-        await deleteItemResource({ identifier, resource: "file.json" });
+        expect(resources.length).toEqual(2);
+
+        await deleteItemResource({ identifier, resource: `${identifier}-01` });
         ({ resources } = await listItemResources({ identifier }));
-        expect(resources.length).toEqual(0);
-        await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
-    });
-    it("should be able to delete an item resource in S3", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
-
-        let data = await getItemResource({ identifier, resource: "file.json" });
-        expect(data).toEqual(JSON.stringify({ some: "thing" }));
-
+        expect(resources.length).toEqual(1);
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
@@ -171,7 +174,7 @@ describe("Item management tests", () => {
     it("should be able to get an item resource link", async () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
-        let data = await getItemResourceLink({ identifier, resource: "file.json" });
+        let data = await getItemResourceLink({ identifier, resource: `${identifier}-01.json` });
         expect(data).toMatch("https://s3.nyingarn.net");
 
         await item.destroy();
@@ -190,13 +193,3 @@ describe("Item management tests", () => {
         await bucket.removeObjects({ prefix: identifier });
     });
 });
-
-async function setupTestItem({ user, bucket }) {
-    const identifier = chance.word();
-    let item = await createItem({ identifier, userId: user.id });
-    expect(item.identifier).toEqual(identifier);
-
-    await bucket.upload({ json: { some: "thing" }, target: `${identifier}/file.json` });
-
-    return { item, identifier };
-}

@@ -2,8 +2,9 @@
     <div class="flex flex-row space-x-2 border border-gray-400 p-4">
         <display-image-thumbnail-component
             class="w-36 cursor-pointer"
-            :data="data"
-            @click="viewResource(resource)"
+            :thumbnail="thumbnail"
+            @click="viewResource"
+            v-if="thumbnail"
         />
         <div class="flex flex-col">
             <div class="text-center my-4 text-lg">{{ resource }}</div>
@@ -48,15 +49,13 @@ export default {
             type: String,
             required: true,
         },
-        data: {
-            type: Array,
-            required: true,
-        },
     },
     data() {
         return {
             identifier: this.$route.params.identifier,
             completed: {},
+            files: [],
+            thumbnail: undefined,
         };
     },
     mounted() {
@@ -64,22 +63,46 @@ export default {
     },
     methods: {
         async init() {
+            await this.getResourceFiles();
+            await this.getImageThumbnailUrl();
+            await this.getStatus();
+        },
+        async getResourceFiles() {
+            let response = await this.$http.get({
+                route: `/items/${this.identifier}/resources/${this.resource}/files`,
+            });
+            if (response.status === 200) {
+                this.files = (await response.json()).files;
+            }
+        },
+        async getStatus() {
             let response = await this.$http.get({
                 route: `/items/${this.identifier}/resources/${this.resource}/status`,
             });
             if (response.status === 200) {
-                this.completed = (await response.json()).completed;
+                this.completed = { ...(await response.json()).completed };
             }
         },
-        viewResource(resource) {
-            this.$router.push(`/resource/${this.identifier}/${resource}`);
+        async getImageThumbnailUrl() {
+            let image = this.files.filter((image) => image.match("thumbnail"));
+            let response = await this.$http.get({
+                route: `/items/${this.$route.params.identifier}/resources/${image}/link`,
+            });
+            if (response.status !== 200) {
+                // can't get link right now
+            }
+            let link = (await response.json()).link;
+            this.thumbnail = link;
+        },
+        viewResource() {
+            this.$router.push(`/resource/${this.identifier}/${this.resource}`);
         },
         async deleteResource() {
             try {
                 await this.$http.delete({
                     route: `/items/${this.identifier}/resources/${this.resource}`,
                 });
-                this.$emit("refresh-item");
+                this.$emit("refresh");
             } catch (error) {
                 ElMessage.error(`Something went wrong deleting this resource`);
             }

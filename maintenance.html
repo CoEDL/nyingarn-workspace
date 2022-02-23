@@ -18,8 +18,24 @@
             style="color: rgb(75 85 99)"
             id="header"
         >
-            <h1 class="display-4">Nyingarn Platform workspace</h1>
-            <div class="display-8">is currently undergoing some maintenance.</div>
+            <div class="display-3">Nyingarn Platform workspace</div>
+            <div style="font-size: 26px">is currently undergoing some maintenance.</div>
+            <div id="timer" class="text-muted"></div>
         </div>
+        <script>
+            let i = 60;
+            setTimeout(update, 1000);
+
+            function update() {
+                i -= 1;
+                if (i === 0) {
+                    location.reload();
+                } else {
+                    let e = document.getElementById("timer");
+                    e.innerHTML = `checking service in ${i} seconds`;
+                    setTimeout(update, 1000);
+                }
+            }
+        </script>
     </body>
 </html>

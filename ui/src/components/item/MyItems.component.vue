@@ -8,16 +8,15 @@
             @current-change="loadItems"
         >
         </el-pagination>
-        <div class="w-full xl:w-3/5">
+        <div class="w-full">
             <el-table :data="items">
                 <el-table-column prop="name" label="Name">
                     <template #default="scope">
                         <router-link :to="scope.row.link">{{ scope.row.name }}</router-link>
                     </template>
                 </el-table-column>
-                <el-table-column prop="resourceTotal" label="Resources" width="100">
-                </el-table-column>
-                <el-table-column label="Actions" width="200">
+                <el-table-column prop="total" label="Pages" width="100"> </el-table-column>
+                <el-table-column label="Actions" width="100">
                     <template #default="scope">
                         <el-popconfirm
                             title="Are you sure you want to delete this item? All data will be removed and this can't be undone."
@@ -65,9 +64,12 @@ export default {
             response = await response.json();
             this.total = response.total;
             let items = response.items.map((i) => ({ name: i }));
-            this.items = items.map((i) => ({ name: i.name, link: `/items/${i.name}/view` }));
+            this.items = items.map((i) => ({
+                name: i.name,
+                link: `/items/${i.name}/view`,
+                statistics: {},
+            }));
 
-            items = [];
             for (let item of this.items) {
                 response = await this.$http.get({ route: `/items/${item.name}/status` });
                 if (response.status == 200) {
@@ -76,9 +78,11 @@ export default {
                         ...item,
                         ...statistics,
                     };
-                    items.push(item);
+                    this.items = this.items.map((i) => {
+                        return i.name === item.name ? item : i;
+                    });
+                    await new Promise((resolve) => setTimeout(resolve, 10));
                 }
-                this.items = [...items];
             }
         },
         async deleteItem(item) {

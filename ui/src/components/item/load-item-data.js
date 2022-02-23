@@ -4,7 +4,7 @@ export async function getResourceFiles({ $http, identifier, resource }) {
     });
 }
 
-export async function getStatus({ $http, identifier, resourc }) {
+export async function getStatus({ $http, identifier, resource }) {
     return await $http.get({
         route: `/items/${identifier}/resources/${resource}/status`,
     });

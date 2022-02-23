@@ -8,7 +8,7 @@
             <el-input v-model="textarea" :rows="20" type="textarea" placeholder="Please input" />
         </div>
         <div>
-            <el-button @click="whitelistUsers">Whitelist these users</el-button>
+            <el-button @click="whitelistUsers">Allow these users</el-button>
         </div>
     </div>
 </template>

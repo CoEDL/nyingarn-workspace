@@ -115,6 +115,12 @@ export async function deleteItemResource({ identifier, resource }) {
     await bucket.removeObjects({ prefix: target });
 }
 
+export async function deleteItemResourceFile({ identifier, file }) {
+    let { bucket } = await getS3Handle();
+    let target = path.join(identifier, file);
+    await bucket.removeObjects({ prefix: target });
+}
+
 export async function putItemResource({
     identifier,
     resource,
@@ -127,13 +133,13 @@ export async function putItemResource({
     return await bucket.upload({ target, localPath, content, json });
 }
 
-export async function getItemResourceLink({ identifier, resource }) {
+export async function getItemResourceLink({ identifier, resource, download }) {
     let { bucket } = await getS3Handle();
     let target = path.join(identifier, resource);
     if (!(await bucket.stat({ path: target }))) {
         throw new Error("Not found");
     } else {
-        return await bucket.getPresignedUrl({ target });
+        return await bucket.getPresignedUrl({ target, download });
     }
 }
 

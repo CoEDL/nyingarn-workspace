@@ -39,6 +39,7 @@
 import { ElMessage } from "element-plus";
 import DisplayImageThumbnailComponent from "./DisplayImageThumbnail.component.vue";
 import DisplayStatusPropertyComponent from "./DisplayStatusProperty.component.vue";
+import { getResourceFiles, getStatus, getFileUrl } from "@/components/item/load-item-data";
 export default {
     components: {
         DisplayImageThumbnailComponent,
@@ -68,16 +69,20 @@ export default {
             await this.getStatus();
         },
         async getResourceFiles() {
-            let response = await this.$http.get({
-                route: `/items/${this.identifier}/resources/${this.resource}/files`,
+            let response = await getResourceFiles({
+                $http: this.$http,
+                identifier: this.identifier,
+                resource: this.resource,
             });
             if (response.status === 200) {
                 this.files = (await response.json()).files;
             }
         },
         async getStatus() {
-            let response = await this.$http.get({
-                route: `/items/${this.identifier}/resources/${this.resource}/status`,
+            let response = await getStatus({
+                $http: this.$http,
+                identifier: this.identifier,
+                resource: this.resource,
             });
             if (response.status === 200) {
                 this.completed = { ...(await response.json()).completed };
@@ -85,8 +90,10 @@ export default {
         },
         async getImageThumbnailUrl() {
             let image = this.files.filter((image) => image.match("thumbnail"));
-            let response = await this.$http.get({
-                route: `/items/${this.$route.params.identifier}/resources/${image}/link`,
+            let response = await getFileUrl({
+                $http: this.$http,
+                identifier: this.identifier,
+                file: image,
             });
             if (response.status !== 200) {
                 // can't get link right now
@@ -99,8 +106,10 @@ export default {
         },
         async deleteResource() {
             try {
-                await this.$http.delete({
-                    route: `/items/${this.identifier}/resources/${this.resource}`,
+                await deleteResource({
+                    $http: this.$http,
+                    identifier: this.identifier,
+                    resource: this.resource,
                 });
                 this.$emit("refresh");
             } catch (error) {

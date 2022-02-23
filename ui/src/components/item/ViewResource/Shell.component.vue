@@ -4,45 +4,39 @@
             <router-link link :to="itemUrl">{{ identifier }}:</router-link>
             <div class="text-lg">{{ resource }}</div>
         </div>
-
-        <div class="flex flex-row">
-            <display-image-component class="w-1/2" :data="data" v-if="data.length" />
-            <display-transcription-component class="w-1/2" :data="data" v-if="data.length" />
+        <div class="px-2">
+            <el-tabs v-model="activeTab">
+                <el-tab-pane label="Edit Transcription" name="transcription">
+                    <transcription-component v-if="activeTab === 'transcription'" />
+                </el-tab-pane>
+                <el-tab-pane label="Files" name="files">
+                    <files-component v-if="activeTab === 'files'" />
+                </el-tab-pane>
+            </el-tabs>
         </div>
     </div>
 </template>
 
 <script>
-import DisplayImageComponent from "./DisplayImage.component.vue";
-import DisplayTranscriptionComponent from "./DisplayTranscription.component.vue";
+import TranscriptionComponent from "./TranscriptionComponent/Shell.component.vue";
+import FilesComponent from "./Files.component.vue";
 export default {
     components: {
-        DisplayImageComponent,
-        DisplayTranscriptionComponent,
+        TranscriptionComponent,
+        FilesComponent,
     },
     data() {
         return {
             identifier: this.$route.params.identifier,
             resource: this.$route.params.resource,
-            data: [],
+            routeWatcher: undefined,
+            tabs: ["transcription", "files"],
+            activeTab: "transcription",
         };
     },
     computed: {
         itemUrl: function () {
             return `/items/${this.identifier}/view`;
-        },
-    },
-    mounted() {
-        this.init();
-    },
-    methods: {
-        async init() {
-            let response = await this.$http.get({
-                route: `/items/${this.identifier}/resources/${this.resource}/files`,
-            });
-            if (response.status === 200) {
-                this.data = (await response.json()).files;
-            }
         },
     },
 };

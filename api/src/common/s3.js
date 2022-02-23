@@ -303,8 +303,15 @@ export class Bucket {
         }
     }
 
-    async getPresignedUrl({ target, expiresIn = 3600 }) {
-        const downloadParams = { Bucket: this.bucket, Key: target };
+    async getPresignedUrl({ target, expiresIn = 3600, download = false }) {
+        let filename = target.split("/").pop();
+        const downloadParams = {
+            Bucket: this.bucket,
+            Key: target,
+        };
+        if (download) {
+            downloadParams.ResponseContentDisposition = `response-content-disposition=attachment; filename: ${filename}`;
+        }
         const command = new GetObjectCommand(downloadParams);
         return await getSignedUrl(this.client, command, { expiresIn });
     }

@@ -5,7 +5,7 @@ import {
     InternalServerError,
 } from "restify-errors";
 import { route, routeAdmin, logEvent, getLogger, getS3Handle } from "../common";
-import { orderBy, groupBy } from "lodash";
+import { orderBy, groupBy, flattenDeep, compact } from "lodash";
 import {
     createItem,
     lookupItemByIdentifier,
@@ -18,39 +18,64 @@ import {
     listItemResourceFiles,
     deleteItem,
     deleteItemResource,
+    deleteItemResourceFile,
     linkItemToUser,
     getResourceProcessingStatus,
 } from "../lib/item";
 import path from "path";
 const log = getLogger();
 
+async function verifyItemAccess(req, res, next) {
+    let item = await lookupItemByIdentifier({
+        identifier: req.params.identifier,
+        userId: req.session.user.id,
+    });
+    if (!item) {
+        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
+    }
+    next();
+}
+function routeItem(handler) {
+    return compact(flattenDeep([...route(), verifyItemAccess, handler]));
+}
+
 export function setupRoutes({ server }) {
     // user routes
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
-    server.del("/items/:identifier", route(deleteItemHandler));
-    server.get("/items/:identifier/status", route(getItemStatisticsHandler));
-    server.get("/items/:identifier/resources", route(getItemResourcesHandler));
-    server.get("/items/:identifier/resources/:resource/files", route(getResourceFilesListHandler));
+    server.del("/items/:identifier", routeItem(deleteItemHandler));
+    server.get("/items/:identifier/status", routeItem(getItemStatisticsHandler));
+    server.get("/items/:identifier/resources", routeItem(getItemResourcesHandler));
+    server.get(
+        "/items/:identifier/resources/:resource/files",
+        routeItem(getResourceFilesListHandler)
+    );
     server.get(
         "/items/:identifier/resources/:resource/status",
-        route(getResourceProcessingStatusHandler)
+        routeItem(getResourceProcessingStatusHandler)
     );
     server.get(
         "/items/:identifier/resources/:resource/transcription",
-        route(getItemTranscriptionHandler)
+        routeItem(getItemTranscriptionHandler)
     );
-    server.get("/items/:identifier/resources/:resource", route(getItemResourceFileHandler));
-    server.get("/items/:identifier/resources/:file/link", route(getItemResourceFileLinkHandler));
-    server.del("/items/:identifier/resources/:resource", route(deleteItemResourceHandler));
+    server.get("/items/:identifier/resources/:resource", routeItem(getItemResourceFileHandler));
+    server.get(
+        "/items/:identifier/resources/:file/link",
+        routeItem(getItemResourceFileLinkHandler)
+    );
+    server.del("/items/:identifier/resources/:resource", routeItem(deleteItemResourceHandler));
+    server.del(
+        "/items/:identifier/resources/:resource/:file",
+        routeItem(deleteItemResourceFileHandler)
+    );
     server.put(
         "/items/:identifier/resources/:resource/saveTranscription",
-        route(saveItemTranscriptionHandler)
+        routeItem(saveItemTranscriptionHandler)
     );
 
     server.post(
         "/items/:identifier/resources/processing-status",
-        route(postResourceProcessingStatus)
+        routeItem(postResourceProcessingStatus)
     );
 
     // admin routes
@@ -106,13 +131,6 @@ async function createItemHandler(req, res, next) {
 }
 
 async function deleteItemHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to delete that item`));
-    }
     try {
         await deleteItem({ id: item.id });
         let { bucket } = await getS3Handle();
@@ -127,13 +145,6 @@ async function deleteItemHandler(req, res, next) {
 }
 
 async function getItemStatisticsHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
     let { resources } = await listItemResources({
         identifier: req.params.identifier,
         groupByResource: true,
@@ -146,13 +157,6 @@ async function getItemStatisticsHandler(req, res, next) {
 }
 
 async function getResourceProcessingStatusHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
     let completed = {};
     const identifier = req.params.identifier;
     const resource = req.params.resource;
@@ -180,14 +184,6 @@ async function getResourceProcessingStatusHandler(req, res, next) {
 }
 
 async function getItemResourcesHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
-
     let query = {
         identifier: req.params.identifier,
     };
@@ -203,13 +199,6 @@ async function getItemResourcesHandler(req, res, next) {
 }
 
 async function getResourceFilesListHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
     let { files } = await listItemResourceFiles({
         identifier: req.params.identifier,
         resource: req.params.resource,
@@ -219,13 +208,6 @@ async function getResourceFilesListHandler(req, res, next) {
 }
 
 async function getItemResourceFileHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
     try {
         let content = await getItemResource({
             identifier: req.params.identifier,
@@ -239,19 +221,23 @@ async function getItemResourceFileHandler(req, res, next) {
 }
 
 async function deleteItemResourceHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
     const { identifier, resource } = req.params;
     try {
         await deleteItemResource({ identifier, resource });
     } catch (error) {
         log.error(`Error deleting item resource: ${identifier}/${resource}`);
-        console.error(error);
+        return next(new InternalServerError());
+    }
+    res.send({});
+    next();
+}
+
+async function deleteItemResourceFileHandler(req, res, next) {
+    const { identifier, file } = req.params;
+    try {
+        await deleteItemResourceFile({ identifier, file });
+    } catch (error) {
+        log.error(`Error deleting item file: ${identifier}/${file}`);
         return next(new InternalServerError());
     }
     res.send({});
@@ -259,13 +245,6 @@ async function deleteItemResourceHandler(req, res, next) {
 }
 
 async function getItemTranscriptionHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
     let content;
     let exists = await itemResourceExists({
         identifier: req.params.identifier,
@@ -319,17 +298,11 @@ async function getItemTranscriptionHandler(req, res, next) {
 }
 
 async function getItemResourceFileLinkHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
     try {
         let link = await getItemResourceLink({
             identifier: req.params.identifier,
             resource: req.params.file,
+            download: req.query.download,
         });
         res.send({ link });
         next();
@@ -339,13 +312,6 @@ async function getItemResourceFileLinkHandler(req, res, next) {
 }
 
 async function saveItemTranscriptionHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
     const { identifier, resource, datafiles, document } = req.params;
     let file = `${resource}.tei.xml`;
     await putItemResource({ identifier, resource: file, content: document });
@@ -354,13 +320,6 @@ async function saveItemTranscriptionHandler(req, res, next) {
 }
 
 async function postResourceProcessingStatus(req, res, next) {
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
-    }
     let tasks = await getResourceProcessingStatus({
         identifier: item.id,
         resources: req.body.resources.map((r) => r.resource),

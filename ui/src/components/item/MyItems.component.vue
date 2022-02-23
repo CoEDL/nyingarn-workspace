@@ -37,6 +37,7 @@
 
 <script>
 import { ElMessage } from "element-plus";
+import { orderBy } from "lodash";
 
 export default {
     data() {
@@ -64,11 +65,13 @@ export default {
             response = await response.json();
             this.total = response.total;
             let items = response.items.map((i) => ({ name: i }));
-            this.items = items.map((i) => ({
+            items = items.map((i) => ({
                 name: i.name,
                 link: `/items/${i.name}/view`,
                 statistics: {},
             }));
+            items = orderBy(items, "name");
+            this.items = [...items];
 
             for (let item of this.items) {
                 response = await this.$http.get({ route: `/items/${item.name}/status` });

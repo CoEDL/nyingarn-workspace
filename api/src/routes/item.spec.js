@@ -146,6 +146,87 @@ describe("Item management route tests", () => {
         await user2.destroy();
         await models.log.destroy({ where: {} });
     });
+    it("should be able to detach a user from an item", async () => {
+        let user = {
+            email: userEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+        let user2 = {
+            email: adminEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user2 = await createUser(user2);
+
+        let session = await createSession({ user });
+
+        // create an item
+        const identifier = chance.word();
+        let response = await fetch(`${host}/items`, {
+            method: "POST",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                identifier,
+            }),
+        });
+        expect(response.status).toEqual(200);
+        let { item } = await response.json();
+
+        // invite user 2 to item
+        response = await fetch(`${host}/items/${identifier}/attach-user`, {
+            method: "PUT",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email: user2.email,
+            }),
+        });
+        expect(response.status).toEqual(200);
+
+        // connect as admin and detach the first user
+        session = await createSession({ user });
+        response = await fetch(`${host}/items/${identifier}/detach-user`, {
+            method: "PUT",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                userId: user.id,
+            }),
+        });
+        expect(response.status).toEqual(200);
+
+        let links = await models.item_user.findAll();
+        expect(links.length).toEqual(1);
+
+        // should fail to detach self as admin
+        response = await fetch(`${host}/items/${identifier}/detach-user`, {
+            method: "PUT",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                userId: user2.id,
+            }),
+        });
+        expect(response.status).toEqual(403);
+
+        await deleteItem({ id: item.id });
+        await user.destroy();
+        await user2.destroy();
+        await models.log.destroy({ where: {} });
+    });
     it("should be able to get a list of item users", async () => {
         let user = {
             email: userEmail,

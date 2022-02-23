@@ -46,6 +46,7 @@ export function setupRoutes({ server }) {
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
     server.put("/items/:identifier/attach-user", routeItem(putItemInviteUserHandler));
+    server.put("/items/:identifier/detach-user", routeItem(putItemDetachUserHandler));
     server.get("/items/:identifier/users", routeItem(getItemUsers));
     server.del("/items/:identifier", routeItem(deleteItemHandler));
     server.get("/items/:identifier/status", routeItem(getItemStatisticsHandler));
@@ -153,6 +154,20 @@ async function putItemInviteUserHandler(req, res, next) {
     }
 }
 
+async function putItemDetachUserHandler(req, res, next) {
+    let user = await models.user.findOne({ where: { id: req.params.userId } });
+    if (user.administrator) {
+        return next(new ForbiddenError());
+    }
+    try {
+        await models.item_user.destroy({ where: { userId: req.params.userId } });
+        res.send({});
+        next();
+    } catch (error) {
+        return next(new InternalServerError());
+    }
+}
+
 async function getItemUsers(req, res, next) {
     let itemUsers = await models.item_user.findAll({
         where: { itemId: req.item.id },
@@ -161,9 +176,10 @@ async function getItemUsers(req, res, next) {
     for (let user of itemUsers) {
         user = await models.user.findOne({
             where: { id: user.userId },
-            attributes: ["email", "givenName", "familyName"],
+            attributes: ["id", "email", "givenName", "familyName", "administrator"],
             raw: true,
         });
+        user.loggedin = req.session.user.id === user.id ? true : false;
         users.push(user);
     }
     res.send({ users });

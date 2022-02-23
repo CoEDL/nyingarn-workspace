@@ -1,0 +1,42 @@
+<template>
+    <div class="flex flex-col">
+        <div class="text-gray-600">Invite users to work on this item with you</div>
+        <div class="flex flex-col my-2 p-2">
+            <div class="flex flex-row">
+                <div class="flex-grow">
+                    <el-input v-model="email" placeholder="Search by user email address" />
+                </div>
+                <div>
+                    <el-button @click="attachUser">attach user</el-button>
+                </div>
+            </div>
+            <div class="text-xs text-gray-600">
+                Search for users by their email address. You will need to provide their email
+                exactly as the system knows it in order to find them.
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import { ElMessage } from "element-plus";
+import { attachUser } from "@/components/item/load-item-data";
+export default {
+    data() {
+        return { identifier: this.$route.params.identifier, email: undefined };
+    },
+    methods: {
+        async attachUser() {
+            let response = await attachUser({
+                $http: this.$http,
+                identifier: this.identifier,
+                email: this.email,
+            });
+            if (response.status === 200) {
+                ElMessage.success(`The user has been given permission to access this item.`);
+                this.email = undefined;
+            }
+        },
+    },
+};
+</script>

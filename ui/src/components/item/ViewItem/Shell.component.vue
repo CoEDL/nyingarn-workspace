@@ -14,9 +14,9 @@
                 <el-tab-pane label="Upload Data" name="upload">
                     <upload-component v-if="activeTab === 'upload'" />
                 </el-tab-pane>
-                <!-- <el-tab-pane label="Data Processing" name="processing">
-                    <data-processing-component v-if="activeTab === 'processing'" />
-                </el-tab-pane> -->
+                <el-tab-pane label="Administration" name="administration">
+                    <administration-component v-if="activeTab === 'administration'" />
+                </el-tab-pane>
             </el-tabs>
         </div>
     </div>
@@ -26,14 +26,14 @@
 import MetadataComponent from "./MetadataComponent/Shell.component.vue";
 import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
 import UploadComponent from "./UploadComponent/Shell.component.vue";
-import DataProcessingComponent from "./DataProcessing/Shell.component.vue";
+import AdministrationComponent from "./Administration/Shell.component.vue";
 
 export default {
     components: {
         MetadataComponent,
         ViewItemContentComponent,
         UploadComponent,
-        DataProcessingComponent,
+        AdministrationComponent,
     },
     props: {
         identifier: {
@@ -44,8 +44,8 @@ export default {
     data() {
         return {
             routeWatcher: undefined,
-            tabs: ["view", "metadata", "upload", "processing"],
-            activeTab: "view",
+            tabs: ["view", "metadata", "upload", "administration"],
+            activeTab: "administration",
         };
     },
     mounted() {

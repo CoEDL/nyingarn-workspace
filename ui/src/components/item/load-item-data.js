@@ -4,7 +4,7 @@ export async function getResourceFiles({ $http, identifier, resource }) {
     });
 }
 
-export async function getStatus({ $http, identifier, resourc }) {
+export async function getStatus({ $http, identifier, resource }) {
     return await $http.get({
         route: `/items/${identifier}/resources/${resource}/status`,
     });
@@ -25,5 +25,12 @@ export async function deleteResource({ $http, identifier, resource }) {
 export async function deleteResourceFile({ $http, identifier, resource, file }) {
     return await $http.delete({
         route: `/items/${identifier}/resources/${resource}/${file}`,
+    });
+}
+
+export async function attachUser({ $http, identifier, email }) {
+    return await $http.put({
+        route: `/items/${identifier}/attach-user`,
+        body: { email },
     });
 }

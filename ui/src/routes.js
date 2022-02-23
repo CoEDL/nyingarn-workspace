@@ -40,8 +40,8 @@ const routes = [
                         component: ViewItemComponent,
                     },
                     {
-                        path: "processing",
-                        name: "items/:identifier/processing",
+                        path: "administration",
+                        name: "items/:identifier/administration",
                         component: ViewItemComponent,
                     },
                 ],

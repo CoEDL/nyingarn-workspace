@@ -34,3 +34,9 @@ export async function attachUser({ $http, identifier, email }) {
         body: { email },
     });
 }
+
+export async function getItemUsers({ $http, identifier }) {
+    return await $http.get({
+        route: `/items/${identifier}/users`,
+    });
+}

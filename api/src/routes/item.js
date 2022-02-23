@@ -172,13 +172,11 @@ async function deleteItemHandler(req, res, next) {
 }
 
 async function getItemStatisticsHandler(req, res, next) {
-    let { resources } = await listItemResources({
+    let { resources, total } = await listItemResources({
         identifier: req.params.identifier,
         groupByResource: true,
     });
-    let statistics = {
-        resourceTotal: Object.keys(resources).length,
-    };
+    let statistics = { total };
     res.send({ statistics });
     next();
 }

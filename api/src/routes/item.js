@@ -46,6 +46,7 @@ export function setupRoutes({ server }) {
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
     server.put("/items/:identifier/attach-user", routeItem(putItemInviteUserHandler));
+    server.get("/items/:identifier/users", routeItem(getItemUsers));
     server.del("/items/:identifier", routeItem(deleteItemHandler));
     server.get("/items/:identifier/status", routeItem(getItemStatisticsHandler));
     server.get("/items/:identifier/resources", routeItem(getItemResourcesHandler));
@@ -150,6 +151,23 @@ async function putItemInviteUserHandler(req, res, next) {
     } catch (error) {
         return next(new InternalServerError());
     }
+}
+
+async function getItemUsers(req, res, next) {
+    let itemUsers = await models.item_user.findAll({
+        where: { itemId: req.item.id },
+    });
+    let users = [];
+    for (let user of itemUsers) {
+        user = await models.user.findOne({
+            where: { id: user.userId },
+            attributes: ["email", "givenName", "familyName"],
+            raw: true,
+        });
+        users.push(user);
+    }
+    res.send({ users });
+    next();
 }
 
 async function deleteItemHandler(req, res, next) {

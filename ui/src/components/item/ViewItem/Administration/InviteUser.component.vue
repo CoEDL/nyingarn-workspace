@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <div class="text-gray-600">Invite users to work on this item with you</div>
-        <div class="flex flex-col my-2 p-2">
+        <div class="flex flex-col my-2">
             <div class="flex flex-row">
                 <div class="flex-grow">
                     <el-input v-model="email" placeholder="Search by user email address" />
@@ -34,8 +34,8 @@ export default {
             });
             if (response.status === 200) {
                 ElMessage.success(`The user has been given permission to access this item.`);
-                this.email = undefined;
             }
+            this.email = undefined;
         },
     },
 };

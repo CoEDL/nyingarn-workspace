@@ -45,6 +45,9 @@ export async function createUser(data) {
         data.locked = false;
         data.upload = true;
         data.administrator = true;
+        data.provider = data.provider;
+        data.givenName = data.givenName;
+        data.familyName = data.familyName;
         user = (
             await models.user.findOrCreate({
                 where: { email: data.email },

@@ -10,7 +10,9 @@ import {
     getItemResource,
     getItemResourceLink,
     deleteItemResource,
+    deleteItemResourceFile,
     listItemResourceFiles,
+    itemResourceExists,
 } from "./item";
 const chance = require("chance").Chance();
 import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "../common";
@@ -138,6 +140,18 @@ describe("Item management tests", () => {
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
+    it("should see if an item resource exists", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        let stat = await itemResourceExists({ identifier, resource: `${identifier}-01.json` });
+        expect(stat.$metadata.httpStatusCode).toEqual(200);
+
+        stat = await itemResourceExists({ identifier, resource: `${identifier}-001.json` });
+        expect(stat).toBeFalse;
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
     it("should be able to get a resource file from S3", async () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
@@ -156,6 +170,20 @@ describe("Item management tests", () => {
         await deleteItemResource({ identifier, resource: `${identifier}-01` });
         ({ resources } = await listItemResources({ identifier }));
         expect(resources.length).toEqual(1);
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to delete an item resource file", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        await deleteItemResourceFile({ identifier, file: `${identifier}-01.json` });
+        let { files } = await listItemResourceFiles({
+            identifier,
+            resource: `${identifier}-01`,
+        });
+
+        expect(files.length).toEqual(1);
+        expect(files[0]).toEqual(`${identifier}-01.txt`);
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });

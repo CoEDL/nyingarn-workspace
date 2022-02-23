@@ -40,3 +40,10 @@ export async function getItemUsers({ $http, identifier }) {
         route: `/items/${identifier}/users`,
     });
 }
+
+export async function detachUserFromItem({ $http, identifier, userId }) {
+    return await $http.put({
+        route: `/items/${identifier}/detach-user`,
+        body: { userId },
+    });
+}

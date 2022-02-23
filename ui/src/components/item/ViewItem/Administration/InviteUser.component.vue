@@ -1,6 +1,10 @@
 <template>
     <div class="flex flex-col">
-        <view-item-users-component :users="users" class="bg-gray-200 p-4 my-2" />
+        <view-item-users-component
+            :users="users"
+            class="bg-gray-200 p-4 my-2"
+            @refresh="getItemUsers"
+        />
 
         <div class="bg-gray-200 p-4 my-2">
             <div class="text-gray-600">Invite users to work on this item with you</div>
@@ -23,7 +27,6 @@
 </template>
 
 <script>
-import { ElMessage } from "element-plus";
 import { attachUser, getItemUsers } from "@/components/item/load-item-data";
 import ViewItemUsersComponent from "./ViewItemUsers.component.vue";
 
@@ -45,7 +48,6 @@ export default {
                 email: this.email,
             });
             if (response.status === 200) {
-                ElMessage.success(`The user has been given permission to access this item.`);
                 this.getItemUsers();
             }
             this.email = undefined;

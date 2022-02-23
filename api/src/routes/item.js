@@ -33,6 +33,7 @@ async function verifyItemAccess(req, res, next) {
     if (!item) {
         return next(new ForbiddenError(`You don't have permission to access this endpoint`));
     }
+    req.item = item;
     next();
 }
 function routeItem(handler) {
@@ -132,7 +133,7 @@ async function createItemHandler(req, res, next) {
 
 async function deleteItemHandler(req, res, next) {
     try {
-        await deleteItem({ id: item.id });
+        await deleteItem({ id: req.item.id });
         let { bucket } = await getS3Handle();
         await bucket.removeObjects({ prefix: req.params.identifier });
     } catch (error) {

@@ -1,3 +1,4 @@
+import models from "../models";
 import {
     BadRequestError,
     ForbiddenError,
@@ -44,6 +45,7 @@ export function setupRoutes({ server }) {
     // user routes
     server.get("/items", route(getItemsHandler));
     server.post("/items", route(createItemHandler));
+    server.put("/items/:identifier/attach-user", routeItem(putItemInviteUserHandler));
     server.del("/items/:identifier", routeItem(deleteItemHandler));
     server.get("/items/:identifier/status", routeItem(getItemStatisticsHandler));
     server.get("/items/:identifier/resources", routeItem(getItemResourcesHandler));
@@ -131,13 +133,37 @@ async function createItemHandler(req, res, next) {
     next();
 }
 
+async function putItemInviteUserHandler(req, res, next) {
+    let user = await models.user.findOne({ where: { email: req.params.email } });
+    if (!user) {
+        return next(new NotFoundError());
+    }
+    try {
+        await linkItemToUser({ itemId: req.item.id, userId: user.id });
+        await logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `User '${req.session.user.email}' invited '${user.email}' to '${req.item.identifier}'`,
+        });
+        res.send({});
+        next();
+    } catch (error) {
+        return next(new InternalServerError());
+    }
+}
+
 async function deleteItemHandler(req, res, next) {
     try {
         await deleteItem({ id: req.item.id });
         let { bucket } = await getS3Handle();
         await bucket.removeObjects({ prefix: req.params.identifier });
+        await logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `User deleted item '${req.params.identifier}'`,
+        });
     } catch (error) {
-        log.error(`Error deleting item with id: ${req.params.identifier}`);
+        log.error(`Error deleting item with id: '${req.params.identifier}'`);
         console.error(error);
         return next(new InternalServerError());
     }
@@ -225,8 +251,13 @@ async function deleteItemResourceHandler(req, res, next) {
     const { identifier, resource } = req.params;
     try {
         await deleteItemResource({ identifier, resource });
+        await logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `User deleted resource: '${identifier}/${resource}'`,
+        });
     } catch (error) {
-        log.error(`Error deleting item resource: ${identifier}/${resource}`);
+        log.error(`Error deleting item resource: '${identifier}/${resource}'`);
         return next(new InternalServerError());
     }
     res.send({});

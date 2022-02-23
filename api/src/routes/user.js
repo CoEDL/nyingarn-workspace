@@ -22,6 +22,27 @@ export function setupRoutes({ server }) {
     // server.post('/user', 'create new user known to this application', { identifier, username, authenticationService })
     // server.del('/user/:userId', 'delete user known to this application', { identifier, authenticationService })
 }
+async function putUsersUploadCapabilityRouteHandler(req, res, next) {
+    let userId = req.session.user.id;
+    let user;
+    try {
+        user = await toggleUserCapability({
+            userId,
+            capability: "upload",
+        });
+        logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `User accepted terms and conditions of use. Enabling upload capability.`,
+        });
+    } catch (error) {
+        return next(new InternalServerError(error.message));
+    }
+
+    let session = await createSession({ user });
+    res.send({ token: session.token });
+    next();
+}
 
 async function getUsersRouteHandler(req, res, next) {
     let users = await getUsers({
@@ -78,27 +99,5 @@ async function deleteUserRouteHandler(req, res, next) {
         return next(new InternalServerError(error.message));
     }
     res.send({});
-    next();
-}
-
-async function putUsersUploadCapabilityRouteHandler(req, res, next) {
-    let userId = req.session.user.id;
-    let user;
-    try {
-        user = await toggleUserCapability({
-            userId,
-            capability: "upload",
-        });
-        logEvent({
-            level: "info",
-            owner: req.session.user.email,
-            text: `User accepted terms and conditions of use. Enabling upload capability.`,
-        });
-    } catch (error) {
-        return next(new InternalServerError(error.message));
-    }
-
-    let session = await createSession({ user });
-    res.send({ token: session.token });
     next();
 }

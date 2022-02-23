@@ -33,7 +33,6 @@ describe("Item management route tests", () => {
     afterAll(async () => {
         await teardownAfterAll(configuration);
     });
-
     it("should be able to create a new item as an administrator", async () => {
         let user = {
             email: adminEmail,
@@ -92,6 +91,60 @@ describe("Item management route tests", () => {
 
         await deleteItem({ id: item.id });
         await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to invite a user to own item", async () => {
+        let user = {
+            email: userEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+        let user2 = {
+            email: adminEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user2 = await createUser(user2);
+
+        let session = await createSession({ user });
+
+        // create an item
+        const identifier = chance.word();
+        let response = await fetch(`${host}/items`, {
+            method: "POST",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                identifier,
+            }),
+        });
+        expect(response.status).toEqual(200);
+        let { item } = await response.json();
+
+        // invite user 2 to item
+        response = await fetch(`${host}/items/${identifier}/attach-user`, {
+            method: "PUT",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email: user2.email,
+            }),
+        });
+        expect(response.status).toEqual(200);
+
+        let links = await models.item_user.findAll();
+        expect(links.length).toEqual(2);
+
+        await deleteItem({ id: item.id });
+        await user.destroy();
+        await user2.destroy();
+        await models.log.destroy({ where: {} });
     });
     it("should be able to delete own item as a user", async () => {
         let user = {

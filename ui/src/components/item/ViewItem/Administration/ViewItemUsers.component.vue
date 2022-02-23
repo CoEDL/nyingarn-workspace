@@ -10,24 +10,15 @@
 </template>
 
 <script>
-import { getItemUsers } from "@/components/item/load-item-data";
 export default {
-    data() {
-        return { identifier: this.$route.params.identifier, users: [] };
-    },
-    mounted() {
-        this.getItemUsers();
-    },
-    methods: {
-        async getItemUsers() {
-            let response = await getItemUsers({
-                $http: this.$http,
-                identifier: this.identifier,
-            });
-            if (response.status === 200) {
-                this.users = (await response.json()).users;
-            }
+    props: {
+        users: {
+            type: Array,
+            required: true,
         },
+    },
+    data() {
+        return {};
     },
 };
 </script>

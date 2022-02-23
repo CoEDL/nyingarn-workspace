@@ -1,18 +1,22 @@
 <template>
     <div class="flex flex-col">
-        <div class="text-gray-600">Invite users to work on this item with you</div>
-        <div class="flex flex-col my-2">
-            <div class="flex flex-row">
-                <div class="flex-grow">
-                    <el-input v-model="email" placeholder="Search by user email address" />
+        <view-item-users-component :users="users" class="bg-gray-200 p-4 my-2" />
+
+        <div class="bg-gray-200 p-4 my-2">
+            <div class="text-gray-600">Invite users to work on this item with you</div>
+            <div class="flex flex-col my-2">
+                <div class="flex flex-row">
+                    <div class="flex-grow">
+                        <el-input v-model="email" placeholder="Search by user email address" />
+                    </div>
+                    <div>
+                        <el-button @click="attachUser">attach user</el-button>
+                    </div>
                 </div>
-                <div>
-                    <el-button @click="attachUser">attach user</el-button>
+                <div class="text-xs text-gray-600">
+                    Search for users by their email address. You will need to provide their email
+                    exactly as the system knows it in order to find them.
                 </div>
-            </div>
-            <div class="text-xs text-gray-600">
-                Search for users by their email address. You will need to provide their email
-                exactly as the system knows it in order to find them.
             </div>
         </div>
     </div>
@@ -20,10 +24,18 @@
 
 <script>
 import { ElMessage } from "element-plus";
-import { attachUser } from "@/components/item/load-item-data";
+import { attachUser, getItemUsers } from "@/components/item/load-item-data";
+import ViewItemUsersComponent from "./ViewItemUsers.component.vue";
+
 export default {
+    components: {
+        ViewItemUsersComponent,
+    },
     data() {
-        return { identifier: this.$route.params.identifier, email: undefined };
+        return { identifier: this.$route.params.identifier, email: undefined, users: [] };
+    },
+    mounted() {
+        this.getItemUsers();
     },
     methods: {
         async attachUser() {
@@ -34,8 +46,18 @@ export default {
             });
             if (response.status === 200) {
                 ElMessage.success(`The user has been given permission to access this item.`);
+                this.getItemUsers();
             }
             this.email = undefined;
+        },
+        async getItemUsers() {
+            let response = await getItemUsers({
+                $http: this.$http,
+                identifier: this.identifier,
+            });
+            if (response.status === 200) {
+                this.users = (await response.json()).users;
+            }
         },
     },
 };

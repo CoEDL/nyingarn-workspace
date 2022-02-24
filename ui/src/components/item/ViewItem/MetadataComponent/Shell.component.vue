@@ -17,12 +17,12 @@ export default {
             if (this.windowWidth <= 1100) {
                 return {
                     width: `${this.windowWidth * (4 / 6) - 60}px`,
-                    height: `${window.innerHeight - 130}px`,
+                    height: `${window.innerHeight - 160}px`,
                 };
             } else {
                 return {
                     width: `${this.windowWidth * (5 / 6) - 40}px`,
-                    height: `${window.innerHeight - 130}px`,
+                    height: `${window.innerHeight - 160}px`,
                 };
             }
         },

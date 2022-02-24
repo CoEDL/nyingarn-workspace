@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <div class="w-full">
-            <el-table :data="items">
+            <el-table :data="items" :height="tableHeight">
                 <el-table-column prop="name" label="Name"> </el-table-column>
                 <el-table-column label="Actions" width="400">
                     <template #default="scope">
@@ -21,6 +21,11 @@
 export default {
     data() {
         return { items: [] };
+    },
+    computed: {
+        tableHeight() {
+            return window.innerHeight - 150;
+        },
     },
     mounted() {
         this.init();

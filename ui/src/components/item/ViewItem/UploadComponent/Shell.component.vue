@@ -16,6 +16,14 @@
                 <digi-vol-help-component v-if="help === 'digivol'" />
                 <ftp-help-component v-if="help === 'ftp'" />
                 <image-help-component v-if="help === 'images'" />
+                <div class="bg-yellow-100 p-2 rounded flex flex-row">
+                    <div class="text-3xl p-4 text-red-600">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="text-base py-2">
+                        Files larger than 10MB are not able to be processed with OCR.
+                    </div>
+                </div>
             </div>
         </div>
         <upload-wizard-component @show-help="showHelp" />

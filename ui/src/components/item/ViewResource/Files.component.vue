@@ -4,7 +4,7 @@
             download file
         </a>
         <el-table :data="files" style="width: 100%">
-            <el-table-column prop="name" label="Name" width="400" />
+            <el-table-column prop="name" label="Name" width="800" />
             <el-table-column label="Operations">
                 <template #default="scope">
                     <el-button @click="triggerDownload(scope.row)">

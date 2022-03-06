@@ -198,7 +198,6 @@ async function deleteItemHandler(req, res, next) {
         });
     } catch (error) {
         log.error(`Error deleting item with id: '${req.params.identifier}'`);
-        console.error(error);
         return next(new InternalServerError());
     }
     res.send({});
@@ -385,7 +384,7 @@ async function saveItemTranscriptionHandler(req, res, next) {
 
 async function postResourceProcessingStatus(req, res, next) {
     let tasks = await getResourceProcessingStatus({
-        identifier: item.id,
+        identifier: req.item.id,
         resources: req.body.resources.map((r) => r.resource),
     });
     tasks = tasks.map((t) => t.get());

@@ -1,7 +1,7 @@
 import path from "path";
 import { getLogger, loadConfiguration } from "../common";
 import { createWorker } from "tesseract.js";
-import { writeFile, readFile, writeJSON } from "fs-extra";
+import { writeFile, readFile, writeJSON, stat } from "fs-extra";
 const log = getLogger();
 import { getResourceImages } from "./";
 const { TextractClient, DetectDocumentTextCommand } = require("@aws-sdk/client-textract");
@@ -79,6 +79,10 @@ export async function runTextractOCR({ directory, identifier, resource }) {
         `${source.basename}.textract_ocr-${configuration.api.filenaming.adminTag}.json`
     );
     source = path.join(directory, identifier, source.name);
+    let fileStat = await stat(source);
+    if (fileStat.size > 10 * 1024 * 1024) {
+        return;
+    }
     log.debug(`Running Textract OCR on '${source}'`);
 
     const client = new TextractClient(awsConfiguration);

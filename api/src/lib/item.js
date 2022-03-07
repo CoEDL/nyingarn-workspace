@@ -264,3 +264,10 @@ export async function getResourceProcessingStatus({ identifier, resources }) {
         order: [["updatedAt", "DESC"]],
     });
 }
+
+export async function statItemFile({ identifier, file }) {
+    let { bucket } = await getS3Handle();
+
+    let fileStat = await bucket.stat({ path: path.join(identifier, file) });
+    return fileStat?.$metadata?.httpStatusCode === 200 ? true : false;
+}

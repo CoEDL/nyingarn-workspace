@@ -22,9 +22,10 @@ import {
     deleteItemResourceFile,
     linkItemToUser,
     getResourceProcessingStatus,
+    statItemFile,
 } from "../lib/item";
-import path from "path";
 const log = getLogger();
+import fetch from "node-fetch";
 
 async function verifyItemAccess(req, res, next) {
     let item = await lookupItemByIdentifier({
@@ -51,6 +52,7 @@ export function setupRoutes({ server }) {
     server.del("/items/:identifier", routeItem(deleteItemHandler));
     server.get("/items/:identifier/status", routeItem(getItemStatisticsHandler));
     server.get("/items/:identifier/resources", routeItem(getItemResourcesHandler));
+    server.put("/items/:identifier/reprocess-imports", routeItem(putReprocessImports));
     server.get(
         "/items/:identifier/resources/:resource/files",
         routeItem(getResourceFilesListHandler)
@@ -253,6 +255,23 @@ async function getItemResourcesHandler(req, res, next) {
         total = 0;
     }
     res.send({ resources, total });
+    next();
+}
+
+async function putReprocessImports(req, res, next) {
+    const files = [
+        `${req.item.identifier}-tei.xml`,
+        `${req.item.identifier}-ftp.xml`,
+        `${req.item.identifier}-digivol.csv`,
+    ];
+
+    let imports = [];
+    for (let file of files) {
+        let exists = await statItemFile({ identifier: req.item.identifier, file });
+        if (exists) imports.push(file);
+    }
+
+    res.send({ imports });
     next();
 }
 

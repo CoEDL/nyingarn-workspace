@@ -47,3 +47,9 @@ export async function detachUserFromItem({ $http, identifier, userId }) {
         body: { userId },
     });
 }
+
+export async function reprocessImports({ $http, identifier, userId }) {
+    return await $http.put({
+        route: `/items/${identifier}/reprocess-imports`,
+    });
+}

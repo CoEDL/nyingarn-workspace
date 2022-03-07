@@ -18,7 +18,7 @@
                     </div>
                 </div>
                 <div class="text-xs text-gray-600">
-                    Search for users by their email address. You will need to provide their email
+                    Invite users by their email address. You will need to provide their email
                     exactly as the system knows it in order to find them.
                 </div>
             </div>

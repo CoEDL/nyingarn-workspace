@@ -10,7 +10,7 @@
                     <el-button @click="triggerDownload(scope.row)">
                         <i class="fas fa-cloud-download-alt"></i
                     ></el-button>
-                    <el-popconfirm
+                    <!-- <el-popconfirm
                         title="Are you sure you want to delete this file?"
                         @confirm="triggerDelete(scope.row)"
                     >
@@ -19,7 +19,7 @@
                                 <i class="fas fa-trash"></i>
                             </el-button>
                         </template>
-                    </el-popconfirm>
+                    </el-popconfirm> -->
                 </template>
             </el-table-column>
         </el-table>

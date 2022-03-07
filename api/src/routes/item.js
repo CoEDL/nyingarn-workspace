@@ -69,10 +69,10 @@ export function setupRoutes({ server }) {
         routeItem(getItemResourceFileLinkHandler)
     );
     server.del("/items/:identifier/resources/:resource", routeItem(deleteItemResourceHandler));
-    server.del(
-        "/items/:identifier/resources/:resource/:file",
-        routeItem(deleteItemResourceFileHandler)
-    );
+    // server.del(
+    //     "/items/:identifier/resources/:resource/:file",
+    //     routeItem(deleteItemResourceFileHandler)
+    // );
     server.put(
         "/items/:identifier/resources/:resource/saveTranscription",
         routeItem(saveItemTranscriptionHandler)
@@ -295,17 +295,17 @@ async function deleteItemResourceHandler(req, res, next) {
     next();
 }
 
-async function deleteItemResourceFileHandler(req, res, next) {
-    const { identifier, file } = req.params;
-    try {
-        await deleteItemResourceFile({ identifier, file });
-    } catch (error) {
-        log.error(`Error deleting item file: ${identifier}/${file}`);
-        return next(new InternalServerError());
-    }
-    res.send({});
-    next();
-}
+// async function deleteItemResourceFileHandler(req, res, next) {
+//     const { identifier, file } = req.params;
+//     try {
+//         await deleteItemResourceFile({ identifier, file });
+//     } catch (error) {
+//         log.error(`Error deleting item file: ${identifier}/${file}`);
+//         return next(new InternalServerError());
+//     }
+//     res.send({});
+//     next();
+// }
 
 async function getItemTranscriptionHandler(req, res, next) {
     let content;

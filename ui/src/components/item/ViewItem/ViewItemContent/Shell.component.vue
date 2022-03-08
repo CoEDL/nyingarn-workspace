@@ -36,7 +36,7 @@ export default {
         return {
             identifier: this.$route.params.identifier,
             resources: [],
-            total: undefined,
+            total: 0,
             currentPage: 1,
             pageSize: 10,
             panelHeight: `${window.innerHeight - 180}px`,

@@ -3,7 +3,7 @@ import { readFile, pathExists, createReadStream, writeFile, appendFile } from "f
 import { parse } from "csv-parse";
 import { zipObject, isEmpty } from "lodash";
 import { getS3Handle, getLogger } from "../common";
-let { DOMParser } = require("xmldom");
+let { DOMParser, XMLSerializer } = require("xmldom");
 import xmlserializer from "xmlserializer";
 const log = getLogger();
 
@@ -51,18 +51,7 @@ export async function processDigivolTranscription({ directory, identifier, resou
 }
 
 export async function processFtpTeiTranscription({ directory, identifier, resource }) {
-    const dom = new DOMParser({
-        locator: {},
-        errorHandler: {
-            warning: () => {},
-            error: (e) => console.log("ERROR:", file, e.replace("\n", " - ")),
-            fatalError: (e) => console.log(file, e),
-        },
-    });
-    const file = path.join(directory, identifier, resource);
-    let data = await readFile(file);
-    const doc = dom.parseFromString(data.toString());
-
+    let doc = await loadTeiDocument({ directory, identifier, resource });
     let nodes = getElementsByName(doc, "pb");
     let pbIds = nodes.map((n) => n.getAttribute("xml:id"));
     let divs = getElementsByName(doc, "div");
@@ -94,6 +83,21 @@ export async function processFtpTeiTranscription({ directory, identifier, resour
             }
         }
     }
+}
+
+export async function loadTeiDocument({ directory, identifier, resource }) {
+    const dom = new DOMParser({
+        locator: {},
+        errorHandler: {
+            warning: () => {},
+            error: (e) => console.log("ERROR:", file, e.replace("\n", " - ")),
+            fatalError: (e) => console.log(file, e),
+        },
+    });
+    const file = path.join(directory, identifier, resource);
+    let data = await readFile(file);
+    const doc = dom.parseFromString(data.toString());
+    return doc;
 }
 
 function getElementsByName(node, element) {

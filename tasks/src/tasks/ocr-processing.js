@@ -4,7 +4,11 @@ import { createWorker } from "tesseract.js";
 import { writeFile, readFile, writeJSON, stat } from "fs-extra";
 const log = getLogger();
 import { getResourceImages } from "./";
-const { TextractClient, DetectDocumentTextCommand } = require("@aws-sdk/client-textract");
+const {
+    TextractClient,
+    AnalyzeDocumentCommand,
+    DetectDocumentTextCommand,
+} = require("@aws-sdk/client-textract");
 
 export async function runTesseractOCR({ directory, identifier, resource }) {
     let images;
@@ -92,8 +96,21 @@ export async function runTextractOCR({ directory, identifier, resource }) {
             Bytes: data,
         },
     };
-    const command = new DetectDocumentTextCommand(params);
+    let command = new DetectDocumentTextCommand(params);
 
     data = await client.send(command);
     await writeJSON(target, data);
+
+    params.FeatureTypes = ["TABLES"];
+    command = new AnalyzeDocumentCommand(params);
+
+    data = await client.send(command);
+    await writeJSON(
+        path.join(
+            directory,
+            identifier,
+            `${source.basename}.textract_ocr_table-${configuration.api.filenaming.adminTag}.json`
+        ),
+        data
+    );
 }

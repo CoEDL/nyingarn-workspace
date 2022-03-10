@@ -1,4 +1,3 @@
-import { pageview } from "vue-gtag";
 import ShellComponent from "@/components/Shell.component.vue";
 import LoginComponent from "@/components/Login.component.vue";
 import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
@@ -114,7 +113,6 @@ async function onAuthRequired(to, from, next) {
         try {
             isAuthed = await isAuthenticated();
             if (!isAuthed && from.name !== "login") return next({ path: "/login" });
-            pageview(to);
             return next();
         } catch (error) {
             if (from.name !== "login") {
@@ -122,7 +120,6 @@ async function onAuthRequired(to, from, next) {
             }
         }
     } else {
-        pageview(to);
         next();
     }
 }

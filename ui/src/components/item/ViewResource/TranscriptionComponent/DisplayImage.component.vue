@@ -1,12 +1,36 @@
 <template>
-    <div class="flex flex-col justify-around p-2">
-        <img ref="image" :srcset="srcset" :src="src" :style="maxHeight" />
+    <div class="flex flex-col justify-around p-2 border border-solid relative">
+        <div
+            class="absolute cursor-pointer"
+            style="
+                top: 100px;
+                width: 50px;
+                height: 50px;
+                right: 8px;
+                z-index: 10;
+                background-color: rgba(255, 255, 255, 0.9);
+            "
+            @click="reset"
+        >
+            <span
+                class="text-gray-500"
+                style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 12px;
+                "
+            >
+                <i class="fas fa-sync"></i>
+            </span>
+        </div>
+        <div id="image" :data-zoomist-src="src" :style="maxHeight" v-if="src" />
     </div>
 </template>
 
 <script>
-import ImageViewer from "iv-viewer";
-import "iv-viewer/dist/iv-viewer.css";
+import Zoomist from "zoomist";
 
 export default {
     props: {
@@ -21,6 +45,7 @@ export default {
             imageFormats: "jpe?g|webp|avif|png",
             srcset: [],
             src: undefined,
+            zoomist: undefined,
         };
     },
     computed: {
@@ -53,7 +78,16 @@ export default {
                     this.srcset.push(link);
                 }
             }
-            const viewer = new ImageViewer(this.$refs.image, {});
+            this.zoomist = new Zoomist("#image", {
+                fill: "contain",
+                maxRatio: 10,
+                slider: true,
+                zoomer: true,
+                height: window.innerHeight - 150,
+            });
+        },
+        reset() {
+            this.zoomist.reset();
         },
     },
 };

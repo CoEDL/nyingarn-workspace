@@ -25,7 +25,7 @@ export default {
     },
     computed: {
         maxHeight: function () {
-            return { height: `${window.innerHeight - 100}px` };
+            return { height: `${window.innerHeight - 150}px` };
         },
     },
     mounted() {

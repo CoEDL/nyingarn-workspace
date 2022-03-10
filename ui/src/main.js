@@ -12,6 +12,7 @@ import { store } from "./store";
 import ElementPlus from "element-plus";
 import log from "loglevel";
 import prefix from "loglevel-plugin-prefix";
+import VueGtag from "vue-gtag";
 const level = process.env.NODE_ENV === "development" ? "debug" : "warn";
 log.setLevel(level);
 const prefixer = prefix.noConflict();
@@ -34,6 +35,9 @@ import HTTPService from "./http.service";
         app.use(ElementPlus);
         app.config.globalProperties.$http = new HTTPService({ router });
         app.config.globalProperties.$log = log;
+        app.use(VueGtag, {
+            config: { id: "G-H1MKNZ08SQ" },
+        });
         app.mount("#app");
         // app.config.globalProperties.$socket = io();
     }

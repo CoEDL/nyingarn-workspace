@@ -101,16 +101,16 @@ export async function runTextractOCR({ directory, identifier, resource }) {
     data = await client.send(command);
     await writeJSON(target, data);
 
-    params.FeatureTypes = ["TABLES"];
-    command = new AnalyzeDocumentCommand(params);
+    // params.FeatureTypes = ["TABLES"];
+    // command = new AnalyzeDocumentCommand(params);
 
-    data = await client.send(command);
-    await writeJSON(
-        path.join(
-            directory,
-            identifier,
-            `${source.basename}.textract_ocr_table-${configuration.api.filenaming.adminTag}.json`
-        ),
-        data
-    );
+    // data = await client.send(command);
+    // await writeJSON(
+    //     path.join(
+    //         directory,
+    //         identifier,
+    //         `${source.basename}.textract_ocr_table-${configuration.api.filenaming.adminTag}.json`
+    //     ),
+    //     data
+    // );
 }

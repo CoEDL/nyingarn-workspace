@@ -43,6 +43,7 @@ export async function runTask(msg) {
             case "process-image":
                 log.info(`Running 'process-image' task for '${identifier}' in ${directory}`);
                 await createImageThumbnail({ directory, identifier, resource });
+                await syncToBucket({ directory, identifier });
                 await createWebFormats({ directory, identifier, resource });
                 await syncToBucket({ directory, identifier });
                 await runTextractOCR({ directory, identifier, resource });

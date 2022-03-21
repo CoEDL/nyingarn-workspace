@@ -29,7 +29,7 @@ export async function cleanup({ directory, identifier }) {
 
 export async function cleanupAfterFailure({ directory, identifier }) {
     log.debug(`Task in ${directory} failed. Cleaning up.`);
-    await syncToBucket({ directory, identifier });
+    // await syncToBucket({ directory, identifier });
 
     if (await pathExists(directory)) {
         await remove(directory);

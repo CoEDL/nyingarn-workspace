@@ -27,6 +27,9 @@ async function setupDescriboSessionRouteHandler(req, res, next) {
                 folder,
             },
         },
+        profile: {
+            file: "nyingarn-profile.json",
+        },
     };
     let response = await fetch(url, {
         method: "POST",

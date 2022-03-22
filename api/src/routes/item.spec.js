@@ -435,6 +435,106 @@ describe("Item management route tests", () => {
         await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
+    it("should be able to get the status of a resource", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        let response = await fetch(
+            `${host}/items/${identifier}/resources/${identifier}-01/status`,
+            {
+                method: "GET",
+                headers: {
+                    authorization: `Bearer ${session.token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        expect(response.status).toEqual(200);
+        response = await response.json();
+        expect(response).toEqual({
+            completed: {
+                markedComplete: false,
+                thumbnail: false,
+                webformats: false,
+                tesseract: false,
+                textract: false,
+                tei: false,
+            },
+        });
+
+        await bucket.removeObjects({ prefix: identifier });
+        await deleteItem({ id: item.id });
+    });
+    it("should be able to toggle the completed status of a resource", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        let response = await fetch(
+            `${host}/items/${identifier}/resources/${identifier}-01/status?complete=true`,
+            {
+                method: "PUT",
+                headers: {
+                    authorization: `Bearer ${session.token}`,
+                    "Content-Type": "application/json",
+                },
+                params: { complete: true },
+            }
+        );
+        expect(response.status).toEqual(200);
+
+        response = await fetch(`${host}/items/${identifier}/resources/${identifier}-01/status`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            params: { complete: true },
+        });
+        response = await response.json();
+        expect(response).toEqual({
+            completed: {
+                markedComplete: true,
+                thumbnail: false,
+                webformats: false,
+                tesseract: false,
+                textract: false,
+                tei: false,
+            },
+        });
+
+        response = await fetch(
+            `${host}/items/${identifier}/resources/${identifier}-01/status?complete=false`,
+            {
+                method: "PUT",
+                headers: {
+                    authorization: `Bearer ${session.token}`,
+                    "Content-Type": "application/json",
+                },
+                params: { complete: true },
+            }
+        );
+        expect(response.status).toEqual(200);
+        response = await fetch(`${host}/items/${identifier}/resources/${identifier}-01/status`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            params: { complete: true },
+        });
+        response = await response.json();
+        expect(response).toEqual({
+            completed: {
+                markedComplete: false,
+                thumbnail: false,
+                webformats: false,
+                tesseract: false,
+                textract: false,
+                tei: false,
+            },
+        });
+
+        await bucket.removeObjects({ prefix: identifier });
+        await deleteItem({ id: item.id });
+    });
     it("should be able to delete an item resource file", async () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 

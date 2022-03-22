@@ -23,6 +23,8 @@ import {
     linkItemToUser,
     getResourceProcessingStatus,
     statItemFile,
+    markResourceComplete,
+    isResourceComplete,
 } from "../lib/item";
 const log = getLogger();
 import fetch from "node-fetch";
@@ -60,6 +62,10 @@ export function setupRoutes({ server }) {
     server.get(
         "/items/:identifier/resources/:resource/status",
         routeItem(getResourceProcessingStatusHandler)
+    );
+    server.put(
+        "/items/:identifier/resources/:resource/status",
+        routeItem(putResourceCompleteHandler)
     );
     server.get(
         "/items/:identifier/resources/:resource/transcription",
@@ -218,8 +224,8 @@ async function getItemStatisticsHandler(req, res, next) {
 
 async function getResourceProcessingStatusHandler(req, res, next) {
     let completed = {};
-    const identifier = req.params.identifier;
-    const resource = req.params.resource;
+    const { identifier, resource } = req.params;
+
     let files = (await listItemResourceFiles({ identifier, resource })).files;
     if (!files) {
         res.send({ completed: (completed[resource] = {}) });
@@ -227,6 +233,7 @@ async function getResourceProcessingStatusHandler(req, res, next) {
     }
 
     completed[resource] = {};
+    completed[resource].markedComplete = await isResourceComplete({ identifier, resource });
     completed[resource].thumbnail = files.filter((f) => f.match(/thumbnail/)).length ? true : false;
     completed[resource].webformats = (() => {
         let jpeg = files.filter((f) => f.match(/\.jpe?g/)).length ? true : false;
@@ -240,6 +247,13 @@ async function getResourceProcessingStatusHandler(req, res, next) {
     completed[resource].tei =
         files.filter((f) => f.match(/\.tei\.xml/)).length === 1 ? true : false;
     res.send({ completed: completed[resource] });
+    next();
+}
+
+async function putResourceCompleteHandler(req, res, next) {
+    const { identifier, resource } = req.params;
+    await markResourceComplete({ identifier, resource, ...req.query });
+    res.send({});
     next();
 }
 

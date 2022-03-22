@@ -11,6 +11,17 @@
                     <i class="fas fa-redo"></i>
                 </el-button>
             </div>
+            <div v-show="!isComplete">
+                <el-button @click="markComplete({ status: true })" size="small">
+                    mark complete
+                </el-button>
+            </div>
+            <div v-show="isComplete">
+                <el-button @click="markComplete({ status: false })" size="small">
+                    mark in progress
+                </el-button>
+            </div>
+            <div class="flex flex-grow"></div>
             <div>
                 <div v-if="saved" class="text-green-400 mx-4">
                     <i class="fas fa-check"></i>
@@ -55,6 +66,7 @@ export default {
             debouncedSave: debounce(this.save, 1000),
             tei: this.$store.state.configuration.teiMarkupControls.controls,
             saved: false,
+            isComplete: undefined,
         };
     },
     computed: {
@@ -64,6 +76,7 @@ export default {
     },
     mounted() {
         this.loadTranscription();
+        this.resourceIsComplete();
     },
     methods: {
         async loadTranscription() {
@@ -108,6 +121,24 @@ export default {
         },
         redo() {
             this.codemirror.redo();
+        },
+        async markComplete({ status }) {
+            const { identifier, resource } = this.$route.params;
+            await this.$http.put({
+                route: `/items/${identifier}/resources/${resource}/status`,
+                params: { complete: status },
+            });
+            await this.resourceIsComplete();
+        },
+        async resourceIsComplete() {
+            const { identifier, resource } = this.$route.params;
+            let response = await this.$http.get({
+                route: `/items/${identifier}/resources/${resource}/status`,
+            });
+            if (response.status === 200) {
+                let { completed } = await response.json();
+                this.isComplete = completed.markedComplete;
+            }
         },
         clearHistory() {
             this.codemirror.clearHistory();

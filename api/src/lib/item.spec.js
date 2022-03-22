@@ -13,6 +13,8 @@ import {
     deleteItemResourceFile,
     listItemResourceFiles,
     itemResourceExists,
+    markResourceComplete,
+    isResourceComplete,
 } from "./item";
 const chance = require("chance").Chance();
 import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "../common";
@@ -173,20 +175,20 @@ describe("Item management tests", () => {
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
-    it("should be able to delete an item resource file", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+    // it("should be able to delete an item resource file", async () => {
+    //     let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
-        await deleteItemResourceFile({ identifier, file: `${identifier}-01.json` });
-        let { files } = await listItemResourceFiles({
-            identifier,
-            resource: `${identifier}-01`,
-        });
+    //     await deleteItemResourceFile({ identifier, file: `${identifier}-01.json` });
+    //     let { files } = await listItemResourceFiles({
+    //         identifier,
+    //         resource: `${identifier}-01`,
+    //     });
 
-        expect(files.length).toEqual(1);
-        expect(files[0]).toEqual(`${identifier}-01.txt`);
-        await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
-    });
+    //     expect(files.length).toEqual(1);
+    //     expect(files[0]).toEqual(`${identifier}-01.txt`);
+    //     await item.destroy();
+    //     await bucket.removeObjects({ prefix: identifier });
+    // });
     it("should fail to get an item resource from S3", async () => {
         let { identifier, item } = await setupTestItem({ user: users[0], bucket });
 
@@ -216,6 +218,20 @@ describe("Item management tests", () => {
         } catch (error) {
             expect(error.message).toEqual("Not found");
         }
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to update resource completed status", async () => {
+        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+
+        await markResourceComplete({ identifier, resource: `${identifier}-01`, complete: true });
+        let status = await isResourceComplete({ identifier, resource: `${identifier}-01` });
+        expect(status).toBeTrue;
+
+        await markResourceComplete({ identifier, resource: `${identifier}-01`, complete: false });
+        status = await isResourceComplete({ identifier, resource: `${identifier}-01` });
+        expect(status).toBeFalse;
 
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });

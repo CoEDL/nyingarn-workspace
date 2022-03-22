@@ -1,9 +1,12 @@
 <template>
-    <div class="flex flex-row space-x-2 border border-gray-400 p-4">
+    <div
+        class="flex flex-row space-x-2 border border-gray-400 p-4"
+        :class="{ 'bg-green-100 border-green-200': completed.markedComplete }"
+        @click="viewResource"
+    >
         <display-image-thumbnail-component
             class="w-36 cursor-pointer"
             :thumbnail="thumbnail"
-            @click="viewResource"
             v-if="thumbnail"
         />
         <div class="flex flex-col">

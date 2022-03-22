@@ -6,6 +6,7 @@ import { writeJson, remove } from "fs-extra";
 import { compact, groupBy, uniq } from "lodash";
 import { sub } from "date-fns";
 const specialFiles = ["ro-crate-metadata.json", "digivol.csv", "ftp.xml"];
+const completedResources = ".completed-resources.json";
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
 
@@ -150,6 +151,7 @@ export async function listItemResources({ identifier, offset = 0, limit = 10 }) 
     try {
         files = await loadResources({ bucket, prefix: identifier });
         files = files.map((c) => c.Key.split(`${identifier}/`).pop());
+        files = files.filter((file) => !file.match(/^\./));
         files = files.filter((file) => {
             let matches = specialFiles.map((sf) => {
                 let re = new RegExp(sf);
@@ -270,4 +272,26 @@ export async function statItemFile({ identifier, file }) {
 
     let fileStat = await bucket.stat({ path: path.join(identifier, file) });
     return fileStat?.$metadata?.httpStatusCode === 200 ? true : false;
+}
+
+export async function markResourceComplete({ identifier, resource, complete = false }) {
+    let status = {};
+    try {
+        status = JSON.parse(await getItemResource({ identifier, resource: completedResources }));
+    } catch (error) {}
+    resource = path.join(identifier, resource);
+    status[resource] = String(complete) === "true";
+
+    let { bucket } = await getS3Handle();
+    let target = path.join(identifier, completedResources);
+    await bucket.upload({ json: status, target });
+}
+
+export async function isResourceComplete({ identifier, resource }) {
+    let status = {};
+    try {
+        status = JSON.parse(await getItemResource({ identifier, resource: completedResources }));
+    } catch (error) {}
+    resource = path.join(identifier, resource);
+    return status[resource] ? status[resource] : false;
 }

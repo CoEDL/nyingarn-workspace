@@ -2,23 +2,27 @@
     <div
         class="flex flex-row space-x-2 border border-gray-400 p-4"
         :class="{ 'bg-green-100 border-green-200': completed.markedComplete }"
-        @click="viewResource"
     >
         <display-image-thumbnail-component
             class="w-36 cursor-pointer"
             :thumbnail="thumbnail"
             v-if="thumbnail"
+            @click="viewResource"
         />
         <div class="flex flex-col">
-            <div class="text-center my-4 text-lg">{{ resource }}</div>
-            <display-status-property-component property="Thumbnail" :value="completed.thumbnail" />
-            <display-status-property-component
-                property="Webformats"
-                :value="completed.webformats"
-            />
-            <display-status-property-component property="OCR" :value="completed.textract" />
-            <display-status-property-component property="TEI" :value="completed.tei" />
-            <div class="flex flex-grow"></div>
+            <div @click="viewResource" class="flex flex-col flex-grow cursor-pointer">
+                <div class="text-center my-4 text-lg">{{ resource }}</div>
+                <display-status-property-component
+                    property="Thumbnail"
+                    :value="completed.thumbnail"
+                />
+                <display-status-property-component
+                    property="Webformats"
+                    :value="completed.webformats"
+                />
+                <display-status-property-component property="OCR" :value="completed.textract" />
+                <display-status-property-component property="TEI" :value="completed.tei" />
+            </div>
             <div class="flex flex-row">
                 <div class="flex-grow"></div>
                 <div>

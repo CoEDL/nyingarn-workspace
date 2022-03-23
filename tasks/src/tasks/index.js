@@ -12,23 +12,47 @@ import { getS3Handle, loadConfiguration } from "../common";
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const thumbnailHeight = 300;
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
+export const specialFiles = ["ro-crate-metadata.json", "digivol.csv", "ftp.xml"];
+
+async function loadResources({ bucket, prefix, continuationToken }) {
+    let resources = await bucket.listObjects({ bucket, prefix, continuationToken });
+    if (resources.NextContinuationToken) {
+        return [
+            ...resources.Contents,
+            ...(await loadResources({
+                prefix,
+                continuationToken: resources.NextContinuationToken,
+            })),
+        ];
+    } else {
+        return resources.Contents;
+    }
+}
 
 export async function getFiles({ identifier }) {
     let configuration = await loadConfiguration();
 
     let { bucket } = await getS3Handle();
-    let files = (await bucket.listObjects({ prefix: identifier })).Contents.map((c) => c.Key);
-
+    // let files = (await bucket.listObjects({ prefix: identifier })).Contents.map((c) => c.Key);
+    let files = await loadResources({ bucket, prefix: identifier });
+    files = files.map((f) => path.basename(f.Key));
+    files = files.filter((file) => !file.match(/^\./));
+    files = files.filter((file) => {
+        let matches = specialFiles.map((sf) => {
+            let re = new RegExp(sf);
+            return file.match(re) ? true : false;
+        });
+        return file ? !matches.includes(true) : null;
+    });
     ({ files } = groupFilesByResource({ files, naming: configuration.api.filenaming }));
     return { files, bucket, configuration };
 }
 
 export function groupFilesByResource({ files, naming }) {
-    let exclusions = ["ro-crate-metadata.json"];
     let resources = [];
     for (let file of files) {
-        let [filepath, filename] = file.split("/");
-        if (exclusions.includes(filename)) continue;
+        let filepath = path.dirname(file);
+        let filename = path.basename(file);
 
         let ext = path.extname(filename).replace(".", "");
         let basename = path.basename(filename, `.${ext}`);

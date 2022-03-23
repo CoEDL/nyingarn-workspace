@@ -3,7 +3,7 @@ import { Op } from "sequelize";
 import { loadConfiguration, getS3Handle, getUserTempLocation } from "../common";
 import path from "path";
 import { writeJson, remove } from "fs-extra";
-import { compact, groupBy, uniq } from "lodash";
+import { compact, groupBy, uniq, isNumber } from "lodash";
 import { sub } from "date-fns";
 const specialFiles = ["ro-crate-metadata.json", "digivol.csv", "ftp.xml"];
 const completedResources = ".completed-resources.json";
@@ -144,7 +144,7 @@ export async function getItemResourceLink({ identifier, resource, download }) {
     }
 }
 
-export async function listItemResources({ identifier, offset = 0, limit = 10 }) {
+export async function listItemResources({ identifier, offset = 0, limit }) {
     let configuration = await loadConfiguration();
     let { bucket } = await getS3Handle();
     let files;
@@ -165,7 +165,21 @@ export async function listItemResources({ identifier, offset = 0, limit = 10 }) 
     files = compact(files);
     let resources = getResourceNames({ identifier, files, naming: configuration.api.filenaming });
     let total = resources.length;
-    return { resources: resources.slice(offset, offset + limit), total };
+    resources = resources.map((r, i) => {
+        let previous = i === 0 ? undefined : resources[i - 1];
+        let next = i === resources.length ? undefined : resources[i + 1];
+        return {
+            previous,
+            name: r,
+            next,
+            page: i + 1,
+            total: resources.length + 1,
+        };
+    });
+    if (isNumber(offset) && isNumber(limit)) {
+        resources = resources.slice(offset, offset + limit);
+    }
+    return { resources, total };
 }
 
 export async function listItemResourceFiles({ identifier, resource }) {

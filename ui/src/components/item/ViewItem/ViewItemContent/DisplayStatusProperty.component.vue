@@ -3,10 +3,10 @@
         <div>{{ property }}:</div>
         <div class="flex flex-grow" />
         <div v-show="value" class="text-green-600 w-10 text-center">
-            <i class="fas fa-check"></i>
+            <i class="fa-solid fa-check"></i>
         </div>
         <div v-show="!value" class="text-red-600 w-10 text-center">
-            <i class="fas fa-times"></i>
+            <i class="fa-solid fa-times"></i>
         </div>
     </div>
 </template>

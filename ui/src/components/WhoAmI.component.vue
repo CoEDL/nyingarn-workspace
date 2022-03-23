@@ -1,10 +1,10 @@
 <template>
     <div class="text-lg text-white flex flex-row space-x-2">
         <div v-show="user.administrator" class="text-yellow-600">
-            <i class="fas fa-user-shield"></i>
+            <i class="fa-solid fa-user-shield"></i>
         </div>
         <div v-show="!user.administrator" class="text-white">
-            <i class="fas fa-user"></i>
+            <i class="fa-solid fa-user"></i>
         </div>
         <div>
             {{ user.givenName }}

@@ -2,7 +2,7 @@
     <div class="flex flex-col space-y-2">
         <div class="bg-yellow-100 p-2 rounded flex flex-row">
             <div class="text-3xl p-4 text-red-600">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fa-solid fa-exclamation-circle"></i>
             </div>
             <div class="text-base py-2">
                 <ol class="pl-2 list-decimal">
@@ -14,7 +14,7 @@
         </div>
         <div class="bg-indigo-100 p-2 rounded flex flex-row">
             <div class="text-3xl p-4 text-gray-600">
-                <i class="far fa-lightbulb"></i>
+                <i class="fa-solid fa-lightbulb"></i>
             </div>
             <div class="text-base py-2">
                 Ensure you are uploading the TEI XML output from FromThePage and that the file is
@@ -23,7 +23,7 @@
         </div>
         <div class="bg-indigo-100 p-2 rounded flex flex-row">
             <div class="text-3xl p-4 text-gray-600">
-                <i class="far fa-lightbulb"></i>
+                <i class="fa-solid fa-lightbulb"></i>
             </div>
             <div class="text-base py-2">
                 File names must match the form {{ this.identifier }}-{sequence number} where

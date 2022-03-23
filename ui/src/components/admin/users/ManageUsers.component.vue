@@ -12,7 +12,7 @@
             <el-table-column prop="familyName" label="Family Name" width="180" />
             <el-table-column prop="locked" label="Locked" width="120">
                 <template #header>
-                    <i class="fas fa-lock"></i>
+                    <i class="fa-solid fa-lock"></i>
                 </template>
                 <template #default="scope">
                     <el-switch
@@ -23,7 +23,7 @@
             </el-table-column>
             <el-table-column prop="upload" label="Upload" width="120">
                 <template #header>
-                    <i class="fas fa-upload"></i>
+                    <i class="fa-solid fa-upload"></i>
                 </template>
                 <template #default="scope">
                     <el-switch
@@ -34,7 +34,7 @@
             </el-table-column>
             <el-table-column prop="administrator" label="Admin" width="120">
                 <template #header>
-                    <i class="fas fa-user-shield"></i>
+                    <i class="fa-solid fa-user-shield"></i>
                 </template>
                 <template #default="scope">
                     <el-switch
@@ -45,7 +45,7 @@
             </el-table-column>
             <el-table-column prop="" label="Delete" width="120">
                 <template #header>
-                    <i class="fas fa-user-minus"></i>
+                    <i class="fa-solid fa-user-minus"></i>
                 </template>
                 <template #default="scope">
                     <el-popconfirm
@@ -54,7 +54,7 @@
                     >
                         <template #reference>
                             <el-button type="danger" size="small">
-                                <i class="fas fa-trash-alt"></i>
+                                <i class="fa-solid fa-trash-alt"></i>
                             </el-button>
                         </template>
                     </el-popconfirm>

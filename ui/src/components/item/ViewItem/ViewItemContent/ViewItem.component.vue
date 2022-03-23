@@ -32,7 +32,7 @@
                     >
                         <template #reference>
                             <el-button type="danger">
-                                <i class="fas fa-trash"></i>
+                                <i class="fa-solid fa-trash"></i>
                             </el-button>
                         </template>
                     </el-popconfirm>

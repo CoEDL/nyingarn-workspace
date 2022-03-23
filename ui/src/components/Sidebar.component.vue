@@ -27,7 +27,7 @@
         <div class="flex flex-col space-y-4 pl-4">
             <who-am-i-component />
             <div @click="logout" class="cursor-pointer">
-                <i class="fas fa-sign-out-alt"></i>
+                <i class="fa-solid fa-sign-out-alt"></i>
                 logout
             </div>
         </div>
@@ -52,11 +52,11 @@ export default {
                 {
                     name: "Permitted Users",
                     path: "/admin/users/permitted",
-                    icon: "fas fa-user-tag",
+                    icon: "fa-solid fa-user-tag",
                 },
-                { name: "Manage Users", path: "/admin/users", icon: "fas fa-users" },
-                { name: "System Logs", path: "/admin/logs", icon: "fas fa-clipboard-list" },
-                { name: "Workspace Items", path: "/admin/items", icon: "fas fa-file-image" },
+                { name: "Manage Users", path: "/admin/users", icon: "fa-solid fa-users" },
+                { name: "System Logs", path: "/admin/logs", icon: "fa-solid fa-clipboard-list" },
+                { name: "Workspace Items", path: "/admin/items", icon: "fa-solid fa-file-image" },
             ],
         };
     },

@@ -8,7 +8,7 @@
             <el-table-column label="Operations">
                 <template #default="scope">
                     <el-button @click="triggerDownload(scope.row)">
-                        <i class="fas fa-cloud-download-alt"></i
+                        <i class="fa-solid fa-cloud-download-alt"></i
                     ></el-button>
                     <!-- <el-popconfirm
                         title="Are you sure you want to delete this file?"
@@ -16,7 +16,7 @@
                     >
                         <template #reference>
                             <el-button type="danger">
-                                <i class="fas fa-trash"></i>
+                                <i class="fa-solid fa-trash"></i>
                             </el-button>
                         </template>
                     </el-popconfirm> -->

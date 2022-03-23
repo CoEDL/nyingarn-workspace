@@ -16,9 +16,9 @@
         <div class="flex flex-row flex-wrap overflow-scroll" :style="{ height: panelHeight }">
             <view-item-component
                 class="cursor-pointer m-2 h-80"
-                v-for="resource in resources"
-                :key="resource"
-                :resource="resource"
+                v-for="r in resources"
+                :key="r.name"
+                :resource="r.name"
                 @refresh="init"
             />
         </div>
@@ -27,6 +27,7 @@
 
 <script>
 import ViewItemComponent from "./ViewItem.component.vue";
+import { getItemResources } from "@/components/item/load-item-data";
 
 export default {
     components: {
@@ -50,8 +51,11 @@ export default {
             let limit = this.pageSize;
             let offset = (this.currentPage - 1) * this.pageSize;
 
-            let response = await this.$http.get({
-                route: `/items/${this.identifier}/resources?offset=${offset}&limit=${limit}`,
+            let response = await getItemResources({
+                $http: this.$http,
+                identifier: this.identifier,
+                offset,
+                limit,
             });
             if (response.status !== 200) {
                 console.error(

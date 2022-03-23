@@ -1,4 +1,5 @@
 import { tokenSessionKey, getLocalStorage } from "@/components/storage";
+import { isNumber, isString } from "lodash";
 
 export default class HTTPService {
     constructor({ router, loginPath = "/login" }) {
@@ -36,9 +37,11 @@ export default class HTTPService {
 
     assembleQueryString(params) {
         let queryString = "";
-        Object.keys(params).forEach(
-            (p) => (queryString += `${p}=${encodeURIComponent(params[p])}&`)
-        );
+        Object.keys(params).forEach((p) => {
+            if (isNumber(params[p]) || isString(params[p])) {
+                queryString += `${p}=${encodeURIComponent(params[p])}&`;
+            }
+        });
         return queryString.slice(0, -1);
     }
 

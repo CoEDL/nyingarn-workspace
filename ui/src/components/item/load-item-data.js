@@ -1,3 +1,11 @@
+export async function getItemResources({ $http, identifier, offset, limit }) {
+    console.log(offset, limit);
+    return await $http.get({
+        route: `/items/${identifier}/resources`,
+        params: { offset, limit },
+    });
+}
+
 export async function getResourceFiles({ $http, identifier, resource }) {
     return await $http.get({
         route: `/items/${identifier}/resources/${resource}/files`,

@@ -1,6 +1,7 @@
 <template>
     <div class="flex flex-col justify-around p-2 border border-solid relative">
         <div
+            v-if="src"
             class="absolute cursor-pointer"
             style="
                 top: 100px;
@@ -16,8 +17,8 @@
                 class="text-gray-500"
                 style="
                     position: absolute;
-                    top: 50%;
-                    left: 50%;
+                    top: 55%;
+                    left: 43%;
                     transform: translate(-50%, -50%);
                     width: 12px;
                 "
@@ -78,13 +79,15 @@ export default {
                     this.srcset.push(link);
                 }
             }
-            this.zoomist = new Zoomist("#image", {
-                fill: "contain",
-                maxRatio: 10,
-                slider: true,
-                zoomer: true,
-                height: window.innerHeight - 150,
-            });
+            if (this.src) {
+                this.zoomist = new Zoomist("#image", {
+                    fill: "contain",
+                    maxRatio: 10,
+                    slider: true,
+                    zoomer: true,
+                    height: window.innerHeight - 150,
+                });
+            }
         },
         reset() {
             this.zoomist.reset();

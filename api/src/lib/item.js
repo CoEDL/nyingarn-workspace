@@ -173,7 +173,7 @@ export async function listItemResources({ identifier, offset = 0, limit }) {
             name: r,
             next,
             page: i + 1,
-            total: resources.length + 1,
+            total: resources.length,
         };
     });
     if (isNumber(offset) && isNumber(limit)) {

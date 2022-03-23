@@ -150,7 +150,7 @@ export async function listItemResources({ identifier, offset = 0, limit }) {
     let files;
     try {
         files = await loadResources({ bucket, prefix: identifier });
-        files = files.map((c) => c.Key.split(`${identifier}/`).pop());
+        files = files.map((f) => path.basename(f.Key));
         files = files.filter((file) => !file.match(/^\./));
         files = files.filter((file) => {
             let matches = specialFiles.map((sf) => {

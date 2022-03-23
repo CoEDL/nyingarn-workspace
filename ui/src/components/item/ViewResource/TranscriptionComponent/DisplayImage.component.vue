@@ -23,7 +23,7 @@
                     width: 12px;
                 "
             >
-                <i class="fas fa-sync"></i>
+                <i class="fa-solid fa-sync"></i>
             </span>
         </div>
         <div id="image" :data-zoomist-src="src" :style="maxHeight" v-if="src" />

@@ -11,7 +11,7 @@
                     @click="loadItem(pageControls.previous)"
                     :disabled="!pageControls.previous"
                 >
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fa-solid fa-arrow-left"></i>
                 </el-button>
             </div>
             <div class="pt-1 text-sm text-gray-700">
@@ -24,7 +24,7 @@
                     @click="loadItem(pageControls.next)"
                     :disabled="!pageControls.next"
                 >
-                    <i class="fas fa-arrow-right"></i>
+                    <i class="fa-solid fa-arrow-right"></i>
                 </el-button>
             </div>
         </div>

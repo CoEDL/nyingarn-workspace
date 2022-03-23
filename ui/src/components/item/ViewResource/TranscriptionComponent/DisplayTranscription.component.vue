@@ -3,12 +3,12 @@
         <div class="flex flex-row mb-2 space-x-1">
             <div>
                 <el-button @click="undo" size="small">
-                    <i class="fas fa-undo"></i>
+                    <i class="fa-solid fa-undo"></i>
                 </el-button>
             </div>
             <div>
                 <el-button @click="redo" size="small">
-                    <i class="fas fa-redo"></i>
+                    <i class="fa-solid fa-redo"></i>
                 </el-button>
             </div>
             <div v-show="!isComplete">
@@ -24,7 +24,7 @@
             <div class="flex flex-grow"></div>
             <div>
                 <div v-if="saved" class="text-green-400 mx-4">
-                    <i class="fas fa-check"></i>
+                    <i class="fa-solid fa-check"></i>
                     saved
                 </div>
             </div>

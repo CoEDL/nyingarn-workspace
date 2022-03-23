@@ -8,7 +8,7 @@
             <el-table-column prop="administrator" label="Admin" width="100">
                 <template #default="scope">
                     <div v-show="scope.row.administrator" class="text-green-600">
-                        <i class="fas fa-check"></i>
+                        <i class="fa-solid fa-check"></i>
                     </div>
                 </template>
             </el-table-column>
@@ -21,7 +21,7 @@
                         >
                             <template #reference>
                                 <el-button type="danger">
-                                    <i class="fas fa-unlink"></i>
+                                    <i class="fa-solid fa-unlink"></i>
                                 </el-button>
                             </template>
                         </el-popconfirm>

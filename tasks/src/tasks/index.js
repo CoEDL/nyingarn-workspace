@@ -3,6 +3,7 @@ export { runTesseractOCR, runTextractOCR } from "./ocr-processing";
 export {
     processDigivolTranscription,
     processFtpTeiTranscription,
+    processTeiTranscription,
 } from "./transcription-processing";
 
 import { groupBy } from "lodash";
@@ -14,7 +15,7 @@ export const thumbnailHeight = 300;
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
 export const specialFiles = ["ro-crate-metadata.json", "digivol.csv", "ftp.xml"];
 
-async function loadResources({ bucket, prefix, continuationToken }) {
+export async function loadResources({ bucket, prefix, continuationToken }) {
     let resources = await bucket.listObjects({ bucket, prefix, continuationToken });
     if (resources.NextContinuationToken) {
         return [

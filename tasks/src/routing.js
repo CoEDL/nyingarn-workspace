@@ -4,7 +4,8 @@ import {
     runTesseractOCR,
     runTextractOCR,
     processDigivolTranscription,
-    processFtpTeiTranscription,
+    //    processFtpTeiTranscription,
+    processTeiTranscription,
 } from "./tasks";
 import {
     prepare,
@@ -20,7 +21,7 @@ const log = getLogger();
 export function setupHandlers({ rabbit }) {
     rabbit.handle("process-image", runTask);
     rabbit.handle("process-digivol", runTask);
-    rabbit.handle("process-ftp-tei", runTask);
+    rabbit.handle("process-tei", runTask);
 }
 
 export async function runTask(msg) {
@@ -36,9 +37,10 @@ export async function runTask(msg) {
                 log.info(`Running 'process-digivol' task for '${identifier}' in ${directory}`);
                 await processDigivolTranscription({ directory, ...msg.body });
                 break;
-            case "process-ftp-tei":
-                log.info(`Running 'process-ftp-tei' task for '${identifier}' in ${directory}`);
-                await processFtpTeiTranscription({ directory, ...msg.body });
+            case "process-tei":
+                log.info(`Running 'process-tei' task for '${identifier}' in ${directory}`);
+                //await processFtpTeiTranscription({ directory, ...msg.body });
+                await processTeiTranscription({ directory, ...msg.body });
                 break;
             case "process-image":
                 log.info(`Running 'process-image' task for '${identifier}' in ${directory}`);

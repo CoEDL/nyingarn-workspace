@@ -7,3 +7,6 @@ configuration.json
 development-configuration.json
 production-configuration.json
 eng.traineddata
+
+# temporary backup files created by jEdit text editor
+*.*~

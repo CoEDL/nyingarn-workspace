@@ -8,20 +8,30 @@
             :close-on-press-escape="false"
             width="90%"
         >
-            <div
-                class="grid grid-flow-col auto-cols-max gap-4 place-content-center text-lg text-center"
-            >
+            <div class="flex justify-center grid grid-cols-3 gap-4 text-lg text-center">
                 <div
                     class="border rounded p-10 break-normal hover:bg-indigo-100 hover:cursor-pointer"
                     @click="showHelp('digivol')"
                 >
-                    Upload data from DigiVol
+                    Upload transcriptions from DigiVol
                 </div>
                 <div
                     class="border rounded p-10 break-normal hover:bg-indigo-100 hover:cursor-pointer"
                     @click="showHelp('ftp')"
                 >
-                    Upload data from FromThePage
+                    Upload transcriptions from FromThePage
+                </div>
+                <div
+                    class="border rounded p-10 break-normal hover:bg-indigo-100 hover:cursor-pointer"
+                    @click="showHelp('tei')"
+                >
+                    Upload TEI transcriptions
+                </div>
+                <div
+                    class="border rounded p-10 break-normal hover:bg-indigo-100 hover:cursor-pointer"
+                    @click="showHelp('word')"
+                >
+                    Upload Word / PDF transcriptions converted to TEI via OxGarage
                 </div>
                 <div
                     class="border rounded p-10 break-normal hover:bg-indigo-100 hover:cursor-pointer"

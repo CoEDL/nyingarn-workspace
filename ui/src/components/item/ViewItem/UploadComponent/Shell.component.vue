@@ -14,7 +14,9 @@
 
             <div class="px-2" v-if="!uploads.length">
                 <digi-vol-help-component v-if="help === 'digivol'" />
-                <ftp-help-component v-if="help === 'ftp'" />
+                <tei-help-component v-if="help === 'ftp'" type="ftp" />
+                <tei-help-component v-if="help === 'tei'" type="tei" />
+                <tei-help-component v-if="help === 'word'" type="word" />
                 <image-help-component v-if="help === 'images'" />
                 <div class="bg-yellow-100 p-2 rounded flex flex-row">
                     <div class="text-3xl p-4 text-red-600">
@@ -34,7 +36,7 @@
 import UploaderComponent from "./Uploader.component.vue";
 import UploadWizardComponent from "./UploadWizard.component.vue";
 import DigiVolHelpComponent from "./HelpDigivol.component.vue";
-import FtpHelpComponent from "./HelpFTP.component.vue";
+import TeiHelpComponent from "./HelpTEI.component.vue";
 import ImageHelpComponent from "./HelpImages.component.vue";
 import ProcessingStatusComponent from "./ProcessingStatus.component.vue";
 import { uniqBy } from "lodash";
@@ -44,7 +46,7 @@ export default {
         UploaderComponent,
         UploadWizardComponent,
         DigiVolHelpComponent,
-        FtpHelpComponent,
+        TeiHelpComponent,
         ImageHelpComponent,
         ProcessingStatusComponent,
     },

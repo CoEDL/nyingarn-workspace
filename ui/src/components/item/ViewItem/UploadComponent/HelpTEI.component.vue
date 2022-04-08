@@ -6,7 +6,11 @@
             </div>
             <div class="text-base py-2">
                 <ol class="pl-2 list-decimal">
-                    <li>Upload the FromThePage TEI XML</li>
+                    <li v-if="type === 'ftp'">Upload the FromThePage TEI XML</li>
+                    <li v-if="type === 'tei'">Upload TEI transcription XML</li>
+                    <li v-if="type === 'word'">
+                        Upload Word document transcriptions converted to TEI via OxGarage
+                    </li>
                     <li>Ensure the image filenames match the names in the CSV file</li>
                     <li>Upload the image files</li>
                 </ol>
@@ -17,8 +21,7 @@
                 <i class="fa-solid fa-lightbulb"></i>
             </div>
             <div class="text-base py-2">
-                Ensure you are uploading the TEI XML output from FromThePage and that the file is
-                named '{{ identifier }}-ftp.xml'
+                Ensure you are uploading a TEI XML file named '{{ identifier }}-tei.xml'
             </div>
         </div>
         <div class="bg-indigo-100 p-2 rounded flex flex-row">
@@ -36,6 +39,9 @@
 
 <script>
 export default {
+    props: {
+        type: { type: String, default: "ftp" },
+    },
     data() {
         return {
             identifier: this.$route.params.identifier,

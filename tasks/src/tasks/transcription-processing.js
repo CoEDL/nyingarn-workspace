@@ -1,10 +1,10 @@
 import path from "path";
 import SaxonJS from "saxon-js";
-import { remove, createReadStream, writeFile, appendFile, readdir } from "fs-extra";
+import { createReadStream, writeFile, appendFile } from "fs-extra";
 import { parse } from "csv-parse";
 import { zipObject } from "lodash";
 import { getS3Handle, getLogger } from "../common";
-import { loadResources, persistNewContentToBucket } from "./";
+import { persistNewContentToBucket } from "./";
 const log = getLogger();
 
 export async function reconstituteTEIFile({ directory, identifier, resource }) {
@@ -52,7 +52,7 @@ export async function processTEIToPageFilesAsStrings({ directory, identifier, re
 
 export async function processTeiTranscription({ directory, identifier, resource }) {
     await __processTeiTranscriptionXMLProcessor({ directory, identifier, resource });
-    await persistNewContentToBucket({ directory, identifier });
+    await persistNewContentToBucket({ directory, identifier, resource });
 }
 
 export async function processDigivolTranscription({ directory, identifier, resource }) {

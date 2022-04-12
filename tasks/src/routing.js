@@ -61,6 +61,7 @@ export async function runTask(msg) {
             });
         }
     } catch (error) {
+        console.log(error);
         log.error(`runTask ERROR: Task in ${directory}`);
         try {
             await cleanupAfterFailure({ directory, identifier });

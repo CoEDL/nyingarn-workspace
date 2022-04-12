@@ -5,7 +5,7 @@ import path from "path";
 import { writeJson, remove } from "fs-extra";
 import { compact, groupBy, uniq, isNumber } from "lodash";
 import { sub } from "date-fns";
-const specialFiles = ["ro-crate-metadata.json", "digivol.csv", "ftp.xml"];
+const specialFiles = ["ro-crate-metadata.json", "-digivol.csv", "-tei.xml"];
 const completedResources = ".completed-resources.json";
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];

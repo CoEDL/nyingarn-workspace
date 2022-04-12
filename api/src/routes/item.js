@@ -275,7 +275,7 @@ async function getItemResourcesHandler(req, res, next) {
 async function putReprocessImports(req, res, next) {
     const files = [
         `${req.item.identifier}-tei.xml`,
-        `${req.item.identifier}-ftp.xml`,
+        `${req.item.identifier}-tei.xml`,
         `${req.item.identifier}-digivol.csv`,
     ];
 

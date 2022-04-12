@@ -13,7 +13,7 @@ import { getS3Handle, loadConfiguration } from "../common";
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const thumbnailHeight = 300;
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
-export const specialFiles = ["ro-crate-metadata.json", "digivol.csv", "ftp.xml"];
+export const specialFiles = ["ro-crate-metadata.json", "-digivol.csv", "-tei.xml"];
 
 export async function loadResources({ bucket, prefix, continuationToken }) {
     let resources = await bucket.listObjects({ bucket, prefix, continuationToken });
@@ -27,6 +27,19 @@ export async function loadResources({ bucket, prefix, continuationToken }) {
         ];
     } else {
         return resources.Contents;
+    }
+}
+
+export async function persistNewContentToBucket({ directory, identifier }) {
+    let { bucket } = await getS3Handle();
+    let files = await loadResources({ bucket, prefix: identifier });
+    files = files.map((f) => path.basename(f.Key));
+
+    let localFiles = await readdir(path.join(directory, identifier));
+    for (let file of localFiles) {
+        if (files.includes(file) && file !== resource) {
+            await remove(path.join(directory, identifier, file));
+        }
     }
 }
 

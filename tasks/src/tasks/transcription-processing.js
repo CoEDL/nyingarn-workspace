@@ -1,12 +1,10 @@
 import path from "path";
 import SaxonJS from "saxon-js";
-import { readFile, remove, createReadStream, writeFile, appendFile, readdir } from "fs-extra";
+import { remove, createReadStream, writeFile, appendFile, readdir } from "fs-extra";
 import { parse } from "csv-parse";
-import { zipObject, isEmpty } from "lodash";
+import { zipObject } from "lodash";
 import { getS3Handle, getLogger } from "../common";
 import { loadResources } from "./";
-let { DOMParser, XMLSerializer } = require("xmldom");
-import xmlserializer from "xmlserializer";
 const log = getLogger();
 
 export async function reconstituteTEIFile({ directory, identifier, resource }) {
@@ -53,20 +51,7 @@ export async function processTEIToPageFilesAsStrings({ directory, identifier, re
 }
 
 export async function processTeiTranscription({ directory, identifier, resource }) {
-    //TODO ask SaxonJS to return the documents in memory, rather than write them directly to disk
-    // so that the storage bucket can be checked for pre-existing files, to avoid overwriting them.
-
-    let sourceURI = "file://" + path.join(directory, identifier, resource);
-    const transformationResults = await SaxonJS.transform(
-        {
-            stylesheetFileName: "src/xslt/process-tei-to-page-files.xsl.sef.json",
-            templateParams: {
-                "source-uri": sourceURI,
-            },
-            baseOutputURI: sourceURI, // output into the same folder as the source data file
-        },
-        "async"
-    );
+    await __processTeiTranscriptionXMLProcessor({ directory, identifier, resource });
 
     let { bucket } = await getS3Handle();
     let files = await loadResources({ bucket, prefix: identifier });
@@ -78,9 +63,6 @@ export async function processTeiTranscription({ directory, identifier, resource 
             await remove(path.join(directory, identifier, file));
         }
     }
-    // for (const documentURI in transformationResults.resultDocuments) {
-    //     console.log(documentURI);
-    // }
 }
 
 export async function processDigivolTranscription({ directory, identifier, resource }) {
@@ -126,60 +108,16 @@ export async function processDigivolTranscription({ directory, identifier, resou
     }
 }
 
-/*
-export async function processFtpTeiTranscription({ directory, identifier, resource }) {
-    let doc = await loadTeiDocument({ directory, identifier, resource });
-    let nodes = getElementsByName(doc, "pb");
-    let pbIds = nodes.map((n) => n.getAttribute("xml:id"));
-    let divs = getElementsByName(doc, "div");
-
-    let { bucket } = await getS3Handle();
-    for (let pbId of pbIds) {
-        const id = pbId.replace("F", "OTP");
-        let node = divs.filter((n) => n.getAttribute("xml:id") === id)[0];
-
-        let paragraphs = getElementsByName(node, "p");
-
-        let pageIdentifier = getElementsByName(node, "fw")[0].childNodes[0].nodeValue;
-
-        let filename = `${pageIdentifier}.tei.xml`;
-        let teiFile = path.join(identifier, filename);
-        let exists = await bucket.pathExists({ path: teiFile });
-
-        if (!exists) {
-            filename = path.join(directory, identifier, filename);
-            await writeFile(filename, `<pb facs="${pageIdentifier}.jpg"/>\n`);
-            for (let p of paragraphs) {
-                p.removeAttribute("xml:id");
-                await appendFile(
-                    filename,
-                    xmlserializer
-                        .serializeToString(p)
-                        .replace(' xmlns="http://www.tei-c.org/ns/1.0"', "")
-                );
-            }
-        }
-    }
-}
-*/
-
-export async function loadTeiDocument({ directory, identifier, resource }) {
-    const dom = new DOMParser({
-        locator: {},
-        errorHandler: {
-            warning: () => {},
-            error: (e) => console.log("ERROR:", file, e.replace("\n", " - ")),
-            fatalError: (e) => console.log(file, e),
+export async function __processTeiTranscriptionXMLProcessor({ directory, identifier, resource }) {
+    let sourceURI = "file://" + path.join(directory, identifier, resource);
+    const transformationResults = await SaxonJS.transform(
+        {
+            stylesheetFileName: "src/xslt/process-tei-to-page-files.xsl.sef.json",
+            templateParams: {
+                "source-uri": sourceURI,
+            },
+            baseOutputURI: sourceURI, // output into the same folder as the source data file
         },
-    });
-    const file = path.join(directory, identifier, resource);
-    let data = await readFile(file);
-    const doc = dom.parseFromString(data.toString());
-    return doc;
-}
-
-function getElementsByName(node, element) {
-    let nodes = node.getElementsByTagName(element);
-    let keys = Object.keys(nodes).filter((k) => k.match(/^\d+$/));
-    return keys.map((k) => nodes[k]);
+        "async"
+    );
 }

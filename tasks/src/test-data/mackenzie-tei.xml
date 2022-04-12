@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd"
+xml:lang="EN"
+xml:id="export">
+
+<teiHeader>
+  <fileDesc>
+    <titleStmt>
+      <title type="full">
+        <title type="main">McKenzie432-435</title>
+        <title type="desc"></title>
+      </title>
+      <author>
+        <persName></persName>
+      </author>
+    </titleStmt>
+
+    <editionStmt>
+      <edition>Edition created from new transcripts of this manuscript.</edition>
+      <respStmt xml:id="AU2">
+        <resp>Initial upload of this work&#39;s facsimile images and metadata to FromThePage for editing</resp>
+        <persName>Nick</persName>
+      </respStmt>
+
+      <respStmt xml:id="OU2">
+        <resp>Adminstrator of the MacKenzie letters transcription project on FromThePage</resp>
+        <persName>Nick</persName>
+      </respStmt>
+
+        <respStmt xml:id="U2">
+          <persName>Nick</persName>
+            <resp>
+              made 21 edits between
+              <date type="first_edit" when="2022-03-21T07:38:40Z">March 21, 2022</date> and
+              <date type="last_edit" when="2022-04-02T23:25:15Z">April  2, 2022</date>.
+            </resp>
+        </respStmt>
+
+
+
+    </editionStmt>
+
+    <publicationStmt>
+    <publisher>Dynamic TEI export from FromThePage (version 21.1)</publisher>
+      <availability>
+        <p></p>
+      </availability>
+      <date when="2022-04-11T01:34:01+00:00">April 11, 2022</date>
+    </publicationStmt>
+
+    <sourceDesc>
+      <msDesc>
+        <msIdentifier>
+            <collection>MacKenzie letters</collection>
+        </msIdentifier>
+        <physDesc>
+          <p></p>
+        </physDesc>
+        <history>
+          <origin>
+            <placeName></placeName>
+          </origin>
+          <provenance></provenance>
+        </history>
+      </msDesc>
+
+
+    </sourceDesc>
+
+  </fileDesc>
+
+
+
+  <profileDesc>
+
+
+  </profileDesc>
+
+  <revisionDesc>
+    <listChange ordered="true">
+        <change xml:id="CHG24" who="U2" when="2022-04-02T23:25:15Z" target="#P259">
+          Version 4 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG23" who="U2" when="2022-04-02T23:24:57Z" target="#P258">
+          Version 7 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG22" who="U2" when="2022-04-02T23:24:55Z" target="#P258">
+          Version 6 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG21" who="U2" when="2022-04-02T23:23:31Z" target="#P258">
+          Version 5 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG20" who="U2" when="2022-04-02T23:22:33Z" target="#P260">
+          Version 6 of page "4":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG19" who="U2" when="2022-04-01T08:56:49Z" target="#P260">
+          Version 5 of page "4":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG18" who="U2" when="2022-04-01T08:56:44Z" target="#P260">
+          Version 4 of page "4":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG17" who="U2" when="2022-03-31T08:05:33Z" target="#P260">
+          Version 3 of page "4":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG16" who="U2" when="2022-03-28T07:30:23Z" target="#P260">
+          Version 2 of page "4":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG15" who="U2" when="2022-03-24T19:49:53Z" target="#P260">
+          Version 1 of page "4":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG14" who="U2" when="2022-03-24T04:11:28Z" target="#P259">
+          Version 3 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG13" who="U2" when="2022-03-24T04:09:54Z" target="#P259">
+          Version 2 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG12" who="U2" when="2022-03-24T03:46:04Z" target="#P259">
+          Version 1 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG11" who="U2" when="2022-03-24T03:33:20Z" target="#P258">
+          Version 4 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG10" who="U2" when="2022-03-24T03:28:20Z" target="#P258">
+          Version 3 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG9" who="U2" when="2022-03-21T08:58:37Z" target="#P258">
+          Version 2 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG8" who="U2" when="2022-03-21T08:07:37Z" target="#P258">
+          Version 1 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG7" who="U2" when="2022-03-21T08:06:49Z" target="#P257">
+          Version 4 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG6" who="U2" when="2022-03-21T08:06:42Z" target="#P257">
+          Version 3 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG5" who="U2" when="2022-03-21T07:53:02Z" target="#P257">
+          Version 2 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG4" who="U2" when="2022-03-21T07:38:40Z" target="#P257">
+          Version 1 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG3" who="U2" when="2022-03-20T22:07:09Z" target="#P260">
+          Version 0 of page "4":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG2" who="U2" when="2022-03-20T22:07:09Z" target="#P259">
+          Version 0 of page "3":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG1" who="U2" when="2022-03-20T22:07:09Z" target="#P258">
+          Version 0 of page "2":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG0" who="U2" when="2022-03-20T22:07:09Z" target="#P257">
+          Version 0 of page "1":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+    </listChange>
+  </revisionDesc>
+</teiHeader>
+
+<text>
+  <body>
+        <pb xml:id="F257" n="1" facs="MacKenzie432.tiff"/>
+        <div xml:id="OTP257">
+        <fw type="pageNum">1</fw>
+        <p xml:id='OTP257P0'>Pango Efate<lb/>
+Aug 25th 73<lb/>
+My dear [Cassie]<lb/>
+I wonder how big<lb/>
+you are now. It will soon be two<lb/>
+years since I saw you, so you<lb/>
+must have grown  considerable in<lb/>
+that time. But there is something<lb/>
+else that I feel more anxious to know<lb/>
+than your size – It was this – Are you<lb/>
+a better girl now than you were<lb/>
+two years ago? Do you love Jesus more<lb/>
+and do you work more for Him. Re<lb/>
+member you have not to come among <lb/>
+the heathen in order to work for Jesus<lb/>
+you can do this at home you can<lb/>
+tell other little girls to love Him,<lb/>
+biut more than this you can be<lb/>
+kind to all at home and when others<lb/>
+are are cross with you, love them for their <lb/>
+hatred. "Render not evil for evil"
+</p>
+
+
+        </div>
+        <pb xml:id="F258" n="2" facs="MacKenzie433.tiff"/>
+        <div xml:id="OTP258">
+        <fw type="pageNum">2</fw>
+        <p xml:id='OTP258P0'>This is quite a cool night. I had to go <lb/>
+and put a warm coat on. I suppose you<lb/>
+often wonder what I am doing. Well I<lb/>
+have a great vriety of work. I was busy<lb/>
+packing flour to-day. We have to [xx]<lb/>
+careful with all our provisions in case<lb/>
+they spoil. I suppose you often wonder<lb/>
+what kind of food we have. To-day we<lb/>
+had preserved beef – we get meat to buy<lb/>
+in Sidney done up in tins air tight<lb/>
+about the size of a tin pint. After a<lb/>
+tin is opened it wont keep more than<lb/>
+two days. It is already cooked so that <lb/>
+we have only to warm it. We buy a <lb/>
+great deal of it, indeed it is the principal<lb/>
+part of our food. We also get fish pre<lb break='no'/>served the same way in small tins.<lb/>
+Then to-day for dinner we had yams<lb/>
+some days we have taro. The natives<lb/>
+cook our yams for us the same way<lb/>
+that they do their own – it would not be <lb/>
+nice boiled, it would be soft.<lb/>
+They roast them. If it is a small [xx] 
+</p>
+
+
+        </div>
+        <pb xml:id="F259" n="3" facs="MacKenzie434.tiff"/>
+        <div xml:id="OTP259">
+        <fw type="pageNum">3</fw>
+        <p xml:id='OTP259P0'>they lay it on the fire and keep turn<lb break='no'/>ing it until it is roasted, just as you<lb/>
+would roast a potato. Some of our <lb/>
+yams are very little bigger than a <lb/>
+potato, but the small ones are de<lb break='no'/>licious, much niver than the large ones.<lb/>
+When it is roasted they scrape the<lb/>
+burnt skin off and then it is ready<lb/>
+to eat. But I never saw them cook<lb/>
+taro in this way nor large yams.<lb/>
+When they make their fire they have <lb/>
+a number of round stones which they<lb/>
+put on the top of the fire, and then<lb/>
+the stones are very hot – they put the<lb/>
+taro or yams on top of the stones and<lb/>
+cover them over with a great quantity <lb/>
+of leaves – and the leaves keep the heat<lb/>
+from escaping. By the time that<lb/>
+the stones are hot the wood is about<lb/>
+consumed, but they don't put on <lb/>
+any more wood, there is heat enough<lb/>
+in the stones themselves – Our girls take
+</p>
+
+
+        </div>
+        <pb xml:id="F260" n="4" facs="MacKenzie435.tiff"/>
+        <div xml:id="OTP260">
+        <fw type="pageNum">4</fw>
+        <p xml:id='OTP260P0'>turn about at cooking our yams.<lb/>
+We have porridge for breakfast. We get beau<lb break='no'/>tiful oatmeal from Sidney in small<lb/>
+tins. It would not do to get a larger<lb/>
+quantity at once for it dont keep long<lb/>
+We have plenty of milk. Mr Morrison<lb/>
+let a cow here. I suppose you would<lb/>
+like to see dear little [pepaxx]. She dont<lb/>
+walk alone yet, but she runs along the <lb/>
+wall or any place she can put her hand<lb/>
+against. She talks away at a great rate<lb/>
+and scolds too, but we dont know what<lb/>
+she is saying. She didn't know me when<lb/>
+I came home from the meeting, you<lb/>
+may be sure I was not well pleased<lb/>
+at her for forgetting me – Dear Ca[xx]<lb/>
+I hope you are a good girl– and that<lb/>
+you are seeking to followJesus. You<lb/>
+remember dear [pepin] had not much<lb/>
+time to think of death.<lb/>
+I remain<lb/>
+Your loving [brother]<lb/>
+John<lb/>
+
+</p>
+
+
+        </div>
+  </body>
+</text>
+</TEI>

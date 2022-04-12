@@ -114,6 +114,7 @@ export async function __processTeiTranscriptionXMLProcessor({ directory, identif
         {
             stylesheetFileName: "src/xslt/process-tei-to-page-files.xsl.sef.json",
             templateParams: {
+                identifier,
                 "source-uri": sourceURI,
             },
             baseOutputURI: sourceURI, // output into the same folder as the source data file

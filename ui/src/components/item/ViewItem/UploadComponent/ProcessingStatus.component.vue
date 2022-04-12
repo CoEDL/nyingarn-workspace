@@ -6,7 +6,12 @@
                     {{ formatDate(props.row.updatedAt) }}
                 </template>
             </el-table-column>
-            <el-table-column prop="status" label="status" width="150" />
+            <el-table-column prop="status" label="Status" width="150" />
+            <el-table-column prop="data" label="Data" width="150" type="expand">
+                <template #default="props">
+                    <pre>{{ props.row.data }}</pre>
+                </template>
+            </el-table-column>
             <el-table-column prop="resource" label="Resource" />
         </el-table>
     </div>
@@ -42,6 +47,8 @@ export default {
                 body: { resources: this.uploads },
             });
             let { tasks } = await response.json();
+            let failedTasks = tasks.filter((t) => t.status === "failed");
+            if (failedTasks.length) this.$emit("failed-tasks", failedTasks);
             this.tasks = [...tasks];
         },
         formatDate(date) {

@@ -4,7 +4,7 @@ import { remove, createReadStream, writeFile, appendFile, readdir } from "fs-ext
 import { parse } from "csv-parse";
 import { zipObject } from "lodash";
 import { getS3Handle, getLogger } from "../common";
-import { loadResources } from "./";
+import { loadResources, persistNewContentToBucket } from "./";
 const log = getLogger();
 
 export async function reconstituteTEIFile({ directory, identifier, resource }) {
@@ -52,17 +52,7 @@ export async function processTEIToPageFilesAsStrings({ directory, identifier, re
 
 export async function processTeiTranscription({ directory, identifier, resource }) {
     await __processTeiTranscriptionXMLProcessor({ directory, identifier, resource });
-
-    let { bucket } = await getS3Handle();
-    let files = await loadResources({ bucket, prefix: identifier });
-    files = files.map((f) => path.basename(f.Key));
-
-    let localFiles = await readdir(path.join(directory, identifier));
-    for (let file of localFiles) {
-        if (files.includes(file) && file !== resource) {
-            await remove(path.join(directory, identifier, file));
-        }
-    }
+    await persistNewContentToBucket({ directory, identifier });
 }
 
 export async function processDigivolTranscription({ directory, identifier, resource }) {

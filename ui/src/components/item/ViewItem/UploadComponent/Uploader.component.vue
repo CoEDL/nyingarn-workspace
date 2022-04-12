@@ -23,7 +23,7 @@ export default {
     },
     data() {
         return {
-	    specialFileNameChecks: ["digivol.csv", "tei.xml"],
+            specialFileNameChecks: ["-digivol.csv", "-tei.xml"],
             show: true,
             uppy: undefined,
         };

@@ -5,6 +5,7 @@ export {
     processFtpTeiTranscription,
     processTeiTranscription,
 } from "./transcription-processing";
+import { remove, readdir } from "fs-extra";
 
 import { groupBy } from "lodash";
 import path from "path";
@@ -30,7 +31,7 @@ export async function loadResources({ bucket, prefix, continuationToken }) {
     }
 }
 
-export async function persistNewContentToBucket({ directory, identifier }) {
+export async function persistNewContentToBucket({ directory, identifier, resource }) {
     let { bucket } = await getS3Handle();
     let files = await loadResources({ bucket, prefix: identifier });
     files = files.map((f) => path.basename(f.Key));

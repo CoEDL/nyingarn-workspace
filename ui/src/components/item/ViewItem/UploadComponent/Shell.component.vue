@@ -9,6 +9,7 @@
             <processing-status-component
                 class="px-2 flex-grow"
                 :uploads="uploads"
+                @failed-tasks="storeFailedTasks"
                 v-if="uploads.length"
             />
 
@@ -29,6 +30,11 @@
             </div>
         </div>
         <upload-wizard-component @show-help="showHelp" />
+        <ul class="ml-10 list-disc">
+            <li v-for="(error, idx) of failedTasks" :key="idx">
+                <error-reporter-component :error="error" />
+            </li>
+        </ul>
     </div>
 </template>
 
@@ -39,6 +45,7 @@ import DigiVolHelpComponent from "./HelpDigivol.component.vue";
 import TeiHelpComponent from "./HelpTEI.component.vue";
 import ImageHelpComponent from "./HelpImages.component.vue";
 import ProcessingStatusComponent from "./ProcessingStatus.component.vue";
+import ErrorReporterComponent from "./ErrorReporter.component.vue";
 import { uniqBy } from "lodash";
 
 export default {
@@ -49,6 +56,7 @@ export default {
         TeiHelpComponent,
         ImageHelpComponent,
         ProcessingStatusComponent,
+        ErrorReporterComponent,
     },
     data() {
         return {
@@ -56,6 +64,7 @@ export default {
             identifier: this.$route.params.identifier,
             help: undefined,
             uploads: [],
+            failedTasks: [],
         };
     },
     methods: {
@@ -67,6 +76,9 @@ export default {
         },
         fileRemoved(data) {
             this.uploads = this.uploads.filter((r) => r.resource !== data.resource);
+        },
+        storeFailedTasks(tasks) {
+            this.failedTasks = tasks;
         },
     },
 };

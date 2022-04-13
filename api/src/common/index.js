@@ -4,6 +4,7 @@ export { loadConfiguration, filterPrivateInformation } from "./configuration";
 export { getLogger, logEvent } from "./logger";
 export { submitTask, registerTask } from "./task";
 export { getS3Handle } from "./getS3Handle";
+import { getS3Handle } from "./getS3Handle";
 export {
     route,
     routeAdmin,
@@ -29,4 +30,17 @@ export async function getUserTempLocation({ userId }) {
     let tempdir = path.join("/srv", "tmp", userId);
     await ensureDir(tempdir);
     return tempdir;
+}
+
+export async function loadFiles({ continuationToken }) {
+    let { bucket } = await getS3Handle();
+    let resources = await bucket.listObjects({ continuationToken });
+    if (resources.NextContinuationToken) {
+        return [
+            ...resources.Contents,
+            ...(await loadItems({ continuationToken: resources.NextContinuationToken })),
+        ];
+    } else {
+        return resources.Contents;
+    }
 }

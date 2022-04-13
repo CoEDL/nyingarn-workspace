@@ -39,7 +39,7 @@ export async function createItem({ identifier, userId }) {
         throw new Error("An item with that identifier already exists.");
     }
     if (collection) {
-	throw new Error("A collection with that identifier already exists.");
+        throw new Error("A collection with that identifier already exists.");
     }
 
     item = await models.item.create({ identifier });
@@ -93,6 +93,7 @@ export async function createItemLocationInObjectStore({ identifier, userId }) {
             localPath: crateFile,
             target: path.join(identifier, "ro-crate-metadata.json"),
         });
+        await bucket.upload({ json: {}, target: path.join(identifier, ".item") });
         await remove(tempdir);
     }
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.tei-c.org/ns/1.0" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd" xml:lang="en" xml:id="unpaginated">
+   <teiHeader>
+      <fileDesc>
+	     <titleStmt>
+	        <title type="full">A TEI document which lacks pagination</title>
+	        <author>Conal Tuohy</author>
+	     </titleStmt>
+	     <publicationStmt>
+	        <publisher>ARC Centre of Excellence for the Dynamics of Language</publisher>
+	     </publicationStmt>
+	     <sourceDesc>
+	        <p>Original digital document</p>
+	     </sourceDesc>
+      </fileDesc>
+   </teiHeader>
+   <text>
+      <body>
+            <div>
+                <head>A totally unpaginated document</head>
+                <p>There is actual content in this file, but it's not divided into pages, so it's not usable by Nyingarn.</p>
+                <p>To be ingested into Nyingarn, a file has to be divided into pages with page-breaks.</p>
+            </div>
+        </body>
+   </text>
+</TEI>

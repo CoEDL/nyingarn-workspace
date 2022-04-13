@@ -3,7 +3,7 @@ import SaxonJS from "saxon-js";
 import { createReadStream, writeFile, appendFile } from "fs-extra";
 import { parse } from "csv-parse";
 import { zipObject } from "lodash";
-import { getS3Handle, getLogger } from "../common";
+import { getS3Handle, getLogger, loadConfiguration } from "../common";
 import { persistNewContentToBucket } from "./";
 const log = getLogger();
 
@@ -100,12 +100,14 @@ export async function processDigivolTranscription({ directory, identifier, resou
 
 export async function __processTeiTranscriptionXMLProcessor({ directory, identifier, resource }) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);
+    let configuration = await loadConfiguration();
     const transformationResults = await SaxonJS.transform(
         {
             stylesheetFileName: "src/xslt/process-tei-to-page-files.xsl.sef.json",
             templateParams: {
-                identifier,
+                "identifier": identifier,
                 "source-uri": sourceURI,
+                "page-identifier-regex": configuration.ui.filename.checkNameStructure
             },
             baseOutputURI: sourceURI, // output into the same folder as the source data file
         },

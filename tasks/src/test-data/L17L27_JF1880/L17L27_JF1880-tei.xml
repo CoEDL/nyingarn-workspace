@@ -3,7 +3,7 @@
 	<teiHeader>
 		<fileDesc>
 			<titleStmt>
-				<title type='main'>L17L27-JF1880</title>
+				<title type='main'>L17L27_JF1880</title>
 			</titleStmt>
 			<publicationStmt>
 				<publisher>tranScriptorium</publisher>
@@ -15,7 +15,7 @@
 	</teiHeader>
 	<text>
 		<body>
-			<pb xml:id='L17L27-JF1880-1.png' n='1'/>
+			<pb xml:id='L17L27_JF1880-01.png' n='1'/>
 			<p>
 				<lb facs='#facs_1_line_1536741204231_249' n='N001'/>579
 				<lb facs='#facs_1_line_1536741211810_250' n='N002'/>E65
@@ -25,12 +25,12 @@
 				<lb facs='#facs_1_line_1536741451799_256' n='N002'/>Grammatik
 				<lb facs='#facs_1_line_1536741458098_257' n='N003'/>
 			</p>
-			<pb xml:id='L17L27-JF1880-2.png' n='2'/>
+			<pb xml:id='L17L27_JF1880-02.png' n='2'/>
 			<p>
 				<lb facs='#facs_2_r1l1' n='N001'/>J. Flierl
 				<lb facs='#facs_2_r1l2' n='N002'/>Dieri
 			</p>
-			<pb xml:id='L17L27-JF1880-3.png' n='3'/>
+			<pb xml:id='L17L27_JF1880-03.png' n='3'/>
 			<p>
 				<lb facs='#facs_3_r1l1' n='N001'/>1 Dieri
 			</p>
@@ -56,7 +56,7 @@
 			<p>
 				<lb facs='#facs_3_r3l1' n='N001'/>Wonkanguru 5
 			</p>
-			<pb xml:id='L17L27-JF1880-4.png' n='4'/>
+			<pb xml:id='L17L27_JF1880-04.png' n='4'/>
 			<p>
 				<lb facs='#facs_4_line_1535514005133_19' n='N001'/>6 D[ieri]
 			</p>
@@ -94,7 +94,7 @@
 				<lb facs='#facs_4_line_1535514256831_22' n='N009'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>[VIII Conjunctionen:] ja, ja</hi>
 				<lb facs='#facs_4_r2l12' n='N010'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>[IX Interjectionen:] jakaiaia, jakaiai! </hi>
 			</p>
-			<pb xml:id='L17L27-JF1880-5.png' n='5'/>
+			<pb xml:id='L17L27_JF1880-05.png' n='5'/>
 			<p>
 				<lb facs='#facs_5_line_1536742664847_259' n='N001'/>8 D[ieri]
 			</p>
@@ -143,7 +143,7 @@
 				<lb facs='#facs_5_r2l27' n='N039'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>a</hi> gehen nach der 1. Decl., Die auf <hi rend='fontSize:0.0; kerning:0; bold:true;'>o</hi> u.<hi rend='fontSize:0.0; kerning:0; bold:true;'>u </hi>der
 				<lb facs='#facs_5_r2l28' n='N040'/>2., die auf I schwanken, gehen jedoch meist auch der 2. —
 			</p>
-			<pb xml:id='L17L27-JF1880-6.png' n='6'/>
+			<pb xml:id='L17L27_JF1880-06.png' n='6'/>
 			<p>
 				<lb facs='#facs_6_r1l1' n='N001'/>10. D[ieri]
 			</p>
@@ -222,7 +222,7 @@
 				<lb facs='#facs_6_r3l41' n='N069'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>Plural </hi>
 				<lb facs='#facs_6_r3l43' n='N070'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>boko kari etc</hi>
 			</p>
-			<pb xml:id='L17L27-JF1880-7.png' n='7'/>
+			<pb xml:id='L17L27_JF1880-07.png' n='7'/>
 			<p>
 				<lb facs='#facs_7_line_1536557080822_11' n='N001'/>12 D[ieri]
 			</p>
@@ -289,7 +289,7 @@
 				<lb facs='#facs_7_region_1536556934486_10l45' n='N057'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>materaia milki</hi>, des Manes Auge,
 				<lb facs='#facs_7_region_1536556934486_10l46' n='N058'/>sondern <hi rend='fontSize:0.0; kerning:0; bold:true;'>materi milki</hi>. Es wird also
 			</p>
-			<pb xml:id='L17L27-JF1880-8.png' n='8'/>
+			<pb xml:id='L17L27_JF1880-08.png' n='8'/>
 			<p>
 				<lb facs='#facs_8_r1l1' n='N001'/>14 D[ieri]
 			</p>
@@ -334,7 +334,7 @@
 				<lb facs='#facs_8_line_1536726273664_21' n='N035'/>Auch v. Sachnamen werden durch
 				<lb facs='#facs_8_r2l30' n='N036'/>Anhängung v. <hi rend='fontSize:0.0; kerning:0; bold:true;'>etja</hi> persönl. Hauptes. wie
 			</p>
-			<pb xml:id='L17L27-JF1880-9.png' n='9'/>
+			<pb xml:id='L17L27_JF1880-09.png' n='9'/>
 			<p>
 				<lb facs='#facs_9_r1l1' n='N001'/>16 D[ieri]
 			</p>
@@ -379,7 +379,7 @@
 				<lb facs='#facs_9_r2l25' n='N035'/>sich mit <hi rend='fontSize:0.0; kerning:0; bold:true;'>ngaiani</hi> u. <hi rend='fontSize:0.0; kerning:0; bold:true;'>ngai</hi>-
 				<lb facs='#facs_9_r2l26' n='N036'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>ana</hi>, wie. —
 			</p>
-			<pb xml:id='L17L27-JF1880-10.png' n='10'/>
+			<pb xml:id='L17L27_JF1880-10.png' n='10'/>
 			<p>
 				<lb facs='#facs_10_line_1536727042989_40' n='N001'/>18 D[ieri]
 			</p>
@@ -522,7 +522,7 @@
 				<lb facs='#facs_10_r2l52' n='N063'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>anirikuna</hi>, unser.
 				<lb facs='#facs_10_line_1536727946752_71' n='N064'/>
 			</p>
-			<pb xml:id='L17L27-JF1880-11.png' n='11'/>
+			<pb xml:id='L17L27_JF1880-11.png' n='11'/>
 			<p>
 				<lb facs='#facs_11_line_1537429860034_7' n='N001'/>20 D[ieri]
 			</p>
@@ -614,7 +614,7 @@
 				<lb facs='#facs_11_r2l34' n='N034'/>
 				<lb facs='#facs_11_r2l36' n='N035'/>
 			</p>
-			<pb xml:id='L17L27-JF1880-12.png' n='12'/>
+			<pb xml:id='L17L27_JF1880-12.png' n='12'/>
 			<p>
 				<lb facs='#facs_12_line_1536731336936_86' n='N001'/>W[onkanguru] 23
 			</p>
@@ -690,7 +690,7 @@
 				<lb facs='#facs_12_line_1536732610820_115' n='N066'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>Abl. woraku-</hi>
 				<lb facs='#facs_12_line_1536732625702_116' n='N067'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>na pudlaru?</hi>
 			</p>
-			<pb xml:id='L17L27-JF1880-13.png' n='13'/>
+			<pb xml:id='L17L27_JF1880-13.png' n='13'/>
 			<p>
 				<lb facs='#facs_13_line_1536732956959_118' n='N001'/>W[onkanguru] 25
 			</p>
@@ -759,7 +759,7 @@
 				<lb facs='#facs_13_line_1536733436907_139' n='N059'/>V. minai!?
 				<lb facs='#facs_13_line_1536733441737_140' n='N060'/>Act. Abl. minaru?
 			</p>
-			<pb xml:id='L17L27-JF1880-14.png' n='14'/>
+			<pb xml:id='L17L27_JF1880-14.png' n='14'/>
 			<p>
 				<lb facs='#facs_14_line_1536733841887_146' n='N001'/>26 D[ieri]
 			</p>
@@ -801,7 +801,7 @@
 				<lb facs='#facs_14_r2l27' n='N032'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>rina</hi>, d.h.: Den liebe ich, welcher mich liebt.
 				<lb facs='#facs_14_r2l28' n='N033'/>Den hasse ich welcher mich haßt.
 			</p>
-			<pb xml:id='L17L27-JF1880-15.png' n='15'/>
+			<pb xml:id='L17L27_JF1880-15.png' n='15'/>
 			<p>
 				<lb facs='#facs_15_line_1536734183117_155' n='N001'/>W[onkanguru] 29
 			</p>
@@ -859,7 +859,7 @@
 				<lb facs='#facs_15_line_1536734322189_167' n='N048'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>karuru</hi>
 				<lb facs='#facs_15_line_1536734327567_168' n='N049'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>karunga</hi>
 			</p>
-			<pb xml:id='L17L27-JF1880-16.png' n='16'/>
+			<pb xml:id='L17L27_JF1880-16.png' n='16'/>
 			<p>
 				<lb facs='#facs_16_r1l1' n='N001'/>30 D[ieri]
 			</p>
@@ -904,7 +904,7 @@
 				<lb facs='#facs_16_r2l27' n='N035'/>mitte; <hi rend='fontSize:0.0; kerning:0; bold:true;'>ngatani </hi>hinter.
 				<lb facs='#facs_16_line_1536735200220_189' n='N036'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>jipali, parara, ngataru</hi>
 			</p>
-			<pb xml:id='L17L27-JF1880-17.png' n='17'/>
+			<pb xml:id='L17L27_JF1880-17.png' n='17'/>
 			<p>
 				<lb facs='#facs_17_line_1537861347425_3' n='N001'/>32 D[ieri]
 			</p>
@@ -945,7 +945,7 @@
 				<lb facs='#facs_17_r1l27' n='N031'/>unmittelbar auf sich selbst richtete,
 				<lb facs='#facs_17_r1l28' n='N032'/>z.B.<hi rend='fontSize:0.0; kerning:0; bold:true;'> ngani nandrateriai, </hi>ich schlage mich.
 			</p>
-			<pb xml:id='L17L27-JF1880-18.png' n='18'/>
+			<pb xml:id='L17L27_JF1880-18.png' n='18'/>
 			<p>
 				<lb facs='#facs_18_r1l1' n='N001'/>34 D[ieri]
 			</p>
@@ -984,7 +984,7 @@
 			<p>
 				<lb facs='#facs_18_r3l1' n='N001'/>W[onkanguru] 35
 			</p>
-			<pb xml:id='L17L27-JF1880-19.png' n='19'/>
+			<pb xml:id='L17L27_JF1880-19.png' n='19'/>
 			<p>
 				<lb facs='#facs_19_line_1535442520829_14' n='N001'/>36. D[ieri]
 			</p>
@@ -1021,7 +1021,7 @@
 			<p>
 				<lb facs='#facs_19_r3l1' n='N001'/>W[ongkanguru] 37
 			</p>
-			<pb xml:id='L17L27-JF1880-20.png' n='20'/>
+			<pb xml:id='L17L27_JF1880-20.png' n='20'/>
 			<p>
 				<lb facs='#facs_20_line_1536737418733_191' n='N001'/>38 D[ieri]
 			</p>
@@ -1062,7 +1062,7 @@
 				<lb facs='#facs_20_line_1536737873924_192' n='N031'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>&quot;rina&quot;: — widinta; tepirina: —</hi>
 				<lb facs='#facs_20_line_1536737879783_193' n='N032'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>nganka widinta</hi>
 			</p>
-			<pb xml:id='L17L27-JF1880-21.png' n='21'/>
+			<pb xml:id='L17L27_JF1880-21.png' n='21'/>
 			<p>
 				<lb facs='#facs_21_line_1536738142004_195' n='N001'/>40 D[ieri]
 			</p>
@@ -1104,7 +1104,7 @@
 				<lb facs='#facs_21_r1l27' n='N032'/>dem prim. machen, doch ist die bedeutung oft
 				<lb facs='#facs_21_r1l28' n='N033'/>sehr verschieden v. der das grund wortes
 			</p>
-			<pb xml:id='L17L27-JF1880-22.png' n='22'/>
+			<pb xml:id='L17L27_JF1880-22.png' n='22'/>
 			<p>
 				<lb facs='#facs_22_line_1536738796737_205' n='N001'/>42 D[ieri]
 			</p>
@@ -1144,7 +1144,7 @@
 			<p>
 				<lb facs='#facs_22_r3l1' n='N001'/>W[onkanguru]
 			</p>
-			<pb xml:id='L17L27-JF1880-23.png' n='23'/>
+			<pb xml:id='L17L27_JF1880-23.png' n='23'/>
 			<p>
 				<lb facs='#facs_23_line_1536738980075_206' n='N001'/>44 D[ieri]
 			</p>
@@ -1183,7 +1183,7 @@
 			<p>
 				<lb facs='#facs_23_r3l1' n='N001'/>W[onkanguru] 45
 			</p>
-			<pb xml:id='L17L27-JF1880-24.png' n='24'/>
+			<pb xml:id='L17L27_JF1880-24.png' n='24'/>
 			<p>
 				<lb facs='#facs_24_r1l1' n='N001'/>
 			</p>
@@ -1219,7 +1219,7 @@
 				<lb facs='#facs_24_r2l28' n='N029'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>kanani,</hi> wenn Regen fallt, dann
 				<lb facs='#facs_24_r2l29' n='N030'/>wächst Gras.
 			</p>
-			<pb xml:id='L17L27-JF1880-25.png' n='25'/>
+			<pb xml:id='L17L27_JF1880-25.png' n='25'/>
 			<p>
 				<lb facs='#facs_25_line_1538009453162_86' n='N001'/>48 D[ieri]
 			</p>
@@ -1406,7 +1406,7 @@
 				<lb facs='#facs_25_line_1540947889617_20' n='N036'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>urkari</hi>
 				<lb facs='#facs_25_line_1540947894518_21' n='N037'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>nakariri</hi>
 			</p>
-			<pb xml:id='L17L27-JF1880-26.png' n='26'/>
+			<pb xml:id='L17L27_JF1880-26.png' n='26'/>
 			<p>
 				<lb facs='#facs_26_line_1536739797254_215' n='N001'/>50 D[ieri]
 			</p>
@@ -1442,7 +1442,7 @@
 				<lb facs='#facs_26_r1l25' n='N026'/>zweite Art ganze für sich bestehende
 				<lb facs='#facs_26_r1l26' n='N027'/>Wörter sind. — Von den einsÿlbigen
 			</p>
-			<pb xml:id='L17L27-JF1880-27.png' n='27'/>
+			<pb xml:id='L17L27_JF1880-27.png' n='27'/>
 			<p>
 				<lb facs='#facs_27_line_1536739982826_219' n='N001'/>52 D[ieri]
 			</p>
@@ -1483,7 +1483,7 @@
 				<lb facs='#facs_27_r1l29' n='N031'/><hi rend='fontSize:0.0; kerning:0; bold:true;'>-ta</hi> wird oft ganz willkurl. an Worte
 				<lb facs='#facs_27_r1l30' n='N032'/>gehängt, ohne Sinnveranderung.
 			</p>
-			<pb xml:id='L17L27-JF1880-28.png' n='28'/>
+			<pb xml:id='L17L27_JF1880-28.png' n='28'/>
 			<p>
 				<lb facs='#facs_28_line_1536740711325_228' n='N001'/>54 D[ieri]
 			</p>
@@ -1522,7 +1522,7 @@
 			<p>
 				<lb facs='#facs_28_r3l1' n='N001'/>W[ongkanguru] 55
 			</p>
-			<pb xml:id='L17L27-JF1880-29.png' n='29'/>
+			<pb xml:id='L17L27_JF1880-29.png' n='29'/>
 			<p>
 				<lb facs='#facs_29_line_1536740981422_242' n='N001'/>
 			</p>
@@ -1551,7 +1551,7 @@
 				<lb facs='#facs_29_r1l15' n='N019'/>setzen
 				<lb facs='#facs_29_line_1537871388214_26' n='N020'/>--------------
 			</p>
-			<pb xml:id='L17L27-JF1880-30.png' n='30'/>
+			<pb xml:id='L17L27_JF1880-30.png' n='30'/>
 		</body>
 	</text>
 </TEI>

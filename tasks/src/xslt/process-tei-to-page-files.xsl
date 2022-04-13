@@ -13,7 +13,9 @@
     <xsl:import href="normalise.xsl"/>
 
     <xsl:template name="xsl:initial-template">
-	<xsl:param name="source-uri"/>
+	<xsl:param name="identifier"/><!-- the identifier of the document in the Nyingarn workspace -->
+	<xsl:param name="source-uri"/><!-- a complete path name to the file "file:///some-folder/{$identifier}/{$identifier}-tei.xml" -->
+	<xsl:param name="page-identifier-regex"/><!-- a regular expression for validating the identifiers of pages within the tei doc -->
 	<xsl:variable name="source" select="document($source-uri)"/>
 	<xsl:variable name="normalised">
 	    <!-- the normalisation step will convert any source-specific conventions into a standard form of TEI -->
@@ -33,7 +35,20 @@
 	    <xsl:apply-templates select="$bubbled" mode="paginate"/>
 	</xsl:variable>
 	<!-- write the surface elements out as separate files -->
-	<xsl:for-each select="$paginated/TEI/sourceDoc/surface[@xml:id]">
+	<xsl:variable name="surfaces" select="$paginated/TEI/sourceDoc/surface"/>
+	<xsl:if test="not(exists($surfaces))">
+		<xsl:message terminate="true">ERROR: unpaginated document. No pages could be extracted from the file because none found in the document.</xsl:message>  
+	</xsl:if>
+	<!-- exportable surfaces are those whose id matches the document's $identifier with a dash and a numeric suffix --> 
+	<xsl:variable name="exportable-surfaces" select="
+		$surfaces
+			[@xml:id => starts-with($identifier || '-')] (: the surface's id must start with the id of the item, followed by a hyphen :)
+			[@xml:id => concat('.tei.xml') => matches($page-identifier-regex) ]
+	"/>
+	<xsl:if test="not(exists($exportable-surfaces))">
+		<xsl:message terminate="true">ERROR: no pages with suitable identifiers. No pages could be extracted from the file, because no pages were found in the document with an identifier which starts with "<xsl:value-of select="$identifier"/>-" and which, with '.tei.xml' appended, matches the regular expression "<xsl:value-of select="$page-identifier-regex"/>".</xsl:message>  
+	</xsl:if>
+	<xsl:for-each select="$exportable-surfaces">
 	    <!-- write the page content to a file named for the @xml:id attribute of the <surface> with no xml declaration or indenting -->
 	    <xsl:result-document href="{@xml:id}.tei.xml" omit-xml-declaration="yes" indent="no">
 		<!-- write out the content between the current page break and the next page break -->

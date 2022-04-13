@@ -1,11 +1,12 @@
 import models from "../models";
+import path from "path";
 import {
     BadRequestError,
     ForbiddenError,
     NotFoundError,
     InternalServerError,
 } from "restify-errors";
-import { route, routeAdmin, logEvent, getLogger, getS3Handle } from "../common";
+import { route, routeAdmin, logEvent, getLogger, getS3Handle, loadFiles } from "../common";
 import { orderBy, groupBy, flattenDeep, compact } from "lodash";
 import {
     createItem,
@@ -90,10 +91,6 @@ export function setupRoutes({ server }) {
         "/items/:identifier/resources/processing-status",
         routeItem(postResourceProcessingStatus)
     );
-
-    // admin routes
-    server.get("/admin/items", routeAdmin(getAdminItemsHandler));
-    server.put("/admin/items/:identifier/connect-user", routeAdmin(putAdminItemUserHandler));
 }
 
 async function getItemsHandler(req, res, next) {
@@ -424,42 +421,5 @@ async function postResourceProcessingStatus(req, res, next) {
     tasks = groupBy(tasks, "resource");
     tasks = Object.keys(tasks).map((r) => tasks[r].shift());
     res.send({ tasks });
-    next();
-}
-
-// admin route handlers
-async function getAdminItemsHandler(req, res, next) {
-    let items = [];
-    let { bucket } = await getS3Handle();
-
-    let resources = await loadItems({});
-    items = resources
-        .filter((r) => r.Key.match("ro-crate-metadata.json"))
-        .map((r) => ({ name: r.Key.split("/").shift() }));
-    items = orderBy(items, "name");
-    res.send({ items });
-    next();
-
-    async function loadItems({ continuationToken }) {
-        let resources = await bucket.listObjects({ continuationToken });
-        if (resources.NextContinuationToken) {
-            return [
-                ...resources.Contents,
-                ...(await loadItems({ continuationToken: resources.NextContinuationToken })),
-            ];
-        } else {
-            return resources.Contents;
-        }
-    }
-}
-
-async function putAdminItemUserHandler(req, res, next) {
-    let item = await lookupItemByIdentifier({ identifier: req.params.identifier });
-    if (item) {
-        await linkItemToUser({ itemId: item.id, userId: req.session.user.id });
-    } else {
-        item = await createItem({ identifier: req.params.identifier, userId: req.session.user.id });
-    }
-    res.send({});
     next();
 }

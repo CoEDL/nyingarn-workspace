@@ -13,7 +13,7 @@
                 </el-pagination></div
         ></template>
         <div class="w-full">
-            <el-table :data="items">
+            <el-table :data="items" :height="tableHeight" size="small">
                 <template #empty>You have no items. Get started by creating an item.</template>
                 <el-table-column prop="name" label="">
                     <template #default="scope">
@@ -28,7 +28,7 @@
                             @confirm="deleteItem(scope.row)"
                         >
                             <template #reference>
-                                <el-button type="danger">
+                                <el-button type="danger" size="small">
                                     <i class="fa-solid fa-trash"></i>
                                 </el-button>
                             </template>
@@ -52,6 +52,15 @@ export default {
             total: 0,
             items: [],
         };
+    },
+    computed: {
+        tableHeight() {
+            if (window.innerWidth > 1280) {
+                return window.innerHeight - 250;
+            } else {
+                return 300;
+            }
+        },
     },
     mounted() {
         this.loadItems();

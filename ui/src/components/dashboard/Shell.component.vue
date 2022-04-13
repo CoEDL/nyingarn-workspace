@@ -1,10 +1,8 @@
 <template>
-    <div class="">
-	<div class="flex flex-col p-4 space-y-4" v-if="canUpload">
-	    <my-collections-component />
-            <my-items-component />
-        </div>
-        <div v-else><terms-and-conditions-component /></div>
+    <div class="flex flex-col space-y-2 p-4 xl:flex-row xl:space-x-2 xl:space-y-0">
+        <my-collections-component class="xl:w-1/2" v-if="canUpload" />
+        <my-items-component class="xl:w-1/2" v-if="canUpload" />
+        <div v-if="!canUpload"><terms-and-conditions-component /></div>
     </div>
 </template>
 
@@ -15,7 +13,7 @@ import TermsAndConditionsComponent from "./TermsAndConditions.component.vue";
 export default {
     components: {
         MyItemsComponent,
-	MyCollectionsComponent,
+        MyCollectionsComponent,
         TermsAndConditionsComponent,
     },
     computed: {

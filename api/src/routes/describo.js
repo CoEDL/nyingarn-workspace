@@ -5,15 +5,25 @@ import fetch from "node-fetch";
 
 export function setupRoutes({ server }) {
     server.post("/describo", route(setupDescriboSessionRouteHandler));
+    server.post("/describo/update", route(postDescriboUpdateRouteHandler));
 }
 
 async function setupDescriboSessionRouteHandler(req, res, next) {
-    let configuration = await loadConfiguration();
+    let { describo, sessionId } = await __setupDescriboSession({
+        session: req.session,
+        folder: req.body.folder,
+    });
+    res.send({ url: `${describo.url}/application?sid=${sessionId}` });
+    next();
+}
+
+async function __setupDescriboSession({ session, folder }) {
+    const configuration = await loadConfiguration();
     const describo = configuration.api.services.describo;
     const s3 = configuration.api.services.s3;
-    const user = req.session.user;
-    const folder = `${s3.bucket}/${req.body.folder}`;
-    let url = `${describo.url}/api/session/application`;
+    const user = session.user;
+    folder = `${s3.bucket}/${folder}`;
+    const url = `${describo.url}/api/session/application`;
     const body = {
         name: `${user.givenName} ${user.familyName}`,
         email: user.email,
@@ -43,6 +53,30 @@ async function setupDescriboSessionRouteHandler(req, res, next) {
         return next(new BadRequestError(`There was an issue setting up a describo session`));
     }
     const sessionId = (await response.json()).sessionId;
-    res.send({ url: `${describo.url}/application?sid=${sessionId}` });
+    return { describo, sessionId, folder };
+}
+
+async function postDescriboUpdateRouteHandler(req, res, next) {
+    let { describo, sessionId, folder } = await __setupDescriboSession({
+        session: req.session,
+        folder: req.body.folder,
+    });
+    let response = await fetch(`${describo.url}/api/load`, {
+        method: "POST",
+        headers: {
+            Authorization: `sid ${sessionId}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ resource: "s3", folder }),
+    });
+    response = await fetch(`${describo.url}/api/session/entities`, {
+        method: "POST",
+        headers: {
+            Authorization: `sid ${sessionId}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req.body.entities),
+    });
+    res.send({});
     next();
 }

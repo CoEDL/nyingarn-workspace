@@ -1,22 +1,19 @@
 <template>
     <div class="flex flex-col h-screen">
         <div class="text-xl mb-2 bg-indigo-200 p-4 text-gray-700">
-            <i class="fa-solid fa-file-image"></i>
+            <span class="fa-layers fa-fw">
+                <i class="fa-solid fa-file-image" data-fa-transform="left-4 up-4"></i>
+                <i class="fa-solid fa-file-image" data-fa-transform="right-4 down-4"></i>
+            </span>
             {{ identifier }}
         </div>
         <div class="p-4">
             <el-tabs v-model="activeTab" @tab-click="updateRouteOnTabSelect">
-                <el-tab-pane label="View Item Content" name="view">
-                    <view-item-content-component v-if="activeTab === 'view'" />
-                </el-tab-pane>
-                <el-tab-pane label="Item Metadata" name="metadata">
+                <el-tab-pane label="Collection Metadata" name="metadata">
                     <metadata-component v-if="activeTab === 'metadata'" />
                 </el-tab-pane>
-                <el-tab-pane label="Associate to Collection" name="associate">
-                    <item-members-component v-if="activeTab === 'associate'" />
-                </el-tab-pane>
-                <el-tab-pane label="Upload Data" name="upload">
-                    <upload-component v-if="activeTab === 'upload'" />
+                <el-tab-pane label="Associate Collections and Items" name="associate">
+                    <collection-members-component v-if="activeTab === 'associate'" />
                 </el-tab-pane>
                 <el-tab-pane label="Administration" name="administration">
                     <administration-component v-if="activeTab === 'administration'" />
@@ -28,18 +25,14 @@
 
 <script>
 import MetadataComponent from "./MetadataComponent/Shell.component.vue";
-import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
-import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
-import ItemMembersComponent from "./ItemMembers.component.vue";
+import CollectionMembersComponent from "./CollectionMembers.component.vue";
 
 export default {
     components: {
         MetadataComponent,
-        ViewItemContentComponent,
-        UploadComponent,
         AdministrationComponent,
-        ItemMembersComponent,
+        CollectionMembersComponent,
     },
     props: {
         identifier: {
@@ -50,8 +43,8 @@ export default {
     data() {
         return {
             routeWatcher: undefined,
-            tabs: ["view", "metadata", "associate", "upload", "administration"],
-            activeTab: "view",
+            tabs: ["metadata", "associate", "administration"],
+            activeTab: "associate",
         };
     },
     mounted() {
@@ -60,7 +53,7 @@ export default {
     },
     methods: {
         updateRouteOnNav() {
-            if (!this.$route.name.match(/^items/)) {
+            if (!this.$route.name.match(/^collections/)) {
                 this.routeWatcher();
                 return;
             }

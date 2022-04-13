@@ -27,7 +27,7 @@
 
 <script>
 import ViewItemComponent from "./ViewItem.component.vue";
-import { getItemResources } from "@/components/item/load-item-data";
+import { getItemResources } from "@/components/item/item-services";
 
 export default {
     components: {

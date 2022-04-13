@@ -127,8 +127,8 @@ describe("Item management tests", () => {
         let { resources, total } = await listItemResources({ identifier });
         expect(resources.length).toEqual(2);
         expect(total).toEqual(2);
-        expect(resources[0]).toEqual(`${identifier}-01`);
-        expect(resources[1]).toEqual(`${identifier}-02`);
+	expect(resources[0].name).toEqual(`${identifier}-01`);
+	expect(resources[1].name).toEqual(`${identifier}-02`);
 
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });

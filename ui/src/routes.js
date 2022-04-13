@@ -3,6 +3,7 @@ import LoginComponent from "@/components/Login.component.vue";
 import CallbackOauthLogin from "@/components/authentication/OauthCallback.component.vue";
 import DashboardComponent from "@/components/dashboard/Shell.component.vue";
 import ViewItemComponent from "@/components/item/ViewItem/Shell.component.vue";
+import ViewCollectionComponent from "@/components/collection/ViewCollection/Shell.component.vue";
 import ViewResourceComponent from "@/components/item/ViewResource/Shell.component.vue";
 import AdminComponent from "@/components/admin/Shell.component.vue";
 import AdminManageUsersComponent from "@/components/admin/users/ManageUsers.component.vue";
@@ -35,6 +36,11 @@ const routes = [
                         component: ViewItemComponent,
                     },
                     {
+                        path: "associate",
+                        name: "items/:identifier/associate",
+                        component: ViewItemComponent,
+                    },
+                    {
                         path: "upload",
                         name: "items/:identifier/upload",
                         component: ViewItemComponent,
@@ -43,6 +49,29 @@ const routes = [
                         path: "administration",
                         name: "items/:identifier/administration",
                         component: ViewItemComponent,
+                    },
+                ],
+            },
+            {
+                name: "collections/:identifier",
+                path: "collections/:identifier",
+                component: ViewCollectionComponent,
+                props: true,
+                children: [
+                    {
+                        path: "associate",
+                        name: "collections/:identifier/associate",
+                        component: ViewCollectionComponent,
+                    },
+                    {
+                        path: "metadata",
+                        name: "collections/:identifier/metadata",
+                        component: ViewCollectionComponent,
+                    },
+                    {
+                        path: "administration",
+                        name: "collections/:identifier/administration",
+                        component: ViewCollectionComponent,
                     },
                 ],
             },

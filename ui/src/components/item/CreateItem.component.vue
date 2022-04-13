@@ -1,7 +1,7 @@
 <template>
     <div>
         <div @click="createNewItem = !createNewItem" class="cursor-pointer">
-            <i class="fa-solid fa-plus"></i> Create a new item
+	    <i class="fa-solid fa-file-image"></i> Create item
         </div>
         <el-dialog title="Create a new Item" v-model="createNewItem" width="80%" destroy-on-close>
             <div class="text-gray-600">
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { createItem } from "./item-services";
 export default {
     data() {
         return {
@@ -64,10 +65,7 @@ export default {
             }
         },
         async createItemEntry() {
-            let response = await this.$http.post({
-                route: "/items",
-                body: { identifier: this.identifier },
-            });
+	    let response = await createItem({ $http: this.$http, identifier: this.identifier });
             if (response.status === 200) {
                 this.error = false;
                 this.createNewItem = false;

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { attachUser, getItemUsers } from "@/components/item/load-item-data";
+import { attachUser, getItemUsers } from "@/components/item/item-services";
 import ViewItemUsersComponent from "./ViewItemUsers.component.vue";
 
 export default {

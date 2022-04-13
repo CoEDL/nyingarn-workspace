@@ -20,6 +20,7 @@ module.exports = function (sequelize, DataTypes) {
         }
     );
     Role.associate = function (models) {};
+    Role.belongsTo;
 
     return Role;
 };

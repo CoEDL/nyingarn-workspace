@@ -5,6 +5,7 @@
         </div>
         <div class="flex flex-col space-y-4 pl-4" v-if="canUpload">
             <create-item-component />
+	    <create-collection-component />
         </div>
         <span v-if="user.administrator">
             <div class="border-b border-white pt-20"></div>
@@ -37,12 +38,14 @@
 
 <script>
 import CreateItemComponent from "@/components/item/CreateItem.component.vue";
+import CreateCollectionComponent from "@/components/collection/CreateCollection.component.vue";
 import WhoAmIComponent from "@/components/WhoAmI.component.vue";
 import { tokenSessionKey, removeLocalStorage } from "@/components/storage";
 
 export default {
     components: {
         CreateItemComponent,
+	CreateCollectionComponent,
         WhoAmIComponent,
     },
     data() {

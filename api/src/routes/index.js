@@ -5,6 +5,7 @@ import { UnauthorizedError, ForbiddenError } from "restify-errors";
 import { setupRoutes as setupUserRoutes } from "./user";
 import { setupRoutes as setupAuthRoutes } from "./auth";
 import { setupRoutes as setupItemRoutes } from "./item";
+import { setupRoutes as setupCollectionRoutes } from "./collection";
 import { setupRoutes as setupDescriboRoutes } from "./describo";
 import { setupRoutes as setupDataRoutes } from "./data";
 import { setupRoutes as setupLogRoutes } from "./logs";
@@ -84,6 +85,7 @@ export function setupRoutes({ server }) {
     setupUserRoutes({ server });
     setupAuthRoutes({ server });
     setupItemRoutes({ server });
+    setupCollectionRoutes({ server });
     setupDataRoutes({ server });
     setupDescriboRoutes({ server });
     setupLogRoutes({ server });

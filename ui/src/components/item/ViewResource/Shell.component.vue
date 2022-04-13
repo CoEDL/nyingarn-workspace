@@ -1,7 +1,10 @@
 <template>
     <div class="flex flex-col">
-        <div class="flex flex-row text-xl mb-2 bg-indigo-200 p-4 flex flex-row space-x-4">
-            <router-link link :to="itemUrl">{{ identifier }}:</router-link>
+	<div class="flex flex-row text-xl mb-2 bg-indigo-200 p-4 space-x-4 text-gray-700">
+	    <div>
+		<i class="fa-solid fa-file-image"></i>
+	    </div>
+	    <router-link :to="itemUrl">{{ identifier }} /</router-link>
             <div class="text-lg">{{ resource }}</div>
             <div class="flex-grow"></div>
             <div>
@@ -44,7 +47,7 @@
 <script>
 import TranscriptionComponent from "./TranscriptionComponent/Shell.component.vue";
 import FilesComponent from "./Files.component.vue";
-import { getItemResources } from "@/components/item/load-item-data";
+import { getItemResources } from "@/components/item/item-services";
 
 export default {
     components: {

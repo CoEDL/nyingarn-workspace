@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { getResourceFiles, deleteResourceFile, getFileUrl } from "@/components/item/load-item-data";
+import { getResourceFiles, deleteResourceFile, getFileUrl } from "@/components/item/item-services";
 import { ElMessage } from "element-plus";
 
 export default {

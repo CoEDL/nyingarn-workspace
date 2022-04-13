@@ -34,8 +34,12 @@ export async function getItems({ userId, offset = 0, limit = 10 }) {
 
 export async function createItem({ identifier, userId }) {
     let item = await models.item.findOne({ where: { identifier } });
+    let collection = await models.collection.findOne({ where: { identifier } });
     if (item) {
         throw new Error("An item with that identifier already exists.");
+    }
+    if (collection) {
+	throw new Error("A collection with that identifier already exists.");
     }
 
     item = await models.item.create({ identifier });

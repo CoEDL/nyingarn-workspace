@@ -51,7 +51,7 @@ import {
     getStatus,
     getFileUrl,
     deleteResource,
-} from "@/components/item/load-item-data";
+} from "@/components/item/item-services";
 export default {
     components: {
         DisplayImageThumbnailComponent,

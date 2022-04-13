@@ -1,16 +1,21 @@
 <template>
-    <div class="flex flex-col p-4">
-        <div class="text-lg">Your items:</div>
-        <el-pagination
-            layout="prev, pager, next"
-            :page-size="limit"
-            :total="total"
-            @current-change="loadItems"
-        >
-        </el-pagination>
+    <el-card class="box-card flex flex-col">
+        <template #header>
+            <div class="card-header flex flex-row">
+                <div>Items</div>
+                <div class="flex-grow"></div>
+                <el-pagination
+                    layout="prev, pager, next"
+                    :page-size="limit"
+                    :total="total"
+                    @current-change="loadItems"
+                >
+                </el-pagination></div
+        ></template>
         <div class="w-full">
             <el-table :data="items">
-                <el-table-column prop="name" label="Name">
+                <template #empty>You have no items. Get started by creating an item.</template>
+                <el-table-column prop="name" label="">
                     <template #default="scope">
                         <router-link :to="scope.row.link">{{ scope.row.name }}</router-link>
                     </template>
@@ -32,7 +37,7 @@
                 </el-table-column>
             </el-table>
         </div>
-    </div>
+    </el-card>
 </template>
 
 <script>

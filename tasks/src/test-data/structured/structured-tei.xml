@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TEI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.tei-c.org/ns/1.0" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd" xml:lang="EN" xml:id="structured-tei">
+<TEI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.tei-c.org/ns/1.0" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd" xml:lang="EN" xml:id="structured">
    <teiHeader>
       <fileDesc>
 	 <titleStmt>
@@ -17,16 +17,16 @@
    <text>
       <body>
 	 <div xml:id="c1">
-	    <pb xml:id="structured-tei-p1"/>
+	    <pb xml:id="structured-01"/>
 	    <head>Chapter 1</head>
 	    <p>This is the text of chapter 1; a minimal chapter consisting of just one paragraph on the start of page 1.</p>
 	 </div>
 	 <div xml:id="c2">
 	    <head>Chapter 2</head>
 	    <p>This is the start of the text of chapter 2; a longer chapter beginning on page 1 and continuing onto page 3.</p>
-	    <pb xml:id="structured-tei-p2"/>
+	    <pb xml:id="structured-02"/>
 	    <p>This is the middle part of chapter 2, taking up all of page 2.</p>
-	    <pb xml:id="structured-tei-p3"/>
+	    <pb xml:id="structured-03"/>
 	    <p>This is the final part of chapter 2, continuing into the start of page 3.</p>
 	 </div>
 	 <div xml:id="c3">
@@ -36,16 +36,16 @@
 	    </div>
 	    <div xml:id="c3-s1">
 	       <p>This is the start of section 1 of chapter 3, beginning on page 3.</p>
-	       <pb xml:id="structured-tei-p4"/>
+	       <pb xml:id="structured-04"/>
 	       <p>This is the middle part of section 1 of chapter 3, taking up all of page 4.</p>
-	       <pb xml:id="structured-tei-p5"/>
+	       <pb xml:id="structured-05"/>
 	       <p>This is the final part of section 1 of chapter 3, taking up the start of page 5.</p>
 	    </div>
 	    <div xml:id="c3-s2">
 	       <p>This is the start of section 2 of chapter 3, beginning on page 5.</p>
-	       <pb xml:id="structured-tei-p6"/>
+	       <pb xml:id="structured-06"/>
 	       <p>This is the middle part of section 2 of chapter 3, taking up all of page 6.</p>
-	       <pb xml:id="structured-tei-p7"/>
+	       <pb xml:id="structured-07"/>
 	       <p>This is the final part of section 2 of chapter 3, concluding the document on page 7.</p>
 	    </div>
 	 </div>

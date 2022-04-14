@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { ElMessage } from "element-plus";
 export default {
     props: {
         link: {
@@ -93,10 +94,16 @@ export default {
                 "@id": `arcp://name,/nyingarn.net/${item.name}`,
                 "@type": "URL",
             });
-            await this.$http.post({
+            let response = await this.$http.post({
                 route: "/describo/update",
                 body: { folder: this.identifier, entities },
             });
+            if (response.status === 200) {
+                ElMessage({
+                    message: "item linked",
+                    type: "success",
+                });
+            }
         },
     },
 };

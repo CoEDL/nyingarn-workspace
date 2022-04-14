@@ -17,7 +17,9 @@
                 <template #empty>You have no items. Get started by creating an item.</template>
                 <el-table-column prop="name" label="">
                     <template #default="scope">
-                        <router-link :to="scope.row.link">{{ scope.row.name }}</router-link>
+                        <router-link :to="scope.row.link" class="text-base">{{
+                            scope.row.name
+                        }}</router-link>
                     </template>
                 </el-table-column>
                 <el-table-column prop="total" label="Pages" width="100"> </el-table-column>
@@ -26,6 +28,8 @@
                         <el-popconfirm
                             title="Are you sure you want to delete this item? All data will be removed and this can't be undone."
                             @confirm="deleteItem(scope.row)"
+                            confirmButtonType="danger"
+                            cancelButtonType="primary"
                         >
                             <template #reference>
                                 <el-button type="danger" size="small">

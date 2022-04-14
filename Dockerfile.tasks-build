@@ -15,4 +15,5 @@ FROM node:14-buster-slim
 WORKDIR /srv
 RUN apt-get update && apt-get install -y ca-certificates
 COPY --from=tasks-module-install /srv/ /srv/
+COPY tasks/src/xslt /srv/src/xslt
 CMD [ "node", "./server.bundle.js" ]  

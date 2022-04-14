@@ -7,12 +7,15 @@
             "help": "Must consist only of alphanumeric characters and must start with a letter.",
             "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9]+$"
         },
+        "collectionName": {
+            "help": "Must start with a letter and can have the following characters only: a-z, A-Z, 0-9 and _.",
+            "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9,_]+$"
+        },
         "filename": {
             "matchItemName": true,
-            "helpName": "Must match the form {item identifier}-{sequence number}. {item identifier} must consist only of alphanumeric characters and must start with a letter.",
-            "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9]+-[0-9]*\\..*$",
-            "helpExtension": "Accepted file types: jpg, jpeg, png, tif, pdf",
-            "checkExtension": ".*\\.(jpg|JPG|jpeg|JPEG|pdf|PDF|tif|TIF|png|PNG)$"
+            "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9,_]+-[0-9]+[a-z,A-Z,0-9]+\\..*$",
+            "helpExtension": "Accepted file types: tiff, jpg, png, csv, xml",
+            "checkExtension": ".*\\.(jpe?g|tif{1,2}|png|csv|xml)$"
         }
     },
     "api": {

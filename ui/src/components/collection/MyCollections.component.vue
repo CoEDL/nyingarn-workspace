@@ -21,7 +21,9 @@
                 >
                 <el-table-column prop="name" label="">
                     <template #default="scope">
-                        <router-link :to="scope.row.link">{{ scope.row.name }}</router-link>
+                        <router-link :to="scope.row.link" class="text-base">{{
+                            scope.row.name
+                        }}</router-link>
                     </template>
                 </el-table-column>
                 <el-table-column label="Actions" width="100">
@@ -29,6 +31,8 @@
                         <el-popconfirm
                             title="Are you sure you want to delete this collection? All data will be removed and this can't be undone."
                             @confirm="deleteCollection(scope.row)"
+                            confirmButtonType="danger"
+                            cancelButtonType="primary"
                         >
                             <template #reference>
                                 <el-button type="danger" size="small">

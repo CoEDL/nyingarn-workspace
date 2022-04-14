@@ -44,7 +44,7 @@ export default {
         return {
             routeWatcher: undefined,
             tabs: ["metadata", "associate", "administration"],
-            activeTab: "associate",
+            activeTab: "metadata",
         };
     },
     mounted() {

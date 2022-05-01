@@ -5,7 +5,7 @@
         </div>
         <div class="flex flex-col space-y-4 pl-4" v-if="canUpload">
             <create-item-component />
-	    <create-collection-component />
+            <create-collection-component />
         </div>
         <span v-if="user.administrator">
             <div class="border-b border-white pt-20"></div>
@@ -45,7 +45,7 @@ import { tokenSessionKey, removeLocalStorage } from "@/components/storage";
 export default {
     components: {
         CreateItemComponent,
-	CreateCollectionComponent,
+        CreateCollectionComponent,
         WhoAmIComponent,
     },
     data() {

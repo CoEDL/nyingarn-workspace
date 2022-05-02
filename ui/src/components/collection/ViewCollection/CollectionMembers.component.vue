@@ -1,15 +1,7 @@
 <template>
-    <div><link-related-resource-component link="all" property="hasPart" /></div>
+    <div><link-related-resource-component link="all" property="hasMember" /></div>
 </template>
 
-<script>
+<script setup>
 import LinkRelatedResourceComponent from "@/components/LinkRelatedResource.component.vue";
-export default {
-    components: {
-        LinkRelatedResourceComponent,
-    },
-    data() {
-        return {};
-    },
-};
 </script>

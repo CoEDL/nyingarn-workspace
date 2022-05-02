@@ -9,10 +9,15 @@ export function setupRoutes({ server }) {
 }
 
 async function setupDescriboSessionRouteHandler(req, res, next) {
-    let { describo, sessionId } = await __setupDescriboSession({
-        session: req.session,
-        folder: req.body.folder,
-    });
+    let describo, sessionId;
+    try {
+        ({ describo, sessionId } = await __setupDescriboSession({
+            session: req.session,
+            folder: req.body.folder,
+        }));
+    } catch (error) {
+        return next(new BadRequestError(`There was a problem setting up a describo session`));
+    }
     res.send({ url: `${describo.url}/application?sid=${sessionId}` });
     next();
 }
@@ -50,7 +55,7 @@ async function __setupDescriboSession({ session, folder }) {
         body: JSON.stringify(body),
     });
     if (response.status !== 200) {
-        return next(new BadRequestError(`There was an issue setting up a describo session`));
+        throw new Error(`There was an issue setting up a describo session`);
     }
     const sessionId = (await response.json()).sessionId;
     return { describo, sessionId, folder };
@@ -60,10 +65,14 @@ async function postDescriboUpdateRouteHandler(req, res, next) {
     for (const update of ["source", "target"]) {
         let describo, folder, sessionId;
         folder = req.body.updates[update].identifier;
-        ({ describo, sessionId, folder } = await __setupDescriboSession({
-            session: req.session,
-            folder,
-        }));
+        try {
+            ({ describo, sessionId, folder } = await __setupDescriboSession({
+                session: req.session,
+                folder,
+            }));
+        } catch (error) {
+            return next(new BadRequestError(`There was a problem setting up a describo session`));
+        }
 
         let response = await fetch(`${describo.url}/api/load/s3`, {
             method: "GET",

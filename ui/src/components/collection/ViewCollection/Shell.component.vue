@@ -10,7 +10,7 @@
         <div class="p-4">
             <el-tabs v-model="activeTab" @tab-click="updateRouteOnTabSelect">
                 <el-tab-pane label="Collection Metadata" name="metadata">
-                    <metadata-component v-if="activeTab === 'metadata'" />
+                    <describo-metadata-component v-if="activeTab === 'metadata'" />
                 </el-tab-pane>
                 <el-tab-pane label="Associate Collections and Items" name="associate">
                     <collection-members-component v-if="activeTab === 'associate'" />
@@ -24,13 +24,13 @@
 </template>
 
 <script>
-import MetadataComponent from "./MetadataComponent/Shell.component.vue";
+import DescriboMetadataComponent from "@/components/DescriboMetadata.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
 import CollectionMembersComponent from "./CollectionMembers.component.vue";
 
 export default {
     components: {
-        MetadataComponent,
+        DescriboMetadataComponent,
         AdministrationComponent,
         CollectionMembersComponent,
     },

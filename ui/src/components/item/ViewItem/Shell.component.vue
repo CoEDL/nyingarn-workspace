@@ -10,7 +10,7 @@
                     <view-item-content-component v-if="activeTab === 'view'" />
                 </el-tab-pane>
                 <el-tab-pane label="Item Metadata" name="metadata">
-                    <metadata-component v-if="activeTab === 'metadata'" />
+                    <describo-metadata-component v-if="activeTab === 'metadata'" />
                 </el-tab-pane>
                 <el-tab-pane label="Associate to Collection" name="associate">
                     <item-members-component v-if="activeTab === 'associate'" />
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import MetadataComponent from "./MetadataComponent/Shell.component.vue";
+import DescriboMetadataComponent from "@/components/DescriboMetadata.component.vue";
 import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
 import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
@@ -35,7 +35,7 @@ import ItemMembersComponent from "./ItemMembers.component.vue";
 
 export default {
     components: {
-        MetadataComponent,
+        DescriboMetadataComponent,
         ViewItemContentComponent,
         UploadComponent,
         AdministrationComponent,

@@ -6,7 +6,11 @@
             <el-table-column prop="type" label="Type" width="150"> </el-table-column>
             <el-table-column label="Actions" width="100">
                 <template #default="scope">
-                    <el-button type="primary" @click="linkItemToCollection(scope.row)">
+                    <el-button
+                        type="primary"
+                        @click="linkItemToCollection(scope.row)"
+                        :disabled="loading"
+                    >
                         <i class="fa-solid fa-link"></i>
                     </el-button>
                 </template>
@@ -23,19 +27,20 @@ export default {
             type: String,
             required: true,
             validator: function (value) {
-                ["collections", "items", "all"].includes(value);
+                return ["collections", "items", "all"].includes(value);
             },
         },
         property: {
             type: String,
             required: true,
             validator: function (value) {
-                ["hasPart", "memberOf"].includes(value);
+                return ["hasMember", "memberOf"].includes(value);
             },
         },
     },
     data() {
         return {
+            loading: false,
             identifier: this.$route.params.identifier,
             items: [],
         };
@@ -84,26 +89,58 @@ export default {
             }
         },
         async linkItemToCollection(item) {
-            let entities = [];
-            entities.push({
-                "@id": "./",
-                "@type": "Dataset",
-                [this.property]: [{ "@id": `arcp://name,/nyingarn.net/${item.name}` }],
-            });
-            entities.push({
-                "@id": `arcp://name,/nyingarn.net/${item.name}`,
-                "@type": "URL",
-            });
+            this.loading = true;
+            let reverseProperty = this.property === "hasMember" ? "memberOf" : "hasMember";
+
+            let updates = {
+                source: {
+                    identifier: this.identifier,
+                    entities: [
+                        {
+                            "@id": "./",
+                            "@type": "Dataset",
+                            [this.property]: [{ "@id": `arcp://name,/nyingarn.net/${item.name}` }],
+                        },
+                        {
+                            "@id": `arcp://name,/nyingarn.net/${item.name}`,
+                            "@type": "URL",
+                        },
+                    ],
+                },
+                target: {
+                    identifier: item.name,
+                    entities: [
+                        {
+                            "@id": "./",
+                            "@type": "Dataset",
+                            [reverseProperty]: [
+                                { "@id": `arcp://name,/nyingarn.net/${this.identifier}` },
+                            ],
+                        },
+                        {
+                            "@id": `arcp://name,/nyingarn.net/${this.identifier}`,
+                            "@type": "URL",
+                        },
+                    ],
+                },
+            };
             let response = await this.$http.post({
                 route: "/describo/update",
-                body: { folder: this.identifier, entities },
+                body: { updates },
             });
             if (response.status === 200) {
                 ElMessage({
                     message: "item linked",
                     type: "success",
                 });
+            } else {
+                ElMessage({
+                    message: "There was an issue creating the item link",
+                    type: "error",
+                });
+                console.error(await response.json());
             }
+            this.loading = false;
         },
     },
 };

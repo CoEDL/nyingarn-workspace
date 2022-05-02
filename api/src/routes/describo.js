@@ -57,26 +57,39 @@ async function __setupDescriboSession({ session, folder }) {
 }
 
 async function postDescriboUpdateRouteHandler(req, res, next) {
-    let { describo, sessionId, folder } = await __setupDescriboSession({
-        session: req.session,
-        folder: req.body.folder,
-    });
-    let response = await fetch(`${describo.url}/api/load`, {
-        method: "POST",
-        headers: {
-            Authorization: `sid ${sessionId}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ resource: "s3", folder }),
-    });
-    response = await fetch(`${describo.url}/api/session/entities`, {
-        method: "POST",
-        headers: {
-            Authorization: `sid ${sessionId}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req.body.entities),
-    });
+    for (const update of ["source", "target"]) {
+        let describo, folder, sessionId;
+        folder = req.body.updates[update].identifier;
+        ({ describo, sessionId, folder } = await __setupDescriboSession({
+            session: req.session,
+            folder,
+        }));
+
+        let response = await fetch(`${describo.url}/api/load/s3`, {
+            method: "GET",
+            headers: {
+                Authorization: `sid ${sessionId}`,
+                "Content-Type": "application/json",
+            },
+        });
+        if (response.status !== 200) {
+            return next(new BadRequestError(`Describo is unable to load that collection`));
+        }
+
+        response = await fetch(`${describo.url}/api/session/entities`, {
+            method: "POST",
+            headers: {
+                Authorization: `sid ${sessionId}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(req.body.updates[update].entities),
+        });
+        if (response.status !== 200) {
+            return next(
+                new BadRequestError(`Describo is unable to add those entities to the collection`)
+            );
+        }
+    }
     res.send({});
     next();
 }

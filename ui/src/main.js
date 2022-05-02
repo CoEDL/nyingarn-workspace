@@ -33,8 +33,14 @@ import HTTPService from "./http.service";
         app.use(router);
         app.use(ElementPlus);
         app.config.globalProperties.$http = new HTTPService({ router });
+        app.provide("$http", app.config.globalProperties.$http);
+
         app.config.globalProperties.$log = log;
-        app.mount("#app");
+        app.provide("$log", app.config.globalProperties.$log);
+
         // app.config.globalProperties.$socket = io();
+        // app.provide('$socket', app.config.globalProperties.$socket)
+
+        app.mount("#app");
     }
 })();

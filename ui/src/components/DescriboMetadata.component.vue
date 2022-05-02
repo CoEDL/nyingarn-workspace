@@ -32,7 +32,7 @@ let frameStyle = computed(() => {
 });
 onMounted(() => {
     window.addEventListener("resize", () => {
-        this.windowWidth = window.innerWidth;
+        data.windowWidth = window.innerWidth;
     });
     init();
 });

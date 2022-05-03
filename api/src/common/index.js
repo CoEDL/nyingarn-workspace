@@ -38,7 +38,7 @@ export async function loadFiles({ continuationToken }) {
     if (resources.NextContinuationToken) {
         return [
             ...resources.Contents,
-            ...(await loadItems({ continuationToken: resources.NextContinuationToken })),
+            ...(await loadFiles({ continuationToken: resources.NextContinuationToken })),
         ];
     } else {
         return resources.Contents;

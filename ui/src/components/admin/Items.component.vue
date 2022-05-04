@@ -6,7 +6,8 @@
                     <div>Collections</div>
                 </div>
             </template>
-            <el-table :data="collections" :height="tableHeight" size="small">
+            <el-table :data="data.collections" :height="tableHeight" size="small">
+                <template #empty> No collections have been found. </template>
                 <el-table-column prop="name" label="Name"> </el-table-column>
                 <el-table-column label="Actions" width="100">
                     <template #default="scope">
@@ -30,7 +31,8 @@
                     <div>Items</div>
                 </div>
             </template>
-            <el-table :data="items" :height="tableHeight" size="small">
+            <el-table :data="data.items" :height="tableHeight" size="small">
+                <template #empty> No items have been found. </template>
                 <el-table-column prop="name" label="Name"> </el-table-column>
                 <el-table-column label="Actions" width="100">
                     <template #default="scope">
@@ -46,41 +48,52 @@
     </div>
 </template>
 
-<script>
-export default {
-    data() {
-        return { items: [], collections: [] };
-    },
-    computed: {
-        tableHeight() {
-            if (window.innerWidth > 1280) {
-                return window.innerHeight - 250;
-            } else {
-                return 300;
-            }
-        },
-    },
-    mounted() {
-        this.init();
-    },
-    methods: {
-        async init() {
-            let response = await this.$http.get({ route: "/admin/entries" });
-            if (response.status !== 200) {
-                // report error
-            }
-            let { items, collections } = await response.json();
-            this.items = [...items];
-            this.collections = [...collections];
-        },
-        async connectItem(item) {
-            await this.$http.put({ route: `/admin/items/${item.name}/connect-user` });
-            this.$router.push(`/items/${item.name}/view`);
-        },
-        async connectCollection(collection) {
-            await this.$http.put({ route: `/admin/collections/${collection.name}/connect-user` });
-            this.$router.push(`/collections/${collection.name}/metadata`);
-        },
-    },
-};
+<script setup>
+import { ElLoading } from "element-plus";
+import { reactive, computed, onMounted, inject, nextTick } from "vue";
+import { useRouter } from "vue-router";
+const router = useRouter();
+const $http = inject("$http");
+
+let data = reactive({
+    items: [],
+    collections: [],
+});
+let tableHeight = computed(() => {
+    if (window.innerWidth > 1280) {
+        return window.innerHeight - 250;
+    } else {
+        return 300;
+    }
+});
+onMounted(() => {
+    init();
+});
+
+async function init() {
+    const loading = ElLoading.service({
+        lock: true,
+        text: "Loading",
+        background: "rgba(0, 0, 0, 0.7)",
+    });
+    let response = await $http.get({ route: "/admin/entries" });
+    if (response.status !== 200) {
+        // report error
+    }
+    let { items, collections } = await response.json();
+    data.items = [...items];
+    data.collections = [...collections];
+
+    nextTick(() => {
+        loading.close();
+    });
+}
+async function connectItem(item) {
+    await $http.put({ route: `/admin/items/${item.name}/connect-user` });
+    router.push(`/items/${item.name}/view`);
+}
+async function connectCollection(collection) {
+    await $http.put({ route: `/admin/collections/${collection.name}/connect-user` });
+    router.push(`/collections/${collection.name}/metadata`);
+}
 </script>

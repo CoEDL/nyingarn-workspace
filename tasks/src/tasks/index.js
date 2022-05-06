@@ -44,12 +44,12 @@ export async function persistNewContentToBucket({ directory, identifier, resourc
     }
 }
 
-export async function getFiles({ identifier }) {
+export async function getFiles({ prefix }) {
     let configuration = await loadConfiguration();
 
     let { bucket } = await getS3Handle();
     // let files = (await bucket.listObjects({ prefix: identifier })).Contents.map((c) => c.Key);
-    let files = await loadResources({ bucket, prefix: identifier });
+    let files = await loadResources({ bucket, prefix });
     files = files.map((f) => path.basename(f.Key));
     files = files.filter((file) => !file.match(/^\./));
     files = files.filter((file) => {
@@ -106,7 +106,7 @@ export function groupFilesByResource({ files, naming }) {
 }
 
 export async function getResourceImages({ identifier, resource }) {
-    let { files } = await getFiles({ identifier });
+    let { files } = await getFiles({ prefix: path.join(identifier, resource) });
 
     for (let resourceId of Object.keys(files)) {
         let re = new RegExp(resourceId);

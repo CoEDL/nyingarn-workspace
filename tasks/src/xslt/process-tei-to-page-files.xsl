@@ -2,7 +2,7 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xpath-default-namespace="http://www.tei-c.org/ns/1.0"
 	xmlns="http://www.tei-c.org/ns/1.0">
 	<!--
-	Processes a "from the page" TEI file into a set of TEI fragments containing one page each.
+	Processes a TEI file into a set of TEI fragments containing one page each.
 	The document is first normalised and tidied up.
 	Then document is split into a set of files each containing one page of transcript.
     -->
@@ -47,10 +47,19 @@
 			[@xml:id => concat('.tei.xml') => matches($page-identifier-regex) ]
 	"/>
 		<xsl:if test="not(exists($exportable-surfaces))">
-			<xsl:message terminate="true">ERROR: no pages with suitable identifiers. No pages could be extracted from the file, because no pages were found in the document with an identifier which starts with "<xsl:value-of select="$identifier"/>
--" and which, with '.tei.xml' appended, matches the regular expression "<xsl:value-of select="$page-identifier-regex"/>
-".</xsl:message>
-	</xsl:if>
+			<xsl:message terminate="true" expand-text="yes">ERROR: no pages with suitable identifiers. No pages could be extracted from the file, because no pages were found in the document with an identifier which starts with "{$identifier}-" and which, with '.tei.xml' appended, matches the regular expression "{$page-identifier-regex}".</xsl:message>
+		</xsl:if>
+		<!-- check to ensure that all the surface identifiers are unique -->
+		<xsl:variable name="surface-identifiers" select="$exportable-surfaces/@xml:id"/>
+		<xsl:variable name="distinct-surface-identifiers" select="distinct-values($surface-identifiers)"/>
+		<xsl:if test="count($distinct-surface-identifiers) != count($surface-identifiers)">
+			<xsl:message terminate="true" expand-text="yes">ERROR: all page identifiers must be unique, but duplicate page identifiers were found. Duplicated: {
+				string-join(
+					for $identifier in $distinct-surface-identifiers return if (count($surface-identifiers[. = $identifier]) != 1) then $identifier else (),
+					', '
+				)
+			}.</xsl:message>
+		</xsl:if>
 	<xsl:for-each select="$exportable-surfaces">
 		<!-- write the page content to a file named for the @xml:id attribute of the <surface> with no xml declaration or indenting -->
 		<xsl:result-document href="{@xml:id}.tei.xml" omit-xml-declaration="yes" indent="no">

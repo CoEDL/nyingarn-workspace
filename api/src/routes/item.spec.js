@@ -138,13 +138,17 @@ describe("Item management route tests", () => {
         });
         expect(response.status).toEqual(200);
 
-        let links = await models.item_user.findAll();
-        expect(links.length).toEqual(2);
+        item = await models.item.findOne({
+            where: { identifier },
+            include: [{ model: models.user }],
+        });
+        expect(item.get("users").length).toEqual(2);
 
         await deleteItem({ id: item.id });
         await user.destroy();
         await user2.destroy();
         await models.log.destroy({ where: {} });
+        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to detach a user from an item", async () => {
         let user = {
@@ -206,8 +210,11 @@ describe("Item management route tests", () => {
         });
         expect(response.status).toEqual(200);
 
-        let links = await models.item_user.findAll();
-        expect(links.length).toEqual(1);
+        item = await models.item.findOne({
+            where: { identifier },
+            include: [{ model: models.user }],
+        });
+        expect(item.get("users").length).toEqual(1);
 
         // should fail to detach self as admin
         response = await fetch(`${host}/items/${identifier}/detach-user`, {
@@ -226,6 +233,7 @@ describe("Item management route tests", () => {
         await user.destroy();
         await user2.destroy();
         await models.log.destroy({ where: {} });
+        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get a list of item users", async () => {
         let user = {
@@ -289,6 +297,7 @@ describe("Item management route tests", () => {
         await user.destroy();
         await user2.destroy();
         await models.log.destroy({ where: {} });
+        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to delete own item as a user", async () => {
         let user = {
@@ -621,7 +630,7 @@ describe("Item management route tests", () => {
         // ({ identifier, item } = await setupTestItem({ user: users[1], bucket }));
         session = await createSession({ user: users[1] });
 
-        let response = await fetch(`${host}/admin/items`, {
+        let response = await fetch(`${host}/admin/entries`, {
             method: "GET",
             headers: {
                 authorization: `Bearer ${session.token}`,

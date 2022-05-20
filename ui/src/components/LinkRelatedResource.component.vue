@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <el-table :data="data.items">
+        <el-table :data="data.items" v-loading="data.loading">
             <template #empty>You have no items. Get started by creating an item.</template>
             <el-table-column prop="name" label="Name"> </el-table-column>
             <el-table-column prop="type" label="Type" width="150"> </el-table-column>
@@ -45,6 +45,7 @@ const props = defineProps({
 const data = reactive({
     loading: false,
     identifier: route.params.identifier,
+    type: route.path.match("collections") ? "collection" : "item",
     items: [],
 });
 onMounted(async () => {
@@ -96,28 +97,32 @@ async function linkItemToCollection(item) {
     let updates = {
         source: {
             identifier: data.identifier,
+            type: data.type,
             entities: [
                 {
                     "@id": "./",
                     "@type": "Dataset",
-                    [props.property]: [{ "@id": `arcp://name,/nyingarn.net/${item.name}` }],
+                    [props.property]: [{ "@id": `https://catalog.nyingarn.net/view/${item.name}` }],
                 },
                 {
-                    "@id": `arcp://name,/nyingarn.net/${item.name}`,
+                    "@id": `https://catalog.nyingarn.net/view/${item.name}`,
                     "@type": "URL",
                 },
             ],
         },
         target: {
             identifier: item.name,
+            type: item.type,
             entities: [
                 {
                     "@id": "./",
                     "@type": "Dataset",
-                    [reverseProperty]: [{ "@id": `arcp://name,/nyingarn.net/${data.identifier}` }],
+                    [reverseProperty]: [
+                        { "@id": `https://catalog.nyingarn.net/view/${data.identifier}` },
+                    ],
                 },
                 {
-                    "@id": `arcp://name,/nyingarn.net/${data.identifier}`,
+                    "@id": `https://catalog.nyingarn.net/view/${data.identifier}`,
                     "@type": "URL",
                 },
             ],

@@ -18,6 +18,7 @@ import {
 } from "./item";
 const chance = require("chance").Chance();
 import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "../common";
+import models from "../models";
 
 describe("Item management tests", () => {
     let users, configuration, bucket;
@@ -35,6 +36,7 @@ describe("Item management tests", () => {
     });
     afterAll(async () => {
         await teardownAfterAll(configuration);
+        models.sequelize.close();
     });
     it("should be able to create a new item", async () => {
         let user = users[0];
@@ -42,8 +44,9 @@ describe("Item management tests", () => {
         let item = await createItem({ identifier, userId: user.id });
         expect(item.identifier).toEqual(identifier);
         let items = await bucket.listObjects({ prefix: identifier });
-        expect(items.Contents.length).toEqual(1);
-        expect(items.Contents[0].Key).toEqual(`${identifier}/ro-crate-metadata.json`);
+        expect(items.Contents.length).toEqual(2);
+        let files = items.Contents.map((c) => c.Key).sort();
+        expect(files).toEqual([`${identifier}/.item`, `${identifier}/ro-crate-metadata.json`]);
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
@@ -88,9 +91,10 @@ describe("Item management tests", () => {
         const identifier = chance.word();
         let item = await createItem({ identifier, userId: user.id });
 
-        let link = await linkItemToUser({ itemId: item.id, userId: user.id });
-        // already linked
-        expect(link[1]).toEqual(false);
+        await linkItemToUser({ itemId: item.id, userId: user.id });
+
+        item = await models.item.findOne({ where: { identifier } });
+        expect((await item.getUsers()).length).toBe(1);
 
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
@@ -127,8 +131,8 @@ describe("Item management tests", () => {
         let { resources, total } = await listItemResources({ identifier });
         expect(resources.length).toEqual(2);
         expect(total).toEqual(2);
-	expect(resources[0].name).toEqual(`${identifier}-01`);
-	expect(resources[1].name).toEqual(`${identifier}-02`);
+        expect(resources[0].name).toEqual(`${identifier}-01`);
+        expect(resources[1].name).toEqual(`${identifier}-02`);
 
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });

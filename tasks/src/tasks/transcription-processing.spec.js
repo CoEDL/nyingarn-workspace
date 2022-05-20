@@ -156,6 +156,26 @@ describe("Test transcription processing utils", () => {
         }
     });
 
+    it("should fail to ingest Bates34-tei.xml as it contains duplicated page identifiers", async () => {
+        let identifier = "Bates34";
+        let resource = "Bates34-tei.xml";
+
+        try {
+            await __processTeiTranscriptionXMLProcessor({
+                directory: path.join(__dirname, "../test-data"),
+                identifier: identifier,
+                resource: resource,
+            });
+            throw new Error("Stylesheet failed to throw the expected error!");
+        } catch (error) {
+            expect(error.message).toMatch(/ERROR:.*Bates34-023/);
+            expect(error.message).toMatch(/ERROR:.*Bates34-025/);
+            expect(error.message).toMatch(/ERROR:.*Bates34-048/);
+            expect(error.message).toMatch(/ERROR:.*Bates34-066/);
+            expect(error.message).toMatch(/ERROR:.*Bates34-100/);
+        }
+    });
+
     /*
     it("should be able to process an FTP tei file", async () => {
 	await processFtpTeiTranscription({

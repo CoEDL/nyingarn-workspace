@@ -36,17 +36,16 @@ export async function createCollection({ identifier, userId }) {
         throw new Error(`An item with that identifier already exists.`);
     }
 
-    collection = await models.collection.create({ identifier });
+    collection = await models.collection.create({ identifier, data: { private: true } });
     await linkCollectionToUser({ collectionId: collection.id, userId });
     await createCollectionLocationInObjectStore({ identifier, userId });
     return collection;
 }
 
 export async function linkCollectionToUser({ collectionId, userId }) {
-    return await models.collection_user.findOrCreate({
-        where: { collectionId, userId },
-        defaults: { collectionId, userId },
-    });
+    let collection = await models.collection.findOne({ where: { id: collectionId } });
+    let user = await models.user.findOne({ where: { id: userId } });
+    await user.addCollections([collection]);
 }
 
 export async function createCollectionLocationInObjectStore({ identifier, userId }) {
@@ -90,4 +89,11 @@ export async function createCollectionLocationInObjectStore({ identifier, userId
 
 export async function deleteCollection({ id }) {
     await models.collection.destroy({ where: { id } });
+}
+
+export async function toggleCollectionVisibility({ collectionId }) {
+    let collection = await models.collection.findOne({ where: { id: collectionId } });
+    collection.data.private = !collection.data.private;
+    collection.changed("data", true);
+    collection = await collection.save();
 }

@@ -53,10 +53,9 @@ export async function deleteItem({ id }) {
 }
 
 export async function linkItemToUser({ itemId, userId }) {
-    return await models.item_user.findOrCreate({
-        where: { itemId, userId },
-        defaults: { itemId, userId },
-    });
+    let item = await models.item.findOne({ where: { id: itemId } });
+    let user = await models.user.findOne({ where: { id: userId } });
+    await user.addItems([item]);
 }
 
 export async function createItemLocationInObjectStore({ identifier, userId }) {

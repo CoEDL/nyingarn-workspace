@@ -26,9 +26,10 @@ module.exports = function (sequelize, DataTypes) {
     );
     Item.associate = function (models) {
         Item.belongsToMany(models.user, {
-            through: models.item_user,
+            through: 'item_users',
         });
         Item.hasMany(models.task, { onDelete: "cascade", hooks: true });
+        Item.belongsToMany(models.collection, { through: "collection_items" });
     };
 
     return Item;

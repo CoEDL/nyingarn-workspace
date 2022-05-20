@@ -2,6 +2,7 @@ import { loadConfiguration } from "../common";
 import { route } from "../common";
 import { BadRequestError } from "restify-errors";
 import fetch from "node-fetch";
+import models from "../models";
 
 export function setupRoutes({ server }) {
     server.post("/describo", route(setupDescriboSessionRouteHandler));
@@ -62,6 +63,26 @@ async function __setupDescriboSession({ session, folder }) {
 }
 
 async function postDescriboUpdateRouteHandler(req, res, next) {
+    let src = req.body.updates.source;
+    let tgt = req.body.updates.target;
+    let source, target;
+    if (src.type === "collection") {
+        source = await models.collection.findOne({ where: { identifier: src.identifier } });
+        if (tgt.type === "collection") {
+            target = await models.collection.findOne({ where: { identifier: tgt.identifier } });
+            await source.addSubCollection(target);
+        } else {
+            target = await models.item.findOne({ where: { identifier: tgt.identifier } });
+            await source.addItem(target);
+        }
+    } else if (src.type === "item") {
+        source = await models.item.findOne({ where: { identifier: src.identifier } });
+        target = await models.collection.findOne({ where: { identifier: tgt.identifier } });
+        await source.addCollection(target);
+    }
+
+    // console.log(JSON.stringify(req.body.updates, null, 2));
+
     for (const update of ["source", "target"]) {
         let describo, folder, sessionId;
         folder = req.body.updates[update].identifier;

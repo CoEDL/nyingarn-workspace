@@ -28,7 +28,6 @@ import {
     isResourceComplete,
 } from "../lib/item";
 const log = getLogger();
-import fetch from "node-fetch";
 
 async function verifyItemAccess(req, res, next) {
     let item = await lookupItemByIdentifier({
@@ -174,19 +173,15 @@ async function putItemDetachUserHandler(req, res, next) {
 }
 
 async function getItemUsers(req, res, next) {
-    let itemUsers = await models.item_user.findAll({
-        where: { itemId: req.item.id },
+    let users = await req.item.getUsers();
+    users = users.map((u) => {
+        return {
+            ...["id", "email", "givenName", "familyName", "administrator"].map((a) => ({
+                [a]: u[a],
+            })),
+            loggedin: req.session.user.id === u.id ? true : false,
+        };
     });
-    let users = [];
-    for (let user of itemUsers) {
-        user = await models.user.findOne({
-            where: { id: user.userId },
-            attributes: ["id", "email", "givenName", "familyName", "administrator"],
-            raw: true,
-        });
-        user.loggedin = req.session.user.id === user.id ? true : false;
-        users.push(user);
-    }
     res.send({ users });
     next();
 }

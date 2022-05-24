@@ -4,10 +4,8 @@ module.exports = function (sequelize, DataTypes) {
     let ItemUser = sequelize.define(
         "item_user",
         {
-            roleId: {
-                type: DataTypes.UUID,
-                allowNull: true,
-            },
+            itemId: DataTypes.UUID,
+            userId: DataTypes.UUID,
         },
         {
             timestamps: false,

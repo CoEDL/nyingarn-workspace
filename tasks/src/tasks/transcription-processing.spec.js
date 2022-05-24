@@ -11,7 +11,7 @@ import { readdir, remove } from "fs-extra";
 jest.setTimeout(20000); // 20s because the CSV processing test is slow
 
 describe("Test transcription processing utils", () => {
-    it.only("should be able to process a digivol csv file", async () => {
+    it("should be able to process a digivol csv file", async () => {
         let identifier = "BM1648A91";
         let resource = "BM1648A91-digivol.csv";
         let expectedFiles = [
@@ -193,6 +193,26 @@ describe("Test transcription processing utils", () => {
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.message).toMatch("ERROR: unpaginated document");
+        }
+    });
+
+    it("should fail to ingest Bates34-tei.xml as it contains duplicated page identifiers", async () => {
+        let identifier = "Bates34";
+        let resource = "Bates34-tei.xml";
+
+        try {
+            await __processTeiTranscriptionXMLProcessor({
+                directory: path.join(__dirname, "../test-data"),
+                identifier: identifier,
+                resource: resource,
+            });
+            throw new Error("Stylesheet failed to throw the expected error!");
+        } catch (error) {
+            expect(error.message).toMatch(/ERROR:.*Bates34-023/);
+            expect(error.message).toMatch(/ERROR:.*Bates34-025/);
+            expect(error.message).toMatch(/ERROR:.*Bates34-048/);
+            expect(error.message).toMatch(/ERROR:.*Bates34-066/);
+            expect(error.message).toMatch(/ERROR:.*Bates34-100/);
         }
     });
 

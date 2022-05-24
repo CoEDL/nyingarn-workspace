@@ -26,6 +26,22 @@
                         }}</router-link>
                     </template>
                 </el-table-column>
+                <el-table-column prop="private" label="Private" width="150">
+                    <template #default="scope">
+                        <el-button
+                            type="primary"
+                            size="small"
+                            @click="toggleCollectionVisibility(scope.row)"
+                        >
+                            <span v-show="scope.row.private">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <span v-show="!scope.row.private">
+                                <i class="fa-solid fa-lock-open"></i>
+                            </span>
+                        </el-button>
+                    </template>
+                </el-table-column>
                 <el-table-column label="Actions" width="100">
                     <template #default="scope">
                         <el-popconfirm
@@ -50,7 +66,11 @@
 <script>
 import { ElMessage } from "element-plus";
 import { orderBy } from "lodash";
-import { getMyCollections, deleteCollection } from "./collection-services";
+import {
+    getMyCollections,
+    deleteCollection,
+    toggleCollectionVisibility,
+} from "./collection-services";
 
 export default {
     data() {
@@ -83,9 +103,8 @@ export default {
             }
             response = await response.json();
             this.total = response.total;
-            let collections = response.collections.map((c) => ({ name: c }));
-            collections = collections.map((c) => ({
-                name: c.name,
+            let collections = response.collections.map((c) => ({
+                ...c,
                 link: `/collections/${c.name}/metadata`,
             }));
             collections = orderBy(collections, "name");
@@ -98,6 +117,13 @@ export default {
             } catch (error) {
                 ElMessage.error(`Something went wrong deleting this collection`);
             }
+        },
+        async toggleCollectionVisibility(collection) {
+            await toggleCollectionVisibility({
+                $http: this.$http,
+                identifier: collection.name,
+            });
+            await this.loadCollections();
         },
     },
 };

@@ -82,9 +82,8 @@ export default {
             }
             response = await response.json();
             this.total = response.total;
-            let items = response.items.map((i) => ({ name: i }));
-            items = items.map((i) => ({
-                name: i.name,
+            let items = response.items.map((i) => ({
+                ...i,
                 link: `/items/${i.name}/view`,
                 statistics: {},
             }));

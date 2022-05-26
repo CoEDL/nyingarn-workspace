@@ -67,7 +67,7 @@ async function getMyItems() {
     });
     if (response.status === 200) {
         response = await response.json();
-        let items = response.items.map((i) => ({ name: i, type: "item" }));
+        let items = response.items;
         if (route.path.match("/items")) {
             items = items.filter((c) => c.name !== data.identifier);
         }
@@ -80,10 +80,7 @@ async function getMyCollections() {
     });
     if (response.status === 200) {
         response = await response.json();
-        let collections = response.collections.map((i) => ({
-            name: i,
-            type: "collection",
-        }));
+        let collections = response.collections;
         if (route.path.match("/collections")) {
             collections = collections.filter((c) => c.name !== data.identifier);
         }

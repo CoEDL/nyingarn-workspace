@@ -33,7 +33,7 @@ async function __setupDescriboSession({ session, folder }) {
     const body = {
         name: `${user.givenName} ${user.familyName}`,
         email: user.email,
-        session: {
+        service: {
             s3: {
                 provider: s3.provider,
                 url: s3.endpointUrl,
@@ -42,6 +42,10 @@ async function __setupDescriboSession({ session, folder }) {
                 region: s3.region,
                 folder,
             },
+        },
+        configuration: {
+            allowProfileChange: false,
+            allowServiceChange: false,
         },
         profile: {
             file: "nyingarn-profile.json",

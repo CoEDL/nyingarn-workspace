@@ -97,7 +97,7 @@ async function getItemsHandler(req, res, next) {
     const offset = req.query.offset;
     const limit = req.query.limit;
     let { count, rows } = await getItems({ userId, offset, limit });
-    let items = rows.map((i) => i.identifier);
+    let items = rows.map((i) => ({ name: i.identifier }));
 
     res.send({ total: count, items });
     next();

@@ -2,18 +2,18 @@
     <div class="flex flex-col">
         <div class="flex flex-row">
             <el-pagination
-                v-model:currentPage="currentPage"
-                v-model:page-size="pageSize"
+                v-model:currentPage="data.currentPage"
+                v-model:page-size="data.pageSize"
                 :page-sizes="[10, 20, 30, 40]"
                 layout="total, sizes, prev, pager, next"
-                :total="total"
+                :total="data.total"
                 @size-change="pageSizeChange"
                 @current-change="init"
             >
             </el-pagination>
         </div>
 
-        <div class="flex flex-row flex-wrap overflow-scroll" :style="{ height: panelHeight }">
+        <div class="flex flex-row flex-wrap overflow-scroll" :style="{ height: data.panelHeight }">
             <view-item-component
                 class="cursor-pointer m-2 h-80"
                 v-for="r in data.resources"

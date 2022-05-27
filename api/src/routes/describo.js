@@ -20,7 +20,6 @@ async function setupDescriboSessionRouteHandler(req, res, next) {
         }));
     } catch (error) {
         log.error(`There was a problem setting up a describo session: ${error.message}`);
-        console.log(error);
         return next(new BadRequestError(`There was a problem setting up a describo session`));
     }
     res.send({ url: `${describo.url}/application?sid=${sessionId}` });
@@ -64,7 +63,6 @@ async function __setupDescriboSession({ session, folder, type = "item" }) {
         body: JSON.stringify(body),
     });
     if (response.status !== 200) {
-        console.log(error);
         log.error(`There was a problem setting up a describo session: ${error.message}`);
         throw new Error(`There was a problem setting up a describo session`);
     }
@@ -103,7 +101,6 @@ async function postDescriboUpdateRouteHandler(req, res, next) {
                 type: req.body.type,
             }));
         } catch (error) {
-            console.log(error);
             log.error(`There was a problem setting up a describo session: ${error.message}`);
             return next(new BadRequestError(`There was a problem setting up a describo session`));
         }
@@ -130,7 +127,6 @@ async function postDescriboUpdateRouteHandler(req, res, next) {
             body: JSON.stringify(req.body.updates[update].entities),
         });
         if (response.status !== 200) {
-            console.log(error);
             log.error(
                 `Describo is unable to add those entities to the collection: ${error.message}`
             );

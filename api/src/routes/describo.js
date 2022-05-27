@@ -15,6 +15,7 @@ async function setupDescriboSessionRouteHandler(req, res, next) {
         ({ describo, sessionId } = await __setupDescriboSession({
             session: req.session,
             folder: req.body.folder,
+            type: req.body.type,
         }));
     } catch (error) {
         return next(new BadRequestError(`There was a problem setting up a describo session`));
@@ -23,7 +24,7 @@ async function setupDescriboSessionRouteHandler(req, res, next) {
     next();
 }
 
-async function __setupDescriboSession({ session, folder }) {
+async function __setupDescriboSession({ session, folder, type = "item" }) {
     const configuration = await loadConfiguration();
     const describo = configuration.api.services.describo;
     const s3 = configuration.api.services.s3;
@@ -48,7 +49,7 @@ async function __setupDescriboSession({ session, folder }) {
             allowServiceChange: false,
         },
         profile: {
-            file: "nyingarn-profile.json",
+            file: `nyingarn-${type}-profile.json`,
         },
     };
     let response = await fetch(url, {
@@ -94,6 +95,7 @@ async function postDescriboUpdateRouteHandler(req, res, next) {
             ({ describo, sessionId, folder } = await __setupDescriboSession({
                 session: req.session,
                 folder,
+                type: req.body.type,
             }));
         } catch (error) {
             return next(new BadRequestError(`There was a problem setting up a describo session`));

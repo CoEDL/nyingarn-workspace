@@ -127,7 +127,7 @@ async function linkItemToCollection(item) {
     };
     let response = await $http.post({
         route: "/describo/update",
-        body: { updates },
+        body: { updates, type: route.meta.type },
     });
     if (response.status === 200) {
         ElMessage({

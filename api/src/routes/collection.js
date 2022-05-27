@@ -35,6 +35,7 @@ function routeCollection(handler) {
 export function setupRoutes({ server }) {
     // user routes
     server.get("/collections", route(getCollectionsHandler));
+    server.get("/collections/:identifier", routeCollection(getCollectionHandler));
     server.post("/collections", route(createCollectionHandler));
     server.put(
         "/collections/:identifier/attach-user",
@@ -60,6 +61,11 @@ async function getCollectionsHandler(req, res, next) {
     let collections = rows.map((c) => ({ name: c.identifier, private: c.data.private }));
 
     res.send({ total: count, collections });
+    next();
+}
+
+async function getCollectionHandler(req, res, next) {
+    res.send({ collection: req.collection });
     next();
 }
 

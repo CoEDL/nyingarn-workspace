@@ -47,6 +47,7 @@ function routeItem(handler) {
 export function setupRoutes({ server }) {
     // user routes
     server.get("/items", route(getItemsHandler));
+    server.get("/items/:identifier", routeItem(getItemHandler));
     server.post("/items", route(createItemHandler));
     server.put("/items/:identifier/attach-user", routeItem(putItemInviteUserHandler));
     server.put("/items/:identifier/detach-user", routeItem(putItemDetachUserHandler));
@@ -100,6 +101,11 @@ async function getItemsHandler(req, res, next) {
     let items = rows.map((i) => ({ name: i.identifier }));
 
     res.send({ total: count, items });
+    next();
+}
+
+async function getItemHandler(req, res, next) {
+    res.send({ item: req.item });
     next();
 }
 

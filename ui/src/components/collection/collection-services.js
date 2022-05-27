@@ -5,6 +5,12 @@ export async function getMyCollections({ $http, offset, limit }) {
     });
 }
 
+export async function getCollection({ $http, identifier }) {
+    return await $http.get({
+        route: `/collections/${identifier}`,
+    });
+}
+
 export async function createCollection({ $http, identifier }) {
     return await $http.post({
         route: "/collections",

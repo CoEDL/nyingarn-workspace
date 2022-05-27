@@ -2,13 +2,53 @@ import "regenerator-runtime";
 import {
     processFtpTeiTranscription,
     __processTeiTranscriptionXMLProcessor,
+    __processDigivolTranscriptionXMLProcessor,
     reconstituteTEIFile,
 } from "./transcription-processing";
 import path from "path";
 import { readdir, remove } from "fs-extra";
 
+jest.setTimeout(20000); // 20s because the CSV processing test is slow
+
 describe("Test transcription processing utils", () => {
-    it("should be able to process a digivol csv file", async () => {});
+    it("should be able to process a digivol csv file", async () => {
+        let identifier = "BM1648A91";
+        let resource = "BM1648A91-digivol.csv";
+        let expectedFiles = [
+            "BM1648A91-0001.tei.xml", "BM1648A91-0002.tei.xml", "BM1648A91-0003.tei.xml", "BM1648A91-0004.tei.xml",
+            "BM1648A91-0005.tei.xml", "BM1648A91-0006.tei.xml", "BM1648A91-0007.tei.xml", "BM1648A91-0008.tei.xml",
+            "BM1648A91-0009.tei.xml", "BM1648A91-0010.tei.xml", "BM1648A91-0011.tei.xml", "BM1648A91-0012.tei.xml",
+            "BM1648A91-0013.tei.xml", "BM1648A91-0014.tei.xml", "BM1648A91-0015.tei.xml", "BM1648A91-0016.tei.xml",
+            "BM1648A91-0017.tei.xml", "BM1648A91-0018.tei.xml", "BM1648A91-0019.tei.xml", "BM1648A91-0020.tei.xml",
+            "BM1648A91-0021.tei.xml", "BM1648A91-0022.tei.xml", "BM1648A91-0023.tei.xml", "BM1648A91-0024.tei.xml",
+            "BM1648A91-0025.tei.xml", "BM1648A91-0026.tei.xml"
+        ];
+        let unexpectedFiles = [
+            "BM1648A92-0001.tei.xml", "BM1648A92-0002.tei.xml", "BM1648A92-0003.tei.xml", "BM1648A92-0004.tei.xml", 
+            "BM1648A92-0005.tei.xml", "BM1648A92-0006.tei.xml", "BM1648A92-0007.tei.xml", "BM1648A94-0001.tei.xml", 
+            "BM1648A94-0002.tei.xml", "BM1648A94-0003.tei.xml", "BM1648A94-0004.tei.xml", "BM1648A94-0005.tei.xml", 
+            "BM1648A94-0006.tei.xml", "BM1648A94-0007.tei.xml", "BM1648A94-0008.tei.xml", "BM1648A94-0009.tei.xml", 
+            "BM1648A94-0010.tei.xml", "BM1648A94-0011.tei.xml", "BM1648A94-0012.tei.xml", "BM1648A94-0013.tei.xml", 
+            "BM1648A94-0014.tei.xml", "BM1648A94-0017.tei.xml", "BM1648A94-0018.tei.xml", "BM1648A94-0019.tei.xml", 
+            "BM1648A94-0020.tei.xml", "BM1648A94-0021.tei.xml", "BM1648A94-0022.tei.xml", "BM1648A94-0023.tei.xml", 
+            "BM1648A94-0024.tei.xml", "BM1648A94-0025.tei.xml", "BM1648A94-0026.tei.xml", "BM1648A94-0027.tei.xml", 
+            "BM1648A95-0001.tei.xml", "BM1648A95-0002.tei.xml", "BM1648A95-0003.tei.xml", "BM1648A95-0004.tei.xml", 
+            "BM1648A95-0005.tei.xml", "BM1648A95-0006.tei.xml", "BM1648A95-0007.tei.xml", "BM1648A95-0008.tei.xml", 
+            "BM1648A95-0009.tei.xml", "BM1648A96-0001.tei.xml", "BM1648A96-0002.tei.xml", "BM1648A96-0003.tei.xml", 
+            "BM1648A96-0004.tei.xml", "BM1648A96-0005.tei.xml", "BM1648A96-0006.tei.xml", "BM1648A96-0007.tei.xml"
+        ];
+        await __processDigivolTranscriptionXMLProcessor({
+            directory: path.join(__dirname, "../test-data"),
+            identifier: identifier,
+            resource: resource,
+        });
+        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        let contents = (await readdir(resourceDirectory)).sort();
+        expectedFiles.forEach((file) => expect(contents).toContain(file));
+        expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+        unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
+        unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));    
+    });
 
     it("should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {
         let identifier = "msword_example";

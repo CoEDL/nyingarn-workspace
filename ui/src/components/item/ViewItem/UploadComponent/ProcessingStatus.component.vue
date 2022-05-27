@@ -7,11 +7,11 @@
                 </template>
             </el-table-column>
             <el-table-column prop="status" label="Status" width="150" />
-            <el-table-column prop="data" label="Data" width="150" type="expand">
+            <!-- <el-table-column prop="data" label="Data" width="150" type="expand">
                 <template #default="props">
                     <pre>{{ props.row.data }}</pre>
                 </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column prop="resource" label="Resource" />
         </el-table>
     </div>

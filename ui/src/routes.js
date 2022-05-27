@@ -28,6 +28,9 @@ const routes = [
                 path: "items/:identifier",
                 component: ViewItemComponent,
                 props: true,
+                meta: {
+                    type: "item",
+                },
                 children: [
                     { path: "view", name: "items/:identifier/view", component: ViewItemComponent },
                     {
@@ -57,6 +60,9 @@ const routes = [
                 path: "collections/:identifier",
                 component: ViewCollectionComponent,
                 props: true,
+                meta: {
+                    type: "collection",
+                },
                 children: [
                     {
                         path: "associate",

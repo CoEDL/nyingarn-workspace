@@ -49,7 +49,7 @@ async function __setupDescriboSession({ session, folder, type = "item" }) {
             allowServiceChange: false,
         },
         profile: {
-            file: `nyingarn-${type}-profile.json`,
+            file: configuration.api.profiles[type],
         },
     };
     let response = await fetch(url, {

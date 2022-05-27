@@ -33,6 +33,10 @@
                 "3": ["collectionId", "itemId", "resourceId"]
             }
         },
+        "profiles": {
+            "collection": "nyingarn-collection-profile.json",
+            "item": "nyingarn-item-profile.json"
+        },
         "processing": {
             "exchange": "nyingarn"
         },

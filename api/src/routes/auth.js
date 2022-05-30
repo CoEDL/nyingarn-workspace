@@ -69,7 +69,12 @@ async function getOauthTokenRouteHandler(req, res, next) {
         user = await models.user.findOne({ where: { email: userData.email } });
         if (!user) {
             // no user found with that email - not whitelisted so deny access
-            log.info(`The account for '${userData.email}' is not whitelisted. Denying user login.`);
+            log.info(`The account for '${userData.email}' is not permitted. Denying user login.`);
+            await logEvent({
+                level: "info",
+                owner: user.email,
+                text: `The account for '${userData.email}' is not permitted. Denying user login.`,
+            });
             return next(new UnauthorizedError());
         }
         if (user?.locked) {
@@ -77,7 +82,7 @@ async function getOauthTokenRouteHandler(req, res, next) {
             await logEvent({
                 level: "info",
                 owner: user.email,
-                text: `The account is locked. Denying user login.`,
+                text: `The account for '${user.email}' is locked. Denying user login.`,
             });
             // user account exists but user is locked
             return next(new UnauthorizedError());
@@ -88,7 +93,7 @@ async function getOauthTokenRouteHandler(req, res, next) {
             await logEvent({
                 level: "info",
                 owner: user.email,
-                text: `The account is being setup.`,
+                text: `The account for '${user.email}' is being setup.`,
             });
             try {
                 user = await createUser(userData);

@@ -36,7 +36,7 @@ export function setupRoutes({ server }) {
     // user routes
     server.get("/collections", route(getCollectionsHandler));
     server.get("/collections/:identifier", routeCollection(getCollectionHandler));
-    server.post("/collections", route(createCollectionHandler));
+    server.post("/collections", route(postCollectionHandler));
     server.put(
         "/collections/:identifier/attach-user",
         routeCollection(putCollectionInviteUserHandler)
@@ -69,7 +69,7 @@ async function getCollectionHandler(req, res, next) {
     next();
 }
 
-async function createCollectionHandler(req, res, next) {
+async function postCollectionHandler(req, res, next) {
     if (!req.body.identifier) {
         return next(new BadRequestError(`collection identifier not defined`));
     }

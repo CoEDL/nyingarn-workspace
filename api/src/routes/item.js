@@ -48,7 +48,7 @@ export function setupRoutes({ server }) {
     // user routes
     server.get("/items", route(getItemsHandler));
     server.get("/items/:identifier", routeItem(getItemHandler));
-    server.post("/items", route(createItemHandler));
+    server.post("/items", route(postItemHandler));
     server.put("/items/:identifier/attach-user", routeItem(putItemInviteUserHandler));
     server.put("/items/:identifier/detach-user", routeItem(putItemDetachUserHandler));
     server.get("/items/:identifier/users", routeItem(getItemUsers));
@@ -109,7 +109,7 @@ async function getItemHandler(req, res, next) {
     next();
 }
 
-async function createItemHandler(req, res, next) {
+async function postItemHandler(req, res, next) {
     if (!req.body.identifier) {
         return next(new BadRequestError(`itemId not defined`));
     }

@@ -33,6 +33,103 @@ describe("Item management route tests", () => {
     afterAll(async () => {
         await teardownAfterAll(configuration);
     });
+    it("should be able to get own items", async () => {
+        let user = {
+            email: userEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+
+        let session = await createSession({ user });
+
+        const identifier = chance.word();
+        let response = await fetch(`${host}/items`, {
+            method: "POST",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                identifier,
+            }),
+        });
+        expect(response.status).toEqual(200);
+        let { item } = await response.json();
+
+        response = await fetch(`${host}/items`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(200);
+        let { total, items } = await response.json();
+        expect(total).toEqual(1);
+
+        await deleteItem({ id: item.id });
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to get defined own item", async () => {
+        let user = {
+            email: userEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+
+        let session = await createSession({ user });
+
+        const identifier = chance.word();
+        let response = await fetch(`${host}/items`, {
+            method: "POST",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                identifier,
+            }),
+        });
+        expect(response.status).toEqual(200);
+        let { item } = await response.json();
+
+        response = await fetch(`${host}/items/${item.identifier}`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(200);
+        expect((await response.json()).item.identifier).toEqual(item.identifier);
+
+        await deleteItem({ id: item.id });
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should fail trying to get a specific item", async () => {
+        let user = {
+            email: userEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+
+        let session = await createSession({ user });
+
+        let response = await fetch(`${host}/items/${chance.word()}`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(403);
+    });
     it("should be able to create a new item as an administrator", async () => {
         let user = {
             email: adminEmail,
@@ -369,45 +466,6 @@ describe("Item management route tests", () => {
             }),
         });
         expect(response.status).toEqual(200);
-
-        await deleteItem({ id: item.id });
-        await bucket.removeObjects({ prefix: identifier });
-    });
-    it("should be able to get own items", async () => {
-        let user = {
-            email: userEmail,
-            givenName: chance.word(),
-            familyName: chance.word(),
-            provider: chance.word(),
-        };
-        user = await createUser(user);
-
-        let session = await createSession({ user });
-
-        const identifier = chance.word();
-        let response = await fetch(`${host}/items`, {
-            method: "POST",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                identifier,
-            }),
-        });
-        expect(response.status).toEqual(200);
-        let { item } = await response.json();
-
-        response = await fetch(`${host}/items`, {
-            method: "GET",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
-        });
-        expect(response.status).toEqual(200);
-        let { total, items } = await response.json();
-        expect(total).toEqual(1);
 
         await deleteItem({ id: item.id });
         await bucket.removeObjects({ prefix: identifier });

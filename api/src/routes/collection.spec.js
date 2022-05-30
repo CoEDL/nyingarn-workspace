@@ -33,6 +33,102 @@ describe("Collection management route tests", () => {
     afterAll(async () => {
         await teardownAfterAll(configuration);
     });
+    it("should be able to get own collections", async () => {
+        let user = {
+            email: userEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+
+        let session = await createSession({ user });
+
+        const identifier = chance.word();
+        let response = await fetch(`${host}/collections`, {
+            method: "POST",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                identifier,
+            }),
+        });
+        expect(response.status).toEqual(200);
+        let { collection } = await response.json();
+
+        response = await fetch(`${host}/collections`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(200);
+        let { total, collections } = await response.json();
+        expect(total).toEqual(1);
+
+        await deleteCollection({ id: collection.id });
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to get defined own collection", async () => {
+        let user = {
+            email: userEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+
+        let session = await createSession({ user });
+
+        const identifier = chance.word();
+        let response = await fetch(`${host}/collections`, {
+            method: "POST",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                identifier,
+            }),
+        });
+        expect(response.status).toEqual(200);
+        let { collection } = await response.json();
+
+        response = await fetch(`${host}/collections/${collection.identifier}`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(200);
+        expect((await response.json()).collection.identifier).toEqual(collection.identifier);
+        await deleteCollection({ id: collection.id });
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should fail trying to get a specific collection", async () => {
+        let user = {
+            email: userEmail,
+            givenName: chance.word(),
+            familyName: chance.word(),
+            provider: chance.word(),
+        };
+        user = await createUser(user);
+
+        let session = await createSession({ user });
+
+        let response = await fetch(`${host}/collections/${chance.word()}`, {
+            method: "GET",
+            headers: {
+                authorization: `Bearer ${session.token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        expect(response.status).toEqual(403);
+    });
     it("should be able to create a new collection as an administrator", async () => {
         let user = {
             email: adminEmail,
@@ -333,45 +429,7 @@ describe("Collection management route tests", () => {
         });
         expect(response.status).toEqual(200);
     });
-    it("should be able to get own collections", async () => {
-        let user = {
-            email: userEmail,
-            givenName: chance.word(),
-            familyName: chance.word(),
-            provider: chance.word(),
-        };
-        user = await createUser(user);
 
-        let session = await createSession({ user });
-
-        const identifier = chance.word();
-        let response = await fetch(`${host}/collections`, {
-            method: "POST",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                identifier,
-            }),
-        });
-        expect(response.status).toEqual(200);
-        let { collection } = await response.json();
-
-        response = await fetch(`${host}/collections`, {
-            method: "GET",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
-        });
-        expect(response.status).toEqual(200);
-        let { total, collections } = await response.json();
-        expect(total).toEqual(1);
-
-        await deleteCollection({ id: collection.id });
-        await bucket.removeObjects({ prefix: identifier });
-    });
     it("should be able to toggle collection visibility", async () => {
         let user = {
             email: userEmail,

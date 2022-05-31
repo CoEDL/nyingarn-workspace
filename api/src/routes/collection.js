@@ -62,8 +62,6 @@ async function getCollectionsHandler(req, res, next) {
         name: c.identifier,
         private: c.data.private,
         type: "collection",
-        items: c.items.map((i) => ({ name: i.identifier })),
-        collections: c.subCollection.map((c) => ({ name: c.identifier })),
     }));
 
     res.send({ total: count, collections });
@@ -71,7 +69,14 @@ async function getCollectionsHandler(req, res, next) {
 }
 
 async function getCollectionHandler(req, res, next) {
-    res.send({ collection: req.collection });
+    let members = [
+        ...(await req.collection.getItems()).map((i) => ({ ...i.get(), type: "item" })),
+        ...(await req.collection.getSubCollection()).map((c) => ({
+            ...c.get(),
+            type: "collection",
+        })),
+    ];
+    res.send({ collection: { ...req.collection.get(), members } });
     next();
 }
 

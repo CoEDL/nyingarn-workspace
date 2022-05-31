@@ -9,6 +9,12 @@
         </div>
         <div class="p-4" v-if="data.userIsPermitted">
             <el-tabs v-model="data.activeTab" @tab-click="updateRouteOnTabSelect">
+                <el-tab-pane label="Collection Members" name="members">
+                    <view-collection-members-component
+                        :collection="data.collection"
+                        v-if="data.activeTab === 'members'"
+                    />
+                </el-tab-pane>
                 <el-tab-pane label="Collection Metadata" name="metadata">
                     <describo-metadata-component v-if="data.activeTab === 'metadata'" />
                 </el-tab-pane>
@@ -28,7 +34,8 @@ import { getCollection } from "../collection-services";
 import DescriboMetadataComponent from "@/components/DescriboMetadata.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
 import CollectionMembersComponent from "./CollectionMembers.component.vue";
-import { reactive, onMounted, onBeforeMount, inject, watch } from "vue";
+import ViewCollectionMembersComponent from "./ViewCollectionMembers.component.vue";
+import { ref, reactive, onMounted, onBeforeMount, inject, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 const route = useRoute();
@@ -43,16 +50,16 @@ let props = defineProps({
 
 let data = reactive({
     userIsPermitted: false,
-
     routeWatcher: undefined,
-    tabs: ["metadata", "associate", "administration"],
-    activeTab: "metadata",
+    tabs: ["members", "metadata", "associate", "administration"],
+    activeTab: "members",
+    collection: {},
 });
 onBeforeMount(async () => {
     await checkUserAccess();
 });
 onMounted(() => {
-    data.routeWatcher = watch(route.path, updateRouteOnNav);
+    data.routeWatcher = watch(ref(route.path), updateRouteOnNav);
     updateRouteOnNav();
 });
 
@@ -62,6 +69,8 @@ async function checkUserAccess() {
         ElMessage.error(`You don't have permission to access that collection`);
         return router.push("/dashboard");
     }
+    response = await response.json();
+    data.collection = response.collection;
     data.userIsPermitted = true;
 }
 function updateRouteOnNav() {

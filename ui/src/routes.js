@@ -65,6 +65,11 @@ const routes = [
                 },
                 children: [
                     {
+                        path: "members",
+                        name: "collections/:identifier/members",
+                        component: ViewCollectionComponent,
+                    },
+                    {
                         path: "associate",
                         name: "collections/:identifier/associate",
                         component: ViewCollectionComponent,

@@ -58,7 +58,13 @@ async function getCollectionsHandler(req, res, next) {
     const offset = req.query.offset;
     const limit = req.query.limit;
     let { count, rows } = await getCollections({ userId, offset, limit });
-    let collections = rows.map((c) => ({ name: c.identifier, private: c.data.private }));
+    let collections = rows.map((c) => ({
+        name: c.identifier,
+        private: c.data.private,
+        type: "collection",
+        items: c.items.map((i) => ({ name: i.identifier })),
+        collections: c.subCollection.map((c) => ({ name: c.identifier })),
+    }));
 
     res.send({ total: count, collections });
     next();
@@ -156,9 +162,11 @@ async function getCollectionUsers(req, res, next) {
     let users = await req.collection.getUsers();
     users = users.map((u) => {
         return {
-            ...["id", "email", "givenName", "familyName", "administrator"].map((a) => ({
-                [a]: u[a],
-            })),
+            id: u.id,
+            email: u.email,
+            givenName: u.givenName,
+            familyName: u.familyName,
+            administrator: u.administrator,
             loggedin: req.session.user.id === u.id ? true : false,
         };
     });

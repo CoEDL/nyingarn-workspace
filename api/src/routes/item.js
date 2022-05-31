@@ -98,7 +98,7 @@ async function getItemsHandler(req, res, next) {
     const offset = req.query.offset;
     const limit = req.query.limit;
     let { count, rows } = await getItems({ userId, offset, limit });
-    let items = rows.map((i) => ({ name: i.identifier }));
+    let items = rows.map((i) => ({ name: i.identifier, type: "item" }));
 
     res.send({ total: count, items });
     next();
@@ -182,9 +182,11 @@ async function getItemUsers(req, res, next) {
     let users = await req.item.getUsers();
     users = users.map((u) => {
         return {
-            ...["id", "email", "givenName", "familyName", "administrator"].map((a) => ({
-                [a]: u[a],
-            })),
+            id: u.id,
+            email: u.email,
+            givenName: u.givenName,
+            familyName: u.familyName,
+            administrator: u.administrator,
             loggedin: req.session.user.id === u.id ? true : false,
         };
     });

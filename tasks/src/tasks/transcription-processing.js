@@ -55,6 +55,7 @@ export async function processTeiTranscription({ directory, identifier, resource 
     await persistNewContentToBucket({ directory, identifier, resource });
 }
 
+/*
 export async function processDigivolTranscription({ directory, identifier, resource }) {
     let file = path.join(directory, identifier, resource);
 
@@ -97,6 +98,7 @@ export async function processDigivolTranscription({ directory, identifier, resou
         }
     }
 }
+*/
 
 export async function __processTeiTranscriptionXMLProcessor({ directory, identifier, resource }) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);
@@ -113,6 +115,11 @@ export async function __processTeiTranscriptionXMLProcessor({ directory, identif
         },
         "async"
     );
+}
+
+export async function processDigivolTranscription({ directory, identifier, resource }) {
+    await __processDigivolTranscriptionXMLProcessor({ directory, identifier, resource });
+    await persistNewContentToBucket({ directory, identifier, resource });
 }
 
 export async function __processDigivolTranscriptionXMLProcessor({ directory, identifier, resource }) {

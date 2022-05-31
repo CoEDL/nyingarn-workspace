@@ -85,6 +85,7 @@ export default {
             this.codemirror.setSize("100%", window.innerHeight - 200);
             this.codemirror.setOption("mode", "text/xml");
             this.codemirror.setOption("theme", "blackboard");
+            this.codemirror.setOption("lineWrapping", true);
             this.codemirror.setValue(this.transcription);
             this.codemirror.on("change", this.debouncedSave);
             this.save();
@@ -100,20 +101,21 @@ export default {
             return transcription;
         },
         addElement(t) {
-            let text = this.codemirror.getSelection();
-            let attributes;
-            if (t?.attributes && t.attributes.length) {
-                attributes = " " + t?.attributes.map((a) => `${a}=""`).join(" ");
-            } else {
-                attributes = "";
-            }
-            if (t.element) {
-                this.codemirror.replaceSelection(
-                    `<${t.element}${attributes}>${text}</${t.element}>`
-                );
-            } else if (t.open && t.close) {
-                this.codemirror.replaceSelection(`${t.open}${attributes}${text}${t.close}`);
-            }
+            let selections = this.codemirror.getSelections();
+            let replacements = selections.map((selection) => {
+                let attributes;
+                if (t?.attributes && t.attributes.length) {
+                    attributes = " " + t?.attributes.map((a) => `${a}=""`).join(" ");
+                } else {
+                    attributes = "";
+                }
+                if (t.element) {
+                    return `<${t.element}${attributes}>${selection}</${t.element}>`;
+                } else if (t.open && t.close) {
+                    return `${t.open}${attributes}${selection}${t.close}`;
+                }
+            });
+            this.codemirror.replaceSelections(replacements);
         },
         undo() {
             if (this.codemirror.historySize().undo === 1) return;

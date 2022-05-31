@@ -91,11 +91,11 @@ export default {
         },
     },
     mounted() {
-        this.loadCollections();
+        this.loadCollections(this.page);
     },
     methods: {
         async loadCollections(p) {
-            if (p) this.page = p;
+            this.page = p ? p : 1;
             let offset = (this.page - 1) * this.limit;
             let response = await getMyCollections({ $http: this.$http, offset, limit: this.limit });
             if (response.status !== 200) {
@@ -105,9 +105,10 @@ export default {
             this.total = response.total;
             let collections = response.collections.map((c) => ({
                 ...c,
-                link: `/collections/${c.name}/metadata`,
+                link: `/collections/${c.name}/members`,
             }));
             collections = orderBy(collections, "name");
+
             this.collections = [...collections];
         },
         async deleteCollection(collection) {

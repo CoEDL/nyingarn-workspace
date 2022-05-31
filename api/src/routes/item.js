@@ -105,7 +105,7 @@ async function getItemsHandler(req, res, next) {
 }
 
 async function getItemHandler(req, res, next) {
-    res.send({ item: req.item });
+    res.send({ item: req.item.get() });
     next();
 }
 

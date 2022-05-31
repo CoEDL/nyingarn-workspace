@@ -17,13 +17,14 @@ export async function lookupCollectionByIdentifier({ identifier, userId }) {
 }
 
 export async function getCollections({ userId, offset = 0, limit = 10 }) {
-    let include = [];
+    let include = [{ model: models.item }, { model: models.collection, as: "subCollection" }];
     if (userId) include.push({ model: models.user, where: { id: userId } });
-    return await models.collection.findAndCountAll({
+    let collections = await models.collection.findAndCountAll({
         offset,
         limit,
         include,
     });
+    return collections;
 }
 
 export async function createCollection({ identifier, userId }) {

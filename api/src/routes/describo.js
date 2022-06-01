@@ -1,6 +1,7 @@
 import { loadConfiguration, getLogger } from "../common";
-import { route } from "../common";
+import { route, getS3Handle } from "../common";
 import { BadRequestError } from "restify-errors";
+import path from "path";
 import fetch from "node-fetch";
 import models from "../models";
 const log = getLogger();
@@ -8,6 +9,9 @@ const log = getLogger();
 export function setupRoutes({ server }) {
     server.post("/describo", route(setupDescriboSessionRouteHandler));
     server.post("/describo/update", route(postDescriboUpdateRouteHandler));
+    server.get("/describo/rocrate/:type/:identifier", route(getDescriboROCrate));
+    server.post("/describo/rocrate/:type/:identifier", route(postDescriboROCrate));
+    server.get("/describo/profile/:type", route(getDescriboProfile));
 }
 
 async function setupDescriboSessionRouteHandler(req, res, next) {
@@ -137,4 +141,185 @@ async function postDescriboUpdateRouteHandler(req, res, next) {
     }
     res.send({});
     next();
+}
+
+// TODO: this code does not have tests
+async function getDescriboROCrate(req, res, next) {
+    let { bucket } = await getS3Handle();
+
+    let rocrateFile = path.join(req.params.identifier, "ro-crate-metadata.json");
+    let pathExists = await bucket.pathExists({ path: rocrateFile });
+    if (pathExists) {
+        rocrateFile = JSON.parse(await bucket.download({ target: rocrateFile }));
+    } else {
+        rocrateFile = createDefaultROCrateFile({ identifier: req.params.identifier });
+    }
+    res.send({ rocrateFile });
+    next();
+}
+
+// TODO: this code does not have tests
+async function postDescriboROCrate(req, res, next) {
+    res.send({});
+    next();
+}
+
+// TODO: this code does not have tests
+async function getDescriboProfile(req, res, next) {
+    let profile = getDefaultProfile();
+    res.send({ profile });
+    next();
+}
+
+function createDefaultROCrateFile({ identifier }) {
+    let context = ["https://w3id.org/ro/crate/1.1/context"];
+    let graph = [
+        {
+            "@id": "ro-crate-metadata.json",
+            "@type": "CreativeWork",
+            conformsTo: {
+                "@id": "https://w3id.org/ro/crate/1.1/context",
+            },
+            about: {
+                "@id": "./",
+            },
+        },
+        {
+            "@id": "./",
+            "@type": "Dataset",
+            name: identifier,
+        },
+    ];
+    return {
+        "@context": context,
+        "@graph": graph,
+    };
+}
+
+function getDefaultProfile() {
+    return {
+        metadata: {
+            name: "Describo Test Profile",
+            description: "A profile with entries for each of the supported datatypes",
+            version: 0.1,
+            warnMissingProperty: true,
+        },
+        classes: {
+            Dataset: {
+                definition: "override",
+                subClassOf: [],
+                inputs: [
+                    {
+                        id: "https://schema.org/location",
+                        name: "location",
+                        label: "Attach a location",
+                        help: "",
+                        type: ["Geo"],
+                        required: true,
+                        multiple: false,
+                    },
+                    {
+                        id: "https://schema.org/entity",
+                        name: "entity",
+                        label: "Attach Entity",
+                        help: "",
+                        type: ["Person", "Organisation"],
+                        required: true,
+                        multiple: true,
+                    },
+                    {
+                        id: "https://schema.org/text",
+                        name: "text",
+                        label: "Text",
+                        help: "",
+                        type: ["Text"],
+                        required: true,
+                        multiple: false,
+                    },
+                    {
+                        id: "https://schema.org/textarea",
+                        name: "TextArea",
+                        label: "TextArea",
+                        help: "",
+                        type: ["TextArea"],
+                        required: true,
+                        multiple: false,
+                    },
+                    {
+                        id: "http://schema.org/url",
+                        name: "url",
+                        label: "URL",
+                        help: "",
+                        multiple: true,
+                        type: ["URL"],
+                    },
+                    {
+                        id: "http://schema.org/date",
+                        name: "date",
+                        label: "Date",
+                        help: "",
+                        multiple: true,
+                        type: ["Date"],
+                    },
+                    {
+                        id: "http://schema.org/datetime",
+                        name: "datetime",
+                        label: "DateTime",
+                        help: "",
+                        multiple: true,
+                        type: ["DateTime"],
+                    },
+                    {
+                        id: "http://schema.org/select-text",
+                        name: "select-text",
+                        label: "Select Text",
+                        help: "",
+                        multiple: true,
+                        type: ["Select"],
+                        values: ["http://schema.org/Person", "http://schema.org/Organisation"],
+                    },
+                    {
+                        id: "http://schema.org/select-url",
+                        name: "select-url",
+                        label: "Select Url",
+                        help: "Language name in non-standard form",
+                        type: ["SelectURL"],
+                        multiple: true,
+                        values: ["http://schema.org/Person", "http://schema.org/Organisation"],
+                    },
+                ],
+            },
+            Person: {
+                definition: "override",
+                subClassOf: [],
+                inputs: [
+                    {
+                        id: "https://schema.org/name",
+                        name: "name",
+                        label: "name",
+                        help: "The name the person",
+                        required: true,
+                        multiple: false,
+                        type: ["Text"],
+                    },
+                ],
+            },
+            Organisation: {
+                definition: "override",
+                subClassOf: [],
+                inputs: [
+                    {
+                        id: "https://schema.org/name",
+                        name: "name",
+                        label: "name",
+                        help: "The name of the organisation",
+                        required: true,
+                        multiple: false,
+                        type: ["Text"],
+                    },
+                ],
+            },
+        },
+        enabledClasses: ["Dataset", "Person", "Organisation"],
+    };
 }

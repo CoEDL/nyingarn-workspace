@@ -6,7 +6,7 @@
                 <span class="text-red-600">{{ error.resource }}</span>
             </div>
             <div class="ml-4">
-                <el-button @click="show = !show" type="small">
+                <el-button @click="show = !show" size="small">
                     <i class="fa-solid fa-chevron-right"></i>
                 </el-button>
             </div>

@@ -376,18 +376,18 @@ async function getItemTranscriptionHandler(req, res, next) {
     }
 
     // otherwise try to get the tesseract transcription
-    exists = await itemResourceExists({
-        identifier: req.params.identifier,
-        resource: `${req.params.resource}.tesseract_ocr-ADMIN.txt`,
-    });
-    if (exists) {
-        content = await getItemResource({
-            identifier: req.params.identifier,
-            resource: `${req.params.resource}.tesseract_ocr-ADMIN.txt`,
-        });
-        res.send({ content });
-        return next();
-    }
+    // exists = await itemResourceExists({
+    //     identifier: req.params.identifier,
+    //     resource: `${req.params.resource}.tesseract_ocr-ADMIN.txt`,
+    // });
+    // if (exists) {
+    //     content = await getItemResource({
+    //         identifier: req.params.identifier,
+    //         resource: `${req.params.resource}.tesseract_ocr-ADMIN.txt`,
+    //     });
+    //     res.send({ content });
+    //     return next();
+    // }
 
     res.send({ content: "" });
     return next();
@@ -410,7 +410,11 @@ async function getItemResourceFileLinkHandler(req, res, next) {
 async function saveItemTranscriptionHandler(req, res, next) {
     const { identifier, resource, datafiles, document } = req.params;
     let file = `${resource}.tei.xml`;
-    await putItemResource({ identifier, resource: file, content: document });
+    try {
+        await putItemResource({ identifier, resource: file, content: document });
+    } catch (error) {
+        log.error(`Error saving transcription: ${error.message}`);
+    }
     res.send({});
     next();
 }

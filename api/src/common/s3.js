@@ -114,7 +114,12 @@ export class Bucket {
         return (await this.stat({ path }))?.$metadata?.httpStatusCode === 200 ? true : false;
     }
 
-    async upload({ localPath, content, json, target }) {
+    async upload({
+        localPath = undefined,
+        content = undefined,
+        json = undefined,
+        target = undefined,
+    }) {
         // check that key length is within the limits
         if (target.length > maxFileNameLength) {
             console.error(
@@ -130,17 +135,17 @@ export class Bucket {
             Metadata: metadata,
         };
 
-        if (localPath) {
+        if (localPath !== undefined) {
             // upload a local file
             const fileStream = createReadStream(localPath);
             fileStream.on("error", function (err) {
                 console.log("File Error", err);
             });
             uploadParams.Body = fileStream;
-        } else if (content) {
+        } else if (content !== undefined) {
             // create a file with this content
             uploadParams.Body = Buffer.from(content);
-        } else if (json) {
+        } else if (json !== undefined) {
             // create a file with this json data
             uploadParams.Body = Buffer.from(JSON.stringify(json));
         } else {
@@ -165,12 +170,12 @@ export class Bucket {
         });
         return response;
 
-        async function V3SinglePartUpload({ params }) {
-            // Straight up V3 upload - not multipart
-            const command = new PutObjectCommand(uploadParams);
-            let response = await this.client.send(command);
-            return response.$metadata;
-        }
+        // async function V3SinglePartUpload({ params }) {
+        //     // Straight up V3 upload - not multipart
+        //     const command = new PutObjectCommand(uploadParams);
+        //     let response = await this.client.send(command);
+        //     return response.$metadata;
+        // }
 
         async function V3MultipartUpload({ params, partSize }) {
             // V3 multipart uploader - doesn't work
@@ -191,22 +196,22 @@ export class Bucket {
             return response.$metadata;
         }
 
-        async function V2MultipartUpload({ params, partSize }) {
-            // V2 multipart uploader
-            AWS.config = this.configuration;
-            const uploader = new AWS.S3.ManagedUpload({
-                partSize,
-                params,
-            });
-            // uploader.on("httpUploadProgress", (progress) => {
-            //   console.log(progress);
-            // });
+        // async function V2MultipartUpload({ params, partSize }) {
+        //     // V2 multipart uploader
+        //     AWS.config = this.configuration;
+        //     const uploader = new AWS.S3.ManagedUpload({
+        //         partSize,
+        //         params,
+        //     });
+        //     // uploader.on("httpUploadProgress", (progress) => {
+        //     //   console.log(progress);
+        //     // });
 
-            let response = await uploader.promise();
-            return {
-                httpStatusCode: 200,
-            };
-        }
+        //     let response = await uploader.promise();
+        //     return {
+        //         httpStatusCode: 200,
+        //     };
+        // }
     }
 
     async download({ target, localPath }) {

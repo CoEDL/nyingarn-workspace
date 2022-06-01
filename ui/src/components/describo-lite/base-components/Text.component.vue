@@ -1,0 +1,65 @@
+<template>
+    <div class="flex flex-row space-x-2">
+        <el-input
+            class="w-full"
+            :type="type"
+            @input="debouncedSave"
+            v-model="internalValue"
+            resize="vertical"
+            :rows="5"
+        ></el-input>
+        <div v-if="!autoSave">
+            <el-button @click="save" type="success" size="small">
+                <i class="fas fa-check fa-fw"></i>
+            </el-button>
+        </div>
+    </div>
+</template>
+
+<script>
+import { debounce } from "lodash";
+
+export default {
+    props: {
+        type: {
+            type: String,
+            default: "textarea",
+        },
+        property: {
+            type: String,
+            required: true,
+        },
+        value: {
+            type: String,
+        },
+        definition: {
+            type: Object,
+        },
+        autoSave: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    data() {
+        return {
+            internalValue: this.value,
+            debouncedSave: this.autoSave ? debounce(this.save, 1000) : () => {},
+        };
+    },
+    watch: {
+        value: function () {
+            this.internalValue = this.value;
+        },
+    },
+    methods: {
+        save() {
+            this.$emit("save:property", {
+                property: this.property,
+                value: this.internalValue,
+            });
+        },
+    },
+};
+</script>
+
+<style lang="scss" scoped></style>

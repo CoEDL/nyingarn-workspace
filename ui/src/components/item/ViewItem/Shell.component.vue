@@ -10,7 +10,12 @@
                     <view-item-content-component v-if="data.activeTab === 'view'" />
                 </el-tab-pane>
                 <el-tab-pane label="Item Metadata" name="metadata">
-                    <describo-metadata-component v-if="data.activeTab === 'metadata'" />
+                    <!-- <describo-metadata-component v-if="data.activeTab === 'metadata'" /> -->
+                    <el-button @click="load">load</el-button>
+                    <describo-lite-component
+                        :rocrate-file="data.crate.file"
+                        :profile="data.crate.profile"
+                    />
                 </el-tab-pane>
                 <el-tab-pane label="Associate to Collection" name="associate">
                     <item-members-component v-if="data.activeTab === 'associate'" />
@@ -29,13 +34,16 @@
 <script setup>
 import { getItem } from "../item-services";
 import DescriboMetadataComponent from "@/components/DescriboMetadata.component.vue";
+import DescriboLiteComponent from "@/components/describo-lite/Shell.component.vue";
 import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
 import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
 import ItemMembersComponent from "./ItemMembers.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
+// import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
+// const store = useStore();
 const route = useRoute();
 const router = useRouter();
 const $http = inject("$http");
@@ -50,7 +58,11 @@ let data = reactive({
     userIsPermitted: false,
     routeWatcher: undefined,
     tabs: ["view", "metadata", "associate", "upload", "administration"],
-    activeTab: "view",
+    activeTab: "metadata",
+    crate: {
+        file: {},
+        profile: {},
+    },
 });
 onBeforeMount(async () => {
     await checkUserAccess();
@@ -81,5 +93,22 @@ function updateRouteOnNav() {
 }
 function updateRouteOnTabSelect(tab) {
     router.push(tab.paneName);
+}
+async function load() {
+    let response = await $http.get({
+        route: `/describo/rocrate/items/${route.params.identifier}`,
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`Unable to retrieve RO Crate file`);
+    }
+    data.crate.file = (await response.json()).rocrateFile;
+
+    response = await $http.get({
+        route: `/describo/profile/item`,
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`Unable to retrieve profile`);
+    }
+    data.crate.profile = (await response.json()).profile;
 }
 </script>

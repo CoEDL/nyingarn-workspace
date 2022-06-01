@@ -12,7 +12,7 @@
             </div>
         </div>
         <div v-if="show">
-            <pre class="text-sm">
+            <pre class="text-sm w-full">
 
     When reporting this problem to us please include the following: 
     
@@ -41,3 +41,9 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+pre {
+    white-space: pre-wrap;
+}
+</style>

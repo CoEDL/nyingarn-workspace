@@ -49,7 +49,7 @@
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/blackboard.css";
-import { debounce } from "lodash";
+import { debounce, isEmpty } from "lodash";
 import { ElMessage } from "element-plus";
 
 export default {
@@ -151,6 +151,10 @@ export default {
         async save() {
             const { identifier, resource } = this.$route.params;
 
+            let document = this.codemirror.getValue();
+            if (isEmpty(document)) {
+                return;
+            }
             await this.$http.put({
                 route: `/items/${identifier}/resources/${resource}/saveTranscription`,
                 body: { datafiles: this.data, document: this.codemirror.getValue() },

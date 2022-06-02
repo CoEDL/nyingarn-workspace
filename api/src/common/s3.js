@@ -1,7 +1,6 @@
 // API Docs: https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/index.html
 // Developer Guide: docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/welcome.html
-require("regenerator-runtime");
-const {
+import {
     S3Client,
     HeadBucketCommand,
     HeadObjectCommand,
@@ -10,12 +9,13 @@ const {
     PutObjectCommand,
     ListObjectsV2Command,
     DeleteObjectsCommand,
-} = require("@aws-sdk/client-s3");
-const { Upload } = require("@aws-sdk/lib-storage");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const { createReadStream, createWriteStream, readdir, ensureDir, stat } = require("fs-extra");
+} from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { createReadStream, createWriteStream, readdir, ensureDir, stat } from "fs-extra";
+import { isEmpty } from "lodash";
 // const AWS = require("aws-sdk");
-const path = require("path");
+import path from "path";
 const MB = 1024 * 1024;
 
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
@@ -142,7 +142,7 @@ export class Bucket {
                 console.log("File Error", err);
             });
             uploadParams.Body = fileStream;
-        } else if (content !== undefined) {
+        } else if (content !== undefined && !isEmpty(content)) {
             // create a file with this content
             uploadParams.Body = Buffer.from(content);
         } else if (json !== undefined) {

@@ -50,6 +50,7 @@ import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/blackboard.css";
 import { debounce } from "lodash";
+import { ElMessage } from "element-plus";
 
 export default {
     props: {
@@ -96,6 +97,8 @@ export default {
             });
             if (response.status !== 200) {
                 // can't get item content
+                ElMessage.error(`There was a problem loading the transcription.`);
+                return "";
             }
             let transcription = (await response.json()).content;
             return transcription;

@@ -61,6 +61,7 @@ export default {
         async getImageUrls() {
             let images = this.data
                 .filter((image) => !image.match("thumbnail"))
+                .filter((image) => !image.match("xml"))
                 .filter((image) => {
                     const re = new RegExp(this.imageFormats, "i");
                     return re.exec(image);

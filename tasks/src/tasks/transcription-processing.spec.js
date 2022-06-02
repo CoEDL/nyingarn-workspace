@@ -5,8 +5,22 @@ import {
     __processDigivolTranscriptionXMLProcessor,
     reconstituteTEIFile,
 } from "./transcription-processing";
+import SaxonJS from "saxon-js";
 import path from "path";
 import { readdir, remove } from "fs-extra";
+
+function evaluateXPath(file, xpath) {
+    return SaxonJS.XPath.evaluate(
+        xpath, 
+        [ ], // no context item required 
+        { // options
+            "xpathDefaultNamespace": "http://www.tei-c.org/ns/1.0",
+            "params": {
+                "file": file
+            }
+        }
+    );
+}
 
 jest.setTimeout(20000); // 20s because the CSV processing test is slow
 
@@ -71,6 +85,55 @@ describe("Test transcription processing utils", () => {
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
         unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
         unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+    });
+
+    it("should be able to strip unwanted text formatting from a TEI file produced by OxGarage from a DOCX file", async () => {
+        let identifier = "msword_formatting";
+        let resource = "msword_formatting-tei.xml";
+        // use TEI as the default namespace so our XPath expressions are more concise
+        let options = {"xpathDefaultNamespace": "http://www.tei-c.org/ns/1.0"};
+
+        await __processTeiTranscriptionXMLProcessor({
+            directory: path.join(__dirname, "../test-data"),
+            identifier: identifier,
+            resource: resource,
+        });
+        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        let sourceFile = path.join(resourceDirectory, resource);
+        let resultFile = path.join(resourceDirectory, "msword_formatting-001.tei.xml");
+        // parse the original TEI document and also the derived (single) TEI surface XML file
+        let sourceDoc = await SaxonJS.getResource({file: sourceFile, type: "xml"});
+        let resultDoc = await SaxonJS.getResource({file: resultFile, type: "xml"});
+        // evaluate XPath queries to retrieve lists of items with particular formatting 
+        let italicised = SaxonJS.XPath.evaluate("//*[tokenize(@rend) = 'italic']", resultDoc, options);
+        let bold = SaxonJS.XPath.evaluate("//*[tokenize(@rend) = 'bold']", resultDoc, options);
+        let normalStyled = SaxonJS.XPath.evaluate("//*[tokenize(@rend) = 'Normal']", resultDoc, options);
+        let underlinedOnly = SaxonJS.XPath.evaluate("//*[@rend = 'underline']", resultDoc, options);
+        let struckOutOnly = SaxonJS.XPath.evaluate("//*[@rend = 'underline']", resultDoc, options);
+        let underlinedAndStruckOut = SaxonJS.XPath.evaluate("//*[every $token in ('underline', 'strikethrough') satisfies $token = tokenize(@rend)]", resultDoc, options);
+        let adjacentIdenticallyFormattedHighlights = SaxonJS.XPath.evaluate(
+            "//hi[let $r1:= tokenize(@rend), $r2:= tokenize(following-sibling::node()[1]/self::hi/@rend) return (count($r1) = count($r2)) and (every $r in $r1 satisfies $r = $r2)]/text()", resultDoc, options);
+        // Parse the source and result documents into a sequence of tokens consisting of either (a) non-punctuation, non-whitespace, or (b) punctuation characters
+        // so that we can compare the two lists.
+        // NB the text of the page-identifier is excluded from the source document because we know the ingestion stylesheet is supposed
+        // to remove this and convert it into a pb element in the result document.
+        let sourceWords = SaxonJS.XPath.evaluate("(for $text in /TEI/text//text()[not(ancestor::hi/@rend='Page')] return analyze-string($text, '[^\\s\\p{P}]+|\\p{P}+')//text()[normalize-space()]) => string-join(' ')", sourceDoc, options);
+        let resultWords = SaxonJS.XPath.evaluate("(for $text in /surface//text() return analyze-string($text, '[^\\s\\p{P}]+|\\p{P}+')//text()[normalize-space()]) => string-join(' ')", resultDoc, options);
+        // there should be no elements whose @rend contains 'italic' or 'bold' or 'Normal'
+        expect(italicised).toBeNull();
+        expect(bold).toBeNull();
+        expect(normalStyled).toBeNull();
+        // every set of adjacent identically-formatted highlights should have been merged into a single highlight
+        expect(adjacentIdenticallyFormattedHighlights).toBeNull();
+        // there should be elements which are just underlined, elements which are just strikethrough, and some which are both
+        expect(underlinedOnly).not.toBeNull();
+        expect(struckOutOnly).not.toBeNull();
+        expect(underlinedAndStruckOut).not.toBeNull();
+        // the full textual content (ignoring white space) of the source document should be preserved in the result document
+        expect(sourceWords).toEqual(resultWords);
+        
+        // delete the result document
+        remove(resultFile);
     });
 
     it("should be able to pass a Transkribus file through an XSLT", async () => {

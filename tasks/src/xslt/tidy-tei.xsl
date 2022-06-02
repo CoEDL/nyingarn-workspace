@@ -2,6 +2,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     xmlns="http://www.tei-c.org/ns/1.0"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
 >
     <!--
 	Tidies up a TEI file.
@@ -9,6 +10,7 @@
 
 	Trims white space appearing before <lb/> elements.
 	Trims white space from the start of each line.
+	Discards <hi> elements with no @rend
     -->
 
     <!-- discard leading white space after a line break -->
@@ -31,7 +33,61 @@
     <xsl:template match="p/text()[not(following-sibling::node())][matches(., '\s$')]" mode="tidy">
 	<xsl:sequence select="replace(., '\s+$', '')"/>
     </xsl:template>
+    
+    <!-- discard highlight elements where the nature of the highlight is missing (has been stripped out in a prior step -->
+    <xsl:template match="hi[not(@rend or @style)]" mode="tidy">
+    	<xsl:apply-templates mode="tidy"/>
+    </xsl:template>
+    
+    <xsl:template match="hi/@xml:space[.='preserve']" mode="tidy"/>
+    
+    <!-- merge sequences of adjacent hi elements with the same @rend and @style values -->
+    <!-- which can occur when adjacent hi elements originally had different @rend, but -->
+    <!-- a pruning of @rend tokens has left them the same -->
+    <xsl:template match="*[hi]" mode="tidy">
+    	<xsl:copy>
+    		<xsl:apply-templates select="@*" mode="tidy"/>
+    		<xsl:for-each-group select="node()" composite="yes" group-adjacent="
+    			(: construct a stable grouping key by tokenizing @rend and @style and sorting the tokens :)
+    			array:sort(
+    				array{
+    					(
+    						self::hi/@rend => tokenize(),
+    						self::hi/@style => tokenize('\s*;\s*')
+    					)
+    				}
+    			)">
+    			<xsl:choose>
+    				<xsl:when test="self::hi">
+    					<!-- a group of hi elements which all have the same rendition and style -->
+    					<!-- TODO what about if adjacent hi elements have other attributes, eg. xml:id? -->
+    					<xsl:variable name="content">
+    						<xsl:apply-templates mode="tidy" select="current-group()/node()"/>
+    					</xsl:variable>
+    					<xsl:choose>
+    						<xsl:when test="@rend or @style">
+    							<!-- the highlight has some kind of formatting attached, so retain the element -->
+		    					<xsl:copy>
+		    						<xsl:apply-templates mode="tidy" select="@*"/>
+								<xsl:sequence select="$content"/>
+							</xsl:copy>
+						</xsl:when>
+						<xsl:otherwise>
+							<!-- the highlight has no formatting attached, so discard it, leaving its content -->
+							<xsl:sequence select="$content"/>
+						</xsl:otherwise>
+					</xsl:choose>
+    				</xsl:when>
+    				<xsl:otherwise>
+    					<!-- a disparate group of non-highlight elements -->
+    					<xsl:apply-templates mode="tidy" select="current-group()"/>
+    				</xsl:otherwise>
+    			</xsl:choose>
+    		</xsl:for-each-group>
+    	</xsl:copy>
+    </xsl:template>
 
+    <!-- otherwise copy the document unchanged -->
     <xsl:mode name="tidy" on-no-match="shallow-copy"/>
 
 </xsl:transform>

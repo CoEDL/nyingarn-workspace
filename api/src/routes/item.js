@@ -7,7 +7,7 @@ import {
     InternalServerError,
 } from "restify-errors";
 import { route, routeAdmin, logEvent, getLogger, getS3Handle, loadFiles } from "../common";
-import { orderBy, groupBy, flattenDeep, compact } from "lodash";
+import { orderBy, groupBy, flattenDeep, compact, isEmpty } from "lodash";
 import {
     createItem,
     lookupItemByIdentifier,
@@ -411,7 +411,9 @@ async function saveItemTranscriptionHandler(req, res, next) {
     const { identifier, resource, datafiles, document } = req.params;
     let file = `${resource}.tei.xml`;
     try {
-        await putItemResource({ identifier, resource: file, content: document });
+        if (!isEmpty(document)) {
+            await putItemResource({ identifier, resource: file, content: document });
+        }
     } catch (error) {
         log.error(`Error saving transcription: ${error.message}`);
     }

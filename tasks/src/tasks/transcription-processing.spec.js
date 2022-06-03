@@ -105,11 +105,11 @@ describe("Test transcription processing utils", () => {
         let sourceDoc = await SaxonJS.getResource({file: sourceFile, type: "xml"});
         let resultDoc = await SaxonJS.getResource({file: resultFile, type: "xml"});
         // evaluate XPath queries to retrieve lists of items with particular formatting 
-        let italicised = SaxonJS.XPath.evaluate("//*[tokenize(@rend) = 'italic']", resultDoc, options);
-        let bold = SaxonJS.XPath.evaluate("//*[tokenize(@rend) = 'bold']", resultDoc, options);
+        let italicised = SaxonJS.XPath.evaluate("//*[@rend => contains-token('italic')]", resultDoc, options);
+        let bold = SaxonJS.XPath.evaluate("//*[@rend => contains-token('bold')]", resultDoc, options);
         let normalStyled = SaxonJS.XPath.evaluate("//*[tokenize(@rend) = 'Normal']", resultDoc, options);
         let underlinedOnly = SaxonJS.XPath.evaluate("//*[@rend = 'underline']", resultDoc, options);
-        let struckOutOnly = SaxonJS.XPath.evaluate("//*[@rend = 'underline']", resultDoc, options);
+        let struckOutOnly = SaxonJS.XPath.evaluate("//*[@rend = 'strikethrough']", resultDoc, options);
         let underlinedAndStruckOut = SaxonJS.XPath.evaluate("//*[every $token in ('underline', 'strikethrough') satisfies $token = tokenize(@rend)]", resultDoc, options);
         let adjacentIdenticallyFormattedHighlights = SaxonJS.XPath.evaluate(
             "//hi[let $r1:= tokenize(@rend), $r2:= tokenize(following-sibling::node()[1]/self::hi/@rend) return (count($r1) = count($r2)) and (every $r in $r1 satisfies $r = $r2)]/text()", resultDoc, options);

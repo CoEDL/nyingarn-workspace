@@ -1,6 +1,6 @@
 import "regenerator-runtime";
 import { CrateManager } from "./helper-methods";
-import { faker } from "@faker-js/faker";
+var chance = require("chance").Chance();
 import { range, round, compact, groupBy, random } from "lodash";
 import { performance } from "perf_hooks";
 
@@ -191,6 +191,198 @@ describe("Test loading / exporting crate files", () => {
     });
 });
 
+describe("Test interacting with the crate", () => {
+    let crate, crateManager;
+    beforeEach(() => {
+        crate = getBaseCrate();
+        crate = addRootDataset({ crate });
+        crateManager = new CrateManager({ crate });
+        crateManager.init();
+    });
+    test("get root dataset", () => {
+        let rootDataset = crateManager.getRootDataset();
+        expect(rootDataset.describoLabel).toEqual("RootDataset");
+        expect(rootDataset["@id"]).toEqual("./");
+    });
+    test(`won't find this entity - not in crate`, () => {
+        let match = crateManager.getEntity({ id: chance.url() });
+        expect(match).toEqual(undefined);
+        match = crateManager.getEntity({ describoId: chance.url() });
+        expect(match).toEqual(undefined);
+    });
+    test("add a simple entity to the crate", () => {
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+        expect(e["@id"]).toEqual(entity["@id"]);
+        expect(e.name).toEqual(entity.name);
+        expect(e.describoId).toBeDefined();
+    });
+    test("add a complex entity to the crate", () => {
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+            text: "some text",
+            author: [{ "@id": chance.url() }],
+        };
+        let e = crateManager.addEntity({ entity });
+        let match = crateManager.getEntity({ describoId: e.describoId });
+        expect(match.properties.length).toEqual(2);
+        expect(match.reverseConnections.length).toEqual(0);
+    });
+    test("update entity name", () => {
+        const url = chance.url();
+        let entity = {
+            "@id": url,
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        crateManager.updateEntityName({ describoId: e.describoId, value: "something else" });
+        e = crateManager.getEntity({ describoId: e.describoId });
+        expect(e.name).toEqual("something else");
+    });
+    test("adding a property to an entity", () => {
+        const url = chance.url();
+        let entity = {
+            "@id": url,
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        crateManager.addProperty({
+            describoId: e.describoId,
+            property: "author",
+            value: "something else",
+        });
+        e = crateManager.getEntity({ describoId: e.describoId });
+        expect(e.properties.length).toEqual(1);
+        expect(e.properties[0].value).toEqual("something else");
+    });
+    test("link two entities", () => {
+        const url = chance.url();
+        let entity = {
+            "@id": url,
+            "@type": "Person",
+            name: chance.sentence(),
+            text: "some text",
+        };
+        let e = crateManager.addEntity({ entity });
+
+        let rootDataset = crateManager.getRootDataset();
+        crateManager.linkEntity({
+            srcEntityId: rootDataset.describoId,
+            property: "author",
+            tgtEntityId: e.describoId,
+        });
+
+        let exportedCrate = crateManager.exportCrate();
+
+        e = exportedCrate["@graph"].filter((e) => e["@id"] === "./")[0];
+        expect(e).toHaveProperty("author");
+        expect(e.author).toEqual({ "@id": url });
+
+        e = exportedCrate["@graph"].filter((e) => e["@id"] === url)[0];
+        expect(e["@reverse"].author).toEqual({ "@id": "./" });
+    });
+    test("unlink two entities", () => {
+        const url = chance.url();
+        let entity = {
+            "@id": url,
+            "@type": "Person",
+            name: chance.sentence(),
+            text: "some text",
+        };
+        let e = crateManager.addEntity({ entity });
+
+        let rootDataset = crateManager.getRootDataset();
+        crateManager.linkEntity({
+            srcEntityId: rootDataset.describoId,
+            property: "author",
+            tgtEntityId: e.describoId,
+        });
+
+        crateManager.unlinkEntity({
+            srcEntityId: rootDataset.describoId,
+            property: "author",
+            tgtEntityId: e.describoId,
+        });
+
+        let exportedCrate = crateManager.exportCrate();
+        e = exportedCrate["@graph"].filter((e) => e["@id"] === "./")[0];
+        expect(e).not.toHaveProperty("author");
+
+        e = exportedCrate["@graph"].filter((e) => e["@id"] === url)[0];
+        expect(e["@reverse"]).not.toHaveProperty("author");
+    });
+    test("delete a property", () => {
+        const url = chance.url();
+        let entity = {
+            "@id": url,
+            "@type": "Person",
+            name: chance.sentence(),
+            text: "some text",
+        };
+        let e = crateManager.addEntity({ entity });
+
+        crateManager.deleteProperty({ propertyId: e.properties[0].propertyId });
+
+        e = crateManager.getEntity({ id: e["@id"] });
+        expect(e.properties.length).toEqual(0);
+    });
+    test("update a property", () => {
+        const url = chance.url();
+        let entity = {
+            "@id": url,
+            "@type": "Person",
+            name: chance.sentence(),
+            text: "some text",
+        };
+        let e = crateManager.addEntity({ entity });
+
+        crateManager.updateProperty({
+            propertyId: e.properties[0].propertyId,
+            value: "something else",
+        });
+
+        e = crateManager.getEntity({ id: e["@id"] });
+        expect(e.properties[0].value).toEqual("something else");
+    });
+    test("add an entity to the crate and then find it", () => {
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        let match = crateManager.getEntity({ id: entity["@id"] });
+        expect({ ...e, properties: [], reverseConnections: [] }).toEqual(match);
+        match = crateManager.getEntity({ describoId: e.describoId });
+        expect({ ...e, properties: [], reverseConnections: [] }).toEqual(match);
+    });
+    test("add an entity then delete it and confirm it's gone", () => {
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        crateManager.deleteEntity({ describoId: entity.describoId });
+        let match = crateManager.getEntity({ id: entity["@id"] });
+        expect(match).toBeUndefined;
+        match = crateManager.getEntity({ describoId: entity.describoId });
+        expect(match).toBeUndefined;
+    });
+});
+
 describe.skip("Test loading large crates and see how it performs", () => {
     test("n = 10, 100, 500, 1000, 2000, 4000, 8000, 16000", async () => {
         const tests = [10, 100, 500, 1000, 2000, 4000, 8000, 16000];
@@ -211,19 +403,13 @@ describe.skip("Test loading large crates and see how it performs", () => {
 
             let t0 = performance.now();
             for (let i in range(total)) {
-                let nEntities = entities.length;
-                let pick = entities[random(0, nEntities - 1)];
+                let pick = chance.pickone(entities);
 
                 let entity = {
-                    "@id": faker.internet.url(),
-                    "@type": faker.helpers.arrayElement([
-                        "Dataset",
-                        "File",
-                        "Person",
-                        "Organisation",
-                    ]),
-                    name: faker.commerce.productDescription(),
-                    [faker.word.noun()]: [{ "@id": pick["@id"] }],
+                    "@id": chance.url(),
+                    "@type": chance.pickone(["Dataset", "File", "Person", "Organisation"]),
+                    name: chance.sentence(),
+                    [chance.word()]: [{ "@id": pick["@id"] }],
                 };
                 crate["@graph"].push(entity);
                 entities.push(entity);
@@ -250,6 +436,59 @@ describe.skip("Test loading large crates and see how it performs", () => {
     });
 });
 
+describe.skip("Test operations on large entity arrays", () => {
+    test("n = 20000", async () => {
+        const tests = [20000];
+        for (const total of tests) {
+            let crate = getBaseCrate();
+            crate["@graph"].push({
+                "@id": "./",
+                "@type": ["Dataset"],
+                name: "Dataset",
+            });
+
+            let entities = crate["@graph"].map((e) => {
+                return e?.about?.["@id"] === "./" ? null : e;
+            });
+            entities = compact(entities);
+            const runtime = {};
+
+            let entity;
+            for (let i in range(total)) {
+                let pick = chance.pickone(entities);
+
+                entity = {
+                    "@id": chance.url(),
+                    "@type": chance.pickone(["Dataset", "File", "Person", "Organisation"]),
+                    name: chance.sentence(),
+                    [chance.word()]: [{ "@id": pick["@id"] }],
+                };
+                crate["@graph"].push(entity);
+                entities.push(entity);
+            }
+
+            let crateManager = new CrateManager({ crate });
+            crateManager.init();
+
+            let t0 = performance.now();
+            groupBy(crateManager.entities, "@id");
+            let t1 = performance.now();
+            runtime.groupByAtId = round(t1 - t0, 2);
+
+            t0 = performance.now();
+            groupBy(crateManager.entities, "describoId");
+            t1 = performance.now();
+            runtime.groupByDescriboId = round(t1 - t0, 2);
+
+            t0 = performance.now();
+            entity = crateManager.entities.filter((e) => e["@id"] === entity["@id"]);
+            t1 = performance.now();
+            runtime.findEntityByFilter = round(t1 - t0, 2);
+            console.log(`n = 20000 ${JSON.stringify(runtime)}`);
+        }
+    });
+});
+
 function getBaseCrate() {
     return {
         "@context": ["https://w3id.org/ro/crate/1.1/context"],
@@ -266,4 +505,13 @@ function getBaseCrate() {
             },
         ],
     };
+}
+
+function addRootDataset({ crate }) {
+    crate["@graph"].push({
+        "@id": "./",
+        "@type": ["Dataset"],
+        name: "Dataset",
+    });
+    return crate;
 }

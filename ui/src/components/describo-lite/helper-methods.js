@@ -27,9 +27,6 @@ export class CrateManager {
     }
 
     init() {
-        // assign describoId to all entities
-        this.graph = this.graph.map((e) => ({ describoId: uuid(), ...e }));
-
         // mark root dataset
         const rootDescriptor = this.rootDescriptor;
         this.graph = this.graph.map((e) => {
@@ -39,19 +36,15 @@ export class CrateManager {
         });
 
         // for each entity, populate entities and properties structs
-        this.graph.forEach((e) => {
-            let entity = this.coreProperties
-                .map((p) => ({ [p]: e[p] }))
-                .reduce((obj, entry) => ({ ...obj, ...entry }));
-            this.entities.push(entity);
+        let entities = this.graph.map((entity) => {
+            return this.__addEntity({ entity });
         });
-        this.entitiesByAtId = groupBy(this.entities, "@id");
-        this.entitiesByType = groupBy(this.entities, "@type");
-        this.entitiesByDescriboId = groupBy(this.entities, "describoId");
+        this.__index();
 
-        this.graph.forEach((e) => {
-            this.__processProperties({ entity: e });
+        entities.forEach((entity) => {
+            this.__processProperties({ entity });
         });
+        delete this.graph;
     }
 
     exportCrate() {
@@ -61,7 +54,7 @@ export class CrateManager {
         };
         this.entities.forEach((entity) => {
             // map in the entity properties
-            let properties = this.properties.filter((p) => p.entityId === entity.describoId);
+            let properties = this.getEntityProperties({ describoId: entity.describoId });
             properties = groupBy(properties, "property");
             for (let property of Object.keys(properties)) {
                 entity[property] = [];
@@ -82,14 +75,14 @@ export class CrateManager {
 
             // map in the reverse property links
             entity["@reverse"] = {};
-            let reverseProperties = this.properties.filter(
-                (p) => p.tgtEntityId === entity.describoId
-            );
+            let reverseProperties = this.getEntityReverseConnections({
+                describoId: entity.describoId,
+            });
             reverseProperties = groupBy(reverseProperties, "property");
             for (let property of Object.keys(reverseProperties)) {
                 entity["@reverse"][property] = [];
                 reverseProperties[property].forEach((instance) => {
-                    let referencedEntity = this.entitiesByDescriboId[instance.entityId][0];
+                    let referencedEntity = this.entitiesByDescriboId[instance.srcEntityId][0];
                     entity["@reverse"][property].push({ "@id": referencedEntity["@id"] });
                 });
                 if (entity["@reverse"][property].length === 1)
@@ -106,6 +99,125 @@ export class CrateManager {
         return this.entities.filter((e) => e.describoLabel === "RootDataset")[0];
     }
 
+    getEntity({ id, describoId }) {
+        let entity;
+        if (id) entity = this.__lookupEntityByAtId({ id });
+        if (describoId) entity = this.__lookupEntityByDescriboId({ id: describoId });
+        if (entity?.describoId) {
+            entity.properties = this.getEntityProperties({
+                describoId: entity.describoId,
+            }).map((c) => {
+                if (c.tgtEntityId && c.tgtEntityId !== "not found") {
+                    return {
+                        ...c,
+                        tgtEntity: this.__lookupEntityByDescriboId({ id: c.tgtEntityId }),
+                    };
+                } else {
+                    return c;
+                }
+            });
+            entity.reverseConnections = this.getEntityReverseConnections({
+                describoId: entity.describoId,
+            }).map((c) => {
+                if (c.tgtEntityId && c.tgtEntityId !== "not found") {
+                    return {
+                        ...c,
+                        tgtEntity: this.__lookupEntityByDescriboId({ id: c.tgtEntityId }),
+                    };
+                } else {
+                    return c;
+                }
+            });
+        }
+        return entity;
+    }
+
+    getEntityProperties({ describoId }) {
+        return this.properties.filter((p) => p.srcEntityId === describoId);
+    }
+
+    getEntityReverseConnections({ describoId }) {
+        return this.properties.filter((p) => p.tgtEntityId === describoId);
+    }
+
+    addEntity({ entity }) {
+        // check there isn't an entity wth that @id already
+        let matches = this.__lookupEntityByAtId({ id: entity["@id"] });
+        if (matches) {
+            return matches.shift();
+        } else {
+            //  if not
+            entity = this.__addEntity({ entity });
+            this.__processProperties({ entity });
+            this.__index();
+            return this.getEntity({ describoId: entity.describoId });
+        }
+    }
+
+    deleteEntity({ describoId }) {
+        this.entities = this.entities.filter((e) => describoId !== this.describoId);
+        this.__index();
+    }
+
+    updateEntityName({ describoId, value }) {
+        this.entities = this.entities.map((e) => {
+            return e.describoId === describoId ? { ...e, name: value } : e;
+        });
+        this.__index();
+    }
+
+    addProperty({ describoId, property, value }) {
+        this.__pushProperty({ srcEntityId: describoId, property, value });
+    }
+
+    updateProperty({ propertyId, value }) {
+        this.properties = this.properties.map((p) => {
+            return p.propertyId == propertyId ? { ...p, value } : p;
+        });
+    }
+
+    deleteProperty({ propertyId }) {
+        this.properties = this.properties.filter((p) => p.propertyId !== propertyId);
+    }
+
+    linkEntity({ srcEntityId, property, tgtEntityId }) {
+        let existingLink = this.properties.filter(
+            (p) =>
+                p.property === property &&
+                p.srcEntityId === srcEntityId &&
+                p.tgtEntityId === tgtEntityId
+        );
+        if (!existingLink.length) {
+            this.__pushProperty({ srcEntityId, property, tgtEntityId });
+        }
+    }
+
+    unlinkEntity({ srcEntityId, property, tgtEntityId }) {
+        this.properties = this.properties.filter(
+            (p) =>
+                !(
+                    p.property === property &&
+                    p.srcEntityId === srcEntityId &&
+                    p.tgtEntityId === tgtEntityId
+                )
+        );
+    }
+
+    __index() {
+        this.entitiesByAtId = groupBy(this.entities, "@id");
+        this.entitiesByType = groupBy(this.entities, "@type");
+        this.entitiesByDescriboId = groupBy(this.entities, "describoId");
+    }
+
+    __addEntity({ entity }) {
+        entity = { describoId: uuid(), ...entity };
+        let e = this.coreProperties
+            .map((p) => ({ [p]: entity[p] }))
+            .reduce((obj, entry) => ({ ...obj, ...entry }));
+        this.entities.push(e);
+        return entity;
+    }
+
     __processProperties({ entity }) {
         const pushProperty = this.__pushProperty.bind(this);
 
@@ -114,8 +226,7 @@ export class CrateManager {
 
             if (isString(entity[prop])) {
                 pushProperty({
-                    entityId: entity.describoId,
-                    propertyId: uuid(),
+                    srcEntityId: entity.describoId,
                     property: prop,
                     value: entity[prop],
                 });
@@ -127,8 +238,7 @@ export class CrateManager {
                 entity[prop].forEach((instance) => {
                     if (isString(instance)) {
                         pushProperty({
-                            entityId: entity.describoId,
-                            propertyId: uuid(),
+                            srcEntityId: entity.describoId,
                             property: prop,
                             value: instance,
                         });
@@ -136,8 +246,7 @@ export class CrateManager {
                         if ("@id" in instance) {
                             let targetEntity = this.__lookupEntityByAtId({ id: instance["@id"] });
                             pushProperty({
-                                entityId: entity.describoId,
-                                propertyId: uuid(),
+                                srcEntityId: entity.describoId,
                                 property: prop,
                                 value: instance["@id"],
                                 tgtEntityId: targetEntity?.describoId || "not found",
@@ -149,8 +258,8 @@ export class CrateManager {
         }
     }
 
-    __pushProperty({ entityId, propertyId, property, value, tgtEntityId }) {
-        this.properties.push({ entityId, propertyId, property, value, tgtEntityId });
+    __pushProperty({ srcEntityId, property, value, tgtEntityId }) {
+        this.properties.push({ propertyId: uuid(), srcEntityId, property, value, tgtEntityId });
     }
 
     __lookupEntityByAtId({ id }) {

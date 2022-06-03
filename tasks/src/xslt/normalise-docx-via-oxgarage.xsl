@@ -28,7 +28,8 @@
     
     <!-- convert the image file identifier from the hi[@rend='Page'] to a pb -->
     <xsl:template match="hi[@rend='Page']" mode="docx-via-oxgarage">
-	<pb xml:id="{.}"/>
+    	<!-- the identifier is terminated by the first '.' in the value (to discard image file extensions such as .jpg) -->
+	<pb xml:id="{replace(., '^([^.]+).*', '$1')}"/>
     </xsl:template>
 
     <!-- insert newline characters before each block element for improved readability -->

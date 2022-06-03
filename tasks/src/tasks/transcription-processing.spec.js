@@ -9,19 +9,6 @@ import SaxonJS from "saxon-js";
 import path from "path";
 import { readdir, remove } from "fs-extra";
 
-function evaluateXPath(file, xpath) {
-    return SaxonJS.XPath.evaluate(
-        xpath, 
-        [ ], // no context item required 
-        { // options
-            "xpathDefaultNamespace": "http://www.tei-c.org/ns/1.0",
-            "params": {
-                "file": file
-            }
-        }
-    );
-}
-
 jest.setTimeout(20000); // 20s because the CSV processing test is slow
 
 describe("Test transcription processing utils", () => {

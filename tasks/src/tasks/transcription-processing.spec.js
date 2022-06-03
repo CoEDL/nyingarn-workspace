@@ -50,6 +50,94 @@ describe("Test transcription processing utils", () => {
         unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
         unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));    
     });
+    
+    it("should remove file extensions (e.g. .jpg) from page identifiers", async () => {
+        let identifier = "c018660";
+        let resource = "c018660-tei.xml";
+        let expectedFiles = [
+            "c018660-004h.tei.xml", "c018660-006h.tei.xml", "c018660-007h.tei.xml", "c018660-008h.tei.xml", "c018660-009h.tei.xml", 
+            "c018660-010h.tei.xml", "c018660-011h.tei.xml", "c018660-012h.tei.xml", "c018660-013h.tei.xml", "c018660-014h.tei.xml", 
+            "c018660-015h.tei.xml", "c018660-016h.tei.xml", "c018660-017h.tei.xml", "c018660-018h.tei.xml", "c018660-019h.tei.xml", 
+            "c018660-020h.tei.xml", "c018660-021h.tei.xml", "c018660-022h.tei.xml", "c018660-023h.tei.xml", "c018660-024h.tei.xml", 
+            "c018660-025h.tei.xml", "c018660-026h.tei.xml", "c018660-027h.tei.xml", "c018660-028h.tei.xml", "c018660-029h.tei.xml", 
+            "c018660-030h.tei.xml", "c018660-031h.tei.xml", "c018660-032h.tei.xml", "c018660-033h.tei.xml", "c018660-034h.tei.xml", 
+            "c018660-035h.tei.xml", "c018660-036h.tei.xml", "c018660-037h.tei.xml", "c018660-038h.tei.xml", "c018660-039h.tei.xml", 
+            "c018660-040h.tei.xml", "c018660-041h.tei.xml", "c018660-042h.tei.xml", "c018660-043h.tei.xml", "c018660-044h.tei.xml", 
+            "c018660-045h.tei.xml", "c018660-046h.tei.xml", "c018660-047h.tei.xml", "c018660-048h.tei.xml", "c018660-049h.tei.xml", 
+            "c018660-050h.tei.xml", "c018660-051h.tei.xml", "c018660-052h.tei.xml", "c018660-053h.tei.xml", "c018660-054h.tei.xml", 
+            "c018660-055h.tei.xml", "c018660-056h.tei.xml", "c018660-057h.tei.xml", "c018660-058h.tei.xml", "c018660-059h.tei.xml", 
+            "c018660-060h.tei.xml", "c018660-061h.tei.xml", "c018660-062h.tei.xml", "c018660-063h.tei.xml", "c018660-064h.tei.xml", 
+            "c018660-065h.tei.xml", "c018660-066h.tei.xml", "c018660-067h.tei.xml", "c018660-068h.tei.xml", "c018660-069h.tei.xml", 
+            "c018660-070h.tei.xml", "c018660-071h.tei.xml", "c018660-072h.tei.xml", "c018660-073h.tei.xml", "c018660-074h.tei.xml", 
+            "c018660-075h.tei.xml", "c018660-076h.tei.xml", "c018660-077h.tei.xml", "c018660-078h.tei.xml", "c018660-079h.tei.xml", 
+            "c018660-080h.tei.xml", "c018660-081h.tei.xml", "c018660-082h.tei.xml", "c018660-084h.tei.xml", "c018660-085h.tei.xml", 
+            "c018660-086h.tei.xml", "c018660-087h.tei.xml", "c018660-088h.tei.xml", "c018660-089h.tei.xml", "c018660-090h.tei.xml", 
+            "c018660-091h.tei.xml", "c018660-092h.tei.xml", "c018660-093h.tei.xml", "c018660-094h.tei.xml", "c018660-095h.tei.xml", 
+            "c018660-096h.tei.xml", "c018660-097h.tei.xml", "c018660-098h.tei.xml", "c018660-099h.tei.xml", "c018660-100h.tei.xml", 
+            "c018660-101h.tei.xml", "c018660-102h.tei.xml", "c018660-103h.tei.xml", "c018660-104h.tei.xml", "c018660-105h.tei.xml", 
+            "c018660-106h.tei.xml", "c018660-107h.tei.xml", "c018660-108h.tei.xml", "c018660-109h.tei.xml", "c018660-110h.tei.xml", 
+            "c018660-111h.tei.xml", "c018660-112h.tei.xml", "c018660-113h.tei.xml", "c018660-114h.tei.xml", "c018660-115h.tei.xml", 
+            "c018660-116h.tei.xml", "c018660-117h.tei.xml", "c018660-118h.tei.xml", "c018660-119h.tei.xml", "c018660-120h.tei.xml", 
+            "c018660-121h.tei.xml", "c018660-122h.tei.xml", "c018660-123h.tei.xml", "c018660-124h.tei.xml", "c018660-125h.tei.xml", 
+            "c018660-126h.tei.xml", "c018660-127h.tei.xml", "c018660-128h.tei.xml", "c018660-129h.tei.xml", "c018660-130h.tei.xml", 
+            "c018660-131h.tei.xml", "c018660-132h.tei.xml", "c018660-133h.tei.xml", "c018660-134h.tei.xml", "c018660-135h.tei.xml", 
+            "c018660-136h.tei.xml", "c018660-137h.tei.xml", "c018660-138h.tei.xml", "c018660-139h.tei.xml", "c018660-140h.tei.xml", 
+            "c018660-141h.tei.xml", "c018660-142h.tei.xml", "c018660-143h.tei.xml", "c018660-144h.tei.xml", "c018660-145h.tei.xml", 
+            "c018660-146h.tei.xml", "c018660-147h.tei.xml", "c018660-148h.tei.xml", "c018660-149h.tei.xml", "c018660-150h.tei.xml", 
+            "c018660-151h.tei.xml", "c018660-152h.tei.xml", "c018660-153h.tei.xml", "c018660-159h.tei.xml", "c018660-160h.tei.xml", 
+            "c018660-161h.tei.xml", "c018660-162h.tei.xml", "c018660-163h.tei.xml", "c018660-164h.tei.xml", "c018660-165h.tei.xml", 
+            "c018660-166h.tei.xml", "c018660-167h.tei.xml", "c018660-168h.tei.xml", "c018660-169h.tei.xml", "c018660-170h.tei.xml", 
+            "c018660-171h.tei.xml", "c018660-172h.tei.xml", "c018660-173h.tei.xml", "c018660-174h.tei.xml", "c018660-175h.tei.xml", 
+            "c018660-176h.tei.xml", "c018660-177h.tei.xml", "c018660-178h.tei.xml", "c018660-179h.tei.xml"
+        ];
+        let unexpectedFiles = [
+            "c018660-004h.jpg.tei.xml", "c018660-006h.jpg.tei.xml", "c018660-007h.jpg.tei.xml", "c018660-008h.jpg.tei.xml", "c018660-009h.jpg.tei.xml", 
+            "c018660-010h.jpg.tei.xml", "c018660-011h.jpg.tei.xml", "c018660-012h.jpg.tei.xml", "c018660-013h.jpg.tei.xml", "c018660-014h.jpg.tei.xml", 
+            "c018660-015h.jpg.tei.xml", "c018660-016h.jpg.tei.xml", "c018660-017h.jpg.tei.xml", "c018660-018h.jpg.tei.xml", "c018660-019h.jpg.tei.xml", 
+            "c018660-020h.jpg.tei.xml", "c018660-021h.jpg.tei.xml", "c018660-022h.jpg.tei.xml", "c018660-023h.jpg.tei.xml", "c018660-024h.jpg.tei.xml", 
+            "c018660-025h.jpg.tei.xml", "c018660-026h.jpg.tei.xml", "c018660-027h.jpg.tei.xml", "c018660-028h.jpg.tei.xml", "c018660-029h.jpg.tei.xml", 
+            "c018660-030h.jpg.tei.xml", "c018660-031h.jpg.tei.xml", "c018660-032h.jpg.tei.xml", "c018660-033h.jpg.tei.xml", "c018660-034h.jpg.tei.xml", 
+            "c018660-035h.jpg.tei.xml", "c018660-036h.jpg.tei.xml", "c018660-037h.jpg.tei.xml", "c018660-038h.jpg.tei.xml", "c018660-039h.jpg.tei.xml", 
+            "c018660-040h.jpg.tei.xml", "c018660-041h.jpg.tei.xml", "c018660-042h.jpg.tei.xml", "c018660-043h.jpg.tei.xml", "c018660-044h.jpg.tei.xml", 
+            "c018660-045h.jpg.tei.xml", "c018660-046h.jpg.tei.xml", "c018660-047h.jpg.tei.xml", "c018660-048h.jpg.tei.xml", "c018660-049h.jpg.tei.xml", 
+            "c018660-050h.jpg.tei.xml", "c018660-051h.jpg.tei.xml", "c018660-052h.jpg.tei.xml", "c018660-053h.jpg.tei.xml", "c018660-054h.jpg.tei.xml", 
+            "c018660-055h.jpg.tei.xml", "c018660-056h.jpg.tei.xml", "c018660-057h.jpg.tei.xml", "c018660-058h.jpg.tei.xml", "c018660-059h.jpg.tei.xml", 
+            "c018660-060h.jpg.tei.xml", "c018660-061h.jpg.tei.xml", "c018660-062h.jpg.tei.xml", "c018660-063h.jpg.tei.xml", "c018660-064h.jpg.tei.xml", 
+            "c018660-065h.jpg.tei.xml", "c018660-066h.jpg.tei.xml", "c018660-067h.jpg.tei.xml", "c018660-068h.jpg.tei.xml", "c018660-069h.jpg.tei.xml", 
+            "c018660-070h.jpg.tei.xml", "c018660-071h.jpg.tei.xml", "c018660-072h.jpg.tei.xml", "c018660-073h.jpg.tei.xml", "c018660-074h.jpg.tei.xml", 
+            "c018660-075h.jpg.tei.xml", "c018660-076h.jpg.tei.xml", "c018660-077h.jpg.tei.xml", "c018660-078h.jpg.tei.xml", "c018660-079h.jpg.tei.xml", 
+            "c018660-080h.jpg.tei.xml", "c018660-081h.jpg.tei.xml", "c018660-082h.jpg.tei.xml", "c018660-084h.jpg.tei.xml", "c018660-085h.jpg.tei.xml", 
+            "c018660-086h.jpg.tei.xml", "c018660-087h.jpg.tei.xml", "c018660-088h.jpg.tei.xml", "c018660-089h.jpg.tei.xml", "c018660-090h.jpg.tei.xml", 
+            "c018660-091h.jpg.tei.xml", "c018660-092h.jpg.tei.xml", "c018660-093h.jpg.tei.xml", "c018660-094h.jpg.tei.xml", "c018660-095h.jpg.tei.xml", 
+            "c018660-096h.jpg.tei.xml", "c018660-097h.jpg.tei.xml", "c018660-098h.jpg.tei.xml", "c018660-099h.jpg.tei.xml", "c018660-100h.jpg.tei.xml", 
+            "c018660-101h.jpg.tei.xml", "c018660-102h.jpg.tei.xml", "c018660-103h.jpg.tei.xml", "c018660-104h.jpg.tei.xml", "c018660-105h.jpg.tei.xml", 
+            "c018660-106h.jpg.tei.xml", "c018660-107h.jpg.tei.xml", "c018660-108h.jpg.tei.xml", "c018660-109h.jpg.tei.xml", "c018660-110h.jpg.tei.xml", 
+            "c018660-111h.jpg.tei.xml", "c018660-112h.jpg.tei.xml", "c018660-113h.jpg.tei.xml", "c018660-114h.jpg.tei.xml", "c018660-115h.jpg.tei.xml", 
+            "c018660-116h.jpg.tei.xml", "c018660-117h.jpg.tei.xml", "c018660-118h.jpg.tei.xml", "c018660-119h.jpg.tei.xml", "c018660-120h.jpg.tei.xml", 
+            "c018660-121h.jpg.tei.xml", "c018660-122h.jpg.tei.xml", "c018660-123h.jpg.tei.xml", "c018660-124h.jpg.tei.xml", "c018660-125h.jpg.tei.xml", 
+            "c018660-126h.jpg.tei.xml", "c018660-127h.jpg.tei.xml", "c018660-128h.jpg.tei.xml", "c018660-129h.jpg.tei.xml", "c018660-130h.jpg.tei.xml", 
+            "c018660-131h.jpg.tei.xml", "c018660-132h.jpg.tei.xml", "c018660-133h.jpg.tei.xml", "c018660-134h.jpg.tei.xml", "c018660-135h.jpg.tei.xml", 
+            "c018660-136h.jpg.tei.xml", "c018660-137h.jpg.tei.xml", "c018660-138h.jpg.tei.xml", "c018660-139h.jpg.tei.xml", "c018660-140h.jpg.tei.xml", 
+            "c018660-141h.jpg.tei.xml", "c018660-142h.jpg.tei.xml", "c018660-143h.jpg.tei.xml", "c018660-144h.jpg.tei.xml", "c018660-145h.jpg.tei.xml", 
+            "c018660-146h.jpg.tei.xml", "c018660-147h.jpg.tei.xml", "c018660-148h.jpg.tei.xml", "c018660-149h.jpg.tei.xml", "c018660-150h.jpg.tei.xml", 
+            "c018660-151h.jpg.tei.xml", "c018660-152h.jpg.tei.xml", "c018660-153h.jpg.tei.xml", "c018660-159h.jpg.tei.xml", "c018660-160h.jpg.tei.xml", 
+            "c018660-161h.jpg.tei.xml", "c018660-162h.jpg.tei.xml", "c018660-163h.jpg.tei.xml", "c018660-164h.jpg.tei.xml", "c018660-165h.jpg.tei.xml", 
+            "c018660-166h.jpg.tei.xml", "c018660-167h.jpg.tei.xml", "c018660-168h.jpg.tei.xml", "c018660-169h.jpg.tei.xml", "c018660-170h.jpg.tei.xml", 
+            "c018660-171h.jpg.tei.xml", "c018660-172h.jpg.tei.xml", "c018660-173h.jpg.tei.xml", "c018660-174h.jpg.tei.xml", "c018660-175h.jpg.tei.xml", 
+            "c018660-176h.jpg.tei.xml", "c018660-177h.jpg.tei.xml", "c018660-178h.jpg.tei.xml", "c018660-179h.jpg.tei.xml"
+        ];
+        await __processTeiTranscriptionXMLProcessor({
+            directory: path.join(__dirname, "../test-data"),
+            identifier: identifier,
+            resource: resource,
+        });
+        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        let contents = (await readdir(resourceDirectory)).sort();
+        expectedFiles.forEach((file) => expect(contents).toContain(file));
+        expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+        unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
+        unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+    });
 
     it("should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {
         let identifier = "msword_example";

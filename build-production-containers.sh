@@ -9,12 +9,12 @@ VERSION="${1}"
 read -p '>> Build the containers? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
     echo ">> Building the API Container"
-    docker build --rm -t arkisto/workspace-api:latest -f Dockerfile.api-build .
+    docker build --platform linux/amd64 --rm -t arkisto/workspace-api:latest -f Dockerfile.api-build .
     docker tag arkisto/workspace-api:latest arkisto/workspace-api:${VERSION}
     echo
 
     echo ">> Building the TASK Runner container"
-    docker build --rm -t arkisto/workspace-task-runner:latest -f Dockerfile.tasks-build .
+    docker build --platform linux/amd64 --rm -t arkisto/workspace-task-runner:latest -f Dockerfile.tasks-build .
     docker tag arkisto/workspace-task-runner:latest arkisto/workspace-task-runner:${VERSION}
     echo
 
@@ -25,12 +25,12 @@ if [ "$resp" == "y" ] ; then
         -v ui_node_modules:/srv/ui/node_modules \
         -w /srv/ui node:14-buster bash -l -c "npm run build"
     cd -
-    docker build --rm -t arkisto/workspace-ui:latest -f Dockerfile.ui-build .
+    docker build --platform linux/amd64 --rm -t arkisto/workspace-ui:latest -f Dockerfile.ui-build .
     docker tag arkisto/workspace-ui:latest arkisto/workspace-ui:${VERSION}
     echo
     
     echo ">> Building the tusd container"
-    docker build -t arkisto/workspace-tusd -f Dockerfile.tus-build .
+    docker build --platform linux/amd64 -t arkisto/workspace-tusd -f Dockerfile.tus-build .
     echo
 fi
 

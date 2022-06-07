@@ -20,7 +20,7 @@ import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
 import { onMounted, reactive, watch } from "vue";
 import { cloneDeep, isEmpty, debounce } from "lodash";
 import { v4 as uuid } from "uuid";
-import { getRootDataset, saveProperty, convertCrateToDatabase } from "./helper-methods";
+import { CrateManager } from "./helper-methods";
 
 const props = defineProps({
     rocrateFile: {
@@ -46,6 +46,7 @@ const data = reactive({
     profile: {},
     currentEntity: {},
     debouncedUpdate: debounce(update, 400),
+    crateManager: undefined,
 });
 
 watch([() => props.rocrateFile, () => props.profile], () => {
@@ -57,9 +58,11 @@ onMounted(() => {
 
 function update() {
     if (isEmpty(props.rocrateFile) || isEmpty(props.profile)) return;
-    convertCrateToDatabase({ crate: props.rocrateFile });
-    data.crate = props.rocrateFile["@graph"].map((e) => ({ describoId: uuid(), ...e }));
     data.profile = cloneDeep(props.profile);
+    data.crate = cloneDeep(props.rocrateFile);
+
+    data.crateManager = new CrateManager({ crate: data.crate });
+    data.crateManager.init();
     if (!data.currentEntity.describoId) {
         setCurrentEntity({ name: "RootDataset" });
     }
@@ -67,11 +70,11 @@ function update() {
 function setCurrentEntity({ describoId = undefined, name = undefined, id = undefined }) {
     let entity = {};
     if (name === "RootDataset") {
-        entity = getRootDataset({ crate: data.crate });
+        entity = data.crateManager.getRootDataset();
     } else if (describoId) {
-        entity = data.crate.filter((e) => e.describoId === describoId)[0];
+        entity = data.crateManagerdata.getEntity({ describoId });
     } else if (id) {
-        entity = data.crate.filter((e) => e["@id"] === id)[0];
+        entity = data.crateManagerdata.getEntity({ id });
     }
     data.currentEntity = { ...entity };
 }

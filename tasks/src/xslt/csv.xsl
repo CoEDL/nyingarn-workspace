@@ -42,7 +42,7 @@
 		</xsl:choose>
 	</xsl:function>
 	
-	<xsl:function name="csv:get-line-cells">
+	<xsl:function name="csv:get-raw-line-cells">
 		<xsl:param name="text"/>
 		<xsl:variable name="cell" select="csv:get-cell($text)"/>
 		<xsl:variable name="cell-length" select="string-length($cell)"/>
@@ -50,7 +50,7 @@
 		<xsl:choose>
 			<xsl:when test="$next-char = ','">
 				<!-- there's more cells in this line, so return this cell, followed by all the remaining cells in this line -->
-				<xsl:sequence select="($cell, csv:get-line-cells(substring($text, $cell-length + 2)))"/>
+				<xsl:sequence select="($cell, csv:get-raw-line-cells(substring($text, $cell-length + 2)))"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<!-- there are no more cells in this line, so just return this, the last cell in this line -->
@@ -67,7 +67,7 @@
 		Each map's keys are the column headings, and the values are the cells from that row.
 		-->
 		<xsl:param name="text"/>
-		<xsl:variable name="raw-header-cells" select="csv:get-line-cells($text)"/>
+		<xsl:variable name="raw-header-cells" select="csv:get-raw-line-cells($text)"/>
 		<xsl:variable name="header-cells" select="for $header in $raw-header-cells return csv:unescape($header)"/>
 		<!-- the CSV data starts after the header line -->
 		<xsl:variable name="header-line-length" select="csv:get-line-length($raw-header-cells)"/>
@@ -75,10 +75,19 @@
 		<xsl:sequence select="csv:parse-data-lines($data-text, $header-cells)"/>
 	</xsl:function>
 
+	<xsl:function name="csv:get-header-cells" as="item()*">
+		<!-- 
+		The returned sequence contains the column-headers as unescaped strings
+		-->
+		<xsl:param name="text"/>
+		<xsl:variable name="raw-header-cells" select="csv:get-raw-line-cells($text)"/>
+		<xsl:sequence select="for $header in $raw-header-cells return csv:unescape($header)"/>
+	</xsl:function>
+		
 	<xsl:function name="csv:parse-data-lines">
 		<xsl:param name="text"/>
 		<xsl:param name="header-cells"/>
-		<xsl:variable name="raw-data-cells" select="csv:get-line-cells($text)"/>
+		<xsl:variable name="raw-data-cells" select="csv:get-raw-line-cells($text)"/>
 		<xsl:variable name="data-line-length" select="csv:get-line-length($raw-data-cells)"/>
 		<xsl:variable name="remaining-text" select="substring($text, $data-line-length)"/>
 		<xsl:variable name="data-cells" select="for $cell in $raw-data-cells return csv:unescape($cell)"/>
@@ -124,6 +133,13 @@
 			$unquoted 
 				=> replace($doubled-quotes, $quote) (: quotes in CSV are doubled :)
 		"/>
+	</xsl:function>
+	
+	<xsl:function name="csv:escape">
+		<!-- escapes a string value so it can be written to CSV -->
+		<!-- NB this function always renders the value enclosed in double quotes --> 
+		<xsl:param name="value"/>
+		<xsl:sequence select="$quote || replace($value, $quote, $doubled-quotes) || $quote"/>
 	</xsl:function>
 
 	<xsl:variable name="doubled-quotes" select="'&quot;&quot;'"/>

@@ -1,26 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TEI xmlns="http://www.tei-c.org/ns/1.0"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd"
-xml:lang="EN"
-xml:id="export">
+<?xml version="1.0" encoding="UTF-8"?><TEI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.tei-c.org/ns/1.0" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd" xml:lang="EN" xml:id="export">
 
 <teiHeader>
   <fileDesc>
     <titleStmt>
       <title type="full">
         <title type="main">McKenzie432-435</title>
-        <title type="desc"></title>
+        <title type="desc"/>
       </title>
       <author>
-        <persName></persName>
+        <persName/>
       </author>
     </titleStmt>
 
     <editionStmt>
       <edition>Edition created from new transcripts of this manuscript.</edition>
       <respStmt xml:id="AU2">
-        <resp>Initial upload of this work&#39;s facsimile images and metadata to FromThePage for editing</resp>
+        <resp>Initial upload of this work's facsimile images and metadata to FromThePage for editing</resp>
         <persName>Nick</persName>
       </respStmt>
 
@@ -45,7 +40,7 @@ xml:id="export">
     <publicationStmt>
     <publisher>Dynamic TEI export from FromThePage (version 21.1)</publisher>
       <availability>
-        <p></p>
+        <p/>
       </availability>
       <date when="2022-04-11T01:34:01+00:00">April 11, 2022</date>
     </publicationStmt>
@@ -56,13 +51,13 @@ xml:id="export">
             <collection>MacKenzie letters</collection>
         </msIdentifier>
         <physDesc>
-          <p></p>
+          <p/>
         </physDesc>
         <history>
           <origin>
-            <placeName></placeName>
+            <placeName/>
           </origin>
-          <provenance></provenance>
+          <provenance/>
         </history>
       </msDesc>
 
@@ -189,27 +184,27 @@ xml:id="export">
         <pb xml:id="F257" n="1" facs="MacKenzie432.tiff"/>
         <div xml:id="OTP257">
         <fw type="pageNum">1</fw>
-        <p xml:id='OTP257P0'>Pango Efate<lb/>
-Aug 25th 73<lb/>
-My dear [Cassie]<lb/>
-I wonder how big<lb/>
-you are now. It will soon be two<lb/>
-years since I saw you, so you<lb/>
-must have grown  considerable in<lb/>
-that time. But there is something<lb/>
-else that I feel more anxious to know<lb/>
-than your size – It was this – Are you<lb/>
-a better girl now than you were<lb/>
-two years ago? Do you love Jesus more<lb/>
-and do you work more for Him. Re<lb/>
-member you have not to come among <lb/>
-the heathen in order to work for Jesus<lb/>
-you can do this at home you can<lb/>
-tell other little girls to love Him,<lb/>
-biut more than this you can be<lb/>
-kind to all at home and when others<lb/>
-are are cross with you, love them for their <lb/>
-hatred. "Render not evil for evil"
+        <p xml:id="OTP257P0">Lorem ipsum<lb/>
+dolor sit amet<lb/>
+consectetur adipiscing [elit]<lb/>
+sed do eiusmod tempor<lb/>
+incididunt ut labore. et dolore magna aliqua Ut<lb/>
+enim ad minim veniam quis, nostrud exercitation<lb/>
+ullamco laboris nisi  ut aliquip<lb/>
+ex ea. commodo consequat Duis aute<lb/>
+irure dolor in reprehenderit in voluptate velit esse<lb/>
+cillum dolore eu – fugiat nulla pariatur – Excepteur sint<lb/>
+non proident sunt in culpa qui officia<lb/>
+deserunt mollit anim? id est  Lorem ipsum<lb/>
+dolor sit amet consectetur adipiscing elit sed. do<lb/>
+eiusmod tempor incididunt ut labore et dolore <lb/>
+magna aliqua Ut enim ad minim veniam quis<lb/>
+nostrud exercitation ullamco laboris nisi ut aliquip ex<lb/>
+ea commodo consequat Duis aute irure dolor,<lb/>
+in reprehenderit in voluptate velit esse cillum<lb/>
+dolore eu fugiat nulla pariatur Excepteur sint occaecat<lb/>
+cupidatat non proident sunt in, culpa qui officia deserunt <lb/>
+mollit. "anim id est  Lorem"
 </p>
 
 
@@ -217,28 +212,28 @@ hatred. "Render not evil for evil"
         <pb xml:id="F258" n="2" facs="MacKenzie433.tiff"/>
         <div xml:id="OTP258">
         <fw type="pageNum">2</fw>
-        <p xml:id='OTP258P0'>This is quite a cool night. I had to go <lb/>
-and put a warm coat on. I suppose you<lb/>
-often wonder what I am doing. Well I<lb/>
-have a great vriety of work. I was busy<lb/>
-packing flour to-day. We have to [xx]<lb/>
-careful with all our provisions in case<lb/>
-they spoil. I suppose you often wonder<lb/>
-what kind of food we have. To-day we<lb/>
-had preserved beef – we get meat to buy<lb/>
-in Sidney done up in tins air tight<lb/>
-about the size of a tin pint. After a<lb/>
-tin is opened it wont keep more than<lb/>
-two days. It is already cooked so that <lb/>
-we have only to warm it. We buy a <lb/>
-great deal of it, indeed it is the principal<lb/>
-part of our food. We also get fish pre<lb break='no'/>served the same way in small tins.<lb/>
-Then to-day for dinner we had yams<lb/>
-some days we have taro. The natives<lb/>
-cook our yams for us the same way<lb/>
-that they do their own – it would not be <lb/>
-nice boiled, it would be soft.<lb/>
-They roast them. If it is a small [xx] 
+        <p xml:id="OTP258P0">Lorem ipsum dolor sit amet consectetur. adipiscing elit sed do <lb/>
+eiusmod tempor incididunt ut labore et. dolore magna aliqua<lb/>
+Ut enim ad minim veniam quis. nostrud exercitation<lb/>
+ullamco laboris nisi ut aliquip ex. ea commodo consequat<lb/>
+Duis aute irure-dolor. in reprehenderit in [voluptate]<lb/>
+voluptate velit esse cillum dolore eu fugiat<lb/>
+nulla pariatur. Excepteur sint occaecat cupidatat non<lb/>
+proident sunt in culpa qui officia. deserunt-mollit anim<lb/>
+anim id est –  Lorem ipsum dolor sit<lb/>
+consectetur adipiscing elit sed do eiusmod tempor incididunt<lb/>
+ut labore et dolore magna aliqua Ut. enim ad<lb/>
+minim veniam quis nostrud exercitation ullamco laboris nisi<lb/>
+ut aliquip. ex ea commodo consequat Duis aute <lb/>
+irure dolor in reprehenderit in voluptate. velit esse cillum <lb/>
+dolore eu fugiat nulla, pariatur Excepteur sint occaecat cupidatat<lb/>
+non proident sunt in. culpa qui officia deserunt mollit<lb break="no"/>anim id est  Lorem ipsum dolor.<lb/>
+sit amet-consectetur adipiscing elit sed do eiusmod<lb/>
+eiusmod tempor incididunt ut labore. et dolore<lb/>
+magna aliqua Ut enim ad minim veniam quis<lb/>
+nostrud exercitation ullamco laboris nisi – ut aliquip ex ea <lb/>
+consequat Duis, aute irure dolor in.<lb/>
+reprehenderit in voluptate. velit esse cillum dolore eu [fugiat] 
 </p>
 
 
@@ -246,26 +241,26 @@ They roast them. If it is a small [xx]
         <pb xml:id="F259" n="3" facs="MacKenzie434.tiff"/>
         <div xml:id="OTP259">
         <fw type="pageNum">3</fw>
-        <p xml:id='OTP259P0'>they lay it on the fire and keep turn<lb break='no'/>ing it until it is roasted, just as you<lb/>
-would roast a potato. Some of our <lb/>
-yams are very little bigger than a <lb/>
-potato, but the small ones are de<lb break='no'/>licious, much niver than the large ones.<lb/>
-When it is roasted they scrape the<lb/>
-burnt skin off and then it is ready<lb/>
-to eat. But I never saw them cook<lb/>
-taro in this way nor large yams.<lb/>
-When they make their fire they have <lb/>
-a number of round stones which they<lb/>
-put on the top of the fire, and then<lb/>
-the stones are very hot – they put the<lb/>
-taro or yams on top of the stones and<lb/>
-cover them over with a great quantity <lb/>
-of leaves – and the leaves keep the heat<lb/>
-from escaping. By the time that<lb/>
-the stones are hot the wood is about<lb/>
-consumed, but they don't put on <lb/>
-any more wood, there is heat enough<lb/>
-in the stones themselves – Our girls take
+        <p xml:id="OTP259P0">Lorem ipsum dolor sit amet consectetur adipiscing elit sed<lb break="no"/>do eiusmod tempor incididunt ut labore, et dolore magna<lb/>
+aliqua Ut enim ad. minim veniam quis <lb/>
+nostrud exercitation ullamco laboris nisi ut aliquip <lb/>
+ex, ea commodo consequat Duis aute irure<lb break="no"/>dolor, in reprehenderit in voluptate velit esse.<lb/>
+cillum dolore eu fugiat nulla pariatur Excepteur<lb/>
+sint occaecat cupidatat non proident sunt in culpa<lb/>
+qui officia. deserunt mollit anim id est <lb/>
+Lorem ipsum dolor sit amet consectetur adipiscing.<lb/>
+elit sed do eiusmod tempor incididunt ut <lb/>
+labore et dolore magna aliqua Ut enim<lb/>
+ad minim veniam quis nostrud exercitation ullamco, laboris nisi<lb/>
+ut aliquip ex ea commodo – consequat Duis aute<lb/>
+dolor in reprehenderit in voluptate velit esse cillum dolore<lb/>
+eu fugiat nulla pariatur Excepteur sint occaecat <lb/>
+cupidatat non – proident sunt in culpa qui officia<lb/>
+mollit anim. id est  Lorem<lb/>
+ipsum dolor sit amet consectetur adipiscing elit sed<lb/>
+do, eiusmod tempor incididunt'ut labore et <lb/>
+et dolore magna, aliqua Ut enim ad<lb/>
+minim veniam quis nostrud – exercitation ullamco laboris
 </p>
 
 
@@ -273,28 +268,28 @@ in the stones themselves – Our girls take
         <pb xml:id="F260" n="4" facs="MacKenzie435.tiff"/>
         <div xml:id="OTP260">
         <fw type="pageNum">4</fw>
-        <p xml:id='OTP260P0'>turn about at cooking our yams.<lb/>
-We have porridge for breakfast. We get beau<lb break='no'/>tiful oatmeal from Sidney in small<lb/>
-tins. It would not do to get a larger<lb/>
-quantity at once for it dont keep long<lb/>
-We have plenty of milk. Mr Morrison<lb/>
-let a cow here. I suppose you would<lb/>
-like to see dear little [pepaxx]. She dont<lb/>
-walk alone yet, but she runs along the <lb/>
-wall or any place she can put her hand<lb/>
-against. She talks away at a great rate<lb/>
-and scolds too, but we dont know what<lb/>
-she is saying. She didn't know me when<lb/>
-I came home from the meeting, you<lb/>
-may be sure I was not well pleased<lb/>
-at her for forgetting me – Dear Ca[xx]<lb/>
-I hope you are a good girl– and that<lb/>
-you are seeking to followJesus. You<lb/>
-remember dear [pepin] had not much<lb/>
-time to think of death.<lb/>
-I remain<lb/>
-Your loving [brother]<lb/>
-John<lb/>
+        <p xml:id="OTP260P0">Lorem ipsum dolor sit amet consectetur.<lb/>
+adipiscing elit sed do eiusmod. tempor incididunt ut<lb break="no"/>labore et dolore magna aliqua Ut<lb/>
+enim. ad minim veniam quis nostrud exercitation ullamco laboris<lb/>
+nisi ut aliquip ex ea commodo consequat Duis<lb/>
+aute irure dolor in reprehenderit. in voluptate<lb/>
+velit esse cillum dolore. eu fugiat nulla pariatur<lb/>
+Excepteur sint occaecat cupidatat non [proident]. sunt in<lb/>
+culpa qui officia, deserunt mollit anim id est <lb/>
+ Lorem ipsum dolor sit amet consectetur adipiscing elit<lb/>
+sed. do eiusmod tempor incididunt ut labore et<lb/>
+dolore magna aliqua, Ut enim ad minim veniam<lb/>
+quis nostrud exercitation. ullamco laboris'nisi ut aliquip ex<lb/>
+ex ea commodo consequat Duis aute, irure<lb/>
+dolor in reprehenderit in voluptate velit esse cillum<lb/>
+dolore eu fugiat nulla pariatur – Excepteur sint[occaecat]<lb/>
+cupidatat non proident sunt in culpa qui– officia deserunt<lb/>
+mollit anim id est . Lorem<lb/>
+ipsum dolor [sit] amet consectetur adipiscing<lb/>
+elit sed do eiusmod tempor.<lb/>
+incididunt ut<lb/>
+labore et [dolore]<lb/>
+magna<lb/>
 
 </p>
 

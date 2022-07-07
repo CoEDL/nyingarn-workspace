@@ -5,7 +5,6 @@ if [ "$#" != 1 ] ; then
     exit -1
 fi
 VERSION="${1}"
-[[ -d docker-metadata ]] && rm -rf docker-metadata
 mkdir docker-metadata
 
 read -p '>> Build the containers? [y|N] ' resp
@@ -108,14 +107,14 @@ if [ "$resp" == "y" ] ; then
         --metadata-file docker-metadata/task-runner-metadata.json \
         -t arkisto/workspace-task-runner:latest \
         -t arkisto/workspace-task-runner:${VERSION} \
-        -f Dockerfile.ui-build .
+        -f Dockerfile.tasks-build .
 
     docker buildx build --platform linux/amd64,linux/arm64 \
         --push \
         --rm \
         --metadata-file docker-metadata/ui-metadata.json \
-        -t arkisto/workspace-api:latest \
-        -t arkisto/workspace-api:${VERSION} \
+        -t arkisto/workspace-ui:latest \
+        -t arkisto/workspace-ui:${VERSION} \
         -f Dockerfile.tasks-build .
 
     docker buildx build --platform linux/amd64,linux/arm64 \

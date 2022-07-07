@@ -190,7 +190,7 @@ describe("Test transcription processing utils", () => {
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
     });
 
-    it("should be able to pass a hierarchically structured TEI file through an XSLT", async () => {
+    it.only("should be able to split a hierarchically structured TEI file into surface files and then reconstitute it", async () => {
         let identifier = "structured";
         let resource = "structured-tei.xml";
         let expectedFiles = [
@@ -208,10 +208,28 @@ describe("Test transcription processing utils", () => {
             resource: resource,
         });
 
+        //TODO reconstitute the file and validate it
+        await reconstituteTEIFile({
+            directory: path.join(__dirname, "../test-data"),
+            identifier: identifier,
+            resource: resource,
+        });
+        
+        // Validate splitting of TEI into <surface> files
         let resourceDirectory = path.join(__dirname, "../test-data", identifier);
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
-        expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+        
+        // Validate reconstitution of TEI doc from <surface> files
+        // TODO what kinds of validation?
+        // it should contain all the text of the original file
+        // it should not have any @part (etc) markup on <div> elements
+        // it should contain the supplied teiHeader metadata
+        
+        // clean up
+        // TODO uncomment and re-enable clean up
+        //expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+
     });
 
     it("should fail to ingest mackenzie-tei.xml as it contains no valid pages", async () => {

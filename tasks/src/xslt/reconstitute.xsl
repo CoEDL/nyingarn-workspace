@@ -20,16 +20,23 @@
 	    </xsl:apply-templates>
 	</xsl:result-document>
     </xsl:template>
+    
+    <xsl:mode name="reconstitute" on-no-match="shallow-copy"/>
 
-    <xsl:template match="body" mode="reconstitute">
-	<!-- replace the content of the body with content drawn from the various fragment files and stitched together -->
+    <xsl:template match="text" mode="reconstitute">
+	<!-- replace the content of the text with content drawn from the various fragment files and stitched together -->
 	<xsl:param name="source-uri" tunnel="yes"/>
 	<xsl:variable name="fragment-identifiers" select=".//pb/@xml:id"/>
-	<xsl:variable name="surfaces">
+	<xsl:variable name="surface-docs">
 	    <xsl:for-each select="$fragment-identifiers">
-		<xsl:sequence select="(. => concat('.tei.xml') => resolve-uri($source-uri) => document())/surface"/>
+		<xsl:sequence select="(. => concat('.tei.xml') => resolve-uri($source-uri) => document())"/>
 	    </xsl:for-each>
 	</xsl:variable>
+	<xsl:copy>
+		<body>
+			<xsl:apply-templates mode="reconstitute" select="$surface-docs/surface/node()"/>
+		</body>
+	</xsl:copy>
     </xsl:template>
-
+    
 </xsl:stylesheet>

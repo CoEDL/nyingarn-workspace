@@ -5,12 +5,14 @@ if [ "$#" != 1 ] ; then
     exit -1
 fi
 VERSION="${1}"
+[[ -d docker-metadata ]] && rm -rf docker-metadata
 mkdir docker-metadata
 
 read -p '>> Build the containers? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
     echo '>> Building the API container '
     docker buildx build --platform=linux/amd64,linux/arm64 \
+        --no-cache \
         --rm \
         --metadata-file docker-metadata/api-metadata.json \
         -t arkisto/workspace-api:latest \
@@ -26,6 +28,7 @@ if [ "$resp" == "y" ] ; then
 
     echo ">> Building the TASK Runner container"
     docker buildx build --platform linux/amd64,linux/arm64 \
+        --no-cache \
         --rm \
         --metadata-file docker-metadata/task-runnner-metadata.json \
         -t arkisto/workspace-task-runner:latest \
@@ -46,6 +49,7 @@ if [ "$resp" == "y" ] ; then
         -w /srv/ui node:14-buster bash -l -c "npm run build"
     cd -
     docker buildx build --platform=linux/amd64,linux/arm64 \
+        --no-cache \
         --rm \
         --metadata-file docker-metadata/ui-metadata.json \
         -t arkisto/workspace-ui:latest \
@@ -60,6 +64,7 @@ if [ "$resp" == "y" ] ; then
 
     echo ">> Building the tusd container"
     docker buildx build --platform linux/amd64,linux/arm64 \
+        --no-cache \
         --rm \
         --metadata-file docker-metadata/tusd-metadata.json \
         -t arkisto/workspace-tusd \

@@ -10,3 +10,5 @@ eng.traineddata
 
 # temporary backup files created by jEdit text editor
 *.*~
+
+docker-metadata

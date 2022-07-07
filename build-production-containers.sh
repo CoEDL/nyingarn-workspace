@@ -5,32 +5,69 @@ if [ "$#" != 1 ] ; then
     exit -1
 fi
 VERSION="${1}"
+mkdir docker-metadata
 
 read -p '>> Build the containers? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
-    echo ">> Building the API Container"
-    docker build --platform linux/amd64 --rm -t arkisto/workspace-api:latest -f Dockerfile.api-build .
-    docker tag arkisto/workspace-api:latest arkisto/workspace-api:${VERSION}
+    echo '>> Building the API container '
+    docker buildx build --platform=linux/amd64,linux/arm64 \
+        --rm \
+        --metadata-file docker-metadata/api-metadata.json \
+        -t arkisto/workspace-api:latest \
+        -t arkisto/workspace-api:${VERSION} \
+        -f Dockerfile.api-build .
+    docker buildx build --load \
+        --metadata-file docker-metadata/api-metadata.json \
+        -t arkisto/workspace-api:latest \
+        -t arkisto/workspace-api:${VERSION} \
+        -f Dockerfile.api-build .
+
     echo
 
     echo ">> Building the TASK Runner container"
-    docker build --platform linux/amd64 --rm -t arkisto/workspace-task-runner:latest -f Dockerfile.tasks-build .
-    docker tag arkisto/workspace-task-runner:latest arkisto/workspace-task-runner:${VERSION}
+    docker buildx build --platform linux/amd64,linux/arm64 \
+        --rm \
+        --metadata-file docker-metadata/task-runnner-metadata.json \
+        -t arkisto/workspace-task-runner:latest \
+        -t arkisto/workspace-task-runner:${VERSION} \
+        -f Dockerfile.tasks-build .
+    docker buildx build --load \
+        --metadata-file docker-metadata/task-runnner-metadata.json \
+        -t arkisto/workspace-task-runner:latest \
+        -t arkisto/workspace-task-runner:${VERSION} \
+        -f Dockerfile.tasks-build .
     echo
 
-    echo ">> Building the UI container"
-    cd ui   
+    echo '>> Building the UI container'
+    cd ui
     docker run -it --rm \
         -v $PWD:/srv/ui \
         -v ui_node_modules:/srv/ui/node_modules \
         -w /srv/ui node:14-buster bash -l -c "npm run build"
     cd -
-    docker build --platform linux/amd64 --rm -t arkisto/workspace-ui:latest -f Dockerfile.ui-build .
-    docker tag arkisto/workspace-ui:latest arkisto/workspace-ui:${VERSION}
+    docker buildx build --platform=linux/amd64,linux/arm64 \
+        --rm \
+        --metadata-file docker-metadata/ui-metadata.json \
+        -t arkisto/workspace-ui:latest \
+        -t arkisto/workspace-ui:${VERSION} \
+        -f Dockerfile.ui-build .
+    docker buildx build --load \
+        --metadata-file docker-metadata/ui-metadata.json \
+        -t arkisto/workspace-ui:latest \
+        -t arkisto/workspace-ui:${VERSION} \
+        -f Dockerfile.ui-build .
     echo
-    
+
     echo ">> Building the tusd container"
-    docker build --platform linux/amd64 -t arkisto/workspace-tusd -f Dockerfile.tus-build .
+    docker buildx build --platform linux/amd64,linux/arm64 \
+        --rm \
+        --metadata-file docker-metadata/tusd-metadata.json \
+        -t arkisto/workspace-tusd \
+        -f Dockerfile.tus-build .
+    docker buildx build --load \
+        --metadata-file docker-metadata/tusd-metadata.json \
+        -t arkisto/workspace-tusd \
+        -f Dockerfile.tus-build .
     echo
 fi
 
@@ -49,15 +86,40 @@ fi
 
 read -p '>> Push the containers to docker hub? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
-    echo ">> Pushing built containers to docker hub"
     docker login
-    docker push arkisto/workspace-api:latest
-    docker push arkisto/workspace-api:${VERSION}
-    docker push arkisto/workspace-task-runner:latest
-    docker push arkisto/workspace-task-runner:${VERSION}
-    docker push arkisto/workspace-ui:latest
-    docker push arkisto/workspace-ui:${VERSION}
-    docker push arkisto/workspace-tusd:latest
+
+    echo "Pushing built containers to docker hub"
+    docker buildx build --platform=linux/amd64,linux/arm64 \
+        --push \
+        --rm \
+        --metadata-file docker-metadata/api-metadata.json \
+        -t arkisto/workspace-api:latest \
+        -t arkisto/workspace-api:${VERSION} \
+        -f Dockerfile.api-build .
+
+    docker buildx build --platform=linux/amd64,linux/arm64 \
+        --push \
+        --rm \
+        --metadata-file docker-metadata/task-runner-metadata.json \
+        -t arkisto/workspace-task-runner:latest \
+        -t arkisto/workspace-task-runner:${VERSION} \
+        -f Dockerfile.ui-build .
+
+    docker buildx build --platform linux/amd64,linux/arm64 \
+        --push \
+        --rm \
+        --metadata-file docker-metadata/ui-metadata.json \
+        -t arkisto/workspace-api:latest \
+        -t arkisto/workspace-api:${VERSION} \
+        -f Dockerfile.tasks-build .
+
+    docker buildx build --platform linux/amd64,linux/arm64 \
+        --push \
+        --rm \
+        --metadata-file docker-metadata/tusd-metadata.json \
+        -t arkisto/workspace-tusd:latest \
+        -t arkisto/workspace-tusd:${VERSION} \
+        -f Dockerfile.tus-build .
 fi
 
 read -p '>> Remove local container copies? [y|N] ' resp
@@ -68,4 +130,5 @@ if [ "$resp" == "y" ] ; then
     docker rmi arkisto/workspace-task-runner:${VERSION}
     docker rmi arkisto/workspace-ui:latest
     docker rmi arkisto/workspace-ui:${VERSION}
+    rm -rf docker-metadata
 fi

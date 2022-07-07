@@ -28,15 +28,12 @@
     
     <!-- convert the image file identifier from the hi[@rend='Page'] to a pb -->
     <xsl:template match="hi[@rend='Page']" mode="docx-via-oxgarage">
-    	<!-- NB an encoder may have included the file extension for the image in the "Page" 
-    	identifiers; if so, we need to strip it off to produce an identifier for the page rather than
-    	for the image file, so we can use the page identifier as the base for a TEI XML file name -->
-    	<xsl:variable name="identifier-without-file-extension" select="replace(., '([^.]+).*', '$1')"/>
-	<pb xml:id="{$identifier-without-file-extension}"/>
+    	<!-- the identifier is terminated by the first '.' in the value (to discard image file extensions such as .jpg) -->
+	<pb xml:id="{replace(., '^([^.]+).*', '$1')}"/>
     </xsl:template>
 
     <!-- insert newline characters before each block element for improved readability -->
-    <xsl:template match="div | head | p | item | label | note | table | row" mode="docx-via-oxgarage">
+    <xsl:template match="div | head | p | item | label | note" mode="docx-via-oxgarage">
 	<xsl:value-of select="codepoints-to-string(10) (: newline character :)"/>
 	<xsl:next-match/>
     </xsl:template>

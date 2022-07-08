@@ -193,6 +193,10 @@ describe("Test transcription processing utils", () => {
     it.only("should be able to split a hierarchically structured TEI file into surface files and then reconstitute it", async () => {
         let identifier = "structured";
         let resource = "structured-tei.xml";
+        let result = "structured-tei-final.xml";
+        let title = "Test document";
+        let publisher = "Test publisher";
+        let sourceDescription = "This document was made up by Conal to serve as a test case";
         let expectedFiles = [
             "structured-01.tei.xml",
             "structured-02.tei.xml",
@@ -201,30 +205,54 @@ describe("Test transcription processing utils", () => {
             "structured-05.tei.xml",
             "structured-06.tei.xml",
             "structured-07.tei.xml",
+            result
         ];
+
+        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        let sourceFile = path.join(resourceDirectory, resource);
+        let resultFile = path.join(resourceDirectory, result);
+        
         await __processTeiTranscriptionXMLProcessor({
             directory: path.join(__dirname, "../test-data"),
             identifier: identifier,
             resource: resource,
         });
 
-        //TODO reconstitute the file and validate it
-        await reconstituteTEIFile({
-            directory: path.join(__dirname, "../test-data"),
-            identifier: identifier,
-            resource: resource,
-        });
+        // reconstitute the file and validate it
+        await reconstituteTEIFile(
+            {
+                directory: path.join(__dirname, "../test-data"),
+                identifier: identifier,
+                resource: resource,
+            },
+            title, publisher, sourceDescription
+        );
         
         // Validate splitting of TEI into <surface> files
-        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
         
         // Validate reconstitution of TEI doc from <surface> files
-        // TODO what kinds of validation?
-        // it should contain all the text of the original file
-        // it should not have any @part (etc) markup on <div> elements
+        
+        // use TEI as the default namespace so our XPath expressions are more concise
+        let options = {"xpathDefaultNamespace": "http://www.tei-c.org/ns/1.0"};
+        let resultDoc = await SaxonJS.getResource({file: resultFile, type: "xml"});
+
+        // it should not have any @part markup on <div> etc elements
+        let parts = SaxonJS.XPath.evaluate("//*[@part]", resultDoc, options);
+        expect(parts).toBeNull();
+
         // it should contain the supplied teiHeader metadata
+        
+        // the title we supplied should be among the document's titles
+        let titles = SaxonJS.XPath.evaluate("/TEI/teiHeader/fileDesc/titleStmt/title/text()!string(.)", resultDoc, options);
+        expect(titles).toContain(title);
+        // the publisher we supplied should be present somewhere in the publicationStmt
+        let publicationStatement = SaxonJS.XPath.evaluate("string(/TEI/teiHeader/fileDesc/publicationStmt)", resultDoc, options);
+        expect(publicationStatement).toEqual(expect.stringContaining(publisher));
+        // the sourceDescription we supplied should be in the document's sourceDesc
+        let sourceDesc = SaxonJS.XPath.evaluate("/TEI/teiHeader/fileDesc/sourceDesc/*/text()!string(.)", resultDoc, options);
+        expect(sourceDesc).toContain(sourceDescription);
         
         // clean up
         // TODO uncomment and re-enable clean up

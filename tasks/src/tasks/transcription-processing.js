@@ -7,13 +7,17 @@ import { getS3Handle, getLogger, loadConfiguration } from "../common";
 import { persistNewContentToBucket } from "./";
 const log = getLogger();
 
-export async function reconstituteTEIFile({ directory, identifier, resource }) {
+export async function reconstituteTEIFile({ directory, identifier, resource }, title, publisher, sourceDescription) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);
     await SaxonJS.transform(
         {
             stylesheetFileName: "src/xslt/reconstitute.xsl.sef.json",
             templateParams: {
                 "source-uri": sourceURI,
+                "identifier": identifier,
+                "title": title, // mandatory metadata for TEI files
+                "publisher": publisher,  // mandatory metadata for TEI files
+                "source-description": sourceDescription // mandatory metadata for TEI files
             },
             baseOutputURI: sourceURI, // output into the same folder as the source data file
         },

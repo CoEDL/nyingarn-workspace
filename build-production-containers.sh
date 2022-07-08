@@ -115,7 +115,7 @@ if [ "$resp" == "y" ] ; then
         --metadata-file docker-metadata/ui-metadata.json \
         -t arkisto/workspace-ui:latest \
         -t arkisto/workspace-ui:${VERSION} \
-        -f Dockerfile.tasks-build .
+        -f Dockerfile.ui-build .
 
     docker buildx build --platform linux/amd64,linux/arm64 \
         --push \

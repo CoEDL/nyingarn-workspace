@@ -18,64 +18,20 @@
 	<!-- generate an output file name; trim off the extension from the main source file, and append "-final.xml" -->
 	<xsl:variable name="output-file-name" select="replace($source-uri, '([^.]+).*', '$1-final.xml')"/>
 	<xsl:result-document href="{$output-file-name}">
-		<xsl:choose>
-			<xsl:when test="$source-uri => ends-with('.csv')">
-				<!-- generate a full TEI file from a digivol csv file and the previously generated TEI surface files -->
-				<xsl:variable name="csv-rows" select="csv:doc($source-uri)" xmlns:csv="https://datatracker.ietf.org/doc/html/rfc4180"/>
-				<xsl:variable name="relevant-rows" select="
-					$csv-rows
-						[.('externalIdentifier') => starts-with($identifier || '-')] (: the surfaces we want are those whose identifier starts with the id of the item, followed by a hyphen :)
-				"/>
-				<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="{$identifier}">
-					<teiHeader>
-						<fileDesc>
-							<titleStmt>
-								<title>{$title}</title>
-							</titleStmt>
-							<publicationStmt>
-								<publisher>{$publisher}</publisher>
-							</publicationStmt>
-							<sourceDesc>
-								<bibl>{$source-description}</bibl>
-							</sourceDesc>
-						</fileDesc>
-					</teiHeader>
-					<text>
-						<body>
-							<!-- for each row of the CSV file, insert a page break, followed by the content of the corresponding surface file -->
-							<xsl:for-each select="$relevant-rows">
-								<xsl:variable name="row" select="."/>
-								<xsl:variable name="surface-id" select="
-									.('externalIdentifier') 
-									=> substring-before('.') 
-								"/>
-								<pb xml:id="{$surface-id}" facs="{.('externalIdentifier')}"/>
-								<xsl:variable name="surface-doc" select="
-									$surface-id
-									=> concat('.tei.xml')
-									=> resolve-uri($source-uri) 
-									=> document()
-								"/>
-								<xsl:sequence select="$surface-doc/surface/node()"/>
-							</xsl:for-each>
-						</body>
-					</text>
-				</TEI>
-			</xsl:when>
-			<xsl:otherwise>
-				<!-- generate a full TEI file from an ingested TEI file, incorporating the previously generated TEI surface files -->
-				<xsl:variable name="original" select="document($source-uri)"/>
-				<xsl:variable name="normalised-original">
-					<xsl:apply-templates select="$original" mode="normalise"/>
-				</xsl:variable>
-				<xsl:apply-templates select="$normalised-original" mode="reconstitute">
-					<xsl:with-param name="source-uri" select="$source-uri" tunnel="yes"/>
-					<xsl:with-param name="title" select="$title" tunnel="yes"/>
-					<xsl:with-param name="publisher" select="$publisher" tunnel="yes"/>
-					<xsl:with-param name="source-description" select="$source-description" tunnel="yes"/>
-				</xsl:apply-templates>
-			</xsl:otherwise>
-		</xsl:choose>
+		<!-- generate a full TEI file from an ingested TEI file, incorporating the previously generated TEI surface files -->
+		<xsl:variable name="original" select="document($source-uri)"/>
+		<!-- normalise the ingested TEI file; this is because TEI files from various sources use different markup conventions
+		to indicate the page identifiers and page image filenames. This normalise step ensures that this variety is reduced
+		to the normal practice of using <pb> elements -->
+		<xsl:variable name="normalised-original">
+			<xsl:apply-templates select="$original" mode="normalise"/>
+		</xsl:variable>
+		<xsl:apply-templates select="$normalised-original" mode="reconstitute">
+			<xsl:with-param name="source-uri" select="$source-uri" tunnel="yes"/>
+			<xsl:with-param name="title" select="$title" tunnel="yes"/>
+			<xsl:with-param name="publisher" select="$publisher" tunnel="yes"/>
+			<xsl:with-param name="source-description" select="$source-description" tunnel="yes"/>
+		</xsl:apply-templates>
 	</xsl:result-document>
     </xsl:template>
     

@@ -4,6 +4,7 @@ import {
     __processTeiTranscriptionXMLProcessor,
     __processDigivolTranscriptionXMLProcessor,
     reconstituteTEIFile,
+    reconstituteTEIFileFromDigivol
 } from "./transcription-processing";
 import SaxonJS from "saxon-js";
 import path from "path";
@@ -12,9 +13,10 @@ import { readdir, remove } from "fs-extra";
 jest.setTimeout(20000); // 20s because the CSV processing test is slow
 
 describe("Test transcription processing utils", () => {
-    it("should be able to process a digivol csv file", async () => {
+    it.only("should be able to parse a digivol csv file into surface files and then assemble a full TEI document file", async () => {
         let identifier = "BM1648A91";
         let resource = "BM1648A91-digivol.csv";
+        let result = "BM1648A91-final.xml";
         let expectedFiles = [
             "BM1648A91-0001.tei.xml", "BM1648A91-0002.tei.xml", "BM1648A91-0003.tei.xml", "BM1648A91-0004.tei.xml",
             "BM1648A91-0005.tei.xml", "BM1648A91-0006.tei.xml", "BM1648A91-0007.tei.xml", "BM1648A91-0008.tei.xml",
@@ -22,7 +24,7 @@ describe("Test transcription processing utils", () => {
             "BM1648A91-0013.tei.xml", "BM1648A91-0014.tei.xml", "BM1648A91-0015.tei.xml", "BM1648A91-0016.tei.xml",
             "BM1648A91-0017.tei.xml", "BM1648A91-0018.tei.xml", "BM1648A91-0019.tei.xml", "BM1648A91-0020.tei.xml",
             "BM1648A91-0021.tei.xml", "BM1648A91-0022.tei.xml", "BM1648A91-0023.tei.xml", "BM1648A91-0024.tei.xml",
-            "BM1648A91-0025.tei.xml", "BM1648A91-0026.tei.xml"
+            "BM1648A91-0025.tei.xml", "BM1648A91-0026.tei.xml", result
         ];
         let unexpectedFiles = [
             "BM1648A92-0001.tei.xml", "BM1648A92-0002.tei.xml", "BM1648A92-0003.tei.xml", "BM1648A92-0004.tei.xml", 
@@ -43,12 +45,29 @@ describe("Test transcription processing utils", () => {
             identifier: identifier,
             resource: resource,
         });
+
+        
+        // reconstitute a full TEI file and validate it
+        let title = "Test document";
+        let publisher = "Test publisher";
+        let sourceDescription = "A transcription of a real document which has been replaced with placeholder text.";
+        await reconstituteTEIFileFromDigivol(
+            {
+                directory: path.join(__dirname, "../test-data"),
+                identifier: identifier,
+                resource: resource,
+            },
+            title, publisher, sourceDescription
+        );        
+        
         let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        let resultFile = path.join(resourceDirectory, result);
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
-        expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+        //expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
         unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
-        unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));    
+        //unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+        // TODO validate full TEI doc and clean up
     });
 
     it("should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {
@@ -190,7 +209,7 @@ describe("Test transcription processing utils", () => {
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
     });
 
-    it.only("should be able to split a hierarchically structured TEI file into surface files and then reconstitute it", async () => {
+    it("should be able to split a hierarchically structured TEI file into surface files and then reconstitute it", async () => {
         let identifier = "structured";
         let resource = "structured-tei.xml";
         let result = "structured-tei-final.xml";

@@ -13,8 +13,8 @@ export async function reconstituteTEIFile({ directory, identifier, resource }, t
         {
             stylesheetFileName: "src/xslt/reconstitute.xsl.sef.json",
             templateParams: {
-                "source-uri": sourceURI,
-                "identifier": identifier,
+                "source-uri": sourceURI, // file: URI for the input document
+                "identifier": identifier, // the Nyingarn document identifier
                 "title": title, // mandatory metadata for TEI files
                 "publisher": publisher,  // mandatory metadata for TEI files
                 "source-description": sourceDescription // mandatory metadata for TEI files
@@ -23,6 +23,36 @@ export async function reconstituteTEIFile({ directory, identifier, resource }, t
         },
         "async"
     );
+}
+
+export async function reconstituteTEIFileFromDigivol({ directory, identifier, resource }) {
+    // SaxonJS doesn't support the "windows-1252" encoding which is used by DigiVol, so we first create a copy
+    // of in the input CSV, re-encoded as UTF-8, process the UTF-8-encoded CSV file with our XSLT, and finally delete
+    // the UTF-8 encoded file.
+    let windowsEncodedFilename = path.join(directory, identifier, resource);
+    let utf8EncodedFilename = path.join(directory, identifier, "utf-8.csv");
+    const inputStream = createReadStream(windowsEncodedFilename, "latin1");
+    const outputStream = createWriteStream(utf8EncodedFilename, "utf-8");
+    inputStream.pipe(outputStream);
+
+    let sourceURI = "file://" + utf8EncodedFilename;
+    let configuration = await loadConfiguration();
+    const transformationResults = await SaxonJS.transform(
+        {
+            stylesheetFileName: "src/xslt/src/xslt/reconstitute-from-digivol.xsl.sef.json",
+            templateParams: {
+                "source-uri": sourceURI, // file: URI for the input document
+                "identifier": identifier, // the Nyingarn document identifier
+                "title": title, // mandatory metadata for TEI files
+                "publisher": publisher,  // mandatory metadata for TEI files
+                "source-description": sourceDescription // mandatory metadata for TEI files
+            },
+            baseOutputURI: sourceURI, // output into the same folder as the source data file            
+        },
+        "async"
+    );
+    // discard the temporarily re-encoded CSV file
+    remove(utf8EncodedFilename);
 }
 
 export async function processTEIToPageFilesAsStrings({ directory, identifier, resource }) {

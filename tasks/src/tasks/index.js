@@ -106,6 +106,7 @@ export function groupFilesByResource({ files, naming }) {
 }
 
 export async function getResourceImages({ identifier, resource }) {
+    resource = path.basename(resource, path.extname(resource));
     let { files } = await getFiles({ prefix: path.join(identifier, resource) });
 
     for (let resourceId of Object.keys(files)) {

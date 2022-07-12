@@ -29,6 +29,7 @@ export async function getItems({ userId, offset = 0, limit = 10 }) {
         offset,
         limit,
         include,
+        order: [["identifier", "ASC"]],
     });
 }
 

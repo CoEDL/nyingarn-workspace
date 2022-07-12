@@ -3,4 +3,7 @@ module.exports = {
     rootDir: "./src",
     testMatch: ["**/*.spec.js"],
     testPathIgnorePatterns: ["node_modules"],
+    transform: {
+        "\\.[jt]sx?$": ["babel-jest", { rootMode: "upward" }],
+    },
 };

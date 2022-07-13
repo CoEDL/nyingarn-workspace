@@ -1,13 +1,12 @@
 import models from "../models";
-import path from "path";
 import {
     BadRequestError,
     ForbiddenError,
     NotFoundError,
     InternalServerError,
 } from "restify-errors";
-import { route, routeAdmin, logEvent, getLogger, getS3Handle, loadFiles } from "../common";
-import { orderBy, groupBy, flattenDeep, compact, isEmpty } from "lodash";
+import { route, logEvent, getLogger, getS3Handle } from "../common";
+import { groupBy, flattenDeep, compact, isEmpty } from "lodash";
 import {
     createItem,
     lookupItemByIdentifier,
@@ -20,7 +19,6 @@ import {
     listItemResourceFiles,
     deleteItem,
     deleteItemResource,
-    deleteItemResourceFile,
     linkItemToUser,
     getResourceProcessingStatus,
     statItemFile,

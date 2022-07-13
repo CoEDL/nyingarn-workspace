@@ -1,5 +1,5 @@
 import path from "path";
-import { routeAdmin, loadFiles, getLogger, getS3Handle } from "../common";
+import { routeAdmin, loadFiles, getLogger } from "../common";
 import { groupBy } from "lodash";
 import { createItem, lookupItemByIdentifier, linkItemToUser } from "../lib/item";
 import {

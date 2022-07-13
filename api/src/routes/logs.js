@@ -1,4 +1,4 @@
-import { routeAdmin, route, logEvent, getLogger } from "../common";
+import { routeAdmin } from "../common";
 import { getLogs } from "../lib/logs";
 
 export function setupRoutes({ server }) {

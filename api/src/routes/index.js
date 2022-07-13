@@ -1,7 +1,7 @@
 // these endpoints will only return data they are responsible for
 //
 import models from "../models";
-import { UnauthorizedError, ForbiddenError } from "restify-errors";
+import { UnauthorizedError } from "restify-errors";
 import { setupRoutes as setupAdminRoutes } from "./admin";
 import { setupRoutes as setupUserRoutes } from "./user";
 import { setupRoutes as setupAuthRoutes } from "./auth";

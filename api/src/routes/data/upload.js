@@ -32,8 +32,8 @@ export async function triggerProcessing(req, res, next) {
         // process digivol file
         name = "process-digivol";
     } else if (resource.match(/tei\.xml/)) {
-	// process tei xml file
-	name = "process-tei";
+        // process tei xml file
+        name = "process-tei";
     } else {
         // process uploaded image
         name = "process-image";

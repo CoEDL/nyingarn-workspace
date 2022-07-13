@@ -5,8 +5,8 @@ import {
     NotFoundError,
     InternalServerError,
 } from "restify-errors";
-import { route, routeAdmin, logEvent, getLogger, getS3Handle } from "../common";
-import { orderBy, groupBy, flattenDeep, compact } from "lodash";
+import { route, logEvent, getLogger, getS3Handle } from "../common";
+import { flattenDeep, compact } from "lodash";
 import {
     getCollections,
     lookupCollectionByIdentifier,

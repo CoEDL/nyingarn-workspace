@@ -51,7 +51,8 @@ export async function processTEIToPageFilesAsStrings({ directory, identifier, re
 }
 
 export async function processTeiTranscription({ directory, identifier, resource }) {
-    await __processTeiTranscriptionXMLProcessor({ directory, identifier, resource });
+    let sourceURI = "file://" + path.join(directory, identifier, resource);
+    await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
     await persistNewContentToBucket({ directory, identifier, resource });
 }
 
@@ -100,8 +101,8 @@ export async function processDigivolTranscription({ directory, identifier, resou
 }
 */
 
-export async function __processTeiTranscriptionXMLProcessor({ directory, identifier, resource }) {
-    let sourceURI = "file://" + path.join(directory, identifier, resource);
+export async function __processTeiTranscriptionXMLProcessor(identifier, sourceURI) {
+    /* identifier = e.g. "Bates23"; sourceURI = "file:///blah/blah/Bates23/Bates23-tei.xml" */
     let configuration = await loadConfiguration();
     const transformationResults = await SaxonJS.transform(
         {

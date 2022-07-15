@@ -59,7 +59,9 @@ describe("Test transcription processing utils", () => {
     
     it("should remove file extensions (e.g. .jpg) from page identifiers", async () => {
         let identifier = "c018660";
+        let directory = "word-page-identifiers-with-extensions";
         let resource = "c018660-tei.xml";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "c018660-004h.tei.xml", "c018660-006h.tei.xml", "c018660-007h.tei.xml", "c018660-008h.tei.xml", "c018660-009h.tei.xml", 
             "c018660-010h.tei.xml", "c018660-011h.tei.xml", "c018660-012h.tei.xml", "c018660-013h.tei.xml", "c018660-014h.tei.xml", 
@@ -132,12 +134,8 @@ describe("Test transcription processing utils", () => {
             "c018660-171h.jpg.tei.xml", "c018660-172h.jpg.tei.xml", "c018660-173h.jpg.tei.xml", "c018660-174h.jpg.tei.xml", "c018660-175h.jpg.tei.xml", 
             "c018660-176h.jpg.tei.xml", "c018660-177h.jpg.tei.xml", "c018660-178h.jpg.tei.xml", "c018660-179h.jpg.tei.xml"
         ];
-        await __processTeiTranscriptionXMLProcessor({
-            directory: path.join(__dirname, "../test-data"),
-            identifier: identifier,
-            resource: resource,
-        });
-        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
+        let resourceDirectory = path.join(__dirname, "../test-data", directory);
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
@@ -148,6 +146,8 @@ describe("Test transcription processing utils", () => {
     it("should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {
         let identifier = "msword_example";
         let resource = "msword_example-tei.xml";
+        let directory = "msword-ingestion";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "msword_example-001.tei.xml",
             "msword_example-002.tei.xml",
@@ -155,12 +155,8 @@ describe("Test transcription processing utils", () => {
         ];
         let unexpectedFiles = ["msword_example_2-001.tei.xml"];
 
-        await __processTeiTranscriptionXMLProcessor({
-            directory: path.join(__dirname, "../test-data"),
-            identifier: identifier,
-            resource: resource,
-        });
-        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
+        let resourceDirectory = path.join(__dirname, "../test-data", directory);
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
@@ -170,9 +166,11 @@ describe("Test transcription processing utils", () => {
     
     it("should ingest a TEI file produced by OxGarage from a DOCX file, stripping extensions from page identifiers", async () => {
         let identifier = "c018660";
+        let directory = "word-page-identifiers-with-extensions";
         // This document contains page-identifiers which include a ".jpg" extension. This test validates that the output files have
         // the extension ".tei.xml" rather than ".jpg.tei.xml"
         let resource = "c018660-tei.xml";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "c018660-004h.tei.xml", "c018660-006h.tei.xml", "c018660-007h.tei.xml", "c018660-008h.tei.xml", "c018660-009h.tei.xml", 
             "c018660-010h.tei.xml", "c018660-011h.tei.xml", "c018660-012h.tei.xml", "c018660-013h.tei.xml", "c018660-014h.tei.xml", 
@@ -210,12 +208,8 @@ describe("Test transcription processing utils", () => {
             "c018660-176h.tei.xml", "c018660-177h.tei.xml", "c018660-178h.tei.xml", "c018660-179h.tei.xml"
         ];
 
-        await __processTeiTranscriptionXMLProcessor({
-            directory: path.join(__dirname, "../test-data"),
-            identifier: identifier,
-            resource: resource,
-        });
-        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
+        let resourceDirectory = path.join(__dirname, "../test-data", directory);
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
@@ -224,15 +218,13 @@ describe("Test transcription processing utils", () => {
     it("should be able to strip unwanted text formatting from a TEI file produced by OxGarage from a DOCX file", async () => {
         let identifier = "msword_formatting";
         let resource = "msword_formatting-tei.xml";
+        let directory = "cleanup-of-msword-formatting";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         // use TEI as the default namespace so our XPath expressions are more concise
         let options = {"xpathDefaultNamespace": "http://www.tei-c.org/ns/1.0"};
 
-        await __processTeiTranscriptionXMLProcessor({
-            directory: path.join(__dirname, "../test-data"),
-            identifier: identifier,
-            resource: resource,
-        });
-        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
+        let resourceDirectory = path.join(__dirname, "../test-data", directory);
         let sourceFile = path.join(resourceDirectory, resource);
         let resultFile = path.join(resourceDirectory, "msword_formatting-001.tei.xml");
         // parse the original TEI document and also the derived (single) TEI surface XML file
@@ -273,6 +265,8 @@ describe("Test transcription processing utils", () => {
     it("should be able to pass a Transkribus file through an XSLT", async () => {
         let identifier = "L17L27_JF1880";
         let resource = "L17L27_JF1880-tei.xml";
+        let directory = "transkribus-ingestion";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "L17L27_JF1880-01.tei.xml",
             "L17L27_JF1880-02.tei.xml",
@@ -306,12 +300,8 @@ describe("Test transcription processing utils", () => {
             "L17L27_JF1880-30.tei.xml",
         ];
 
-        await __processTeiTranscriptionXMLProcessor({
-            directory: path.join(__dirname, "../test-data"),
-            identifier: identifier,
-            resource: resource,
-        });
-        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
+        let resourceDirectory = path.join(__dirname, "../test-data", directory);
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
@@ -320,18 +310,16 @@ describe("Test transcription processing utils", () => {
     it("should be able to pass an FTP file through an XSLT", async () => {
         let identifier = "Bates35";
         let resource = "Bates35-tei.xml";
+        let directory = "ftp-ingestion";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "Bates35-125T.tei.xml",
             "Bates35-126T.tei.xml",
             "Bates35-132T.tei.xml",
         ];
 
-        await __processTeiTranscriptionXMLProcessor({
-            directory: path.join(__dirname, "../test-data"),
-            identifier: identifier,
-            resource: resource,
-        });
-        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
+        let resourceDirectory = path.join(__dirname, "../test-data", directory);
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
@@ -340,6 +328,8 @@ describe("Test transcription processing utils", () => {
     it("should be able to pass a hierarchically structured TEI file through an XSLT", async () => {
         let identifier = "structured";
         let resource = "structured-tei.xml";
+        let directory = "tei-div-hierarchy-splitting";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "structured-01.tei.xml",
             "structured-02.tei.xml",
@@ -349,13 +339,9 @@ describe("Test transcription processing utils", () => {
             "structured-06.tei.xml",
             "structured-07.tei.xml",
         ];
-        await __processTeiTranscriptionXMLProcessor({
-            directory: path.join(__dirname, "../test-data"),
-            identifier: identifier,
-            resource: resource,
-        });
+        await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
 
-        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        let resourceDirectory = path.join(__dirname, "../test-data", directory);
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
@@ -363,14 +349,12 @@ describe("Test transcription processing utils", () => {
 
     it("should fail to ingest mackenzie-tei.xml as it contains no valid pages", async () => {
         let identifier = "mackenzie";
+        let directory = "ftp-invalid-page-identifiers";
         let resource = "mackenzie-tei.xml";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
 
         try {
-            await __processTeiTranscriptionXMLProcessor({
-                directory: path.join(__dirname, "../test-data"),
-                identifier: identifier,
-                resource: resource,
-            });
+            await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.message).toMatch("ERROR: no pages with suitable identifiers");
@@ -379,14 +363,12 @@ describe("Test transcription processing utils", () => {
 
     it("should fail to ingest unpaginated-tei.xml as it contains no page breaks", async () => {
         let identifier = "unpaginated";
+        let directory = "unpaginated";
         let resource = "unpaginated-tei.xml";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
 
         try {
-            await __processTeiTranscriptionXMLProcessor({
-                directory: path.join(__dirname, "../test-data"),
-                identifier: identifier,
-                resource: resource,
-            });
+            await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.message).toMatch("ERROR: unpaginated document");
@@ -395,14 +377,12 @@ describe("Test transcription processing utils", () => {
 
     it("should fail to ingest Bates34-tei.xml as it contains duplicated page identifiers", async () => {
         let identifier = "Bates34";
+        let directory = "duplicate-page-identifiers";
         let resource = "Bates34-tei.xml";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
 
         try {
-            await __processTeiTranscriptionXMLProcessor({
-                directory: path.join(__dirname, "../test-data"),
-                identifier: identifier,
-                resource: resource,
-            });
+            await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
             throw new Error("Stylesheet failed to throw the expected error!");
         } catch (error) {
             expect(error.message).toMatch(/ERROR:.*Bates34-023/);

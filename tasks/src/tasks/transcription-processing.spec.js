@@ -38,17 +38,23 @@ describe("Test transcription processing utils", () => {
             "BM1648A95-0009.tei.xml", "BM1648A96-0001.tei.xml", "BM1648A96-0002.tei.xml", "BM1648A96-0003.tei.xml", 
             "BM1648A96-0004.tei.xml", "BM1648A96-0005.tei.xml", "BM1648A96-0006.tei.xml", "BM1648A96-0007.tei.xml"
         ];
-        await __processDigivolTranscriptionXMLProcessor({
-            directory: path.join(__dirname, "../test-data"),
-            identifier: identifier,
-            resource: resource,
-        });
         let resourceDirectory = path.join(__dirname, "../test-data", identifier);
-        let contents = (await readdir(resourceDirectory)).sort();
-        expectedFiles.forEach((file) => expect(contents).toContain(file));
-        expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
-        unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
-        unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));    
+        try {
+            await __processDigivolTranscriptionXMLProcessor({
+                directory: path.join(__dirname, "../test-data"),
+                identifier: identifier,
+                resource: resource,
+            });
+            let contents = (await readdir(resourceDirectory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContain(file));
+            unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
+        } catch (error) {
+            console.log(error);
+            throw error;
+        } finally {
+            expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+            unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file))); 
+        }
     });
     
     it("should remove file extensions (e.g. .jpg) from page identifiers", async () => {

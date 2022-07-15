@@ -1,10 +1,9 @@
 ---
-name: Bug report
+name: Data Ingestion / Processing Bug Report
 about: Template to report data ingestion / processing problems
-title: ''
+title: ""
 labels: bug
 assignees: Conal-Tuohy
-
 ---
 
 ### 1 Describe the problem
@@ -14,7 +13,7 @@ Provide a clear and concise explanation of the problem and then save the issue t
 ```
 Example:
 
-Excessive tei markup is not being removed from Bates34-tei.xml 
+Excessive tei markup is not being removed from Bates34-tei.xml
 (generated from word doc via oxgarage).
 ```
 
@@ -26,7 +25,9 @@ Save the issue to get the id:
 
 ### 2. Create the test case in drive
 
-Create a test case with the relevant data file in drive. If there's a suitable top level classification then create a new test case inside it. If not, create a top level classification first. Test cases should be in their own folder - even if there's only example.
+Create a test case with the relevant data file in drive. If there's a suitable top level
+classification then create a new test case inside it. If not, create a top level classification
+first. Test cases should be in their own folder - even if there's only example.
 
 Name the folders as: `${item identifier} - github ${github id}`
 
@@ -39,11 +40,11 @@ Example:
     |_ Bates34-tei.docx (original file)
 ```
 
-* Each test case should have one or at most a few relevant examples
-  * tei ingestion problem : add the word doc and tei file produced by oxgarage
-  * image processing problem: one or two examples
-* Create a new folder for each test case 
-* There should not be more than two levels of nesting
+-   Each test case should have one or at most a few relevant examples
+    -   tei ingestion problem : add the word doc and tei file produced by oxgarage
+    -   image processing problem: one or two examples
+-   Create a new folder for each test case
+-   There should not be more than two levels of nesting
 
 ### 3. Update the issue with a link to the test case
 

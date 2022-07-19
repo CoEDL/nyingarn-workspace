@@ -14,7 +14,9 @@ jest.setTimeout(20000); // 20s because the CSV processing test is slow
 describe("Test transcription processing utils", () => {
     it("should be able to process a digivol csv file", async () => {
         let identifier = "BM1648A91";
+        let directory = "digivol-ingestion";
         let resource = "BM1648A91-digivol.csv";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "BM1648A91-0001.tei.xml", "BM1648A91-0002.tei.xml", "BM1648A91-0003.tei.xml", "BM1648A91-0004.tei.xml",
             "BM1648A91-0005.tei.xml", "BM1648A91-0006.tei.xml", "BM1648A91-0007.tei.xml", "BM1648A91-0008.tei.xml",
@@ -38,13 +40,9 @@ describe("Test transcription processing utils", () => {
             "BM1648A95-0009.tei.xml", "BM1648A96-0001.tei.xml", "BM1648A96-0002.tei.xml", "BM1648A96-0003.tei.xml", 
             "BM1648A96-0004.tei.xml", "BM1648A96-0005.tei.xml", "BM1648A96-0006.tei.xml", "BM1648A96-0007.tei.xml"
         ];
-        let resourceDirectory = path.join(__dirname, "../test-data", identifier);
+        let resourceDirectory = path.join(__dirname, "../test-data", directory);
         try {
-            await __processDigivolTranscriptionXMLProcessor({
-                directory: path.join(__dirname, "../test-data"),
-                identifier: identifier,
-                resource: resource,
-            });
+            await __processDigivolTranscriptionXMLProcessor(identifier, sourceURI);
             let contents = (await readdir(resourceDirectory)).sort();
             expectedFiles.forEach((file) => expect(contents).toContain(file));
             unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
@@ -162,6 +160,19 @@ describe("Test transcription processing utils", () => {
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
         unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
         unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+    });
+    
+    it("should fail to ingest Bates35.xml which contains duplicate page numbers", async () => {
+        let identifier = "Bates35";
+        let resource = "Bates35-tei.xml";
+        let directory = "bates35-wont-upload-no-error-message";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
+        try {
+            await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
+            throw new Error("Stylesheet failed to throw the expected error!");
+        } catch (error) {
+            expect(error.message).toMatch(/ERROR:.*Bates35-0104/);
+        }
     });
     
     it("should ingest a TEI file produced by OxGarage from a DOCX file, stripping extensions from page identifiers", async () => {

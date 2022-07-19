@@ -119,28 +119,29 @@ export async function __processTeiTranscriptionXMLProcessor(identifier, sourceUR
 }
 
 export async function processDigivolTranscription({ directory, identifier, resource }) {
-    await __processDigivolTranscriptionXMLProcessor({ directory, identifier, resource });
+    let sourceURI = "file://" + path.join(directory, identifier, resource);
+    await __processDigivolTranscriptionXMLProcessor(identifier, sourceURI);
     await persistNewContentToBucket({ directory, identifier, resource });
 }
 
-export async function __processDigivolTranscriptionXMLProcessor({ directory, identifier, resource }) {
+export async function __processDigivolTranscriptionXMLProcessor(identifier, sourceURI) {
     // SaxonJS doesn't support the "windows-1252" encoding which is used by DigiVol, so we first create a copy
     // of in the input CSV, re-encoded as UTF-8, process the UTF-8-encoded CSV file with our XSLT, and finally delete
     // the UTF-8 encoded file.
-    let windowsEncodedFilename = path.join(directory, identifier, resource);
-    let utf8EncodedFilename = path.join(directory, identifier, "utf-8.csv");
+    
+    let windowsEncodedFilename = sourceURI.replace("file://", "");
+    let utf8EncodedFilename = windowsEncodedFilename + ".utf-8.csv";
     const inputStream = createReadStream(windowsEncodedFilename, "latin1");
     const outputStream = createWriteStream(utf8EncodedFilename, "utf-8");
     inputStream.pipe(outputStream);
 
-    let sourceURI = "file://" + utf8EncodedFilename;
     let configuration = await loadConfiguration();
     const transformationResults = await SaxonJS.transform(
         {
             stylesheetFileName: "src/xslt/process-digivol-csv-to-page-files.xsl.sef.json",
             templateParams: {
                 identifier: identifier,
-                "source-uri": sourceURI,
+                "source-uri": utf8EncodedFilename,
                 "page-identifier-regex": configuration.ui.filename.checkNameStructure,
             },
             baseOutputURI: sourceURI, // output into the same folder as the source data file

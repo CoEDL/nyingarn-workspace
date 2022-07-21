@@ -52,7 +52,7 @@ export async function processTEIToPageFilesAsStrings({ directory, identifier, re
 
 export async function processTeiTranscription({ directory, identifier, resource }) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);
-    await __processTeiTranscriptionXMLProcessor(identifier, sourceURI);
+    await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
     await persistNewContentToBucket({ directory, identifier, resource });
 }
 
@@ -101,7 +101,11 @@ export async function processDigivolTranscription({ directory, identifier, resou
 }
 */
 
-export async function __processTeiTranscriptionXMLProcessor(identifier, sourceURI) {
+export async function __processTeiTranscriptionXMLProcessor({
+    identifier,
+    sourceURI,
+    output = undefined,
+}) {
     /* identifier = e.g. "Bates23"; sourceURI = "file:///blah/blah/Bates23/Bates23-tei.xml" */
     let configuration = await loadConfiguration();
     const transformationResults = await SaxonJS.transform(
@@ -112,7 +116,7 @@ export async function __processTeiTranscriptionXMLProcessor(identifier, sourceUR
                 "source-uri": sourceURI,
                 "page-identifier-regex": configuration.ui.filename.checkNameStructure,
             },
-            baseOutputURI: sourceURI, // output into the same folder as the source data file
+            baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
         },
         "async"
     );
@@ -120,15 +124,19 @@ export async function __processTeiTranscriptionXMLProcessor(identifier, sourceUR
 
 export async function processDigivolTranscription({ directory, identifier, resource }) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);
-    await __processDigivolTranscriptionXMLProcessor(identifier, sourceURI);
+    await __processDigivolTranscriptionXMLProcessor({ identifier, sourceURI });
     await persistNewContentToBucket({ directory, identifier, resource });
 }
 
-export async function __processDigivolTranscriptionXMLProcessor(identifier, sourceURI) {
+export async function __processDigivolTranscriptionXMLProcessor({
+    identifier,
+    sourceURI,
+    output = undefined,
+}) {
     // SaxonJS doesn't support the "windows-1252" encoding which is used by DigiVol, so we first create a copy
     // of in the input CSV, re-encoded as UTF-8, process the UTF-8-encoded CSV file with our XSLT, and finally delete
     // the UTF-8 encoded file.
-    
+
     let windowsEncodedFilename = sourceURI.replace("file://", "");
     let utf8EncodedFilename = windowsEncodedFilename + ".utf-8.csv";
     const inputStream = createReadStream(windowsEncodedFilename, "latin1");
@@ -144,7 +152,7 @@ export async function __processDigivolTranscriptionXMLProcessor(identifier, sour
                 "source-uri": utf8EncodedFilename,
                 "page-identifier-regex": configuration.ui.filename.checkNameStructure,
             },
-            baseOutputURI: sourceURI, // output into the same folder as the source data file
+            baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
         },
         "async"
     );

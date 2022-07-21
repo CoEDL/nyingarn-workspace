@@ -60,16 +60,16 @@
 				)
 			}.</xsl:message>
 		</xsl:if>
-	<xsl:for-each select="$exportable-surfaces">
-		<!-- write the page content to a file named for the @xml:id attribute of the <surface> with no xml declaration or indenting -->
-		<xsl:result-document href="{@xml:id}.tei.xml" omit-xml-declaration="yes" indent="no">
-			<!-- write out the content between the current page break and the next page break -->
-			<xsl:apply-templates select="." mode="serialize"/>
-		</xsl:result-document>
-	</xsl:for-each>
+		<xsl:for-each select="$exportable-surfaces">
+			<!-- write the page content to a file named for the @xml:id attribute of the <surface> with no xml declaration or indenting -->
+			<xsl:result-document href="{@xml:id}.tei.xml" omit-xml-declaration="yes" indent="no">
+				<!-- write out the content between the current page break and the next page break -->
+				<xsl:apply-templates select="." mode="serialize"/>
+			</xsl:result-document>
+		</xsl:for-each>
 
-	<!-- debug -->
-	<!--
+		<!-- debug -->
+		<!--
 	<xsl:result-document href="tidied.xml" omit-xml-declaration="yes" indent="yes">
 	    <xsl:sequence select="$tidied"/>
 	</xsl:result-document>
@@ -80,19 +80,19 @@
 	    <xsl:sequence select="$paginated"/>
 	</xsl:result-document>
     -->
-</xsl:template>
+	</xsl:template>
 
-<!-- copy any other elements while discarding unused namespace declarations -->
-<xsl:template match="*" mode="serialize">
-	<xsl:copy copy-namespaces="no">
-		<xsl:apply-templates select="@*" mode="serialize"/>
-		<xsl:apply-templates select="node()" mode="serialize"/>
-	</xsl:copy>
-</xsl:template>
+	<!-- copy any other elements while discarding unused namespace declarations -->
+	<xsl:template match="*" mode="serialize">
+		<xsl:copy copy-namespaces="no">
+			<xsl:apply-templates select="@*" mode="serialize"/>
+			<xsl:apply-templates select="node()" mode="serialize"/>
+		</xsl:copy>
+	</xsl:template>
 
-<!-- copy all attributes -->
-<xsl:template match="@*" mode="serialize">
-	<xsl:copy/>
-</xsl:template>
+	<!-- copy all attributes -->
+	<xsl:template match="@*" mode="serialize">
+		<xsl:copy/>
+	</xsl:template>
 
 </xsl:transform>

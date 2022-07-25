@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8"?><TEI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.tei-c.org/ns/1.0" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd" xml:lang="EN" xml:id="export">
+
+<teiHeader>
+  <fileDesc>
+    <titleStmt>
+      <title type="full">
+        <title type="main">Bates34</title>
+        <title type="desc"/>
+      </title>
+      <author>
+        <persName/>
+      </author>
+    </titleStmt>
+
+    <editionStmt>
+      <edition>Edition created from new transcripts of this manuscript.</edition>
+      <respStmt xml:id="AU6">
+        <resp>Initial upload of this work's facsimile images and metadata to FromThePage for editing</resp>
+        <persName>sophie </persName>
+      </respStmt>
+
+      <respStmt xml:id="OU6">
+        <resp>Adminstrator of the Bates transcription project on FromThePage</resp>
+        <persName>sophie </persName>
+      </respStmt>
+
+        <respStmt xml:id="U6">
+          <persName>sophie </persName>
+            <resp>
+              made 11 edits between
+              <date type="first_edit" when="2022-03-22T22:22:27Z">March 22, 2022</date> and
+              <date type="last_edit" when="2022-03-22T22:32:41Z">March 22, 2022</date>.
+            </resp>
+        </respStmt>
+
+
+
+    </editionStmt>
+
+    <publicationStmt>
+    <publisher>Dynamic TEI export from FromThePage (version 21.1)</publisher>
+      <availability>
+        <p/>
+      </availability>
+      <date when="2022-03-22T22:33:01+00:00">March 22, 2022</date>
+    </publicationStmt>
+
+    <sourceDesc>
+      <msDesc>
+        <msIdentifier>
+            <collection>Bates</collection>
+        </msIdentifier>
+        <physDesc>
+          <p/>
+        </physDesc>
+        <history>
+          <origin>
+            <placeName/>
+          </origin>
+          <provenance/>
+        </history>
+      </msDesc>
+
+
+    </sourceDesc>
+
+  </fileDesc>
+
+
+
+  <profileDesc>
+
+
+      <langUsage>
+        <language ident="eng">English</language>
+      </langUsage>
+  </profileDesc>
+
+  <revisionDesc>
+    <listChange ordered="true">
+        <change xml:id="CHG21" who="U6" when="2022-03-22T22:32:41Z" target="#P279">
+          Version 1 of page "Bates34-9T":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG20" who="U6" when="2022-03-22T22:32:28Z" target="#P278">
+          Version 1 of page "Bates34-8T":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG19" who="U6" when="2022-03-22T22:32:13Z" target="#P277">
+          Version 1 of page "Bates34-7T":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG18" who="U6" when="2022-03-22T22:31:24Z" target="#P276">
+          Version 1 of page "Bates34-6T":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG17" who="U6" when="2022-03-22T22:31:08Z" target="#P275">
+          Version 1 of page "Bates34-5T":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG16" who="U6" when="2022-03-22T22:28:59Z" target="#P274">
+          Version 1 of page "Bates34-4T":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG15" who="U6" when="2022-03-22T22:27:44Z" target="#P273">
+          Version 1 of page "Bates34-3T":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG14" who="U6" when="2022-03-22T22:24:32Z" target="#P272">
+          Version 1 of page "Bates34-2T":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG13" who="U6" when="2022-03-22T22:24:06Z" target="#P271">
+          Version 1 of page "Bates34-1bT":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG12" who="U6" when="2022-03-22T22:23:33Z" target="#P270">
+          Version 1 of page "Bates34-1aT":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG11" who="U6" when="2022-03-22T22:22:27Z" target="#P269">
+          Version 1 of page "Bates34-1M":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG10" who="U6" when="2022-03-22T22:18:44Z" target="#P279">
+          Version 0 of page "Bates34-9T":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG9" who="U6" when="2022-03-22T22:18:44Z" target="#P278">
+          Version 0 of page "Bates34-8T":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG8" who="U6" when="2022-03-22T22:18:44Z" target="#P277">
+          Version 0 of page "Bates34-7T":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG7" who="U6" when="2022-03-22T22:18:43Z" target="#P276">
+          Version 0 of page "Bates34-6T":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG6" who="U6" when="2022-03-22T22:18:43Z" target="#P275">
+          Version 0 of page "Bates34-5T":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG5" who="U6" when="2022-03-22T22:18:43Z" target="#P274">
+          Version 0 of page "Bates34-4T":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG4" who="U6" when="2022-03-22T22:18:43Z" target="#P273">
+          Version 0 of page "Bates34-3T":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG3" who="U6" when="2022-03-22T22:18:42Z" target="#P272">
+          Version 0 of page "Bates34-2T":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG2" who="U6" when="2022-03-22T22:18:42Z" target="#P271">
+          Version 0 of page "Bates34-1bT":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG1" who="U6" when="2022-03-22T22:18:42Z" target="#P270">
+          Version 0 of page "Bates34-1aT":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG0" who="U6" when="2022-03-22T22:18:42Z" target="#P269">
+          Version 0 of page "Bates34-1M":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+    </listChange>
+  </revisionDesc>
+</teiHeader>
+
+<text>
+  <body>
+        <pb xml:id="F269" n="1" facs="https://fromthepage.nyingarn.net/image-service/269/full/full/0/native.jpg"/>
+        <div xml:id="OTP269">
+        <fw type="pageNum">Bates34-1M</fw>
+        <p xml:id="OTP269P0"><lb/>
+Lorem/ipsum/dolor<lb/>
+ipsum dolor. sit.<lb/>
+amet. consectetur.<lb/>
+<hi rend="underline">adipiscing<lb/>
+elit</hi><lb/>
+(sed do. eiusmod tempor incididunt. ut labore, et)<lb/>
+dolore magna aliqua Ut enim, ad, minim veniam’quis nostrud, exercitation, ullamco.<lb/>
+ullamco. laboris.<lb/>
+
+</p>
+
+
+        </div>
+        <pb xml:id="F270" n="2" facs="https://fromthepage.nyingarn.net/image-service/270/full/full/0/native.jpg"/>
+        <div xml:id="OTP270">
+        <fw type="pageNum">Bates34-1aT</fw>
+        <p xml:id="OTP270P0">Lorem ipsum dolor<lb/>
+sit amet<lb/>
+<hi rend="underline">consectetur adipiscing<lb/>
+elit, sed </hi>
+</p>
+
+
+        </div>
+        <pb xml:id="F271" n="3" facs="https://fromthepage.nyingarn.net/image-service/271/full/full/0/native.jpg"/>
+        <div xml:id="OTP271">
+        <fw type="pageNum">Bates34-1bT</fw>
+        <p xml:id="OTP271P0"><hi rend="underline">Lorem ipsum<lb/>
+dolor, sit</hi><lb/>
+amet consectetur. (adipiscing)<lb/>
+elit sed do.
+</p>
+
+
+        </div>
+        <pb xml:id="F272" n="4" facs="https://fromthepage.nyingarn.net/image-service/272/full/full/0/native.jpg"/>
+        <div xml:id="OTP272">
+        <fw type="pageNum">Bates34-2T</fw>
+        <p xml:id="OTP272P0">Lorem/ipsum/dolor<lb/>
+ipsum dolor<lb/>
+<hi rend="underline">sit, amet</hi><lb/>
+(consectetur adipiscing. elit sed do. eiusmod tempor, incididunt)<lb/>
+ut labore et dolore magna, aliqua, Ut enim'ad minim, veniam, quis
+</p>
+
+
+        </div>
+        <pb xml:id="F273" n="5" facs="https://fromthepage.nyingarn.net/image-service/273/full/full/0/native.jpg"/>
+        <div xml:id="OTP273">
+        <fw type="pageNum">Bates34-3T</fw>
+        <p xml:id="OTP273P0">Lorem/ipsum<lb/>
+<hi rend="underline">ipsum, dolor, sit.</hi><lb/>
+<hi rend="underline">amet</hi><lb/>
+(consectetur adipiscing. elit sed do. eiusmod tempor, incididunt)<lb/>
+ut<lb/>
+labore	et<lb/>
+dolore	magna aliqua	Ut<lb/>
+enim		ad minim veniam<lb/>
+quis		nostrud exercitation ullamco<lb/>
+laboris - nisi		ut aliquip ex, ea commodo<lb/>
+Duis	aute irure. dolor, in, reprehenderit.<lb/>
+in			voluptate, velit<lb/>
+esse	cillum dolore (eu fugiat nulla pariatur)<lb/>
+Excepteur	sint occaecat - cupidatat non proident<lb/>
+in culpa - qui<lb/>
+deserunt	mollit anim - id est  - Lorem ipsum dolor sit’amet consectetur<lb/>
+elit	sed do eiusmod<lb/>
+tempor, incididunt ut<lb/>
+labore et<lb/>
+dolore	magna aliqua<lb/>
+Ut enim<lb/>
+ad minim (veniam), {“quis” nostrud, exercitation ullamco laboris’nisi ut aliquip ex ea commodo.}<lb/>
+commodo	consequat - Duis aute irure, dolor in reprehenderit<lb/>
+voluptate	velit esse cillum<lb/>
+dolore eu fugiat<lb/>
+nulla pariatur -Excepteur, sint, occaecat cupidatat non<lb/>
+proident	sunt in - culpa qui officia<lb/>
+mollit anim id<lb/>
+est	 Lorem ipsum, dolor., sit amet consectetur, adipiscing elit sed<lb/>
+do	eiusmod tempor incididunt ut labore<lb/>
+et dolore magna<lb/>
+aliqua	Ut enim - ad minim veniam<lb/>
+(nostrud exercitation)<lb/>
+ullamco	laboris nisi ut<lb/>
+aliquip ex ea commodo<lb/>
+consequat Duis aute<lb/>
+irure	dolor in<lb/>
+reprehenderit in (voluptate)<lb/>
+velit esse cillum (dolore eu fugiat) - nulla<lb/>
+Excepteur	sint occaecat cupidatat non<lb/>
+proident	sunt<lb/>
+in culpa qui officia<lb/>
+deserunt	mollit anim id<lb/>
+est	’Lorem ipsum (dolor sit amet)<lb/>
+amet	consectetur adipiscing<lb/>
+elit	sed do eiusmod tempor<lb/>
+incididunt	ut labore’ et dolore magna<lb/>
+aliqua	Ut’enim ad minim<lb/>
+minim	veniam’quis nostrud<lb/>
+nostrud exercitation - ullamco laboris nisi ut<lb/>
+ex ea - commodo consequat<lb/>
+aute	irure dolor’in reprehenderit in<lb/>
+in	voluptate velit - esse<lb/>
+dolore	eu fugiat<lb/>
+nulla	pariatur Excepteur sint occaecat (cupidatat non proident)<lb/>
+sunt	in culpa - qui<lb/>
+deserunt	mollit anim - id, est  Lorem<lb/>
+dolor, sit amet consectetur adipiscing<lb/>
+elit	sed do eiusmod tempor<lb/>
+incididunt	ut labore - et dolore<lb/>
+aliqua	Ut enim ad minim veniam<lb/>
+quis	nostrud exercitation ullamco laboris nisi<lb/>
+ut	aliquip ex ea commodo consequat Duis aute<lb/>
+irure	dolor, in, reprehenderit.<lb/>
+in	voluptate velit (esse cillum) - dolore eu fugiat<lb/>
+pariatur	Excepteur sint (occaecat cupidatat non)<lb/>
+
+</p>
+
+
+        </div>
+        <pb xml:id="F274" n="6" facs="https://fromthepage.nyingarn.net/image-service/274/full/full/0/native.jpg"/>
+        <div xml:id="OTP274">
+        <fw type="pageNum">Bates34-4T</fw>
+        <p xml:id="OTP274P0">Lorem/ipsum<lb/>
+ipsum	dolor sit amet<lb/>
+consectetur adipiscing<lb/>
+elit	sed’do eiusmod <lb/>
+eiusmod’tempor incididunt<lb/>
+incididunt	ut labore et dolore<lb/>
+magna	aliqua Ut’enim ad<lb/>
+ad	minim veniam’quis nostrud "exercitation ullamco laboris nisi ut" (aliquip ex ea commodo)<lb/>
+commodo	consequat Duis aute irure<lb/>
+dolor	in reprehenderit in voluptate<lb/>
+velit	esse cillum dolore; eu fugiat nulla pariatur Excepteur<lb/>
+sint	occaecat cupidatat non proident<lb/>
+sunt	in culpa qui officia<lb/>
+deserunt	mollit anim id est,  Lorem, ipsum, dolor, sit amet consectetur<lb/>
+adipiscing	elit sed do, eiusmod.<lb/>
+tempor incididunt<lb/>
+ut - labore<lb/>
+dolore<lb/>
+magna - aliqua<lb/>
+enim	ad minim<lb/>
+veniam - quis	nostrud’exercitation ullamco (laboris)<lb/>
+nisi	ut aliquip ex<lb/>
+ea commodo - consequat Duis<lb/>
+irure	dolor in<lb/>
+reprehenderit	in voluptate<lb/>
+velit esse cillum dolore eu<lb/>
+fugiat	nulla pariatur Excepteur<lb/>
+sint occaecat cupidatat non<lb/>
+proident	sunt, in culpa qui officia<lb/>
+deserunt	mollit anim id est<lb/>
+ Lorem ipsum dolor<lb/>
+sit	amet consectetur<lb/>
+adipiscing elit - sed do<lb/>
+tempor	incididunt ut labore<lb/>
+et	dolore magna aliqua - Ut enim<lb/>
+minim	veniam quis nostrud exercitation ullamco<lb/>
+laboris	nisi ut aliquip ex (?)<lb/>
+(commodo consequat)<lb/>
+Duis<lb/>
+aute	irure’ dolor<lb/>
+in	reprehenderit in voluptate velit esse<lb/>
+cillum dolore eu<lb/>
+fugiat	nulla pariatur Excepteur<lb/>
+sint, occaecat., cupidatat non proident sunt<lb/>
+in	culpa qui<lb/>
+(officia) deserunt - mollit anim (id) est () Lorem<lb/>
+dolor	sit’amet consectetur<lb/>
+(consectetur) adipiscing elit (sed) do eiusmod<lb/>
+tempor	incididunt ut labore et<lb/>
+(dolore) magna-aliqua Ut (enim) ad minim<lb/>
+minim	veniam-quis nostrud<lb/>
+(nostrud) exercitation ullamco<lb/>
+laboris	nisi ut aliquip - ex<lb/>
+commodo	consequat Duis aute<lb/>
+irure	dolor in reprehenderit<lb/>
+in	voluptate velit esse<lb/>
+cillum	dolore eu fugiat<lb/>
+nulla	pariatur Excepteur sint<lb/>
+occaecat-cupidatat	non proident sunt in culpa.<lb/>
+culpa qui<lb/>
+officia deserunt (mollit. anim)<lb/>
+id	est  - Lorem ipsum (dolor)<lb/>
+amet	consectetur - adipiscing elit<lb/>
+do-eiusmod	tempor'incididunt ut labore et dolore magna aliqua (Ut enim)<lb/>
+Ut-enim	ad minim veniam quis nostrud (exercitation ullamco laboris nisi ut)
+</p>
+
+<p xml:id="OTP274P1"/>
+        </div>
+        <pb xml:id="F275" n="7" facs="https://fromthepage.nyingarn.net/image-service/275/full/full/0/native.jpg"/>
+        <div xml:id="OTP275">
+        <fw type="pageNum">Bates34-5T</fw>
+        <p xml:id="OTP275P0">Lorem/ipsum<lb/>
+<hi rend="underline">ipsum, dolor.</hi><lb/>
+sit amet "consectetur" adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim, ad, minim, veniam., quis nostrud exercitation ullamco, laboris nisi "ut aliquip" ex ea commodo consequat Duis aute.<lb/>
+irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident sunt in, culpa qui officia. deserunt. mollit anim id est  Lorem ipsum dolor sit amet consectetur adipiscing elit sed do.eiusmod. tempor. incididunt ut labore et dolore magna aliqua Ut, enim ad minim veniam, quis nostrud exercitation ullamco laboris, nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in, voluptate velit esse cillum dolore, eu fugiat nulla pariatur Excepteur sint.<lb/>
+sint occaecat cupidatat, non, proident sunt in culpa qui officia deserunt mollit anim id, est  Lorem ipsum dolor sit amet consectetur adipiscing (elit sed) :-<lb/>
+<hi rend="underline">eiusmod tempor</hi> - incididunt, ut'labore, et'dolore, magna', aliqua, Ut'enim, ad, minim, veniam, quis.<lb/>
+<hi rend="underline">veniam quis nostrud exercitation</hi> - ullamco, laboris, nisi, ut, aliquip, ex, ea.<lb/>
+consequat Duis - aute. irure dolor - in.<lb/>
+voluptate velit esse cillum dolore eu fugiat nulla pariatur, Excepteur., sint occaecat cupidatat non proident sunt in, culpa qui officia deserunt (mollit anim id est);  (Lorem ipsum dolor); sit amet (consectetur adipiscing elit); sed (do eiusmod tempor incididunt ut labore) et. dolore.<lb/>
+magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip, ex ea commodo consequat Duis (aute irure), dolor (in); reprehenderit in voluptate velit esse cillum dolore, eu fugiat nulla (pariatur Excepteur sint "occaecat" cupidatat); non proident (sunt-in culpa); qui officia (deserunt, mollit, anim. id); est  (Lorem ipsum dolor sit amet consectetur adipiscing) elit.<lb/>
+elit sed do eiusmod tempor incididunt ut, labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea, commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore<lb/>
+
+</p>
+
+
+        </div>
+        <pb xml:id="F276" n="8" facs="https://fromthepage.nyingarn.net/image-service/276/full/full/0/native.jpg"/>
+        <div xml:id="OTP276">
+        <fw type="pageNum">Bates34-6T</fw>
+        <p xml:id="OTP276P0">Lorem/ipsum<lb/>
+ipsum<lb/>
+dolor sit amet consectetur adipiscing elit sed do eiusmod. tempor incididunt, ut labore et dolore, magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea, commodo consequat Duis aute irure, dolor in reprehenderit in, voluptate velit esse cillum, dolore, eu., fugiat nulla pariatur Excepteur sint occaecat cupidatat, non proident sunt in culpa qui officia deserunt mollit anim id est  Lorem, ipsum dolor sit amet consectetur adipiscing elit sed do.<lb/>
+eiusmod tempor, incididunt ut labore et dolore magna, aliqua Ut enim ad minim veniam' quis nostrud exercitation ullamco, laboris nisi, ut aliquip ex ea, commodo consequat Duis aute irure, dolor in, reprehenderit in voluptate velit esse cillum dolore eu, fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est  Lorem ipsum.<lb/>
+dolor sit amet consectetur adipiscing elit sed do eiusmod - tempor, incididunt ut labore et - dolore magna aliqua Ut enim ad minim veniam quis, nostrud exercitation ullamco laboris, nisi ut aliquip ex ea commodo consequat.<lb/>
+irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla, pariatur Excepteur sint, occaecat cupidatat, non proident, sunt in culpa qui officia deserunt mollit anim, id est  Lorem, ipsum dolor sit amet consectetur adipiscing elit sed do, eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis.<lb/>
+nostrud exercitation ullamco, laboris nisi ut aliquip ex ea commodo consequat Duis aute, irure dolor in reprehenderit in; voluptate velit esse cillum, dolore eu fugiat nulla pariatur Excepteur-sint, occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit {anim id est  Lorem ipsum dolor sit amet, consectetur adipiscing elit sed}. do eiusmod tempor incididunt ut labore et, dolore magna aliqua Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in, voluptate velit esse cillum dolore eu fugiat.<lb/>
+fugiat nulla pariatur Excepteur, sint occaecat cupidatat non proident sunt in, culpa qui officia deserunt mollit anim, id est  Lorem ipsum dolor sit amet consectetur adipiscing elit sed do. eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut.<lb/>
+
+</p>
+
+
+        </div>
+        <pb xml:id="F277" n="9" facs="https://fromthepage.nyingarn.net/image-service/277/full/full/0/native.jpg"/>
+        <div xml:id="OTP277">
+        <fw type="pageNum">Bates34-7T</fw>
+        <p xml:id="OTP277P0">Lorem/ipsum<lb/>
+ipsum<lb/>
+dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore, magna, aliqua Ut enim ad minim veniam quis nostrud, exercitation ullamco laboris nisi, ut aliquip ex ea, commodo consequat "Duis" aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat. non proident, sunt, in culpa qui officia, deserunt mollit anim id, est  Lorem ipsum dolor sit amet consectetur adipiscing elit sed do.<lb/>
+eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris, nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla.<lb/>
+pariatur Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est  Lorem ipsum dolor sit amet consectetur adipiscing elit sed, do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut. enim, ad, minim veniam, quis nostrud exercitation ullamco, laboris nisi, ut aliquip ex ea commodo consequat Duis aute, irure dolor in reprehenderit in voluptate "velit esse" cillum dolore eu fugiat. nulla pariatur Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit, anim id est  "Lorem" ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore, magna aliqua Ut, enim ad, minim veniam quis nostrud exercitation ullamco laboris nisi ut, aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum, dolore eu fugiat. nulla pariatur Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est.<lb/>
+ Lorem ipsum, dolor sit, amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore (et dolore magna aliqua) Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat, Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla. pariatur Excepteur sint occaecat cupidatat non proident sunt in.<lb/>
+culpa qui officia deserunt mollit anim id est , Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod, tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation.<lb/>
+ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat<lb/>
+
+</p>
+
+
+        </div>
+        <pb xml:id="F278" n="10" facs="https://fromthepage.nyingarn.net/image-service/278/full/full/0/native.jpg"/>
+        <div xml:id="OTP278">
+        <fw type="pageNum">Bates34-8T</fw>
+        <p xml:id="OTP278P0">Lorem/ipsum<lb/>
+ipsum<lb/>
+dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation ullamco laboris, nisi ut aliquip ex ea commodo consequat Duis, aute irure dolor in reprehenderit in (voluptate), velit (esse cillum dolore), eu-fugiat (nulla pariatur - Excepteur sint occaecat cupidatat non), proident (sunt' in), culpa (qui officia), deserunt (mollit anim), id est  (Lorem ipsum), dolor sit amet (consectetur adipiscing elit), sed do eiusmod tempor, incididunt'ut (labore et dolore, magna aliqua "Ut"), enim ad (minim veniam quis nostrud "exercitation" ullamco), laboris (nisi ut aliquip ex ea commodo consequat), Duis aute (irure' dolor) in reprehenderit in voluptate, velit esse cillum dolore-eu fugiat nulla pariatur Excepteur sint:- occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est  Lorem, ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut. labore et dolore, magna aliqua Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in, reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint, occaecat cupidatat non proident-sunt in culpa qui. officia deserunt mollit anim id est  Lorem ipsum dolor sit amet' consectetur, adipiscing elit sed do eiusmod tempor incididunt ut labore.<lb/>
+incididunt ut labore et dolore magna aliqua, Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris-nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in. reprehenderit in voluptate velit esse cillum dolore eu fugiat. nulla pariatur Excepteur sint occaecat-cupidatat non, proident sunt in culpa qui officia deserunt mollit. anim id est  Lorem ipsum dolor sit amet consectetur adipiscing elit sed do-eiusmod tempor.<lb/>
+do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad, minim veniam quis nostrud exercitation ullamco laboris nisi, ut aliquip ex ea commodo. consequat Duis aute irure dolor in reprehenderit in voluptate velit. esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est . Lorem ipsum dolor, sit amet consectetur-adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim "veniam" quis nostrud exercitation ullamco laboris nisi, ut aliquip ex ea commodo consequat Duis aute irure
+</p>
+
+<p xml:id="OTP278P1"/>
+        </div>
+        <pb xml:id="F279" n="11" facs="https://fromthepage.nyingarn.net/image-service/279/full/full/0/native.jpg"/>
+        <div xml:id="OTP279">
+        <fw type="pageNum">Bates34-9T</fw>
+        <p xml:id="OTP279P0">Lorem/ipsum<lb/>
+ipsum<lb/>
+dolor sit amet consectetur adipiscing. elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, Ut enim ad minim veniam quis nostrud exercitation ullamco laboris, nisi ut aliquip ex ea commodo. consequat Duis aute irure dolor in reprehenderit in voluptate, velit esse cillum dolore eu fugiat, nulla pariatur Excepteur sint occaecat cupidatat.<lb/>
+non proident sunt in culpa qui, officia deserunt mollit anim id est  Lorem ipsum, dolor sit amet consectetur adipiscing elit, sed do eiusmod, tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam. quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure, dolor in reprehenderit in voluptate velit. esse cillum dolore eu fugiat nulla pariatur Excepteur sint, occaecat cupidatat non proident sunt in culpa, qui officia deserunt mollit anim id, est " Lorem" ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod. tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip.<lb/>
+ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla, pariatur Excepteur sint occaecat cupidatat non proident sunt.<lb/>
+in-culpa-qui officia deserunt mollit anim id est  Lorem ipsum dolor, sit amet consectetur, adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut. aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident-sunt-in, culpa qui, officia deserunt mollit anim id est  Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.<lb/>
+exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum, dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non "proident” sunt in culpa qui. officia deserunt mollit anim id est  Lorem ipsum dolor sit amet consectetur adipiscing elit sed do, eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim, ad minim veniam quis nostrud exercitation ullamco "laboris." nisi ut aliquip ex ea commodo
+</p>
+
+<p xml:id="OTP279P1"/>
+        </div>
+  </body>
+</text>
+</TEI>

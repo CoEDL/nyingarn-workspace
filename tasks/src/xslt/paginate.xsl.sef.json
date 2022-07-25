@@ -1,1 +1,1431 @@
-{"N":"package","version":"30","packageVersion":"1","saxonVersion":"SaxonJS 2.4","target":"JS","targetVersion":"2","name":"TOP-LEVEL","relocatable":"false","buildDateTime":"2022-07-25T01:08:52.074Z","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0","defaultElementNS":"http://www.tei-c.org/ns/1.0","C":[{"N":"co","binds":"","id":"0","C":[{"N":"mode","onNo":"SC","flags":"","patternSlots":"0","name":"Q{}paginate","prec":"","C":[{"N":"templateRule","rank":"0","prec":"0","seq":"0","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0","minImp":"0","flags":"s","slots":"200","baseUri":"file:///srv/tasks/src/xslt/paginate.xsl","line":"11","module":"paginate.xsl","xpath-default-namespace":"http://www.tei-c.org/ns/1.0","expand-text":"true","match":"/TEI/text","prio":"0.5","matches":"NE nQ{http://www.tei-c.org/ns/1.0}text","C":[{"N":"p.withUpper","role":"match","axis":"parent","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}text","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"p.nodeTest","test":"NE nQ{http://www.tei-c.org/ns/1.0}text"},{"N":"p.withUpper","axis":"parent","C":[{"N":"p.nodeTest","test":"NE nQ{http://www.tei-c.org/ns/1.0}TEI"},{"N":"p.nodeTest","test":"ND"}]}]},{"N":"let","var":"Q{}content","slot":"0","sType":"*NE ","line":"14","role":"action","C":[{"N":"docOrder","sType":"*N","role":"select","line":"14","C":[{"N":"slash","op":"/","sType":"*N","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"axis","name":"child","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}body"},{"N":"axis","name":"child","nodeTest":"*N u[NT,NP,NC,NE]"}]}]},{"N":"let","var":"Q{}page-breaks","slot":"1","sType":"*NE ","line":"15","C":[{"N":"docOrder","sType":"*NE nQ{http://www.tei-c.org/ns/1.0}pb","role":"select","line":"15","C":[{"N":"docOrder","sType":"*NE nQ{http://www.tei-c.org/ns/1.0}pb","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}content","slot":"0"}]},{"N":"axis","name":"self","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]}]},{"N":"elem","name":"sourceDoc","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}sourceDoc ","nsuri":"http://www.tei-c.org/ns/1.0","namespaces":"=http://www.tei-c.org/ns/1.0","line":"16","C":[{"N":"forEach","sType":"*NE ","line":"17","C":[{"N":"varRef","name":"Q{}page-breaks","slot":"1","sType":"*","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"17"},{"N":"let","var":"Q{}current-page-break","slot":"2","sType":"*NE ","line":"19","C":[{"N":"dot","sType":"1","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"19"},{"N":"elem","name":"surface","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}surface ","nsuri":"http://www.tei-c.org/ns/1.0","namespaces":"=http://www.tei-c.org/ns/1.0","line":"21","C":[{"N":"sequence","sType":"*N ","C":[{"N":"copyOf","flags":"c","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export","line":"22","sType":"*NA","C":[{"N":"docOrder","sType":"*NA","role":"select","line":"22","C":[{"N":"docOrder","sType":"*NA","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}current-page-break","slot":"2"}]},{"N":"axis","name":"attribute","nodeTest":"*NA"}]}]}]}]},{"N":"docOrder","sType":"*N","role":"select","line":"23","C":[{"N":"docOrder","sType":"*N","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}current-page-break","slot":"2"}]},{"N":"filter","C":[{"N":"filter","C":[{"N":"axis","name":"following-sibling","nodeTest":"*N"},{"N":"fn","name":"not","C":[{"N":"axis","name":"self","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]},{"N":"is","C":[{"N":"fn","name":"reverse","C":[{"N":"first","C":[{"N":"axis","name":"preceding-sibling","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]},{"N":"treat","as":"N","diag":"1|0||Expression","C":[{"N":"check","card":"?","diag":"1|0||Expression","C":[{"N":"varRef","name":"Q{}current-page-break","slot":"2"}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]},{"N":"co","id":"1","binds":"1","C":[{"N":"mode","onNo":"SC","flags":"","patternSlots":"0","name":"Q{}bubble-pagebreaks","prec":"","C":[{"N":"templateRule","rank":"0","prec":"0","seq":"1","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0","minImp":"0","flags":"s","slots":"200","baseUri":"file:///srv/tasks/src/xslt/paginate.xsl","line":"31","module":"paginate.xsl","xpath-default-namespace":"http://www.tei-c.org/ns/1.0","expand-text":"true","match":"body//*","prio":"0.5","matches":"NE","C":[{"N":"p.withUpper","role":"match","axis":"ancestor","sType":"1NE","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"p.nodeTest","test":"NE"},{"N":"p.nodeTest","test":"NE nQ{http://www.tei-c.org/ns/1.0}body"}]},{"N":"let","var":"Q{}container","slot":"0","sType":"* ","line":"32","role":"action","C":[{"N":"dot","sType":"1NE","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"32"},{"N":"let","var":"Q{}paginated-content","slot":"1","sType":"* ","line":"33","C":[{"N":"doc","sType":"1ND ","base":"file:///srv/tasks/src/xslt/paginate.xsl","role":"select","C":[{"N":"applyT","sType":"* ","line":"34","mode":"Q{}bubble-pagebreaks","bSlot":"0","C":[{"N":"axis","name":"child","nodeTest":"*N u[NT,NP,NC,NE]","sType":"*N u[NT,NP,NC,NE]","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"34"}]}]},{"N":"let","var":"Q{}page-breaks","slot":"2","sType":"* ","line":"37","C":[{"N":"docOrder","sType":"*NE nQ{http://www.tei-c.org/ns/1.0}pb","role":"select","line":"37","C":[{"N":"docOrder","sType":"*NE nQ{http://www.tei-c.org/ns/1.0}pb","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}paginated-content","slot":"1"}]},{"N":"axis","name":"child","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]}]},{"N":"choose","sType":"* ","type":"item()*","line":"38","C":[{"N":"varRef","name":"Q{}page-breaks","slot":"2","sType":"*","ns":"= xml=~ fn=~ xsl=~ ","line":"39"},{"N":"let","var":"Q{}first-page-break-at-top-of-container","slot":"3","sType":"* ","line":"44","C":[{"N":"filter","sType":"?","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"44","C":[{"N":"first","C":[{"N":"varRef","name":"Q{}page-breaks","slot":"2"}]},{"N":"fn","name":"not","C":[{"N":"fn","name":"reverse","C":[{"N":"filter","C":[{"N":"axis","name":"preceding-sibling","nodeTest":"*N"},{"N":"fn","name":"normalize-space","C":[{"N":"fn","name":"string","C":[{"N":"dot"}]}]}]}]}]}]},{"N":"sequence","sType":"* ","C":[{"N":"choose","sType":"* ","type":"item()*","line":"45","C":[{"N":"varRef","name":"Q{}first-page-break-at-top-of-container","slot":"3","sType":"*","ns":"= xml=~ fn=~ xsl=~ ","line":"46"},{"N":"sequence","sType":"* ","C":[{"N":"first","sType":"?","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"47","C":[{"N":"varRef","name":"Q{}page-breaks","slot":"2"}]},{"N":"forEach","sType":"* ","C":[{"N":"check","card":"?","sType":"? ","diag":"2|0|XTTE3180|xsl:copy/@select","role":"select","line":"48","C":[{"N":"varRef","name":"Q{}container","slot":"0","sType":"*","ns":"= xml=~ fn=~ xsl=~ "}]},{"N":"copy","sType":"1 ","flags":"cin","line":"48","C":[{"N":"sequence","sType":"*N ","C":[{"N":"copyOf","flags":"c","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export","line":"49","sType":"*NA","C":[{"N":"docOrder","sType":"*NA","role":"select","line":"49","C":[{"N":"docOrder","sType":"*NA","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}container","slot":"0"}]},{"N":"axis","name":"attribute","nodeTest":"*NA"}]}]}]}]},{"N":"docOrder","sType":"*N","role":"select","line":"50","C":[{"N":"docOrder","sType":"*N","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}paginated-content","slot":"1"}]},{"N":"filter","C":[{"N":"filter","C":[{"N":"axis","name":"child","nodeTest":"*N u[NT,NP,NC,NE]"},{"N":"is","C":[{"N":"fn","name":"reverse","C":[{"N":"first","C":[{"N":"axis","name":"preceding-sibling","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]},{"N":"treat","as":"N","diag":"1|0||Expression","C":[{"N":"check","card":"?","diag":"1|0||Expression","C":[{"N":"varRef","name":"Q{}first-page-break-at-top-of-container","slot":"3"}]}]}]}]},{"N":"fn","name":"not","C":[{"N":"axis","name":"self","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]}]}]}]}]}]}]}]},{"N":"true"},{"N":"forEach","sType":"* ","C":[{"N":"check","card":"?","sType":"? ","diag":"2|0|XTTE3180|xsl:copy/@select","role":"select","line":"55","C":[{"N":"varRef","name":"Q{}container","slot":"0","sType":"*","ns":"= xml=~ fn=~ xsl=~ "}]},{"N":"copy","sType":"1 ","flags":"cin","line":"55","C":[{"N":"sequence","sType":"*N ","C":[{"N":"copyOf","flags":"c","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export","line":"56","sType":"*NA","C":[{"N":"docOrder","sType":"*NA","role":"select","line":"56","C":[{"N":"docOrder","sType":"*NA","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}container","slot":"0"}]},{"N":"axis","name":"attribute","nodeTest":"*NA"}]}]}]}]},{"N":"att","name":"part","sType":"1NA ","line":"57","C":[{"N":"fn","name":"string-join","role":"select","C":[{"N":"forEach","sType":"*AS ","C":[{"N":"data","sType":"*A ","C":[{"N":"mergeAdj","C":[{"N":"valueOf","sType":"1NT ","C":[{"N":"str","sType":"1AS ","val":"I"}]}]}]},{"N":"fn","name":"string","sType":"1AS ","C":[{"N":"dot"}]}]},{"N":"str","sType":"1AS ","val":""}]}]},{"N":"docOrder","sType":"*N","role":"select","line":"59","C":[{"N":"docOrder","sType":"*N","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}paginated-content","slot":"1"}]},{"N":"filter","flags":"p","C":[{"N":"axis","name":"child","nodeTest":"*N u[NT,NP,NC,NE]"},{"N":"is","C":[{"N":"first","C":[{"N":"axis","name":"following-sibling","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]},{"N":"treat","as":"N","diag":"1|0||Expression","C":[{"N":"check","card":"?","diag":"1|0||Expression","C":[{"N":"first","C":[{"N":"varRef","name":"Q{}page-breaks","slot":"2"}]}]}]}]}]}]}]}]}]}]}]}]},{"N":"forEach","sType":"* ","line":"65","C":[{"N":"except","op":"except","sType":"*NE nQ{http://www.tei-c.org/ns/1.0}pb","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"65","C":[{"N":"docOrder","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}paginated-content","slot":"1"}]},{"N":"axis","name":"child","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]},{"N":"docOrder","C":[{"N":"treat","as":"N","diag":"1|1||except","C":[{"N":"varRef","name":"Q{}first-page-break-at-top-of-container","slot":"3"}]}]}]},{"N":"let","var":"Q{}pb","slot":"4","sType":"* ","line":"66","C":[{"N":"dot","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}pb","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"66"},{"N":"sequence","sType":"* ","C":[{"N":"copyOf","flags":"c","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export","line":"67","sType":"*","C":[{"N":"varRef","name":"Q{}pb","slot":"4","sType":"*","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"67"}]},{"N":"forEach","sType":"* ","C":[{"N":"check","card":"?","sType":"? ","diag":"2|0|XTTE3180|xsl:copy/@select","role":"select","line":"68","C":[{"N":"varRef","name":"Q{}container","slot":"0","sType":"*","ns":"= xml=~ fn=~ xsl=~ "}]},{"N":"copy","sType":"1 ","flags":"cin","line":"68","C":[{"N":"sequence","sType":"*N ","C":[{"N":"copyOf","flags":"c","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export","line":"69","sType":"*NA","C":[{"N":"docOrder","sType":"*NA","role":"select","line":"69","C":[{"N":"docOrder","sType":"*NA","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}container","slot":"0"}]},{"N":"axis","name":"attribute","nodeTest":"*NA"}]}]}]}]},{"N":"att","name":"part","sType":"1NA ","line":"70","C":[{"N":"fn","name":"string-join","role":"select","C":[{"N":"choose","sType":"1AS","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"70","C":[{"N":"docOrder","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}pb","slot":"4"}]},{"N":"axis","name":"following-sibling","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]},{"N":"str","val":"M"},{"N":"true"},{"N":"str","val":"F"}]},{"N":"str","sType":"1AS ","val":" "}]}]},{"N":"docOrder","sType":"*N","role":"select","line":"72","C":[{"N":"docOrder","sType":"*N","ns":"= xml=~ fn=~ xsl=~ ","C":[{"N":"slash","op":"/","C":[{"N":"treat","as":"N","diag":"1|0|XPTY0019|slash","C":[{"N":"varRef","name":"Q{}paginated-content","slot":"1"}]},{"N":"filter","C":[{"N":"filter","C":[{"N":"axis","name":"child","nodeTest":"*N u[NT,NP,NC,NE]"},{"N":"is","C":[{"N":"fn","name":"reverse","C":[{"N":"first","C":[{"N":"axis","name":"preceding-sibling","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]},{"N":"treat","as":"N","diag":"1|0||Expression","C":[{"N":"check","card":"?","diag":"1|0||Expression","C":[{"N":"varRef","name":"Q{}pb","slot":"4"}]}]}]}]},{"N":"fn","name":"not","C":[{"N":"axis","name":"self","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]}]}]}]}]}]}]}]}]}]}]}]},{"N":"true"},{"N":"varRef","name":"Q{}container","slot":"0","sType":"*","ns":"= xml=~ fn=~ xsl=~ ","role":"select","line":"78"}]}]}]}]}]}]}]},{"N":"co","binds":"","id":"2","C":[{"N":"mode","onNo":"TC","flags":"","patternSlots":"0","prec":""}]},{"N":"overridden"},{"N":"output","C":[{"N":"property","name":"Q{http://saxon.sf.net/}stylesheet-version","value":"30"},{"N":"property","name":"indent","value":"yes"},{"N":"property","name":"method","value":"xml"}]},{"N":"decimalFormat"}],"Σ":"36f35488"}
+{
+    "N": "package",
+    "version": "30",
+    "packageVersion": "1",
+    "saxonVersion": "SaxonJS 2.4",
+    "target": "JS",
+    "targetVersion": "2",
+    "name": "TOP-LEVEL",
+    "relocatable": "false",
+    "buildDateTime": "2022-07-25T01:08:52.074Z",
+    "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0",
+    "defaultElementNS": "http://www.tei-c.org/ns/1.0",
+    "C": [
+        {
+            "N": "co",
+            "binds": "",
+            "id": "0",
+            "C": [
+                {
+                    "N": "mode",
+                    "onNo": "SC",
+                    "flags": "",
+                    "patternSlots": "0",
+                    "name": "Q{}paginate",
+                    "prec": "",
+                    "C": [
+                        {
+                            "N": "templateRule",
+                            "rank": "0",
+                            "prec": "0",
+                            "seq": "0",
+                            "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0",
+                            "minImp": "0",
+                            "flags": "s",
+                            "slots": "200",
+                            "baseUri": "file:///srv/tasks/src/xslt/paginate.xsl",
+                            "line": "11",
+                            "module": "paginate.xsl",
+                            "xpath-default-namespace": "http://www.tei-c.org/ns/1.0",
+                            "expand-text": "true",
+                            "match": "/TEI/text",
+                            "prio": "0.5",
+                            "matches": "NE nQ{http://www.tei-c.org/ns/1.0}text",
+                            "C": [
+                                {
+                                    "N": "p.withUpper",
+                                    "role": "match",
+                                    "axis": "parent",
+                                    "sType": "1NE nQ{http://www.tei-c.org/ns/1.0}text",
+                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                    "C": [
+                                        {
+                                            "N": "p.nodeTest",
+                                            "test": "NE nQ{http://www.tei-c.org/ns/1.0}text"
+                                        },
+                                        {
+                                            "N": "p.withUpper",
+                                            "axis": "parent",
+                                            "C": [
+                                                {
+                                                    "N": "p.nodeTest",
+                                                    "test": "NE nQ{http://www.tei-c.org/ns/1.0}TEI"
+                                                },
+                                                { "N": "p.nodeTest", "test": "ND" }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "N": "let",
+                                    "var": "Q{}content",
+                                    "slot": "0",
+                                    "sType": "*NE ",
+                                    "line": "14",
+                                    "role": "action",
+                                    "C": [
+                                        {
+                                            "N": "docOrder",
+                                            "sType": "*N",
+                                            "role": "select",
+                                            "line": "14",
+                                            "C": [
+                                                {
+                                                    "N": "slash",
+                                                    "op": "/",
+                                                    "sType": "*N",
+                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                    "C": [
+                                                        {
+                                                            "N": "axis",
+                                                            "name": "child",
+                                                            "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}body"
+                                                        },
+                                                        {
+                                                            "N": "axis",
+                                                            "name": "child",
+                                                            "nodeTest": "*N u[NT,NP,NC,NE]"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "N": "let",
+                                            "var": "Q{}page-breaks",
+                                            "slot": "1",
+                                            "sType": "*NE ",
+                                            "line": "15",
+                                            "C": [
+                                                {
+                                                    "N": "docOrder",
+                                                    "sType": "*NE nQ{http://www.tei-c.org/ns/1.0}pb",
+                                                    "role": "select",
+                                                    "line": "15",
+                                                    "C": [
+                                                        {
+                                                            "N": "docOrder",
+                                                            "sType": "*NE nQ{http://www.tei-c.org/ns/1.0}pb",
+                                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                                            "C": [
+                                                                {
+                                                                    "N": "slash",
+                                                                    "op": "/",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "treat",
+                                                                            "as": "N",
+                                                                            "diag": "1|0|XPTY0019|slash",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "varRef",
+                                                                                    "name": "Q{}content",
+                                                                                    "slot": "0"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "N": "axis",
+                                                                            "name": "self",
+                                                                            "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "N": "elem",
+                                                    "name": "sourceDoc",
+                                                    "sType": "1NE nQ{http://www.tei-c.org/ns/1.0}sourceDoc ",
+                                                    "nsuri": "http://www.tei-c.org/ns/1.0",
+                                                    "namespaces": "=http://www.tei-c.org/ns/1.0",
+                                                    "line": "16",
+                                                    "C": [
+                                                        {
+                                                            "N": "forEach",
+                                                            "sType": "*NE ",
+                                                            "line": "17",
+                                                            "C": [
+                                                                {
+                                                                    "N": "varRef",
+                                                                    "name": "Q{}page-breaks",
+                                                                    "slot": "1",
+                                                                    "sType": "*",
+                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                    "role": "select",
+                                                                    "line": "17"
+                                                                },
+                                                                {
+                                                                    "N": "let",
+                                                                    "var": "Q{}current-page-break",
+                                                                    "slot": "2",
+                                                                    "sType": "*NE ",
+                                                                    "line": "19",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "dot",
+                                                                            "sType": "1",
+                                                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                            "role": "select",
+                                                                            "line": "19"
+                                                                        },
+                                                                        {
+                                                                            "N": "elem",
+                                                                            "name": "surface",
+                                                                            "sType": "1NE nQ{http://www.tei-c.org/ns/1.0}surface ",
+                                                                            "nsuri": "http://www.tei-c.org/ns/1.0",
+                                                                            "namespaces": "=http://www.tei-c.org/ns/1.0",
+                                                                            "line": "21",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "sequence",
+                                                                                    "sType": "*N ",
+                                                                                    "C": [
+                                                                                        {
+                                                                                            "N": "copyOf",
+                                                                                            "flags": "c",
+                                                                                            "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export",
+                                                                                            "line": "22",
+                                                                                            "sType": "*NA",
+                                                                                            "C": [
+                                                                                                {
+                                                                                                    "N": "docOrder",
+                                                                                                    "sType": "*NA",
+                                                                                                    "role": "select",
+                                                                                                    "line": "22",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "docOrder",
+                                                                                                            "sType": "*NA",
+                                                                                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "slash",
+                                                                                                                    "op": "/",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "treat",
+                                                                                                                            "as": "N",
+                                                                                                                            "diag": "1|0|XPTY0019|slash",
+                                                                                                                            "C": [
+                                                                                                                                {
+                                                                                                                                    "N": "varRef",
+                                                                                                                                    "name": "Q{}current-page-break",
+                                                                                                                                    "slot": "2"
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "N": "axis",
+                                                                                                                            "name": "attribute",
+                                                                                                                            "nodeTest": "*NA"
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "N": "docOrder",
+                                                                                            "sType": "*N",
+                                                                                            "role": "select",
+                                                                                            "line": "23",
+                                                                                            "C": [
+                                                                                                {
+                                                                                                    "N": "docOrder",
+                                                                                                    "sType": "*N",
+                                                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "slash",
+                                                                                                            "op": "/",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "treat",
+                                                                                                                    "as": "N",
+                                                                                                                    "diag": "1|0|XPTY0019|slash",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "varRef",
+                                                                                                                            "name": "Q{}current-page-break",
+                                                                                                                            "slot": "2"
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "N": "filter",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "filter",
+                                                                                                                            "C": [
+                                                                                                                                {
+                                                                                                                                    "N": "axis",
+                                                                                                                                    "name": "following-sibling",
+                                                                                                                                    "nodeTest": "*N"
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                    "N": "fn",
+                                                                                                                                    "name": "not",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "axis",
+                                                                                                                                            "name": "self",
+                                                                                                                                            "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "N": "is",
+                                                                                                                            "C": [
+                                                                                                                                {
+                                                                                                                                    "N": "fn",
+                                                                                                                                    "name": "reverse",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "first",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "axis",
+                                                                                                                                                    "name": "preceding-sibling",
+                                                                                                                                                    "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                    "N": "treat",
+                                                                                                                                    "as": "N",
+                                                                                                                                    "diag": "1|0||Expression",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "check",
+                                                                                                                                            "card": "?",
+                                                                                                                                            "diag": "1|0||Expression",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "varRef",
+                                                                                                                                                    "name": "Q{}current-page-break",
+                                                                                                                                                    "slot": "2"
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "N": "co",
+            "id": "1",
+            "binds": "1",
+            "C": [
+                {
+                    "N": "mode",
+                    "onNo": "SC",
+                    "flags": "",
+                    "patternSlots": "0",
+                    "name": "Q{}bubble-pagebreaks",
+                    "prec": "",
+                    "C": [
+                        {
+                            "N": "templateRule",
+                            "rank": "0",
+                            "prec": "0",
+                            "seq": "1",
+                            "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0",
+                            "minImp": "0",
+                            "flags": "s",
+                            "slots": "200",
+                            "baseUri": "file:///srv/tasks/src/xslt/paginate.xsl",
+                            "line": "31",
+                            "module": "paginate.xsl",
+                            "xpath-default-namespace": "http://www.tei-c.org/ns/1.0",
+                            "expand-text": "true",
+                            "match": "body//*",
+                            "prio": "0.5",
+                            "matches": "NE",
+                            "C": [
+                                {
+                                    "N": "p.withUpper",
+                                    "role": "match",
+                                    "axis": "ancestor",
+                                    "sType": "1NE",
+                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                    "C": [
+                                        { "N": "p.nodeTest", "test": "NE" },
+                                        {
+                                            "N": "p.nodeTest",
+                                            "test": "NE nQ{http://www.tei-c.org/ns/1.0}body"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "N": "let",
+                                    "var": "Q{}container",
+                                    "slot": "0",
+                                    "sType": "* ",
+                                    "line": "32",
+                                    "role": "action",
+                                    "C": [
+                                        {
+                                            "N": "dot",
+                                            "sType": "1NE",
+                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                            "role": "select",
+                                            "line": "32"
+                                        },
+                                        {
+                                            "N": "let",
+                                            "var": "Q{}paginated-content",
+                                            "slot": "1",
+                                            "sType": "* ",
+                                            "line": "33",
+                                            "C": [
+                                                {
+                                                    "N": "doc",
+                                                    "sType": "1ND ",
+                                                    "base": "file:///srv/tasks/src/xslt/paginate.xsl",
+                                                    "role": "select",
+                                                    "C": [
+                                                        {
+                                                            "N": "applyT",
+                                                            "sType": "* ",
+                                                            "line": "34",
+                                                            "mode": "Q{}bubble-pagebreaks",
+                                                            "bSlot": "0",
+                                                            "C": [
+                                                                {
+                                                                    "N": "axis",
+                                                                    "name": "child",
+                                                                    "nodeTest": "*N u[NT,NP,NC,NE]",
+                                                                    "sType": "*N u[NT,NP,NC,NE]",
+                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                    "role": "select",
+                                                                    "line": "34"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "N": "let",
+                                                    "var": "Q{}page-breaks",
+                                                    "slot": "2",
+                                                    "sType": "* ",
+                                                    "line": "37",
+                                                    "C": [
+                                                        {
+                                                            "N": "docOrder",
+                                                            "sType": "*NE nQ{http://www.tei-c.org/ns/1.0}pb",
+                                                            "role": "select",
+                                                            "line": "37",
+                                                            "C": [
+                                                                {
+                                                                    "N": "docOrder",
+                                                                    "sType": "*NE nQ{http://www.tei-c.org/ns/1.0}pb",
+                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "slash",
+                                                                            "op": "/",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "treat",
+                                                                                    "as": "N",
+                                                                                    "diag": "1|0|XPTY0019|slash",
+                                                                                    "C": [
+                                                                                        {
+                                                                                            "N": "varRef",
+                                                                                            "name": "Q{}paginated-content",
+                                                                                            "slot": "1"
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "N": "axis",
+                                                                                    "name": "child",
+                                                                                    "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "N": "choose",
+                                                            "sType": "* ",
+                                                            "type": "item()*",
+                                                            "line": "38",
+                                                            "C": [
+                                                                {
+                                                                    "N": "varRef",
+                                                                    "name": "Q{}page-breaks",
+                                                                    "slot": "2",
+                                                                    "sType": "*",
+                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                    "line": "39"
+                                                                },
+                                                                {
+                                                                    "N": "let",
+                                                                    "var": "Q{}first-page-break-at-top-of-container",
+                                                                    "slot": "3",
+                                                                    "sType": "* ",
+                                                                    "line": "44",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "filter",
+                                                                            "sType": "?",
+                                                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                            "role": "select",
+                                                                            "line": "44",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "first",
+                                                                                    "C": [
+                                                                                        {
+                                                                                            "N": "varRef",
+                                                                                            "name": "Q{}page-breaks",
+                                                                                            "slot": "2"
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "N": "fn",
+                                                                                    "name": "not",
+                                                                                    "C": [
+                                                                                        {
+                                                                                            "N": "fn",
+                                                                                            "name": "reverse",
+                                                                                            "C": [
+                                                                                                {
+                                                                                                    "N": "filter",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "axis",
+                                                                                                            "name": "preceding-sibling",
+                                                                                                            "nodeTest": "*N"
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "N": "fn",
+                                                                                                            "name": "normalize-space",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "fn",
+                                                                                                                    "name": "string",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "dot"
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "N": "sequence",
+                                                                            "sType": "* ",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "choose",
+                                                                                    "sType": "* ",
+                                                                                    "type": "item()*",
+                                                                                    "line": "45",
+                                                                                    "C": [
+                                                                                        {
+                                                                                            "N": "varRef",
+                                                                                            "name": "Q{}first-page-break-at-top-of-container",
+                                                                                            "slot": "3",
+                                                                                            "sType": "*",
+                                                                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                            "line": "46"
+                                                                                        },
+                                                                                        {
+                                                                                            "N": "sequence",
+                                                                                            "sType": "* ",
+                                                                                            "C": [
+                                                                                                {
+                                                                                                    "N": "first",
+                                                                                                    "sType": "?",
+                                                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                    "role": "select",
+                                                                                                    "line": "47",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "varRef",
+                                                                                                            "name": "Q{}page-breaks",
+                                                                                                            "slot": "2"
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                {
+                                                                                                    "N": "forEach",
+                                                                                                    "sType": "* ",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "check",
+                                                                                                            "card": "?",
+                                                                                                            "sType": "? ",
+                                                                                                            "diag": "2|0|XTTE3180|xsl:copy/@select",
+                                                                                                            "role": "select",
+                                                                                                            "line": "48",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "varRef",
+                                                                                                                    "name": "Q{}container",
+                                                                                                                    "slot": "0",
+                                                                                                                    "sType": "*",
+                                                                                                                    "ns": "= xml=~ fn=~ xsl=~ "
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "N": "copy",
+                                                                                                            "sType": "1 ",
+                                                                                                            "flags": "cin",
+                                                                                                            "line": "48",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "sequence",
+                                                                                                                    "sType": "*N ",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "copyOf",
+                                                                                                                            "flags": "c",
+                                                                                                                            "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export",
+                                                                                                                            "line": "49",
+                                                                                                                            "sType": "*NA",
+                                                                                                                            "C": [
+                                                                                                                                {
+                                                                                                                                    "N": "docOrder",
+                                                                                                                                    "sType": "*NA",
+                                                                                                                                    "role": "select",
+                                                                                                                                    "line": "49",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "docOrder",
+                                                                                                                                            "sType": "*NA",
+                                                                                                                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "slash",
+                                                                                                                                                    "op": "/",
+                                                                                                                                                    "C": [
+                                                                                                                                                        {
+                                                                                                                                                            "N": "treat",
+                                                                                                                                                            "as": "N",
+                                                                                                                                                            "diag": "1|0|XPTY0019|slash",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "varRef",
+                                                                                                                                                                    "name": "Q{}container",
+                                                                                                                                                                    "slot": "0"
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        },
+                                                                                                                                                        {
+                                                                                                                                                            "N": "axis",
+                                                                                                                                                            "name": "attribute",
+                                                                                                                                                            "nodeTest": "*NA"
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "N": "docOrder",
+                                                                                                                            "sType": "*N",
+                                                                                                                            "role": "select",
+                                                                                                                            "line": "50",
+                                                                                                                            "C": [
+                                                                                                                                {
+                                                                                                                                    "N": "docOrder",
+                                                                                                                                    "sType": "*N",
+                                                                                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "slash",
+                                                                                                                                            "op": "/",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "treat",
+                                                                                                                                                    "as": "N",
+                                                                                                                                                    "diag": "1|0|XPTY0019|slash",
+                                                                                                                                                    "C": [
+                                                                                                                                                        {
+                                                                                                                                                            "N": "varRef",
+                                                                                                                                                            "name": "Q{}paginated-content",
+                                                                                                                                                            "slot": "1"
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                },
+                                                                                                                                                {
+                                                                                                                                                    "N": "filter",
+                                                                                                                                                    "C": [
+                                                                                                                                                        {
+                                                                                                                                                            "N": "filter",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "axis",
+                                                                                                                                                                    "name": "child",
+                                                                                                                                                                    "nodeTest": "*N u[NT,NP,NC,NE]"
+                                                                                                                                                                },
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "is",
+                                                                                                                                                                    "C": [
+                                                                                                                                                                        {
+                                                                                                                                                                            "N": "fn",
+                                                                                                                                                                            "name": "reverse",
+                                                                                                                                                                            "C": [
+                                                                                                                                                                                {
+                                                                                                                                                                                    "N": "first",
+                                                                                                                                                                                    "C": [
+                                                                                                                                                                                        {
+                                                                                                                                                                                            "N": "axis",
+                                                                                                                                                                                            "name": "preceding-sibling",
+                                                                                                                                                                                            "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                                                                                                                        }
+                                                                                                                                                                                    ]
+                                                                                                                                                                                }
+                                                                                                                                                                            ]
+                                                                                                                                                                        },
+                                                                                                                                                                        {
+                                                                                                                                                                            "N": "treat",
+                                                                                                                                                                            "as": "N",
+                                                                                                                                                                            "diag": "1|0||Expression",
+                                                                                                                                                                            "C": [
+                                                                                                                                                                                {
+                                                                                                                                                                                    "N": "check",
+                                                                                                                                                                                    "card": "?",
+                                                                                                                                                                                    "diag": "1|0||Expression",
+                                                                                                                                                                                    "C": [
+                                                                                                                                                                                        {
+                                                                                                                                                                                            "N": "varRef",
+                                                                                                                                                                                            "name": "Q{}first-page-break-at-top-of-container",
+                                                                                                                                                                                            "slot": "3"
+                                                                                                                                                                                        }
+                                                                                                                                                                                    ]
+                                                                                                                                                                                }
+                                                                                                                                                                            ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        },
+                                                                                                                                                        {
+                                                                                                                                                            "N": "fn",
+                                                                                                                                                            "name": "not",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "axis",
+                                                                                                                                                                    "name": "self",
+                                                                                                                                                                    "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "N": "true"
+                                                                                        },
+                                                                                        {
+                                                                                            "N": "forEach",
+                                                                                            "sType": "* ",
+                                                                                            "C": [
+                                                                                                {
+                                                                                                    "N": "check",
+                                                                                                    "card": "?",
+                                                                                                    "sType": "? ",
+                                                                                                    "diag": "2|0|XTTE3180|xsl:copy/@select",
+                                                                                                    "role": "select",
+                                                                                                    "line": "55",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "varRef",
+                                                                                                            "name": "Q{}container",
+                                                                                                            "slot": "0",
+                                                                                                            "sType": "*",
+                                                                                                            "ns": "= xml=~ fn=~ xsl=~ "
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                {
+                                                                                                    "N": "copy",
+                                                                                                    "sType": "1 ",
+                                                                                                    "flags": "cin",
+                                                                                                    "line": "55",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "sequence",
+                                                                                                            "sType": "*N ",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "copyOf",
+                                                                                                                    "flags": "c",
+                                                                                                                    "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export",
+                                                                                                                    "line": "56",
+                                                                                                                    "sType": "*NA",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "docOrder",
+                                                                                                                            "sType": "*NA",
+                                                                                                                            "role": "select",
+                                                                                                                            "line": "56",
+                                                                                                                            "C": [
+                                                                                                                                {
+                                                                                                                                    "N": "docOrder",
+                                                                                                                                    "sType": "*NA",
+                                                                                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "slash",
+                                                                                                                                            "op": "/",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "treat",
+                                                                                                                                                    "as": "N",
+                                                                                                                                                    "diag": "1|0|XPTY0019|slash",
+                                                                                                                                                    "C": [
+                                                                                                                                                        {
+                                                                                                                                                            "N": "varRef",
+                                                                                                                                                            "name": "Q{}container",
+                                                                                                                                                            "slot": "0"
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                },
+                                                                                                                                                {
+                                                                                                                                                    "N": "axis",
+                                                                                                                                                    "name": "attribute",
+                                                                                                                                                    "nodeTest": "*NA"
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "N": "att",
+                                                                                                                    "name": "part",
+                                                                                                                    "sType": "1NA ",
+                                                                                                                    "line": "57",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "fn",
+                                                                                                                            "name": "string-join",
+                                                                                                                            "role": "select",
+                                                                                                                            "C": [
+                                                                                                                                {
+                                                                                                                                    "N": "forEach",
+                                                                                                                                    "sType": "*AS ",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "data",
+                                                                                                                                            "sType": "*A ",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "mergeAdj",
+                                                                                                                                                    "C": [
+                                                                                                                                                        {
+                                                                                                                                                            "N": "valueOf",
+                                                                                                                                                            "sType": "1NT ",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "str",
+                                                                                                                                                                    "sType": "1AS ",
+                                                                                                                                                                    "val": "I"
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        },
+                                                                                                                                        {
+                                                                                                                                            "N": "fn",
+                                                                                                                                            "name": "string",
+                                                                                                                                            "sType": "1AS ",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "dot"
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                    "N": "str",
+                                                                                                                                    "sType": "1AS ",
+                                                                                                                                    "val": ""
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "N": "docOrder",
+                                                                                                                    "sType": "*N",
+                                                                                                                    "role": "select",
+                                                                                                                    "line": "59",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "docOrder",
+                                                                                                                            "sType": "*N",
+                                                                                                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                                            "C": [
+                                                                                                                                {
+                                                                                                                                    "N": "slash",
+                                                                                                                                    "op": "/",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "treat",
+                                                                                                                                            "as": "N",
+                                                                                                                                            "diag": "1|0|XPTY0019|slash",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "varRef",
+                                                                                                                                                    "name": "Q{}paginated-content",
+                                                                                                                                                    "slot": "1"
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        },
+                                                                                                                                        {
+                                                                                                                                            "N": "filter",
+                                                                                                                                            "flags": "p",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "axis",
+                                                                                                                                                    "name": "child",
+                                                                                                                                                    "nodeTest": "*N u[NT,NP,NC,NE]"
+                                                                                                                                                },
+                                                                                                                                                {
+                                                                                                                                                    "N": "is",
+                                                                                                                                                    "C": [
+                                                                                                                                                        {
+                                                                                                                                                            "N": "first",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "axis",
+                                                                                                                                                                    "name": "following-sibling",
+                                                                                                                                                                    "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        },
+                                                                                                                                                        {
+                                                                                                                                                            "N": "treat",
+                                                                                                                                                            "as": "N",
+                                                                                                                                                            "diag": "1|0||Expression",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "check",
+                                                                                                                                                                    "card": "?",
+                                                                                                                                                                    "diag": "1|0||Expression",
+                                                                                                                                                                    "C": [
+                                                                                                                                                                        {
+                                                                                                                                                                            "N": "first",
+                                                                                                                                                                            "C": [
+                                                                                                                                                                                {
+                                                                                                                                                                                    "N": "varRef",
+                                                                                                                                                                                    "name": "Q{}page-breaks",
+                                                                                                                                                                                    "slot": "2"
+                                                                                                                                                                                }
+                                                                                                                                                                            ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "N": "forEach",
+                                                                                    "sType": "* ",
+                                                                                    "line": "65",
+                                                                                    "C": [
+                                                                                        {
+                                                                                            "N": "except",
+                                                                                            "op": "except",
+                                                                                            "sType": "*NE nQ{http://www.tei-c.org/ns/1.0}pb",
+                                                                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                            "role": "select",
+                                                                                            "line": "65",
+                                                                                            "C": [
+                                                                                                {
+                                                                                                    "N": "docOrder",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "slash",
+                                                                                                            "op": "/",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "treat",
+                                                                                                                    "as": "N",
+                                                                                                                    "diag": "1|0|XPTY0019|slash",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "varRef",
+                                                                                                                            "name": "Q{}paginated-content",
+                                                                                                                            "slot": "1"
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "N": "axis",
+                                                                                                                    "name": "child",
+                                                                                                                    "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                {
+                                                                                                    "N": "docOrder",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "treat",
+                                                                                                            "as": "N",
+                                                                                                            "diag": "1|1||except",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "varRef",
+                                                                                                                    "name": "Q{}first-page-break-at-top-of-container",
+                                                                                                                    "slot": "3"
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "N": "let",
+                                                                                            "var": "Q{}pb",
+                                                                                            "slot": "4",
+                                                                                            "sType": "* ",
+                                                                                            "line": "66",
+                                                                                            "C": [
+                                                                                                {
+                                                                                                    "N": "dot",
+                                                                                                    "sType": "1NE nQ{http://www.tei-c.org/ns/1.0}pb",
+                                                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                    "role": "select",
+                                                                                                    "line": "66"
+                                                                                                },
+                                                                                                {
+                                                                                                    "N": "sequence",
+                                                                                                    "sType": "* ",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "copyOf",
+                                                                                                            "flags": "c",
+                                                                                                            "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export",
+                                                                                                            "line": "67",
+                                                                                                            "sType": "*",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "varRef",
+                                                                                                                    "name": "Q{}pb",
+                                                                                                                    "slot": "4",
+                                                                                                                    "sType": "*",
+                                                                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                                    "role": "select",
+                                                                                                                    "line": "67"
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "N": "forEach",
+                                                                                                            "sType": "* ",
+                                                                                                            "C": [
+                                                                                                                {
+                                                                                                                    "N": "check",
+                                                                                                                    "card": "?",
+                                                                                                                    "sType": "? ",
+                                                                                                                    "diag": "2|0|XTTE3180|xsl:copy/@select",
+                                                                                                                    "role": "select",
+                                                                                                                    "line": "68",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "varRef",
+                                                                                                                            "name": "Q{}container",
+                                                                                                                            "slot": "0",
+                                                                                                                            "sType": "*",
+                                                                                                                            "ns": "= xml=~ fn=~ xsl=~ "
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "N": "copy",
+                                                                                                                    "sType": "1 ",
+                                                                                                                    "flags": "cin",
+                                                                                                                    "line": "68",
+                                                                                                                    "C": [
+                                                                                                                        {
+                                                                                                                            "N": "sequence",
+                                                                                                                            "sType": "*N ",
+                                                                                                                            "C": [
+                                                                                                                                {
+                                                                                                                                    "N": "copyOf",
+                                                                                                                                    "flags": "c",
+                                                                                                                                    "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 ex=http://ns.saxonica.com/xslt/export",
+                                                                                                                                    "line": "69",
+                                                                                                                                    "sType": "*NA",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "docOrder",
+                                                                                                                                            "sType": "*NA",
+                                                                                                                                            "role": "select",
+                                                                                                                                            "line": "69",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "docOrder",
+                                                                                                                                                    "sType": "*NA",
+                                                                                                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                                                                    "C": [
+                                                                                                                                                        {
+                                                                                                                                                            "N": "slash",
+                                                                                                                                                            "op": "/",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "treat",
+                                                                                                                                                                    "as": "N",
+                                                                                                                                                                    "diag": "1|0|XPTY0019|slash",
+                                                                                                                                                                    "C": [
+                                                                                                                                                                        {
+                                                                                                                                                                            "N": "varRef",
+                                                                                                                                                                            "name": "Q{}container",
+                                                                                                                                                                            "slot": "0"
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                                },
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "axis",
+                                                                                                                                                                    "name": "attribute",
+                                                                                                                                                                    "nodeTest": "*NA"
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                    "N": "att",
+                                                                                                                                    "name": "part",
+                                                                                                                                    "sType": "1NA ",
+                                                                                                                                    "line": "70",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "fn",
+                                                                                                                                            "name": "string-join",
+                                                                                                                                            "role": "select",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "choose",
+                                                                                                                                                    "sType": "1AS",
+                                                                                                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                                                                    "role": "select",
+                                                                                                                                                    "line": "70",
+                                                                                                                                                    "C": [
+                                                                                                                                                        {
+                                                                                                                                                            "N": "docOrder",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "slash",
+                                                                                                                                                                    "op": "/",
+                                                                                                                                                                    "C": [
+                                                                                                                                                                        {
+                                                                                                                                                                            "N": "treat",
+                                                                                                                                                                            "as": "N",
+                                                                                                                                                                            "diag": "1|0|XPTY0019|slash",
+                                                                                                                                                                            "C": [
+                                                                                                                                                                                {
+                                                                                                                                                                                    "N": "varRef",
+                                                                                                                                                                                    "name": "Q{}pb",
+                                                                                                                                                                                    "slot": "4"
+                                                                                                                                                                                }
+                                                                                                                                                                            ]
+                                                                                                                                                                        },
+                                                                                                                                                                        {
+                                                                                                                                                                            "N": "axis",
+                                                                                                                                                                            "name": "following-sibling",
+                                                                                                                                                                            "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        },
+                                                                                                                                                        {
+                                                                                                                                                            "N": "str",
+                                                                                                                                                            "val": "M"
+                                                                                                                                                        },
+                                                                                                                                                        {
+                                                                                                                                                            "N": "true"
+                                                                                                                                                        },
+                                                                                                                                                        {
+                                                                                                                                                            "N": "str",
+                                                                                                                                                            "val": "F"
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                },
+                                                                                                                                                {
+                                                                                                                                                    "N": "str",
+                                                                                                                                                    "sType": "1AS ",
+                                                                                                                                                    "val": " "
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                    "N": "docOrder",
+                                                                                                                                    "sType": "*N",
+                                                                                                                                    "role": "select",
+                                                                                                                                    "line": "72",
+                                                                                                                                    "C": [
+                                                                                                                                        {
+                                                                                                                                            "N": "docOrder",
+                                                                                                                                            "sType": "*N",
+                                                                                                                                            "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                                                                                            "C": [
+                                                                                                                                                {
+                                                                                                                                                    "N": "slash",
+                                                                                                                                                    "op": "/",
+                                                                                                                                                    "C": [
+                                                                                                                                                        {
+                                                                                                                                                            "N": "treat",
+                                                                                                                                                            "as": "N",
+                                                                                                                                                            "diag": "1|0|XPTY0019|slash",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "varRef",
+                                                                                                                                                                    "name": "Q{}paginated-content",
+                                                                                                                                                                    "slot": "1"
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        },
+                                                                                                                                                        {
+                                                                                                                                                            "N": "filter",
+                                                                                                                                                            "C": [
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "filter",
+                                                                                                                                                                    "C": [
+                                                                                                                                                                        {
+                                                                                                                                                                            "N": "axis",
+                                                                                                                                                                            "name": "child",
+                                                                                                                                                                            "nodeTest": "*N u[NT,NP,NC,NE]"
+                                                                                                                                                                        },
+                                                                                                                                                                        {
+                                                                                                                                                                            "N": "is",
+                                                                                                                                                                            "C": [
+                                                                                                                                                                                {
+                                                                                                                                                                                    "N": "fn",
+                                                                                                                                                                                    "name": "reverse",
+                                                                                                                                                                                    "C": [
+                                                                                                                                                                                        {
+                                                                                                                                                                                            "N": "first",
+                                                                                                                                                                                            "C": [
+                                                                                                                                                                                                {
+                                                                                                                                                                                                    "N": "axis",
+                                                                                                                                                                                                    "name": "preceding-sibling",
+                                                                                                                                                                                                    "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                                                                                                                                }
+                                                                                                                                                                                            ]
+                                                                                                                                                                                        }
+                                                                                                                                                                                    ]
+                                                                                                                                                                                },
+                                                                                                                                                                                {
+                                                                                                                                                                                    "N": "treat",
+                                                                                                                                                                                    "as": "N",
+                                                                                                                                                                                    "diag": "1|0||Expression",
+                                                                                                                                                                                    "C": [
+                                                                                                                                                                                        {
+                                                                                                                                                                                            "N": "check",
+                                                                                                                                                                                            "card": "?",
+                                                                                                                                                                                            "diag": "1|0||Expression",
+                                                                                                                                                                                            "C": [
+                                                                                                                                                                                                {
+                                                                                                                                                                                                    "N": "varRef",
+                                                                                                                                                                                                    "name": "Q{}pb",
+                                                                                                                                                                                                    "slot": "4"
+                                                                                                                                                                                                }
+                                                                                                                                                                                            ]
+                                                                                                                                                                                        }
+                                                                                                                                                                                    ]
+                                                                                                                                                                                }
+                                                                                                                                                                            ]
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                                },
+                                                                                                                                                                {
+                                                                                                                                                                    "N": "fn",
+                                                                                                                                                                    "name": "not",
+                                                                                                                                                                    "C": [
+                                                                                                                                                                        {
+                                                                                                                                                                            "N": "axis",
+                                                                                                                                                                            "name": "self",
+                                                                                                                                                                            "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                                                                                                                                        }
+                                                                                                                                                                    ]
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                { "N": "true" },
+                                                                {
+                                                                    "N": "varRef",
+                                                                    "name": "Q{}container",
+                                                                    "slot": "0",
+                                                                    "sType": "*",
+                                                                    "ns": "= xml=~ fn=~ xsl=~ ",
+                                                                    "role": "select",
+                                                                    "line": "78"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "N": "co",
+            "binds": "",
+            "id": "2",
+            "C": [{ "N": "mode", "onNo": "TC", "flags": "", "patternSlots": "0", "prec": "" }]
+        },
+        { "N": "overridden" },
+        {
+            "N": "output",
+            "C": [
+                {
+                    "N": "property",
+                    "name": "Q{http://saxon.sf.net/}stylesheet-version",
+                    "value": "30"
+                },
+                { "N": "property", "name": "indent", "value": "yes" },
+                { "N": "property", "name": "method", "value": "xml" }
+            ]
+        },
+        { "N": "decimalFormat" }
+    ],
+    "Σ": "36f35488"
+}

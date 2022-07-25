@@ -81,7 +81,7 @@ async function getOauthTokenRouteHandler(req, res, next) {
             log.info(`The account for '${user.email}' is locked. Denying user login.`);
             await logEvent({
                 level: "info",
-                owner: user.email,
+                owner: userData.email,
                 text: `The account for '${user.email}' is locked. Denying user login.`,
             });
             // user account exists but user is locked

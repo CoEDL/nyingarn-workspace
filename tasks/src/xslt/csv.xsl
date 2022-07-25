@@ -37,7 +37,7 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<!-- not a quoted cell, so terminated by a comma or end of line -->
-				<xsl:sequence select="replace($text, '([^,\r\n]*)', '$1')"/>
+				<xsl:sequence select="replace($text, '([^,\r\n]+)', '$1')"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:function>

@@ -15,7 +15,7 @@ jest.setTimeout(20000); // 20s because the CSV processing test is slow
 describe(`Check that known good files are processed successfully`, () => {
     it("BM1648A91 - should be able to process a digivol csv file", async () => {
         let identifier = "BM1648A91";
-        let directory = "digivol-ingestion/BM1648A91";
+        let directory = "Succeeds-digivol-upload/BM1648A91";
         let resource = "BM1648A91-digivol.csv";
         let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
@@ -118,7 +118,7 @@ describe(`Check that known good files are processed successfully`, () => {
     it("fake-msword-example - should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {
         let identifier = "msword_example";
         let resource = "msword_example-tei.xml";
-        let directory = "msword-ingestion/fake-msword-example";
+        let directory = "Succeeds-word_doc_upload/fake-msword-example";
         let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "msword_example-001.tei.xml",
@@ -136,9 +136,25 @@ describe(`Check that known good files are processed successfully`, () => {
         });
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
-        expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
         unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
-        unexpectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+        await remove(resourceDirectory);
+    });
+    it("SLNSW_FL814 - should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {
+        let identifier = "SLNSW_FL814";
+        let resource = "SLNSW_FL814-tei.xml";
+        let directory = "Succeeds-word_doc_upload/SLNSW_FL814";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
+        let expectedFiles = ["SLNSW_FL814-357.tei.xml"];
+
+        let resourceDirectory = path.join(__dirname, "../test-data", directory, "test-output");
+        await ensureDir(resourceDirectory);
+        await __processTeiTranscriptionXMLProcessor({
+            identifier,
+            sourceURI,
+            output: `file://${resourceDirectory}/`,
+        });
+        let contents = (await readdir(resourceDirectory)).sort();
+        expectedFiles.forEach((file) => expect(contents).toContain(file));
         await remove(resourceDirectory);
     });
     it("L17L27_JF1880 - should be able to pass a Transkribus file through an XSLT", async () => {
@@ -194,7 +210,7 @@ describe(`Check that known good files are processed successfully`, () => {
     it("Bates35 - should be able to pass an FTP file through an XSLT", async () => {
         let identifier = "Bates35";
         let resource = "Bates35-tei.xml";
-        let directory = "ftp-ingestion/Bates35";
+        let directory = "Succeeds-ftp-upload/Bates35";
         let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "Bates35-125T.tei.xml",
@@ -211,7 +227,24 @@ describe(`Check that known good files are processed successfully`, () => {
         });
         let contents = (await readdir(resourceDirectory)).sort();
         expectedFiles.forEach((file) => expect(contents).toContain(file));
-        expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+        await remove(resourceDirectory);
+    });
+    it("Bates34 - should be able to pass an FTP file through an XSLT", async () => {
+        let identifier = "Bates34";
+        let resource = "Bates34-tei.xml";
+        let directory = "Succeeds-ftp-upload/Bates34";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
+        let expectedFiles = ["Bates34-1aT.tei.xml", "Bates34-1bT.tei.xml", "Bates34-2T.tei.xml"];
+
+        let resourceDirectory = path.join(__dirname, "../test-data", directory, "test-output");
+        await ensureDir(resourceDirectory);
+        await __processTeiTranscriptionXMLProcessor({
+            identifier,
+            sourceURI,
+            output: `file://${resourceDirectory}/`,
+        });
+        let contents = (await readdir(resourceDirectory)).sort();
+        expectedFiles.forEach((file) => expect(contents).toContain(file));
         await remove(resourceDirectory);
     });
     it("structured - should be able to pass a hierarchically structured TEI file through an XSLT", async () => {
@@ -797,7 +830,6 @@ describe(`Confirm file extensions are removed`, () => {
         await remove(resourceDirectory);
     });
 });
-
 describe(`Confirm no valid pages found`, () => {
     it("should fail to ingest mackenzie-tei.xml as it contains no valid pages", async () => {
         let identifier = "mackenzie";
@@ -845,7 +877,6 @@ describe(`Confirm no valid pages found`, () => {
     });
 */
 });
-
 describe(`Confirm that excessive TEI markup is removed`, () => {
     it("cleanup_of_msword_formatting - should be able to strip unwanted text formatting from a TEI file produced by OxGarage from a DOCX file", async () => {
         let identifier = "msword_formatting";
@@ -955,7 +986,6 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
         remove(output);
     });
 });
-
 describe(`Confirm that documents with duplicate page identifiers are handled sensibly`, () => {
     it("Bates34 - should fail to ingest Bates34-tei.xml as it contains duplicate page identifiers", async () => {
         let identifier = "Bates34";

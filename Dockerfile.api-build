@@ -12,4 +12,4 @@ COPY --from=api-builder /srv/dist/package-lock.json /srv/api/package-lock.json
 COPY scripts/wait-for-postgres.sh /srv/api/wait-for-postgres.sh
 RUN npm install
 COPY --from=api-builder /srv/dist/ /srv/api/
-CMD [ "/srv/api/wait-for-postgres.sh", "node", "./server.bundle.cjs" ]  
+CMD [ "/srv/api/wait-for-postgres.sh", "node", "./server.bundle.js" ]  

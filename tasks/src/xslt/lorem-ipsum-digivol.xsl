@@ -29,7 +29,13 @@
 		<xsl:variable name="rows" select="csv:parse($text)"/>
 
 		<!-- output the column heading row -->
-		<xsl:sequence select="string-join($column-headings, ',') || codepoints-to-string((13, 10))"/>
+		<xsl:value-of select="
+			string-join(
+				for $heading in $column-headings return '&quot;' || $heading || '&quot;',
+				','
+			)
+		"/>
+		<xsl:call-template name="new-line"/>
 		
 		<!-- process each row -->
 		<xsl:for-each select="$rows">
@@ -76,9 +82,13 @@
 				</xsl:choose>
 				<xsl:if test="position() &lt; last()">,</xsl:if>
 			</xsl:for-each>
-			<xsl:sequence select="codepoints-to-string((13, 10))"/>
+			<xsl:call-template name="new-line"/>
 		</xsl:for-each>
 
 	</xsl:template>
 	
+	<xsl:template name="new-line">
+		<!-- NB the CSV spec says that lines end in CRLF, but DIgivol uses just LF, so we do too -->
+		<xsl:value-of select="codepoints-to-string(10)"/>
+	</xsl:template>
 </xsl:transform>

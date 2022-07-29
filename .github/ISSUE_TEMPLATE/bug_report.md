@@ -1,9 +1,10 @@
 ---
 name: Data Ingestion / Processing Bug Report
 about: Template to report data ingestion / processing problems
-title: ""
+title: ''
 labels: bug
-assignees: Conal-Tuohy
+assignees: marcolarosa
+
 ---
 
 ### 1 Describe the problem

@@ -1,12 +1,24 @@
-import { getS3Handle, getStoreHandle } from "./common";
+import { getS3Handle, getStoreHandle } from "../common";
 import { groupBy } from "lodash";
 import path from "path";
 
 main();
 
 async function main() {
-    // const { bucket } = await getS3Handle();
-    // let files = await listResources(bucket);
+    const { bucket } = await getS3Handle();
+    let files = await listResources(bucket);
+
+    //  remove .item / .collection files in new hierarchy
+    // for (let file of files) {
+    //     if (!file.match(/^nyingarn.net/)) continue
+    //     if (file.match(/\.item/)) console.log(file)
+    //     // if (file.match(/\.item/)) await bucket.removeObjects({ keys: [file]})
+    //     if (file.match(/\.collection/)) console.log(file)
+    //     // if (file.match(/\.collection/)) await bucket.removeObjects({ keys: [file]})
+    // }
+
+
+    // copy files from old hierarchy to new
     // files = groupBy(files, (file) => path.dirname(file));
     // let items = {};
     // let collections = {};

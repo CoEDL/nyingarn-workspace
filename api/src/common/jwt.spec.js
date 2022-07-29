@@ -4,7 +4,7 @@ import { generateToken, verifyToken } from "./jwt";
 import { loadConfiguration } from "../common";
 const chance = require("chance").Chance();
 import MockDate from "mockdate";
-import { copy, move, readJSON, writeJSON } from "fs-extra";
+import { copy, move, readJSON, writeJSON, readdir } from "fs-extra";
 import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "./";
 
 describe("JWT tests", () => {
@@ -63,25 +63,12 @@ describe("JWT tests", () => {
         let configuration = await loadConfiguration();
         let { token, expires } = await generateToken({ configuration, user });
 
-        await copy(
-            "/srv/configuration/development-configuration.json",
-            "/srv/configuration/development-configuration-copy.json"
-        );
-        let config = await readJSON("/srv/configuration/development-configuration.json");
-        config.api.session.secret = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-        await writeJSON("/srv/configuration/development-configuration.json", config);
-        configuration = await loadConfiguration();
+        configuration.api.session.secret = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         try {
             let data = await verifyToken({ token, configuration });
         } catch (error) {
             expect(error.message).toBe("signature verification failed");
         }
-
-        move(
-            "/srv/configuration/development-configuration-copy.json",
-            "/srv/configuration/development-configuration.json",
-            { overwrite: true }
-        );
         await user.destroy();
     });
 });

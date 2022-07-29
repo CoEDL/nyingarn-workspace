@@ -1,12 +1,20 @@
 import models from "../models";
 import { Op } from "sequelize";
 import { loadConfiguration, getS3Handle, getUserTempLocation } from "../common";
+import { getStoreHandle } from "../common";
 import path from "path";
 import { writeJson, remove } from "fs-extra";
 import { compact, groupBy, uniq, isNumber } from "lodash";
 import { sub } from "date-fns";
-const specialFiles = ["ro-crate-metadata.json", "-digivol.csv", "-tei.xml"];
 const completedResources = ".completed-resources.json";
+const specialFiles = [
+    "ro-crate-metadata.json",
+    "-digivol.csv",
+    "-tei.xml",
+    "nocfl.identifier.json",
+    "nocfl.inventory.json",
+    completedResources,
+];
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
 
@@ -45,7 +53,7 @@ export async function createItem({ identifier, userId }) {
 
     item = await models.item.create({ identifier });
     await linkItemToUser({ itemId: item.id, userId });
-    await createItemLocationInObjectStore({ identifier, userId });
+    await createItemLocationInObjectStore({ identifier });
     return item;
 }
 
@@ -59,66 +67,42 @@ export async function linkItemToUser({ itemId, userId }) {
     await user.addItems([item]);
 }
 
-export async function createItemLocationInObjectStore({ identifier, userId }) {
-    let { bucket } = await getS3Handle();
-
-    let pathExists = await bucket.pathExists({ path: identifier });
-    if (!pathExists) {
-        // create stub ro-crate file
-        let context = ["https://w3id.org/ro/crate/1.1/context"];
-        let graph = [
-            {
-                "@id": "ro-crate-metadata.json",
-                "@type": "CreativeWork",
-                conformsTo: {
-                    "@id": "https://w3id.org/ro/crate/1.1/context",
-                },
-                about: {
-                    "@id": "./",
-                },
-            },
-            {
-                "@id": "./",
-                "@type": "Dataset",
-                name: identifier,
-            },
-        ];
-        let tempdir = await getUserTempLocation({ userId });
-        let crateFile = path.join(tempdir, "ro-crate-metadata.json");
-        await writeJson(crateFile, {
-            "@context": context,
-            "@graph": graph,
-        });
-        await bucket.upload({
-            localPath: crateFile,
-            target: path.join(identifier, "ro-crate-metadata.json"),
-        });
-        await bucket.upload({ json: {}, target: path.join(identifier, ".item") });
-        await remove(tempdir);
+export async function createItemLocationInObjectStore({ identifier }) {
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    let exists = await store.itemExists();
+    if (!exists) {
+        await store.createItem();
     }
 }
 
 export async function itemResourceExists({ identifier, resource }) {
-    let { bucket } = await getS3Handle();
-    let target = path.join(identifier, resource);
-    let stat = await bucket.stat({ path: target });
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    if (!(await store.itemExists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+    let stat = await store.stat({ path: resource });
+
     return stat;
 }
 
 export async function getItemResource({ identifier, resource }) {
-    let { bucket } = await getS3Handle();
-    let target = path.join(identifier, resource);
-    if (!(await bucket.stat({ path: target }))) {
-        throw new Error("Not found");
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    if (!(await store.itemExists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+    if (!(await store.pathExists({ path: resource }))) {
+        throw new Error(`Not found`);
     } else {
-        return await bucket.download({ target });
+        return await store.get({ target: resource });
     }
 }
 
 export async function deleteItemResource({ identifier, resource }) {
-    let { bucket } = await getS3Handle();
-    let target = path.join(identifier, resource);
-    await bucket.removeObjects({ prefix: target });
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    if (!(await store.itemExists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+    await store.delete({ prefix: resource });
     await markResourceComplete({ identifier, resource, complete: false });
 }
 
@@ -128,47 +112,41 @@ export async function deleteItemResource({ identifier, resource }) {
 //     await bucket.removeObjects({ prefix: target });
 // }
 
-export async function putItemResource({
-    identifier,
-    resource,
-    localPath = undefined,
-    content = undefined,
-    json,
-}) {
-    let { bucket } = await getS3Handle();
-    let target = path.join(identifier, resource);
-    return await bucket.upload({ target, localPath, content, json });
-}
+// export async function putItemResource({
+//     identifier,
+//     resource,
+//     localPath = undefined,
+//     content = undefined,
+//     json,
+// }) {
+//     let { bucket } = await getS3Handle();
+//     let target = path.join(identifier, resource);
+//     return await bucket.upload({ target, localPath, content, json });
+// }
 
 export async function getItemResourceLink({ identifier, resource, download }) {
-    let { bucket } = await getS3Handle();
-    let target = path.join(identifier, resource);
-    if (!(await bucket.stat({ path: target }))) {
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    if (!(await store.itemExists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+
+    if (!(await store.pathExists({ path: resource }))) {
         throw new Error("Not found");
     } else {
-        return await bucket.getPresignedUrl({ target, download });
+        return await store.getPresignedUrl({ target: resource, download });
     }
 }
 
 export async function listItemResources({ identifier, offset = 0, limit }) {
-    let configuration = await loadConfiguration();
-    let { bucket } = await getS3Handle();
-    let files;
-    try {
-        files = await loadResources({ bucket, prefix: identifier });
-        files = files.map((f) => path.basename(f.Key));
-        files = files.filter((file) => !file.match(/^\./));
-        files = files.filter((file) => {
-            let matches = specialFiles.map((sf) => {
-                let re = new RegExp(sf);
-                return file.match(re) ? true : false;
-            });
-            return file ? !matches.includes(true) : null;
-        });
-    } catch (error) {
-        files = [];
+    const configuration = await loadConfiguration();
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    if (!(await store.itemExists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
-    files = compact(files);
+
+    let files = await store.listResources();
+    ({ files } = filterSpecialFiles({ files }));
+
     let resources = getResourceNames({ identifier, files, naming: configuration.api.filenaming });
     let total = resources.length;
     resources = resources.map((r, i) => {
@@ -189,30 +167,34 @@ export async function listItemResources({ identifier, offset = 0, limit }) {
 }
 
 export async function listItemResourceFiles({ identifier, resource }) {
-    let { bucket } = await getS3Handle();
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    if (!(await store.itemExists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+    // let { bucket } = await getS3Handle();
     let files;
     try {
-        files = await loadResources({ bucket, prefix: `${identifier}/${resource}` });
-        files = files.map((c) => c.Key.split(`${identifier}/`).pop());
+        files = await store.listResources();
+        ({ files } = filterSpecialFiles({ files }));
+        files = files.filter((f) => f.match(resource));
     } catch (error) {
         files = [];
     }
     return { files };
 }
 
-async function loadResources({ bucket, prefix, continuationToken }) {
-    let resources = await bucket.listObjects({ bucket, prefix, continuationToken });
-    if (resources.NextContinuationToken) {
-        return [
-            ...resources.Contents,
-            ...(await loadResources({
-                prefix,
-                continuationToken: resources.NextContinuationToken,
-            })),
-        ];
-    } else {
-        return resources.Contents;
-    }
+function filterSpecialFiles({ files }) {
+    files = files.map((f) => f.Key);
+    files = files.filter((f) => !f.match(/^\.\//));
+    files = files.filter((f) => {
+        let matches = specialFiles.map((sf) => {
+            let re = new RegExp(sf);
+            return f.match(re) ? true : false;
+        });
+        return !matches.includes(true) ? f : null;
+    });
+    files = compact(files);
+    return { files };
 }
 
 export function getResourceNames({ identifier, files, naming }) {
@@ -295,16 +277,19 @@ export async function statItemFile({ identifier, file }) {
 }
 
 export async function markResourceComplete({ identifier, resource, complete = false }) {
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    if (!(await store.itemExists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+
     let status = {};
     try {
-        status = JSON.parse(await getItemResource({ identifier, resource: completedResources }));
+        status = JSON.parse(await store.get({ target: completedResources }));
     } catch (error) {}
     resource = path.join(identifier, resource);
     status[resource] = String(complete) === "true";
 
-    let { bucket } = await getS3Handle();
-    let target = path.join(identifier, completedResources);
-    await bucket.upload({ json: status, target });
+    await store.put({ json: status, target: completedResources });
 }
 
 export async function isResourceComplete({ identifier, resource }) {

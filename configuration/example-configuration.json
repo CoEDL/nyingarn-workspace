@@ -19,6 +19,7 @@
         }
     },
     "api": {
+        "domain": "nyingarn.net",
         "administrators": ["{user@email.com}", "{other user@somewhere.else.com}"],
         "teiMarkupControls": "/srv/configuration/tei-markup-controls.json",
         "session": {

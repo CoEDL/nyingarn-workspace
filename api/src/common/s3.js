@@ -7,6 +7,7 @@ import {
     ListBucketsCommand,
     GetObjectCommand,
     PutObjectCommand,
+    CopyObjectCommand,
     ListObjectsV2Command,
     DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
@@ -112,6 +113,21 @@ export class Bucket {
 
     async pathExists({ path }) {
         return (await this.stat({ path }))?.$metadata?.httpStatusCode === 200 ? true : false;
+    }
+
+    async copy({ source, target }) {
+        source = path.join(this.bucket, source);
+        target = path.join(target);
+        const command = new CopyObjectCommand({
+            Bucket: this.bucket,
+            CopySource: source,
+            Key: target,
+        });
+        try {
+            const response = await this.client.send(command);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async upload({
@@ -268,14 +284,16 @@ export class Bucket {
     async removeObjects({ keys = [], prefix = undefined }) {
         if (prefix) {
             let objects = (await this.listObjects({ prefix })).Contents;
-            keys = objects.map((entry) => entry.Key);
+            if (objects) keys = objects.map((entry) => entry.Key);
         }
         let objs = keys.map((k) => ({ Key: k }));
-        const command = new DeleteObjectsCommand({
-            Bucket: this.bucket,
-            Delete: { Objects: objs },
-        });
-        return (await this.client.send(command)).$metadata;
+        if (objs?.length) {
+            const command = new DeleteObjectsCommand({
+                Bucket: this.bucket,
+                Delete: { Objects: objs },
+            });
+            return (await this.client.send(command)).$metadata;
+        }
     }
 
     async syncLocalPathToBucket({ localPath }) {

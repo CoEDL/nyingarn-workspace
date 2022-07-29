@@ -3,7 +3,7 @@ import { ensureDir } from "fs-extra";
 export { loadConfiguration, filterPrivateInformation } from "./configuration";
 export { getLogger, logEvent } from "./logger";
 export { submitTask, registerTask } from "./task";
-export { getS3Handle } from "./getS3Handle";
+export { getS3Handle, getStoreHandle } from "./getS3Handle";
 import { getS3Handle } from "./getS3Handle";
 export {
     route,
@@ -32,15 +32,32 @@ export async function getUserTempLocation({ userId }) {
     return tempdir;
 }
 
-export async function loadFiles({ continuationToken }) {
+export async function loadFiles({ prefix, continuationToken }) {
     let { bucket } = await getS3Handle();
-    let resources = await bucket.listObjects({ continuationToken });
+    let resources = await bucket.listObjects({ prefix, continuationToken });
     if (resources.NextContinuationToken) {
         return [
             ...resources.Contents,
-            ...(await loadFiles({ continuationToken: resources.NextContinuationToken })),
+            ...(await loadFiles({ prefix, continuationToken: resources.NextContinuationToken })),
         ];
     } else {
         return resources.Contents;
+    }
+}
+
+export async function listObjects({ prefix, continuationToken }) {
+    let { bucket } = await getS3Handle();
+    let resources = await bucket.listObjects({ prefix, continuationToken });
+    if (resources.NextContinuationToken) {
+        return [
+            ...resources.Contents?.filter((r) => r.Key.match("nocfl.identifier.json")).map((r) =>
+                path.basename(path.dirname(r.Key))
+            ),
+            ...(await loadFiles({ prefix, continuationToken: resources.NextContinuationToken })),
+        ];
+    } else {
+        return resources.Contents?.filter((r) => r.Key.match("nocfl.identifier.json")).map((r) =>
+            path.basename(path.dirname(r.Key))
+        );
     }
 }

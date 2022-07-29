@@ -4,7 +4,7 @@ import { deleteItem, createItem } from "../lib/item";
 import { createSession } from "../lib/session";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";
-import { getS3Handle } from "../common";
+import { getS3Handle, getStoreHandle } from "../common";
 import models from "../models";
 import {
     host,
@@ -19,6 +19,7 @@ describe("Item management route tests", () => {
     let configuration, users, bucket, session, user;
     const userEmail = chance.email();
     const adminEmail = chance.email();
+    let identifier, store;
     beforeAll(async () => {
         configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
         ({ bucket } = await getS3Handle());
@@ -26,9 +27,17 @@ describe("Item management route tests", () => {
     beforeEach(async () => {
         users = await setupBeforeEach({ emails: [userEmail], adminEmails: [adminEmail] });
         session = await createSession({ user: users[0] });
+        identifier = chance.word();
+        store = await getStoreHandle({
+            id: identifier,
+            className: "item",
+        });
     });
     afterEach(async () => {
         await teardownAfterEach({ users });
+        try {
+            await bucket.removeObjects({ prefix: store.getItemPath() });
+        } catch (error) {}
     });
     afterAll(async () => {
         await teardownAfterAll(configuration);
@@ -44,7 +53,6 @@ describe("Item management route tests", () => {
 
         let session = await createSession({ user });
 
-        const identifier = chance.word();
         let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
@@ -70,7 +78,6 @@ describe("Item management route tests", () => {
         expect(total).toEqual(1);
 
         await deleteItem({ id: item.id });
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get defined own item", async () => {
         let user = {
@@ -83,7 +90,6 @@ describe("Item management route tests", () => {
 
         let session = await createSession({ user });
 
-        const identifier = chance.word();
         let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
@@ -108,7 +114,6 @@ describe("Item management route tests", () => {
         expect((await response.json()).item.identifier).toEqual(item.identifier);
 
         await deleteItem({ id: item.id });
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should fail trying to get a specific item", async () => {
         let user = {
@@ -141,7 +146,6 @@ describe("Item management route tests", () => {
 
         let session = await createSession({ user });
 
-        const identifier = chance.word();
         let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
@@ -158,7 +162,6 @@ describe("Item management route tests", () => {
 
         await deleteItem({ id: item.id });
         await user.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to create a new item as a normal user", async () => {
         let user = {
@@ -171,7 +174,6 @@ describe("Item management route tests", () => {
 
         let session = await createSession({ user });
 
-        const identifier = chance.word();
         let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
@@ -187,7 +189,6 @@ describe("Item management route tests", () => {
         expect(item.identifier).toEqual(identifier);
 
         await deleteItem({ id: item.id });
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to invite a user to own item", async () => {
         let user = {
@@ -208,7 +209,6 @@ describe("Item management route tests", () => {
         let session = await createSession({ user });
 
         // create an item
-        const identifier = chance.word();
         let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
@@ -245,7 +245,6 @@ describe("Item management route tests", () => {
         await user.destroy();
         await user2.destroy();
         await models.log.destroy({ where: {} });
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to detach a user from an item", async () => {
         let user = {
@@ -266,7 +265,6 @@ describe("Item management route tests", () => {
         let session = await createSession({ user });
 
         // create an item
-        const identifier = chance.word();
         let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
@@ -330,7 +328,6 @@ describe("Item management route tests", () => {
         await user.destroy();
         await user2.destroy();
         await models.log.destroy({ where: {} });
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get a list of item users", async () => {
         let user = {
@@ -351,7 +348,6 @@ describe("Item management route tests", () => {
         let session = await createSession({ user });
 
         // create an item
-        const identifier = chance.word();
         let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
@@ -394,7 +390,6 @@ describe("Item management route tests", () => {
         await user.destroy();
         await user2.destroy();
         await models.log.destroy({ where: {} });
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to delete own item as a user", async () => {
         let user = {
@@ -407,7 +402,6 @@ describe("Item management route tests", () => {
 
         let session = await createSession({ user });
 
-        const identifier = chance.word();
         let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
@@ -429,6 +423,12 @@ describe("Item management route tests", () => {
             body: JSON.stringify({ identifier }),
         });
         expect(response.status).toEqual(200);
+
+        let items = await models.item.findAll();
+        expect(items.length).toEqual(0);
+
+        let itemExists = await store.itemExists();
+        expect(itemExists).toBe(false);
     });
     it("should succeed if the new item exists and is already associated to this user", async () => {
         let user = {
@@ -441,7 +441,6 @@ describe("Item management route tests", () => {
 
         let session = await createSession({ user });
 
-        const identifier = chance.word();
         let response = await fetch(`${host}/items`, {
             method: "POST",
             headers: {
@@ -468,10 +467,9 @@ describe("Item management route tests", () => {
         expect(response.status).toEqual(200);
 
         await deleteItem({ id: item.id });
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get item resources", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let response = await fetch(`${host}/items/${identifier}/resources`, {
             method: "GET",
@@ -484,11 +482,10 @@ describe("Item management route tests", () => {
         response = await response.json();
         expect(response.resources.length).toEqual(2);
 
-        await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should be able to get an item resource", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let response = await fetch(`${host}/items/${identifier}/resources/${identifier}-01.json`, {
             method: "GET",
@@ -503,7 +500,7 @@ describe("Item management route tests", () => {
         await deleteItem({ id: item.id });
     });
     it("should be able to get the status of a resource", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let response = await fetch(
             `${host}/items/${identifier}/resources/${identifier}-01/status`,
@@ -528,11 +525,10 @@ describe("Item management route tests", () => {
             },
         });
 
-        await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should be able to toggle the completed status of a resource", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let response = await fetch(
             `${host}/items/${identifier}/resources/${identifier}-01/status?complete=true`,
@@ -599,11 +595,10 @@ describe("Item management route tests", () => {
             },
         });
 
-        await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should be able to delete an item resource file", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         response = await fetch(`${host}/items/${identifier}/resources/${identifier}-01.json`, {
             method: "DELETE",
@@ -624,11 +619,10 @@ describe("Item management route tests", () => {
         let { files } = await response.json();
         expect(files.length).toBe(1);
 
-        await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should fail to get an item resource - not found", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let response = await fetch(`${host}/items/${identifier}/resources/notfound.json`, {
             method: "GET",
@@ -639,11 +633,10 @@ describe("Item management route tests", () => {
         });
         expect(response.status).toEqual(404);
 
-        await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should be able to get a presigned link to an item resource", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let response = await fetch(
             `${host}/items/${identifier}/resources/${identifier}-01.json/link`,
@@ -657,11 +650,10 @@ describe("Item management route tests", () => {
         );
         expect(response.status).toEqual(200);
 
-        await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
     it("should fail to get a presigned link to an item resource - not found", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let response = await fetch(`${host}/items/${identifier}/resources/notfound.json/link`, {
             method: "GET",
@@ -672,20 +664,13 @@ describe("Item management route tests", () => {
         });
         expect(response.status).toEqual(404);
 
-        await bucket.removeObjects({ prefix: identifier });
         await deleteItem({ id: item.id });
     });
-    it("should be able to get a list of all items in the space", async () => {
-        let identifiers = [];
-        let items = [];
+    it("an admin should be able to get a list of all items in the space", async () => {
         //  setup as a normal user
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
-
-        identifiers.push(identifier);
-        items.push(item);
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         // setup and connect as an admin
-        // ({ identifier, item } = await setupTestItem({ user: users[1], bucket }));
         session = await createSession({ user: users[1] });
 
         let response = await fetch(`${host}/admin/entries`, {
@@ -696,11 +681,8 @@ describe("Item management route tests", () => {
             },
         });
         response = await response.json();
-        expect(response.items.length).toBeGreaterThanOrEqual(2);
+        expect(response.items.length).toBeGreaterThanOrEqual(1);
 
-        for (let identifier of identifiers) {
-            await bucket.removeObjects({ prefix: identifier });
-        }
         await models.user.destroy({ where: {} });
         await models.item.destroy({ where: {} });
     });
@@ -708,14 +690,12 @@ describe("Item management route tests", () => {
         let identifiers = [];
         let items = [];
         //  setup as a normal user
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
-        identifiers.push(identifier);
-        items.push(item);
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         // connect as an admin
         session = await createSession({ user: users[1] });
 
-        let response = await fetch(`${host}/admin/items/${identifiers[0]}/connect-user`, {
+        let response = await fetch(`${host}/admin/items/${identifier}/connect-user`, {
             method: "PUT",
             headers: {
                 authorization: `Bearer ${session.token}`,
@@ -724,9 +704,6 @@ describe("Item management route tests", () => {
         });
         expect(response.status).toEqual(200);
 
-        for (let identifier of identifiers) {
-            await bucket.removeObjects({ prefix: identifier });
-        }
         await models.user.destroy({ where: {} });
         await models.item.destroy({ where: {} });
     });

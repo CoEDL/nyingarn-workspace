@@ -4,7 +4,7 @@ import { createReadStream, createWriteStream, writeFile, appendFile, remove } fr
 import { parse } from "csv-parse";
 import { zipObject } from "lodash";
 import { getS3Handle, getLogger, loadConfiguration } from "../common";
-import { persistNewContentToBucket } from "./";
+import { removeOverlappingNewContent } from "./";
 const log = getLogger();
 
 export async function reconstituteTEIFile({ directory, identifier, resource }) {
@@ -53,7 +53,7 @@ export async function processTEIToPageFilesAsStrings({ directory, identifier, re
 export async function processTeiTranscription({ directory, identifier, resource }) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);
     await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
-    await persistNewContentToBucket({ directory, identifier, resource });
+    await removeOverlappingNewContent({ directory, identifier, resource });
 }
 
 /*
@@ -125,7 +125,7 @@ export async function __processTeiTranscriptionXMLProcessor({
 export async function processDigivolTranscription({ directory, identifier, resource }) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);
     await __processDigivolTranscriptionXMLProcessor({ identifier, sourceURI });
-    await persistNewContentToBucket({ directory, identifier, resource });
+    await removeOverlappingNewContent({ directory, identifier, resource });
 }
 
 export async function __processDigivolTranscriptionXMLProcessor({

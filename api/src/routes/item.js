@@ -5,7 +5,7 @@ import {
     NotFoundError,
     InternalServerError,
 } from "restify-errors";
-import { route, logEvent, getLogger, getS3Handle } from "../common";
+import { route, logEvent, getLogger, getStoreHandle } from "../common";
 import { groupBy, flattenDeep, compact, isEmpty } from "lodash";
 import {
     createItem,
@@ -195,8 +195,8 @@ async function getItemUsers(req, res, next) {
 async function deleteItemHandler(req, res, next) {
     try {
         await deleteItem({ id: req.item.id });
-        let { bucket } = await getS3Handle();
-        await bucket.removeObjects({ prefix: req.params.identifier });
+        let store = await getStoreHandle({ id: req.params.identifier, className: "item" });
+        await store.deleteItem();
         await logEvent({
             level: "info",
             owner: req.session.user.email,

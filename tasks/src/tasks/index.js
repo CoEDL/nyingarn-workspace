@@ -5,120 +5,71 @@ export {
     processFtpTeiTranscription,
     processTeiTranscription,
 } from "./transcription-processing";
-import { remove, readdir } from "fs-extra";
 
-import { groupBy } from "lodash";
 import path from "path";
-import { getS3Handle, loadConfiguration } from "../common";
+import { getLogger, getStoreHandle } from "../common";
+import { ensureDir, remove, pathExists, readdir } from "fs-extra";
+import { walk } from "@root/walk";
+const log = getLogger();
 
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const thumbnailHeight = 300;
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
-export const specialFiles = ["ro-crate-metadata.json", "-digivol.csv", "-tei.xml"];
+export const specialFiles = ["ro-crate-metadata.json", "nocfl.", "-digivol.csv", "-tei.xml"];
 
-export async function loadResources({ bucket, prefix, continuationToken }) {
-    let resources = await bucket.listObjects({ bucket, prefix, continuationToken });
-    if (resources.NextContinuationToken) {
-        return [
-            ...resources.Contents,
-            ...(await loadResources({
-                prefix,
-                continuationToken: resources.NextContinuationToken,
-            })),
-        ];
-    } else {
-        return resources.Contents;
-    }
-}
+export async function removeOverlappingNewContent({ directory, identifier, className = "item" }) {
+    let store = await getStoreHandle({ id: identifier, className });
+    let storeResources = (await store.listResources()).map((r) => r.Key);
 
-export async function persistNewContentToBucket({ directory, identifier, resource }) {
-    let { bucket } = await getS3Handle();
-    let files = await loadResources({ bucket, prefix: identifier });
-    files = files.map((f) => path.basename(f.Key));
-
-    let localFiles = await readdir(path.join(directory, identifier));
-    for (let file of localFiles) {
-        if (files.includes(file) && file !== resource) {
-            await remove(path.join(directory, identifier, file));
+    directory = path.join(directory, identifier);
+    await walk(directory, async (err, pathname, dirent) => {
+        if (dirent.isFile()) {
+            if (storeResources.includes(path.relative(directory, pathname))) {
+                await remove(pathname);
+            }
         }
-    }
-}
-
-export async function getFiles({ prefix }) {
-    let configuration = await loadConfiguration();
-
-    let { bucket } = await getS3Handle();
-    // let files = (await bucket.listObjects({ prefix: identifier })).Contents.map((c) => c.Key);
-    let files = await loadResources({ bucket, prefix });
-    files = files.map((f) => path.basename(f.Key));
-    files = files.filter((file) => !file.match(/^\./));
-    files = files.filter((file) => {
-        let matches = specialFiles.map((sf) => {
-            let re = new RegExp(sf);
-            return file.match(re) ? true : false;
-        });
-        return file ? !matches.includes(true) : null;
     });
-    ({ files } = groupFilesByResource({ files, naming: configuration.api.filenaming }));
-    return { files, bucket, configuration };
 }
 
-export function groupFilesByResource({ files, naming }) {
-    let resources = [];
-    for (let file of files) {
-        let filepath = path.dirname(file);
-        let filename = path.basename(file);
+export async function prepare({ task, identifier, resource, className = "item" }) {
+    let store = await getStoreHandle({ id: identifier, className });
+    const directory = await ensureDir(path.join("/tmp", task.id, identifier));
+    log.debug(`Setting up task to run in directory: ${directory}.`);
 
-        let ext = path.extname(filename).replace(".", "");
-        let basename = path.basename(filename, `.${ext}`);
-        let identifierSegments = basename
-            .split(`-${naming.adminTag}`)[0]
-            .split(naming.resourceQualifierSeparator)[0]
-            .split("-");
+    await store.get({ target: resource, localPath: path.join(directory, identifier, resource) });
+    return directory;
+}
 
-        let adminLabel = path.basename(filename, ext).split(naming.adminTag)[1];
+export async function cleanup({ directory, identifier, className = "item" }) {
+    log.debug(`Task in ${directory} completed successfully.`);
+    await syncToBucket({ directory, identifier, className });
 
-        let type;
-        imageExtensions.forEach((t) => {
-            let re = new RegExp(t);
-            type = ext.match(re) ? "image" : type;
-        });
-
-        let data = naming.identifierSegments[identifierSegments.length]
-            .map((segmentName, i) => ({
-                [segmentName]: identifierSegments[i],
-            }))
-            .reduce((acc, cv) => ({ ...acc, ...cv }));
-
-        resources.push({
-            file,
-            basename,
-            name: filename,
-            path: filepath,
-            ext,
-            adminLabel,
-            type,
-            ...data,
-        });
+    if (await pathExists(directory)) {
+        await remove(directory);
     }
-
-    return { files: groupBy(resources, "resourceId") };
+    log.debug(`Task in ${directory} complete.`);
 }
 
-export async function getResourceImages({ identifier, resource }) {
-    resource = path.basename(resource, path.extname(resource));
-    let { files } = await getFiles({ prefix: path.join(identifier, resource) });
+export async function cleanupAfterFailure({ directory }) {
+    log.debug(`Task in ${directory} failed. Cleaning up.`);
+    // await syncToBucket({ directory, identifier });
 
-    for (let resourceId of Object.keys(files)) {
-        let re = new RegExp(resourceId);
-        if (resource.match(re)) {
-            resource = files[resourceId];
-            break;
+    if (await pathExists(directory)) {
+        await remove(directory);
+    }
+}
+
+export async function syncToBucket({ directory, identifier, className = "item" }) {
+    log.debug(`Sync'ing back to bucket.`);
+    let store = await getStoreHandle({ id: identifier, className });
+    directory = path.join(directory, identifier);
+
+    let batch = [];
+    await walk(directory, async (err, pathname, dirent) => {
+        if (dirent.isFile()) {
+            log.debug(`Uploading: ${path.relative(directory, pathname)} to the store`);
+            batch.push({ localPath: pathname, target: path.relative(directory, pathname) });
         }
-    }
-
-    let images = resource
-        .filter((f) => f.type === "image")
-        .filter((f) => !f.name.match(/thumbnail/));
-    return { resource, images };
+    });
+    await store.put({ batch });
 }

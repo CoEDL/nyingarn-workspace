@@ -50,14 +50,18 @@ export async function listObjects({ prefix, continuationToken }) {
     let resources = await bucket.listObjects({ prefix, continuationToken });
     if (resources.NextContinuationToken) {
         return [
-            ...resources.Contents?.filter((r) => r.Key.match("nocfl.identifier.json")).map((r) =>
-                path.basename(path.dirname(r.Key))
+            ...resources.Contents?.filter((r) => r.Key.match(/nocfl\.identifier\.json/)).map(
+                (r) => {
+                    return path.basename(path.dirname(r.Key));
+                }
             ),
-            ...(await loadFiles({ prefix, continuationToken: resources.NextContinuationToken })),
+            ...(await listObjects({ prefix, continuationToken: resources.NextContinuationToken })),
         ];
     } else {
-        return resources.Contents?.filter((r) => r.Key.match("nocfl.identifier.json")).map((r) =>
-            path.basename(path.dirname(r.Key))
+        return resources.Contents?.filter((r) => r.Key.match(/nocfl\.identifier\.json/)).map(
+            (r) => {
+                return path.basename(path.dirname(r.Key));
+            }
         );
     }
 }

@@ -1,5 +1,5 @@
 import path from "path";
-import { routeAdmin, loadFiles, getLogger } from "../common";
+import { routeAdmin, loadFiles, listObjects, getLogger, loadConfiguration } from "../common";
 import { groupBy } from "lodash";
 import { createItem, lookupItemByIdentifier, linkItemToUser } from "../lib/item";
 import {
@@ -19,20 +19,13 @@ export function setupRoutes({ server }) {
 }
 
 async function getAdminEntriesHandler(req, res, next) {
-    let items = [];
-    let collections = [];
+    const configuration = await loadConfiguration();
 
-    let resources = await loadFiles({});
-    resources = groupBy(resources, (r) => path.dirname(r.Key));
-
-    Object.keys(resources).forEach((key) => {
-        if (resources[key].filter((f) => f.Key === path.join(key, ".item")).length) {
-            items.push({ name: key });
-        }
-        if (resources[key].filter((f) => f.Key === path.join(key, ".collection")).length) {
-            collections.push({ name: key });
-        }
-    });
+    let items = (await listObjects({ prefix: `/${configuration.api.domain}/item` })) || [];
+    let collections =
+        (await listObjects({ prefix: `/${configuration.api.domain}/collection` })) || [];
+    items = items.map((i) => ({ name: i }));
+    collections = collections.map((c) => ({ name: c }));
     res.send({ items, collections });
     next();
 }

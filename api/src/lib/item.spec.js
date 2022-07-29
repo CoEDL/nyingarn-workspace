@@ -1,5 +1,5 @@
 require("regenerator-runtime");
-import { getS3Handle, setupTestItem } from "../common";
+import { getS3Handle, getStoreHandle, setupTestItem } from "../common";
 import {
     createItem,
     lookupItemByIdentifier,
@@ -24,15 +24,24 @@ describe("Item management tests", () => {
     let users, configuration, bucket;
     const userEmail = chance.email();
     const adminEmail = chance.email();
+    let identifier, store;
     beforeAll(async () => {
         configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
         ({ bucket } = await getS3Handle());
     });
     beforeEach(async () => {
         users = await setupBeforeEach({ emails: [userEmail] });
+        identifier = chance.word();
+        store = await getStoreHandle({
+            id: identifier,
+            className: "item",
+        });
     });
     afterEach(async () => {
         await teardownAfterEach({ users });
+        try {
+            await bucket.removeObjects({ prefix: store.getItemPath() });
+        } catch (error) {}
     });
     afterAll(async () => {
         await teardownAfterAll(configuration);
@@ -40,19 +49,20 @@ describe("Item management tests", () => {
     });
     it("should be able to create a new item", async () => {
         let user = users[0];
-        const identifier = chance.word();
         let item = await createItem({ identifier, userId: user.id });
         expect(item.identifier).toEqual(identifier);
-        let items = await bucket.listObjects({ prefix: identifier });
-        expect(items.Contents.length).toEqual(2);
-        let files = items.Contents.map((c) => c.Key).sort();
-        expect(files).toEqual([`${identifier}/.item`, `${identifier}/ro-crate-metadata.json`]);
+        let files = await store.listResources();
+        expect(files.length).toEqual(3);
+        files = files.map((c) => c.Key).sort();
+        expect(files).toEqual([
+            "nocfl.identifier.json",
+            "nocfl.inventory.json",
+            "ro-crate-metadata.json",
+        ]);
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should not be able to create a new item with the same identifier as an existing item", async () => {
         let user = users[0];
-        const identifier = chance.word();
         let item = await createItem({ identifier, userId: user.id });
         expect(item.identifier).toEqual(identifier);
         try {
@@ -61,16 +71,13 @@ describe("Item management tests", () => {
             expect(error.message).toEqual("An item with that identifier already exists.");
         }
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should find an existing item by identifier", async () => {
         let user = users[0];
-        const identifier = chance.word();
         let item = await createItem({ identifier, userId: user.id });
         item = await lookupItemByIdentifier({ identifier, userId: user.id });
         expect(item.identifier).toEqual(identifier);
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should not find an existing item by identifier", async () => {
         let user = users[0];
@@ -79,16 +86,13 @@ describe("Item management tests", () => {
     });
     it("should be able to delete an item", async () => {
         let user = users[0];
-        const identifier = chance.word();
         let item = await createItem({ identifier, userId: user.id });
         await deleteItem({ id: item.id });
         item = await lookupItemByIdentifier({ identifier, userId: user.id });
         expect(item).toBeNull;
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to link an item to a user", async () => {
         let user = users[0];
-        const identifier = chance.word();
         let item = await createItem({ identifier, userId: user.id });
 
         await linkItemToUser({ itemId: item.id, userId: user.id });
@@ -97,23 +101,18 @@ describe("Item management tests", () => {
         expect((await item.getUsers()).length).toBe(1);
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get own items", async () => {
         let user = users[0];
-        const identifier = chance.word();
         let item = await createItem({ identifier, userId: user.id });
 
-        // let link = await linkItemToUser({ itemId: item.id, userId: user.id });
         let items = await getItems({ userId: user.id });
         expect(items.count).toEqual(1);
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should find no items using pagination", async () => {
         let user = users[0];
-        const identifier = chance.word();
         let item = await createItem({ identifier, userId: user.id });
 
         let link = await linkItemToUser({ itemId: item.id, userId: user.id });
@@ -123,10 +122,9 @@ describe("Item management tests", () => {
         expect(items.rows.length).toEqual(0);
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to list item resources in S3", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let { resources, total } = await listItemResources({ identifier });
         expect(resources.length).toEqual(2);
@@ -135,19 +133,17 @@ describe("Item management tests", () => {
         expect(resources[1].name).toEqual(`${identifier}-02`);
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to list item resource files from S3", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let { files } = await listItemResourceFiles({ identifier, resource: `${identifier}-01` });
         expect(files.length).toEqual(2);
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should see if an item resource exists", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let stat = await itemResourceExists({ identifier, resource: `${identifier}-01.json` });
         expect(stat.$metadata.httpStatusCode).toEqual(200);
@@ -156,19 +152,17 @@ describe("Item management tests", () => {
         expect(stat).toBeFalse;
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get a resource file from S3", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let data = await getItemResource({ identifier, resource: `${identifier}-01.json` });
         expect(data).toEqual(JSON.stringify({ some: "thing" }));
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to delete an item resource", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let { resources } = await listItemResources({ identifier });
         expect(resources.length).toEqual(2);
@@ -177,7 +171,6 @@ describe("Item management tests", () => {
         ({ resources } = await listItemResources({ identifier }));
         expect(resources.length).toEqual(1);
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     // it("should be able to delete an item resource file", async () => {
     //     let { identifier, item } = await setupTestItem({ user: users[0], bucket });
@@ -194,7 +187,7 @@ describe("Item management tests", () => {
     //     await bucket.removeObjects({ prefix: identifier });
     // });
     it("should fail to get an item resource from S3", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         try {
             let data = await getItemResource({ identifier, resource: "notfound.json" });
@@ -203,19 +196,17 @@ describe("Item management tests", () => {
         }
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to get an item resource link", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         let data = await getItemResourceLink({ identifier, resource: `${identifier}-01.json` });
         expect(data).toMatch("https://s3.nyingarn.net");
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should fail to get an item resource link", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         try {
             let data = await getItemResourceLink({ identifier, resource: "notfound.json" });
@@ -224,10 +215,9 @@ describe("Item management tests", () => {
         }
 
         await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
     });
     it("should be able to update resource completed status", async () => {
-        let { identifier, item } = await setupTestItem({ user: users[0], bucket });
+        let { item } = await setupTestItem({ identifier, store, user: users[0] });
 
         await markResourceComplete({ identifier, resource: `${identifier}-01`, complete: true });
         let status = await isResourceComplete({ identifier, resource: `${identifier}-01` });

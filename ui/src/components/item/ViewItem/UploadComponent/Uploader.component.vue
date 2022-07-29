@@ -1,111 +1,124 @@
 <template>
-    <div ref="dashboard"></div>
+    <div>
+        <div v-if="data.error" class="bg-red-200 rounded p-2 w-96">
+            The file uploader cannot be initialised at this time.
+        </div>
+        <div ref="dashboard"></div>
+    </div>
 </template>
 
-<script>
+<script setup>
 import Dashboard from "@uppy/dashboard";
 import Tus from "@uppy/tus";
-
 import "@uppy/core/dist/style.css";
 import "@uppy/dashboard/dist/style.css";
-
 import Uppy from "@uppy/core";
+import { ref, reactive, onMounted, inject } from "vue";
+import { useStore } from "vuex";
+const store = useStore();
+const $http = inject("$http");
+const dashboard = ref(null);
 
-export default {
-    components: {
-        Dashboard,
+const props = defineProps({
+    identifier: {
+        type: String,
+        required: true,
     },
-    props: {
-        identifier: {
-            type: String,
-            required: true,
-        },
-    },
-    data() {
-        return {
-            specialFileNameChecks: ["-digivol.csv", "-tei.xml"],
-            show: true,
-            uppy: undefined,
-        };
-    },
-    mounted() {
-        this.init();
-    },
-    methods: {
-        init() {
-            const identifier = this.identifier;
-            const configuration = this.$store.state.configuration;
-            let uppy = new Uppy({
-                debug: false,
-                autoProceed: false,
+});
+const emit = defineEmits(["upload-success", "file-removed"]);
+const data = reactive({
+    specialFileNameChecks: ["-digivol.csv", "-tei.xml"],
+    show: true,
+    uppy: undefined,
+    path: undefined,
+    error: false,
+});
 
-                onBeforeFileAdded: (currentFile, files) => {
-                    // does the first part of the file match the identifier
-                    let regex = new RegExp(`^${identifier}-.*`);
-                    if (
-                        !currentFile.name.match(regex) &&
-                        configuration.ui.filename?.matchItemName
-                    ) {
-                        uppy.info(
-                            `Skipping file '${currentFile.name}' because the name doesn't match the item name.`,
-                            "error",
-                            5000
-                        );
-                        return false;
-                    }
+onMounted(() => {
+    init();
+});
+async function init() {
+    await getItemPath();
+    if (!data.path) return;
+    const identifier = props.identifier;
+    const configuration = store.state.configuration;
+    let uppy = new Uppy({
+        debug: false,
+        autoProceed: false,
 
-                    // is it a special file
-                    for (let specialFileNameCheck of this.specialFileNameChecks) {
-                        let regex = new RegExp(specialFileNameCheck, "i");
-                        if (currentFile.name.match(regex)) {
-                            return true;
-                        }
-                    }
+        onBeforeFileAdded: (currentFile, files) => {
+            // does the first part of the file match the identifier
+            let regex = new RegExp(`^${props.identifier}-.*`);
+            if (!currentFile.name.match(regex) && configuration.ui.filename?.matchItemName) {
+                uppy.info(
+                    `Skipping file '${currentFile.name}' because the name doesn't match the item name.`,
+                    "error",
+                    5000
+                );
+                return false;
+            }
 
-                    if (configuration.ui.filename?.checkNameStructure) {
-                        let regex = new RegExp(configuration.ui.filename.checkNameStructure);
-                        if (!currentFile.name.match(regex)) {
-                            uppy.info(
-                                `Skipping file '${currentFile.name}' because the name is not in the expected format.`,
-                                "error",
-                                5000
-                            );
-                            return false;
-                        }
-                    }
-                    if (configuration.ui.filename?.checkExtension) {
-                        let regex = new RegExp(configuration.ui.filename.checkExtension, "i");
-                        if (!currentFile.name.match(regex)) {
-                            uppy.info(
-                                `Skipping file '${currentFile.name}' because the type is not an accepted type.`,
-                                "error",
-                                5000
-                            );
-                            return false;
-                        }
-                    }
-
+            // is it a special file
+            for (let specialFileNameCheck of data.specialFileNameChecks) {
+                let regex = new RegExp(specialFileNameCheck, "i");
+                if (currentFile.name.match(regex)) {
                     return true;
-                },
-            });
-            uppy.use(Dashboard, {
-                target: this.$refs.dashboard,
-                inline: true,
-            });
-            uppy.use(Tus, {
-                endpoint: configuration.ui.tusEndpoint,
-                // retryDelays: null,
-            });
-            const token = this.$http.getToken();
-            uppy.setMeta({ itemId: this.identifier, token });
-            uppy.on("upload-success", (data) => {
-                this.$emit("file-uploaded", { itemId: this.identifier, resource: data.name });
-            });
-            uppy.on("file-removed", ({ data }) => {
-                this.$emit("file-removed", { resource: data.name });
-            });
-            this.uppy = uppy;
+                }
+            }
+
+            if (configuration.ui.filename?.checkNameStructure) {
+                let regex = new RegExp(configuration.ui.filename.checkNameStructure);
+                if (!currentFile.name.match(regex)) {
+                    uppy.info(
+                        `Skipping file '${currentFile.name}' because the name is not in the expected format.`,
+                        "error",
+                        5000
+                    );
+                    return false;
+                }
+            }
+            if (configuration.ui.filename?.checkExtension) {
+                let regex = new RegExp(configuration.ui.filename.checkExtension, "i");
+                if (!currentFile.name.match(regex)) {
+                    uppy.info(
+                        `Skipping file '${currentFile.name}' because the type is not an accepted type.`,
+                        "error",
+                        5000
+                    );
+                    return false;
+                }
+            }
+
+            return true;
         },
-    },
-};
+    });
+    uppy.use(Dashboard, {
+        target: dashboard.value,
+        inline: true,
+    });
+    uppy.use(Tus, {
+        endpoint: configuration.ui.tusEndpoint,
+        // retryDelays: null,
+    });
+    const token = $http.getToken();
+    console.log(data.path);
+    uppy.setMeta({ identifier: props.identifier, path: data.path, token });
+    uppy.on("upload-success", (data) => {
+        emit("file-uploaded", { itemId: props.identifier, resource: data.name });
+    });
+    uppy.on("file-removed", ({ data }) => {
+        emit("file-removed", { resource: data.name });
+    });
+    data.uppy = uppy;
+}
+
+async function getItemPath() {
+    let response = await $http.get({ route: `/upload/pre-create/item/${props.identifier}` });
+    if (response.status === 200) {
+        data.path = (await response.json()).path;
+        console.log(data.path);
+    } else {
+        data.error = true;
+    }
+}
 </script>

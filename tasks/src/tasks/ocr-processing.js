@@ -1,74 +1,30 @@
 import path from "path";
-import { getLogger, loadConfiguration } from "../common";
-import { createWorker } from "tesseract.js";
-import { writeFile, readFile, writeJSON, stat } from "fs-extra";
+import { getLogger, loadConfiguration, getStoreHandle } from "../common";
+import { readFile, writeJSON, stat, readdir } from "fs-extra";
 const log = getLogger();
-import { getResourceImages } from "./";
 const {
     TextractClient,
     AnalyzeDocumentCommand,
     DetectDocumentTextCommand,
 } = require("@aws-sdk/client-textract");
 
-export async function runTesseractOCR({ directory, identifier, resource }) {
-    let images;
-    const configuration = await loadConfiguration();
-    ({ resource, images } = await getResourceImages({ identifier, resource }));
+export async function runTextractOCR({ directory, identifier, resource, className = "item" }) {
+    let store = await getStoreHandle({ id: identifier, className });
+    let storeResources = (await store.listResources()).map((r) => r.Key);
 
-    let masterTei = resource.filter((f) => f.name.match(/tei\.xml/));
-    if (masterTei.length) return;
-
-    const worker = createWorker({
-        // logger: (m) => console.log(m),
-    });
-    await worker.load();
-    await worker.loadLanguage("eng");
-    await worker.initialize("eng");
-    let source = images.filter((i) => i.ext.match("jpe?g")).pop();
-    let target = path.join(
-        directory,
-        identifier,
-        `${source.basename}.tesseract_ocr-${configuration.api.filenaming.adminTag}`
-    );
-
-    source = path.join(directory, identifier, source.name);
-    log.debug(`Running Tesseract OCR on '${source}'`);
-
-    try {
-        let text = await recognize({ worker, source });
-        await writeToFile(identifier, `${target}.txt`, text.data.text);
-        await writeToFile(identifier, `${target}.html`, text.data.hocr);
-    } catch (error) {}
-
-    async function writeToFile(identifier, file, content) {
-        try {
-            await writeFile(file, content);
-        } catch (error) {
-            console.log(`Error writing OCR output for '${identifier}' to: ${file}`);
-        }
+    // have we already run OCR or do we have a TEI xml from somewhere else
+    let resourceBasename = path.basename(resource, path.extname(resource));
+    if (storeResources.includes(`${resourceBasename}.textract_ocr-ADMIN.json`)) {
+        log.debug(`Not sending ${resource} to OCR since we've already done it.`);
+        return;
+    }
+    if (storeResources.includes(`${resourceBasename}.tei.xml`)) {
+        log.debug(`Not sending ${resource} to OCR since we already have a TEI xml file.`);
+        return;
     }
 
-    async function recognize({ worker, source }) {
-        return new Promise(async (resolve, reject) => {
-            let timeout = setTimeout(async () => {
-                log.debug(`Killing the OCR job - 5 minutes have passed.`);
-                await worker.terminate();
-                reject();
-            }, 300000);
-            let text = await worker.recognize(source);
-            await worker.terminate();
-            clearTimeout(timeout);
-            resolve(text);
-        });
-    }
-}
-
-export async function runTextractOCR({ directory, identifier, resource }) {
-    let images;
     const configuration = await loadConfiguration();
-    ({ resource, images } = await getResourceImages({ identifier, resource }));
-
-    let awsConfiguration = {
+    const awsConfiguration = {
         credentials: {
             accessKeyId: configuration.api.services.aws.awsAccessKeyId,
             secretAccessKey: configuration.api.services.aws.awsSecretAccessKey,
@@ -76,16 +32,24 @@ export async function runTextractOCR({ directory, identifier, resource }) {
         region: configuration.api.services.aws.region,
     };
 
-    let source = images.filter((i) => i.ext.match("jpe?g")).pop();
+    let localFiles = await readdir(path.join(directory, identifier));
+    const sourceImage = localFiles
+        .filter((f) => f.match(/\.jpe?g/))
+        .filter((f) => !f.match(/thumbnail/))
+        .pop();
+    const sourceBasename = path.basename(sourceImage, path.extname(sourceImage));
+    const source = path.join(directory, identifier, sourceImage);
     let target = path.join(
         directory,
         identifier,
-        `${source.basename}.textract_ocr-${configuration.api.filenaming.adminTag}.json`
+        `${sourceBasename}.textract_ocr-${configuration.api.filenaming.adminTag}.json`
     );
-    source = path.join(directory, identifier, source.name);
+
     let fileStat = await stat(source);
     if (fileStat.size > 10 * 1024 * 1024) {
-        return;
+        throw new Error(
+            `That image file is too big. OCR only accepts images which are less than 10MB in size.`
+        );
     }
     log.debug(`Running Textract OCR on '${source}'`);
 
@@ -100,17 +64,4 @@ export async function runTextractOCR({ directory, identifier, resource }) {
 
     data = await client.send(command);
     await writeJSON(target, data);
-
-    // params.FeatureTypes = ["TABLES"];
-    // command = new AnalyzeDocumentCommand(params);
-
-    // data = await client.send(command);
-    // await writeJSON(
-    //     path.join(
-    //         directory,
-    //         identifier,
-    //         `${source.basename}.textract_ocr_table-${configuration.api.filenaming.adminTag}.json`
-    //     ),
-    //     data
-    // );
 }

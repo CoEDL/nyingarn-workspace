@@ -1,6 +1,6 @@
 import { ForbiddenError } from "restify-errors";
 import { log } from "./";
-import { submitTask } from "../../common";
+import { submitTask, getStoreHandle } from "../../common";
 import { lookupItemByIdentifier } from "../../lib/item";
 
 export async function authenticateTusRequest(req, res, next) {
@@ -8,6 +8,15 @@ export async function authenticateTusRequest(req, res, next) {
         return next(new UnauthorizedError());
     }
     res.send({});
+    next();
+}
+
+export async function getItemPath(req, res, next) {
+    if (!req.session.user.upload) {
+        return next(new UnauthorizedError());
+    }
+    let store = await getStoreHandle({ id: req.params.identifier, className: req.params.itemType });
+    res.send({ path: store.getItemPath() });
     next();
 }
 

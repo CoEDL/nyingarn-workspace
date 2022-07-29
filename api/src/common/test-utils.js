@@ -69,27 +69,25 @@ export async function generateLogs(info, warn, error) {
     }
 }
 
-export async function setupTestItem({ user, bucket }) {
-    const identifier = chance.word();
+export async function setupTestItem({ identifier, store, user }) {
     let item = await createItem({ identifier, userId: user.id });
     expect(item.identifier).toEqual(identifier);
 
-    await bucket.upload({
+    await store.put({
         json: { some: "thing" },
-        target: `${identifier}/${identifier}-01.json`,
+        target: `${identifier}-01.json`,
     });
-    await bucket.upload({
+    await store.put({
         content: "text",
-        target: `${identifier}/${identifier}-01.txt`,
+        target: `${identifier}-01.txt`,
     });
-    await bucket.upload({
+    await store.put({
         json: { some: "thing" },
-        target: `${identifier}/${identifier}-02.json`,
+        target: `${identifier}-02.json`,
     });
-    await bucket.upload({
+    await store.put({
         content: "text",
-        target: `${identifier}/${identifier}-02.txt`,
+        target: `${identifier}-02.txt`,
     });
-
-    return { item, identifier };
+    return { item };
 }

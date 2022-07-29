@@ -24,7 +24,8 @@ check S3_BUCKET
 file="/data/${TUS_ID}"
 
 if [ -f "${file}" ] ; then
-    itemId=$(cat "${file}.info" | jq .MetaData.itemId | sed -e 's/"//g')
+    path=$(cat "${file}.info" | jq .MetaData.path| sed -e 's/"//g')
+    identifier=$(cat "${file}.info" | jq .MetaData.identifier| sed -e 's/"//g')
     filename=$(cat "${file}.info" | jq .MetaData.filename | sed -e 's/"//g')
     token=$(cat "${file}.info" | jq .MetaData.token | sed 's/"//g')
 
@@ -35,15 +36,15 @@ if [ -f "${file}" ] ; then
 
     # copy to s3
     if [ ! -z ${S3_ENDPOINT_URL} ] ; then
-        aws --endpoint-url "${S3_ENDPOINT_URL}" s3 cp "${file}" "s3://${S3_BUCKET}/${itemId}/${filename}"
+        aws --endpoint-url "${S3_ENDPOINT_URL}" s3 cp "${file}" "s3://${S3_BUCKET}/${path}/${filename}"
         [[ $? != 0 ]] && cleanup ${file} && exit -1
     else
-        aws s3 cp "${file}" "s3://${S3_BUCKET}/${itemId}/${filename}"
+        aws s3 cp "${file}" "s3://${S3_BUCKET}/${path}/${filename}"
         [[ $? != 0 ]] && cleanup ${file} && exit -1
     fi
 
     if [ ! -z "${POST_FINISH}" ] ; then
-        curl --silent --header "authorization: Bearer ${token}" "${POST_FINISH}/${itemId}/${filename}"
+        curl --silent --header "authorization: Bearer ${token}" "${POST_FINISH}/${identifier}/${filename}"
     fi
     cleanup ${file}
 

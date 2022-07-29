@@ -1,21 +1,15 @@
 import {
     createImageThumbnail,
     createWebFormats,
-    runTesseractOCR,
     runTextractOCR,
     processDigivolTranscription,
-    //    processFtpTeiTranscription,
     processTeiTranscription,
-} from "./tasks";
-import {
     prepare,
     cleanup,
     syncToBucket,
     cleanupAfterFailure,
-    getLogger,
-    updateTask,
-    deleteTask,
-} from "./common";
+} from "./tasks";
+import { getLogger, updateTask, deleteTask } from "./common";
 const log = getLogger();
 
 export function setupHandlers({ rabbit }) {

@@ -182,8 +182,8 @@ async function getCollectionUsers(req, res, next) {
 async function deleteCollectionHandler(req, res, next) {
     try {
         await deleteCollection({ id: req.collection.id });
-        let { bucket } = await getS3Handle();
-        await bucket.removeObjects({ prefix: req.collection.identifier });
+        let store = await getStoreHandle({ id: req.params.identifier, className: "collection" });
+        await store.deleteItem();
         await logEvent({
             level: "info",
             owner: req.session.user.email,

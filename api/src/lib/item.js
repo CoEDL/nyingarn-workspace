@@ -112,17 +112,19 @@ export async function deleteItemResource({ identifier, resource }) {
 //     await bucket.removeObjects({ prefix: target });
 // }
 
-// export async function putItemResource({
-//     identifier,
-//     resource,
-//     localPath = undefined,
-//     content = undefined,
-//     json,
-// }) {
-//     let { bucket } = await getS3Handle();
-//     let target = path.join(identifier, resource);
-//     return await bucket.upload({ target, localPath, content, json });
-// }
+export async function putItemResource({
+    identifier,
+    resource,
+    localPath = undefined,
+    content = undefined,
+    json,
+}) {
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    if (!(await store.itemExists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+    await store.put({ target: resource, localPath, content, json });
+}
 
 export async function getItemResourceLink({ identifier, resource, download }) {
     let store = await getStoreHandle({ id: identifier, className: "item" });

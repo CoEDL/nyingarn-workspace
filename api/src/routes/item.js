@@ -414,6 +414,7 @@ async function saveItemTranscriptionHandler(req, res, next) {
         }
     } catch (error) {
         log.error(`Error saving transcription: ${error.message}`);
+        return next(new InternalServerError());
     }
     res.send({});
     next();

@@ -3,6 +3,26 @@
         <el-card class="box-card xl:w-1/2">
             <template #header>
                 <div class="card-header flex flex-row">
+                    <div>Items</div>
+                </div>
+            </template>
+            <el-table :data="data.items" :height="tableHeight" size="small">
+                <template #empty> No items have been found. </template>
+                <el-table-column prop="name" label="Name"> </el-table-column>
+                <el-table-column label="Actions" width="100">
+                    <template #default="scope">
+                        <div class="flex flex-row">
+                            <el-button type="primary" @click="connectItem(scope.row)" size="small">
+                                connect
+                            </el-button>
+                        </div>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-card>
+        <el-card class="box-card xl:w-1/2">
+            <template #header>
+                <div class="card-header flex flex-row">
                     <div>Collections</div>
                 </div>
             </template>
@@ -17,27 +37,6 @@
                                 @click="connectCollection(scope.row)"
                                 size="small"
                             >
-                                connect
-                            </el-button>
-                        </div>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-card>
-
-        <el-card class="box-card xl:w-1/2">
-            <template #header>
-                <div class="card-header flex flex-row">
-                    <div>Items</div>
-                </div>
-            </template>
-            <el-table :data="data.items" :height="tableHeight" size="small">
-                <template #empty> No items have been found. </template>
-                <el-table-column prop="name" label="Name"> </el-table-column>
-                <el-table-column label="Actions" width="100">
-                    <template #default="scope">
-                        <div class="flex flex-row">
-                            <el-button type="primary" @click="connectItem(scope.row)" size="small">
                                 connect
                             </el-button>
                         </div>

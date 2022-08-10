@@ -31,7 +31,7 @@
                 </el-button>
             </div>
         </div>
-        <div class="px-2" v-if="ready">
+        <div class="px-5" v-if="ready">
             <el-tabs v-model="activeTab">
                 <el-tab-pane label="Edit Transcription" name="transcription">
                     <transcription-component v-if="activeTab === 'transcription'" />

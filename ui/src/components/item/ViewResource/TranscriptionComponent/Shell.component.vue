@@ -128,7 +128,7 @@ function mouseUpHandler() {
     background-color: #cbd5e0;
     cursor: ew-resize;
     height: 100%;
-    width: 6px;
+    width: 10px;
 }
 .resize_container__right {
     /* Take the remaining width */

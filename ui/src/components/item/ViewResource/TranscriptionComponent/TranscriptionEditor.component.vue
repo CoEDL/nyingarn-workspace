@@ -417,7 +417,7 @@ async function addElement(type) {
 <style>
 .cm-editor {
     font-size: 16px;
-    height: calc(100vh - 400px);
+    height: calc(100vh - 200px);
     overflow: scroll;
 }
 </style>

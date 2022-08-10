@@ -7,40 +7,6 @@ fi
 VERSION="${1}"
 mkdir docker-metadata
 
-read -p '>> Build the containers? [y|N] ' resp
-if [ "$resp" == "y" ] ; then
-    echo '>> Building the API container '
-    docker buildx build --load --rm \
-        -t arkisto/workspace-api:latest \
-        -t arkisto/workspace-api:${VERSION} \
-        -f Dockerfile.api-build .
-    echo
-
-    echo ">> Building the TASK Runner container"
-    docker buildx build --load --rm \
-        -t arkisto/workspace-task-runner:latest \
-        -t arkisto/workspace-task-runner:${VERSION} \
-        -f Dockerfile.tasks-build .
-    echo
-
-    echo '>> Building the UI container'
-    docker run -it --rm \
-        -v $PWD/ui:/srv/ui \
-        -v ui_node_modules:/srv/ui/node_modules \
-        -w /srv/ui node:14-buster bash -l -c "npm run build"
-    docker buildx build --load --rm \
-        -t arkisto/workspace-ui:latest \
-        -t arkisto/workspace-ui:${VERSION} \
-        -f Dockerfile.ui-build .
-    echo
-
-    echo ">> Building the tusd container"
-    docker buildx build --load --rm \
-        -t arkisto/workspace-tusd \
-        -f Dockerfile.tus-build .
-    echo
-fi
-
 read -p '>> Tag the repo (select N if you are still testing the builds)? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
     cd api
@@ -54,11 +20,11 @@ if [ "$resp" == "y" ] ; then
     git commit -a -m "tag and bump version"
 fi
 
-read -p '>> Push the containers to docker hub? [y|N] ' resp
+
+read -p '>> Build the containers and push to docker hub? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
     docker login
 
-    echo "Pushing built containers to docker hub"
     docker buildx build --push --rm --platform=linux/amd64,linux/arm64 \
         -t arkisto/workspace-api:latest \
         -t arkisto/workspace-api:${VERSION} \

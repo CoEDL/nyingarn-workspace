@@ -51,13 +51,33 @@
                         complete
                     </el-button>
                 </div>
-                <div class="flex-grow"></div>
-                <div v-if="data.saved" class="text-green-400 mx-4 pt-1">
-                    <i class="fa-solid fa-check"></i>
-                    saved
+                <div>
+                    <el-button @click="deleteTranscription" type="primary" size="large">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </el-button>
                 </div>
                 <div>
-                    <el-button @click="save" type="primary" size="large"> save </el-button>
+                    <el-button @click="convertToTei" type="primary" size="large">
+                        <i class="fa-solid fa-code"></i>
+                    </el-button>
+                </div>
+                <div class="flex-grow"></div>
+                <div>
+                    <el-button
+                        @click="save"
+                        :type="data.saved ? 'success' : 'primary'"
+                        size="large"
+                        :disabled="data.saved"
+                    >
+                        <div v-show="data.saved">
+                            <i class="fa-solid fa-check"></i>
+                            &nbsp;saved
+                        </div>
+                        <div v-show="!data.saved">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            &nbsp;save
+                        </div>
+                    </el-button>
                 </div>
             </div>
             <div class="">
@@ -99,7 +119,7 @@ import {
     closeBracketsKeymap,
 } from "@codemirror/autocomplete";
 import { xml, xmlLanguage } from "@codemirror/lang-xml";
-import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
+import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { isEmpty } from "lodash";
@@ -127,7 +147,9 @@ onBeforeMount(async () => {
 onMounted(async () => {
     await loadTranscription();
     ({ view } = setupCodeMirror());
-    formatDocument();
+    nextTick(() => {
+        formatDocument();
+    });
 });
 onBeforeUnmount(async () => {
     await save();
@@ -224,18 +246,41 @@ async function resourceIsComplete() {
         data.isComplete = completed.markedComplete;
     }
 }
+function deleteTranscription() {
+    let update = view.state.update({
+        changes: {
+            from: 0,
+            to: view.state.doc.length,
+            insert: "",
+        },
+    });
+    view.update([update]);
+}
+function convertToTei() {
+    let document = view.state.doc.toString().split("\n");
+    if (document[0].match(/^\<surface xmlns=/)) return;
+    let tei = [`<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${$route.params.resource}">`];
+    tei = [...tei, ...document.map((l) => `<p>${l}</p>`), "</surface>"];
+    let update = view.state.update({
+        changes: {
+            from: 0,
+            to: view.state.doc.length,
+            insert: tei.join("\n"),
+        },
+    });
+    view.update([update]);
+    nextTick(() => {
+        formatDocument();
+    });
+}
 async function save() {
     let document = view.state.doc.toString();
-    if (isEmpty(document)) {
-        return;
-    }
-
     await $http.put({
         route: `/items/${data.identifier}/resources/${data.resource}/saveTranscription`,
         body: { datafiles: props.data, document },
     });
     data.saved = true;
-    formatDocument();
+    if (document) formatDocument();
 
     setTimeout(() => {
         data.saved = false;

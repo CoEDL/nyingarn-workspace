@@ -1,7 +1,13 @@
 <template>
     <div class="resize_container">
         <div class="resize_container__left">
-            <display-image-component class="w-full" :data="data.files" v-if="data.files.length" />
+            <display-image-component
+                class="w-full"
+                :refresh="data.refresh"
+                :data="data.files"
+                @updated="data.refresh = false"
+                v-if="data.files.length"
+            />
         </div>
         <div class="resizer" id="resizer"></div>
         <div class="resize_container__right">
@@ -30,6 +36,7 @@ const data = reactive({
     x: 0,
     y: 0,
     leftWidth: 0,
+    refresh: false,
 });
 onMounted(() => {});
 
@@ -104,6 +111,8 @@ function mouseUpHandler() {
     // Remove the handlers of `mousemove` and `mouseup`
     document.removeEventListener("mousemove", mouseMoveHandler);
     document.removeEventListener("mouseup", mouseUpHandler);
+
+    data.refresh = true;
 }
 </script>
 

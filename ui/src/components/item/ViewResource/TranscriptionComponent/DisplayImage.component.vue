@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col justify-around p-2 border border-solid relative">
         <div
-            v-if="src"
+            v-if="data.src"
             class="absolute cursor-pointer"
             style="
                 top: 100px;
@@ -26,73 +26,83 @@
                 <i class="fa-solid fa-sync"></i>
             </span>
         </div>
-        <div id="image" :data-zoomist-src="src" :style="maxHeight" v-if="src" />
+        <div id="image" :data-zoomist-src="data.src" :style="maxHeight" v-if="data.src" />
     </div>
 </template>
 
-<script>
+<script setup>
 import Zoomist from "zoomist";
+import { reactive, computed, onMounted, inject, watch } from "vue";
+import { useRoute } from "vue-router";
+const $route = useRoute();
+const $http = inject("$http");
 
-export default {
-    props: {
-        data: {
-            type: Array,
-            required: true,
-        },
+const props = defineProps({
+    data: {
+        type: Array,
+        required: true,
     },
-    data() {
-        return {
-            identifier: this.$route.params.identifier,
-            imageFormats: "jpe?g|webp|avif|png",
-            srcset: [],
-            src: undefined,
-            zoomist: undefined,
-        };
+    refresh: {
+        type: Boolean,
     },
-    computed: {
-        maxHeight: function () {
-            return { height: `${window.innerHeight - 150}px` };
-        },
-    },
-    mounted() {
-        this.getImageUrls();
-    },
-    methods: {
-        async getImageUrls() {
-            let images = this.data
-                .filter((image) => !image.match("thumbnail"))
-                .filter((image) => !image.match("xml"))
-                .filter((image) => {
-                    const re = new RegExp(this.imageFormats, "i");
-                    return re.exec(image);
-                });
-            for (let image of images) {
-                let response = await this.$http.get({
-                    route: `/items/${this.identifier}/resources/${image}/link`,
-                });
-                if (response.status !== 200) {
-                    // can't get link right now
-                }
-                let link = (await response.json()).link;
-                if (image.match(/jpe?g/i)) {
-                    this.src = link;
-                } else {
-                    this.srcset.push(link);
-                }
-            }
-            if (this.src) {
-                this.zoomist = new Zoomist("#image", {
-                    fill: "contain",
-                    maxRatio: 10,
-                    slider: true,
-                    zoomer: true,
-                    height: window.innerHeight - 150,
-                });
-            }
-        },
-        reset() {
-            this.zoomist.update();
-        },
-    },
-};
+});
+const emit = defineEmits(["updated"]);
+const data = reactive({
+    identifier: $route.params.identifier,
+    imageFormats: "jpe?g|webp|avif|png",
+    srcset: [],
+    src: undefined,
+    zoomist: undefined,
+});
+let maxHeight = computed(() => {
+    return { height: `${window.innerHeight - 150}px` };
+});
+
+watch(
+    () => props.refresh,
+    () => {
+        data.zoomist.update();
+        emit("updated");
+    }
+);
+
+onMounted(() => {
+    getImageUrls();
+});
+
+async function getImageUrls() {
+    let images = props.data
+        .filter((image) => !image.match("thumbnail"))
+        .filter((image) => !image.match("xml"))
+        .filter((image) => {
+            const re = new RegExp(data.imageFormats, "i");
+            return re.exec(image);
+        });
+    for (let image of images) {
+        let response = await $http.get({
+            route: `/items/${data.identifier}/resources/${image}/link`,
+        });
+        if (response.status !== 200) {
+            // can't get link right now
+        }
+        let link = (await response.json()).link;
+        if (image.match(/jpe?g/i)) {
+            data.src = link;
+        } else {
+            data.srcset.push(link);
+        }
+    }
+    if (data.src) {
+        data.zoomist = new Zoomist("#image", {
+            fill: "contain",
+            maxRatio: 10,
+            slider: true,
+            zoomer: true,
+            height: window.innerHeight - 150,
+        });
+    }
+}
+function reset() {
+    data.zoomist.update();
+}
 </script>

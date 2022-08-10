@@ -1,16 +1,16 @@
 <template>
     <div class="flex flex-col">
-	<div class="flex flex-row text-xl mb-2 bg-indigo-200 p-4 space-x-4 text-gray-700">
-	    <div>
-		<i class="fa-solid fa-file-image"></i>
-	    </div>
-	    <router-link :to="itemUrl">{{ identifier }} /</router-link>
+        <div class="flex flex-row text-xl mb-2 bg-indigo-200 p-4 space-x-4 text-gray-700">
+            <div>
+                <i class="fa-solid fa-file-image"></i>
+            </div>
+            <router-link :to="itemUrl">{{ identifier }} /</router-link>
             <div class="text-lg">{{ resource }}</div>
             <div class="flex-grow"></div>
             <div>
                 <el-button
                     size="small"
-                    type="text"
+                    text
                     @click="loadItem(pageControls.previous)"
                     :disabled="!pageControls.previous"
                 >
@@ -23,7 +23,7 @@
             <div>
                 <el-button
                     size="small"
-                    type="text"
+                    text
                     @click="loadItem(pageControls.next)"
                     :disabled="!pageControls.next"
                 >

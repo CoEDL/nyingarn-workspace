@@ -1,35 +1,59 @@
 <template>
-    <div class="flex flex-row">
-        <sidebar-component class="bg-gray-800 w-2/6 xl:w-1/6 h-screen" />
-        <div class="w-4/6 xl:w-5/6">
+    <div class="flex flex-row relative">
+        <div class="relative bg-gray-800 h-screen" :style="sidebarWidth">
+            <sidebar-component class="w-full bg-gray-800 h-screen" v-show="data.expanded" />
+        </div>
+        <div
+            class="relative flex flex-col justify-center -left-4 top-14 z-10 p-2 h-52 text-2xl text-white bg-gray-800 rounded border-solid border-black cursor-pointer"
+            @click="data.expanded = !data.expanded"
+        >
+            <div v-show="data.expanded"><i class="fa-solid fa-chevron-left"></i></div>
+            <div v-show="!data.expanded"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="w-full relative">
             <router-view />
         </div>
     </div>
 </template>
 
-<script>
+<script setup>
 import { tokenSessionKey, getLocalStorage } from "@/components/storage";
 import SidebarComponent from "./Sidebar.component.vue";
-export default {
-    components: {
-        SidebarComponent,
-    },
-    data() {
-        return {};
-    },
-    mounted() {
-        this.init();
-    },
-    methods: {
-        async init() {
-            let response = await this.$http.get({ route: "/authenticated" });
-            if (response.status === 200) {
-                let { token } = getLocalStorage({ key: tokenSessionKey });
-                let user = JSON.parse(atob(token.split(".")[1]));
-                this.$store.commit("setUserData", user);
-            }
-            if (this.$route.path === "/") this.$router.push("/dashboard");
-        },
-    },
-};
+import { reactive, onMounted, inject, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useStore } from "vuex";
+const $http = inject("$http");
+const $route = useRoute();
+const $router = useRouter();
+const $store = useStore();
+const data = reactive({
+    expanded: true,
+});
+onMounted(() => {
+    init();
+});
+
+let sidebarWidth = computed(() => {
+    if (data.expanded) {
+        if (window.innerWidth < 1280) {
+            return { "min-width": `${window.innerWidth * 0.3}px` };
+        } else if (window.innerWidth < 1536) {
+            return { "min-width": `${window.innerWidth * 0.25}px` };
+        } else if (window.innerWidth < 2000) {
+            return { "min-width": `${window.innerWidth * 0.2}px` };
+        } else {
+            return { "min-width": `${window.innerWidth * 0.15}px` };
+        }
+    }
+    return { width: `10px` };
+});
+async function init() {
+    let response = await $http.get({ route: "/authenticated" });
+    if (response.status === 200) {
+        let { token } = getLocalStorage({ key: tokenSessionKey });
+        let user = JSON.parse(atob(token.split(".")[1]));
+        $store.commit("setUserData", user);
+    }
+    if ($route.path === "/") $router.push("/dashboard");
+}
 </script>

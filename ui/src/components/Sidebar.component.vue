@@ -1,5 +1,5 @@
 <template>
-    <div class="text-white flex flex-col space-y-2 h-screen text-lg">
+    <div class="text-white flex flex-col space-y-2 text-lg">
         <div class="text-center py-6">
             <router-link to="/dashboard" class="text-xl text-white">{{ siteName }}</router-link>
         </div>
@@ -83,9 +83,3 @@ export default {
     },
 };
 </script>
-
-<style lang="scss">
-.el-color-primary {
-    color: "#ffffff" !important;
-}
-</style>

@@ -91,7 +91,7 @@ export default {
             }
         },
         reset() {
-            this.zoomist.reset();
+            this.zoomist.update();
         },
     },
 };

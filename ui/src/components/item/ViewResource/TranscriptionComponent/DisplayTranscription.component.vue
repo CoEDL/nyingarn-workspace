@@ -1,170 +1,306 @@
 <template>
-    <div class="flex flex-col p-2">
-        <div class="flex flex-row mb-2 space-x-1">
-            <div>
-                <el-button @click="undo" size="small">
-                    <i class="fa-solid fa-undo"></i>
-                </el-button>
-            </div>
-            <div>
-                <el-button @click="redo" size="small">
-                    <i class="fa-solid fa-redo"></i>
-                </el-button>
-            </div>
-            <div v-show="!isComplete">
-                <el-button @click="markComplete({ status: true })" size="small">
-                    mark complete
-                </el-button>
-            </div>
-            <div v-show="isComplete">
-                <el-button @click="markComplete({ status: false })" size="small">
-                    mark in progress
-                </el-button>
-            </div>
-            <div class="flex flex-grow"></div>
-            <div>
-                <div v-if="saved" class="text-green-400 mx-4">
-                    <i class="fa-solid fa-check"></i>
-                    saved
+    <div class="flex flex-row px-2">
+        <div class="flex flex-col">
+            <div class="h-12"></div>
+            <div class="flex flex-col space-y-2 items-end">
+                <div>
+                    <el-button @click="addElement('paragraph')" size="large" type="primary">
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span class="pb-1">p</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </el-button>
+                </div>
+                <div>
+                    <el-button @click="addElement('underline')" size="large" type="primary">
+                        <i class="fa-solid fa-underline"></i>
+                    </el-button>
+                </div>
+                <div>
+                    <el-button @click="addElement('strikethrough')" size="large" type="primary">
+                        <i class="fa-solid fa-strikethrough"></i>
+                    </el-button>
+                </div>
+                <div>
+                    <el-button @click="addElement('linebreak')" size="large" type="primary">
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span class="">lb</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </el-button>
                 </div>
             </div>
         </div>
-        <div class="flex flex-row">
-            <textarea ref="textarea" class="w-full"></textarea>
-            <div class="flex flex-col w-64">
-                <div class="flex flex-row flex-wrap pl-1">
-                    <div v-for="(t, idx) of tei" :key="idx" class="pl-1 mb-1">
-                        <el-button @click="addElement(t)">
-                            <span v-if="t.icon"><i :class="t.icon"></i></span>
-                            {{ t.name }}
-                        </el-button>
-                    </div>
+        <div class="flex flex-col flex-grow px-2">
+            <div class="flex flex-row mb-2 space-x-2">
+                <div>
+                    <el-button @click="undoButtonHandler" type="primary" size="large">
+                        <i class="fa-solid fa-undo"></i>
+                    </el-button>
                 </div>
+                <div>
+                    <el-button @click="redoButtonHandler" type="primary" size="large">
+                        <i class="fa-solid fa-redo"></i>
+                    </el-button>
+                </div>
+                <div v-show="!data.isComplete">
+                    <el-button @click="markComplete({ status: true })" type="warning" size="large">
+                        in progress
+                    </el-button>
+                </div>
+                <div v-show="data.isComplete">
+                    <el-button @click="markComplete({ status: false })" type="success" size="large">
+                        complete
+                    </el-button>
+                </div>
+                <div class="flex-grow"></div>
+                <div v-if="data.saved" class="text-green-400 mx-4 pt-1">
+                    <i class="fa-solid fa-check"></i>
+                    saved
+                </div>
+                <div>
+                    <el-button @click="save" type="primary" size="large"> save </el-button>
+                </div>
+            </div>
+            <div class="">
+                <div ref="codemirror"></div>
             </div>
         </div>
     </div>
 </template>
 
-<script>
-import CodeMirror from "codemirror";
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/blackboard.css";
-import { debounce, isEmpty } from "lodash";
-import { ElMessage } from "element-plus";
+<script setup>
+import {
+    EditorView,
+    keymap,
+    highlightSpecialChars,
+    drawSelection,
+    highlightActiveLine,
+    dropCursor,
+    rectangularSelection,
+    crosshairCursor,
+    lineNumbers,
+    highlightActiveLineGutter,
+} from "@codemirror/view";
+import { EditorState, Text, Transaction } from "@codemirror/state";
+import {
+    defaultHighlightStyle,
+    syntaxHighlighting,
+    indentOnInput,
+    bracketMatching,
+    foldGutter,
+    foldKeymap,
+} from "@codemirror/language";
+import { defaultKeymap, history, historyKeymap, undo, redo } from "@codemirror/commands";
+import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
+import { oneDark } from "@codemirror/theme-one-dark";
+import {
+    autocompletion,
+    completionKeymap,
+    closeBrackets,
+    closeBracketsKeymap,
+} from "@codemirror/autocomplete";
+import { xml, xmlLanguage } from "@codemirror/lang-xml";
+import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
+import { useRoute } from "vue-router";
+import { useStore } from "vuex";
+import { isEmpty } from "lodash";
+import format from "xml-formatter";
 
-export default {
-    props: {
-        data: {
-            type: Array,
-            required: true,
-        },
-    },
-    data() {
-        return {
-            ...this.$route.params,
-            transcription: "",
-            debouncedLog: debounce(console.log, 1000),
-            debouncedSave: debounce(this.save, 1000),
-            tei: this.$store.state.configuration.teiMarkupControls.controls,
-            saved: false,
-            isComplete: undefined,
-        };
-    },
-    computed: {
-        rows: function () {
-            return (window.innerHeight - 60) / 30;
-        },
-    },
-    mounted() {
-        this.loadTranscription();
-        this.resourceIsComplete();
-    },
-    methods: {
-        async loadTranscription() {
-            this.transcription = await this.getTranscription();
-            this.codemirror = CodeMirror.fromTextArea(this.$refs.textarea, {});
-            this.codemirror.setSize("100%", window.innerHeight - 200);
-            this.codemirror.setOption("mode", "text/xml");
-            this.codemirror.setOption("theme", "blackboard");
-            this.codemirror.setOption("lineWrapping", true);
-            this.codemirror.setValue(this.transcription);
-            this.codemirror.on("change", this.debouncedSave);
-            this.save();
-        },
-        async getTranscription() {
-            let response = await this.$http.get({
-                route: `/items/${this.identifier}/resources/${this.resource}/transcription`,
-            });
-            if (response.status !== 200) {
-                // can't get item content
-                ElMessage.error(`There was a problem loading the transcription.`);
-                return "";
-            }
-            let transcription = (await response.json()).content;
-            return transcription;
-        },
-        addElement(t) {
-            let selections = this.codemirror.getSelections();
-            let replacements = selections.map((selection) => {
-                let attributes;
-                if (t?.attributes && t.attributes.length) {
-                    attributes = " " + t?.attributes.map((a) => `${a}=""`).join(" ");
-                } else {
-                    attributes = "";
-                }
-                if (t.element) {
-                    return `<${t.element}${attributes}>${selection}</${t.element}>`;
-                } else if (t.open && t.close) {
-                    return `${t.open}${attributes}${selection}${t.close}`;
-                }
-            });
-            this.codemirror.replaceSelections(replacements);
-        },
-        undo() {
-            if (this.codemirror.historySize().undo === 1) return;
-            this.codemirror.undo();
-        },
-        redo() {
-            this.codemirror.redo();
-        },
-        async markComplete({ status }) {
-            const { identifier, resource } = this.$route.params;
-            await this.$http.put({
-                route: `/items/${identifier}/resources/${resource}/status`,
-                params: { complete: status },
-            });
-            await this.resourceIsComplete();
-        },
-        async resourceIsComplete() {
-            const { identifier, resource } = this.$route.params;
-            let response = await this.$http.get({
-                route: `/items/${identifier}/resources/${resource}/status`,
-            });
-            if (response.status === 200) {
-                let { completed } = await response.json();
-                this.isComplete = completed.markedComplete;
-            }
-        },
-        clearHistory() {
-            this.codemirror.clearHistory();
-        },
-        async save() {
-            const { identifier, resource } = this.$route.params;
+const $http = inject("$http");
+const $route = useRoute();
+const $store = useStore();
 
-            let document = this.codemirror.getValue();
-            if (isEmpty(document)) {
-                return;
-            }
-            await this.$http.put({
-                route: `/items/${identifier}/resources/${resource}/saveTranscription`,
-                body: { datafiles: this.data, document: this.codemirror.getValue() },
-            });
+const props = defineProps({
+    data: { type: Array, required: true },
+});
 
-            this.saved = true;
-            setTimeout(() => {
-                this.saved = false;
-            }, 1500);
+let data = reactive({
+    ...$route.params,
+    transcription: undefined,
+    isComplete: false,
+    saved: false,
+    tei: $store.state.configuration.teiMarkupControls.controls,
+});
+
+onBeforeMount(async () => {
+    await resourceIsComplete();
+});
+onMounted(async () => {
+    await loadTranscription();
+    ({ view } = setupCodeMirror());
+    formatDocument();
+});
+onBeforeUnmount(async () => {
+    await save();
+});
+
+const codemirror = ref(null);
+let view;
+
+function setupCodeMirror() {
+    const initialState = EditorState.create({
+        doc: data.transcription,
+        extensions: [
+            EditorView.lineWrapping,
+            lineNumbers(),
+            highlightActiveLineGutter(),
+            highlightSpecialChars(),
+            history(),
+            foldGutter(),
+            drawSelection(),
+            dropCursor(),
+            EditorState.allowMultipleSelections.of(true),
+            indentOnInput(),
+            syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+            bracketMatching(),
+            closeBrackets(),
+            autocompletion(),
+            rectangularSelection(),
+            crosshairCursor(),
+            highlightActiveLine(),
+            highlightSelectionMatches(),
+            oneDark,
+            keymap.of([
+                ...closeBracketsKeymap,
+                ...defaultKeymap,
+                ...searchKeymap,
+                ...historyKeymap,
+                ...foldKeymap,
+                ...completionKeymap,
+            ]),
+            xml(),
+            xmlLanguage,
+        ],
+    });
+
+    const view = new EditorView({
+        state: initialState,
+        parent: codemirror.value,
+    });
+    return { view };
+}
+async function loadTranscription() {
+    let response = await $http.get({
+        route: `/items/${$route.params.identifier}/resources/${$route.params.resource}/transcription`,
+    });
+    if (response.status !== 200) {
+        // can't get item content
+        ElMessage.error(`There was a problem loading the transcription.`);
+        data.transcription = "";
+        return;
+    }
+    try {
+        data.transcription = (await response.json()).content;
+    } catch (error) {
+        data.transcription = "";
+    }
+}
+function undoButtonHandler(e) {
+    undo({
+        state: view.state,
+        dispatch: view.dispatch,
+    });
+}
+function redoButtonHandler(e) {
+    redo({
+        state: view.state,
+        dispatch: view.dispatch,
+    });
+}
+async function markComplete({ status }) {
+    let response = await $http.put({
+        route: `/items/${data.identifier}/resources/${data.resource}/status`,
+        params: { complete: status },
+    });
+    if (response.status === 200) {
+        data.isComplete = !data.isComplete;
+    }
+}
+async function resourceIsComplete() {
+    let response = await $http.get({
+        route: `/items/${data.identifier}/resources/${data.resource}/status`,
+    });
+    if (response.status === 200) {
+        let { completed } = await response.json();
+        data.isComplete = completed.markedComplete;
+    }
+}
+async function save() {
+    let document = view.state.doc.toString();
+    if (isEmpty(document)) {
+        return;
+    }
+
+    await $http.put({
+        route: `/items/${data.identifier}/resources/${data.resource}/saveTranscription`,
+        body: { datafiles: props.data, document },
+    });
+    data.saved = true;
+    formatDocument();
+
+    setTimeout(() => {
+        data.saved = false;
+    }, 1500);
+}
+function formatDocument() {
+    let update = view.state.update({
+        changes: {
+            from: 0,
+            to: view.state.doc.length,
+            insert: format(view.state.doc.toString(), { indentation: "  ", collapseContent: true }),
         },
-    },
-};
+    });
+    view.update([update]);
+}
+async function addElement(type) {
+    let selections = view.state.selection.ranges.reverse();
+    switch (type) {
+        case "paragraph":
+            selections.forEach((r) => {
+                let changes = {
+                    from: r.from,
+                    to: r.to,
+                    insert: `<p>${view.state.sliceDoc(r.from, r.to)}</p>`,
+                };
+                view.dispatch({ changes });
+            });
+            break;
+        case "underline":
+            selections.forEach((r) => {
+                let changes = {
+                    from: r.from,
+                    to: r.to,
+                    insert: `<u>${view.state.sliceDoc(r.from, r.to)}</u>`,
+                };
+                view.dispatch({ changes });
+            });
+            break;
+        case "strikethrough":
+            selections.forEach((r) => {
+                let changes = {
+                    from: r.from,
+                    to: r.to,
+                    insert: `<s>${view.state.sliceDoc(r.from, r.to)}</s>`,
+                };
+                view.dispatch({ changes });
+            });
+            break;
+        case "linebreak":
+            selections.forEach((r) => {
+                let changes = {
+                    from: r.to,
+                    insert: `<lb/>`,
+                };
+                view.dispatch({ changes });
+            });
+            break;
+    }
+}
 </script>
+
+<style>
+.cm-editor {
+    font-size: 16px;
+    height: calc(100vh - 400px);
+    overflow: scroll;
+}
+</style>

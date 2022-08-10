@@ -187,7 +187,7 @@ export async function listItemResourceFiles({ identifier, resource }) {
 
 function filterSpecialFiles({ files }) {
     files = files.map((f) => f.Key);
-    files = files.filter((f) => !f.match(/^\.\//));
+    files = files.filter((f) => !f.match(/^\./));
     files = files.filter((f) => {
         let matches = specialFiles.map((sf) => {
             let re = new RegExp(sf);

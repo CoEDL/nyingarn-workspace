@@ -3,30 +3,50 @@
         <div class="flex flex-col">
             <div class="h-12"></div>
             <div class="flex flex-col space-y-2 items-end">
-                <div>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Add a paragraph"
+                    placement="top-start"
+                >
                     <el-button @click="addElement('paragraph')" size="large" type="primary">
                         <i class="fa-solid fa-chevron-left"></i>
                         <span class="pb-1">p</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </el-button>
-                </div>
-                <div>
+                </el-tooltip>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Underline the selection"
+                    placement="top-start"
+                >
                     <el-button @click="addElement('underline')" size="large" type="primary">
                         <i class="fa-solid fa-underline"></i>
                     </el-button>
-                </div>
-                <div>
+                </el-tooltip>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Strikethrough the selection"
+                    placement="top-start"
+                >
                     <el-button @click="addElement('strikethrough')" size="large" type="primary">
                         <i class="fa-solid fa-strikethrough"></i>
                     </el-button>
-                </div>
-                <div>
+                </el-tooltip>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Add a linebreak"
+                    placement="top-start"
+                >
                     <el-button @click="addElement('linebreak')" size="large" type="primary">
                         <i class="fa-solid fa-chevron-left"></i>
                         <span class="">lb</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </el-button>
-                </div>
+                </el-tooltip>
             </div>
         </div>
         <div class="flex flex-col flex-grow px-2">
@@ -41,26 +61,58 @@
                         <i class="fa-solid fa-redo"></i>
                     </el-button>
                 </div>
-                <div v-show="!data.isComplete">
-                    <el-button @click="markComplete({ status: true })" type="warning" size="large">
-                        in progress
-                    </el-button>
-                </div>
-                <div v-show="data.isComplete">
-                    <el-button @click="markComplete({ status: false })" type="success" size="large">
-                        complete
-                    </el-button>
-                </div>
-                <div>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Mark the transcription as in progress"
+                    placement="top-start"
+                >
+                    <div v-show="!data.isComplete">
+                        <el-button
+                            @click="markComplete({ status: true })"
+                            type="warning"
+                            size="large"
+                        >
+                            in progress
+                        </el-button>
+                    </div>
+                </el-tooltip>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Mark the transcription as complete"
+                    placement="top-start"
+                >
+                    <div v-show="data.isComplete">
+                        <el-button
+                            @click="markComplete({ status: false })"
+                            type="success"
+                            size="large"
+                        >
+                            complete
+                        </el-button>
+                    </div>
+                </el-tooltip>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Delete the transcription"
+                    placement="top-start"
+                >
                     <el-button @click="deleteTranscription" type="primary" size="large">
                         <i class="fa-solid fa-trash-can"></i>
                     </el-button>
-                </div>
-                <div>
+                </el-tooltip>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Convert the text to a TEI document"
+                    placement="top-start"
+                >
                     <el-button @click="convertToTei" type="primary" size="large">
                         <i class="fa-solid fa-code"></i>
                     </el-button>
-                </div>
+                </el-tooltip>
                 <div class="flex-grow"></div>
                 <div>
                     <el-button

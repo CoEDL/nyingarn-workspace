@@ -4,7 +4,7 @@
             <sidebar-component class="w-full bg-gray-800 h-screen" v-show="data.expanded" />
         </div>
         <div
-            class="relative flex flex-col justify-center -left-4 top-64 z-10 p-2 h-52 text-2xl text-white bg-gray-800 rounded border-solid border-black cursor-pointer"
+            class="relative flex flex-col justify-center -left-5 top-20 z-10 p-2 h-52 text-2xl text-white bg-gray-800 rounded border-solid border-black cursor-pointer"
             @click="data.expanded = !data.expanded"
         >
             <div v-show="data.expanded"><i class="fa-solid fa-chevron-left"></i></div>
@@ -22,6 +22,7 @@ import SidebarComponent from "./Sidebar.component.vue";
 import { reactive, onMounted, inject, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { round } from "lodash";
 const $http = inject("$http");
 const $route = useRoute();
 const $router = useRouter();
@@ -35,15 +36,16 @@ onMounted(() => {
 
 let sidebarWidth = computed(() => {
     if (data.expanded) {
-        if (window.innerWidth < 1280) {
-            return { "min-width": `${window.innerWidth * 0.3}px` };
-        } else if (window.innerWidth < 1536) {
-            return { "min-width": `${window.innerWidth * 0.25}px` };
-        } else if (window.innerWidth < 2000) {
-            return { "min-width": `${window.innerWidth * 0.2}px` };
-        } else {
-            return { "min-width": `${window.innerWidth * 0.15}px` };
-        }
+        // if (window.innerWidth < 1280) {
+        //     return { "min-width": `${round(window.innerWidth * 0.3)}px` };
+        // } else if (window.innerWidth < 1536) {
+        //     return { "min-width": `${round(window.innerWidth * 0.25)}px` };
+        // } else if (window.innerWidth < 2000) {
+        //     return { "min-width": `${round(window.innerWidth * 0.2)}px` };
+        // } else {
+        //     return { "min-width": `${round(window.innerWidth * 0.15)}px` };
+        // }
+        return { "min-width": `200px` };
     }
     return { width: `10px` };
 });

@@ -4,7 +4,7 @@
             <i class="fa-solid fa-file-image"></i>
             {{ props.identifier }}
         </div>
-        <div class="p-4" v-if="data.userIsPermitted">
+        <div class="px-6" v-if="data.userIsPermitted">
             <el-tabs v-model="data.activeTab" @tab-click="updateRouteOnTabSelect">
                 <el-tab-pane label="View Item Content" name="view">
                     <view-item-content-component v-if="data.activeTab === 'view'" />

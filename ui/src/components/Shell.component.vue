@@ -4,13 +4,13 @@
             <sidebar-component class="w-full bg-gray-800 h-screen" v-show="data.expanded" />
         </div>
         <div
-            class="relative flex flex-col justify-center -left-4 top-14 z-10 p-2 h-52 text-2xl text-white bg-gray-800 rounded border-solid border-black cursor-pointer"
+            class="relative flex flex-col justify-center -left-4 top-64 z-10 p-2 h-52 text-2xl text-white bg-gray-800 rounded border-solid border-black cursor-pointer"
             @click="data.expanded = !data.expanded"
         >
             <div v-show="data.expanded"><i class="fa-solid fa-chevron-left"></i></div>
             <div v-show="!data.expanded"><i class="fa-solid fa-chevron-right"></i></div>
         </div>
-        <div class="w-full relative">
+        <div class="w-full relative -ml-8">
             <router-view />
         </div>
     </div>

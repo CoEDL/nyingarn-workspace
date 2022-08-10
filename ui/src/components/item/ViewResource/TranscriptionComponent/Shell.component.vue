@@ -5,7 +5,7 @@
         </div>
         <div class="resizer" id="resizer"></div>
         <div class="resize_container__right">
-            <display-transcription-component
+            <transcription-editor
                 class="w-full h-full"
                 :data="data.files"
                 v-if="data.files.length"
@@ -16,7 +16,7 @@
 
 <script setup>
 import DisplayImageComponent from "./DisplayImage.component.vue";
-import DisplayTranscriptionComponent from "./DisplayTranscription.component.vue";
+import TranscriptionEditor from "./TranscriptionEditor.component.vue";
 import { reactive, onMounted, inject } from "vue";
 import { useRoute } from "vue-router";
 const $route = useRoute();

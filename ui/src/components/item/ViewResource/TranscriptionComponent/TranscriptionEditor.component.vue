@@ -47,17 +47,27 @@
                         <i class="fa-solid fa-chevron-right"></i>
                     </el-button>
                 </el-tooltip>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Mark text as unclear"
+                    placement="top-start"
+                >
+                    <el-button @click="addElement('unclear')" size="large" type="primary">
+                        unclear
+                    </el-button>
+                </el-tooltip>
             </div>
         </div>
         <div class="flex flex-col flex-grow px-2">
             <div class="flex flex-row mb-2 space-x-2">
                 <div>
-                    <el-button @click="undoButtonHandler" type="primary" size="large">
+                    <el-button @click="undoButton" type="primary" size="large">
                         <i class="fa-solid fa-undo"></i>
                     </el-button>
                 </div>
                 <div>
-                    <el-button @click="redoButtonHandler" type="primary" size="large">
+                    <el-button @click="redoButton" type="primary" size="large">
                         <i class="fa-solid fa-redo"></i>
                     </el-button>
                 </div>
@@ -268,13 +278,13 @@ async function loadTranscription() {
         data.transcription = "";
     }
 }
-function undoButtonHandler(e) {
+function undoButton() {
     undo({
         state: view.state,
         dispatch: view.dispatch,
     });
 }
-function redoButtonHandler(e) {
+function redoButton() {
     redo({
         state: view.state,
         dispatch: view.dispatch,
@@ -386,6 +396,16 @@ async function addElement(type) {
                 let changes = {
                     from: r.to,
                     insert: `<lb/>`,
+                };
+                view.dispatch({ changes });
+            });
+            break;
+        case "unclear":
+            selections.forEach((r) => {
+                let changes = {
+                    from: r.from,
+                    to: r.to,
+                    insert: `<unclear>${view.state.sliceDoc(r.from, r.to)}</unclear>`,
                 };
                 view.dispatch({ changes });
             });

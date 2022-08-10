@@ -35,6 +35,10 @@ if [ "$resp" == "y" ] ; then
         -t arkisto/workspace-task-runner:${VERSION} \
         -f Dockerfile.tasks-build .
 
+    docker run -it --rm \
+        -v $PWD/ui:/srv/ui \
+        -v ui_node_modules:/srv/ui/node_modules \
+        -w /srv/ui node:14-buster bash -l -c "npm run build"
     docker buildx build --push --rm --platform linux/amd64,linux/arm64 \
         -t arkisto/workspace-ui:latest \
         -t arkisto/workspace-ui:${VERSION} \

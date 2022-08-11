@@ -40,7 +40,6 @@ onMounted(() => {
     data.interval = setInterval(updateProcessingStatus, 2000);
 });
 onBeforeUnmount(() => {
-    console.log("clearing the update checker");
     clearInterval(data.interval);
 });
 async function updateProcessingStatus() {

@@ -25,7 +25,7 @@ const props = defineProps({
         required: true,
     },
 });
-const emit = defineEmits(["upload-started", "upload-success", "file-removed"]);
+const emit = defineEmits(["upload-started", "file-uploaded", "file-removed"]);
 const data = reactive({
     specialFileNameChecks: ["-digivol.csv", "-tei.xml"],
     show: true,

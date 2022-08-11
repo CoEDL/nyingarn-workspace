@@ -11,7 +11,7 @@
                 z-index: 10;
                 background-color: rgba(255, 255, 255, 0.9);
             "
-            @click="reset"
+            @click="update"
         >
             <span
                 class="text-gray-500"
@@ -34,6 +34,7 @@
 import Zoomist from "zoomist";
 import { reactive, computed, onMounted, inject, watch } from "vue";
 import { useRoute } from "vue-router";
+import { debounce } from "lodash";
 const $route = useRoute();
 const $http = inject("$http");
 
@@ -53,6 +54,7 @@ const data = reactive({
     srcset: [],
     src: undefined,
     zoomist: undefined,
+    debouncedUpdate: debounce(update, 500),
 });
 let maxHeight = computed(() => {
     return { height: `${window.innerHeight - 150}px` };
@@ -60,9 +62,8 @@ let maxHeight = computed(() => {
 
 watch(
     () => props.refresh,
-    () => {
-        data.zoomist.update();
-        emit("updated");
+    (n) => {
+        if (n) data.debouncedUpdate();
     }
 );
 
@@ -102,7 +103,8 @@ async function getImageUrls() {
         });
     }
 }
-function reset() {
+function update() {
     data.zoomist.update();
+    emit("updated");
 }
 </script>

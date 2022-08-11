@@ -1,21 +1,20 @@
 import models from "../models";
 import { loadConfiguration } from "../common";
 import { uniqBy } from "lodash";
+import Chance from "chance";
+const chance = Chance();
 
-export async function getUsers({ offset = 0, limit = 10 }) {
+export async function getUsers({ offset = 0, limit = 10, orderBy = "familyName" }) {
+    let direction = orderBy === "upload" ? "DESC" : "ASC";
     let users = await models.user.findAndCountAll({
         offset,
         limit,
-        order: [
-            ["givenName", "ASC"],
-            ["familyName", "ASC"],
-        ],
+        order: [[orderBy, direction]],
     });
     return { total: users.count, users: users.rows.map((u) => u.get()) };
 }
 
-export async function getUser({ userId, email }) {
-    let where = {};
+export async function getUser({ userId, email, orderBy }) {
     if (userId) where.id = userId;
     if (email) where.email = email;
     let user = await models.user.findOne({

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-table :data="tasks" v-if="tasks.length" class="w-full">
+        <el-table :data="data.tasks" v-if="data.tasks.length" class="w-full">
             <el-table-column prop="updatedAt" label="Date" width="220">
                 <template #default="props">
                     {{ formatDate(props.row.updatedAt) }}
@@ -17,43 +17,43 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import { format, parseISO } from "date-fns";
+import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
+import { useRoute } from "vue-router";
+const $http = inject("$http");
+const $route = useRoute();
 
-export default {
-    props: {
-        uploads: {
-            type: Array,
-            required: true,
-        },
+const props = defineProps({
+    uploads: {
+        type: Array,
+        required: true,
     },
-    data() {
-        return {
-            identifier: this.$route.params.identifier,
-            interval: undefined,
-            tasks: [],
-        };
-    },
-    mounted() {
-        this.interval = setInterval(this.updateProcessingStatus, 2000);
-    },
-    unmounted() {
-        clearInterval(this.interval);
-    },
-    methods: {
-        async updateProcessingStatus() {
-            let response = await this.$http.post({
-                route: `/items/${this.identifier}/resources/processing-status`,
-                body: { resources: this.uploads },
-            });
-            let { tasks } = await response.json();
-            let failedTasks = tasks.filter((t) => t.status === "failed");
-            if (failedTasks.length) this.$emit("failed-tasks", failedTasks);
-            this.tasks = [...tasks];
-        },
-        formatDate(date) {
-            return format(parseISO(date), "PPpp");
-        },
-    },
-};
+});
+const emit = defineEmits(["failed-tasks"]);
+const data = reactive({
+    identifier: $route.params.identifier,
+    interval: undefined,
+    tasks: [],
+});
+onMounted(() => {
+    data.interval = setInterval(updateProcessingStatus, 2000);
+});
+onBeforeUnmount(() => {
+    console.log("clearing the update checker");
+    clearInterval(data.interval);
+});
+async function updateProcessingStatus() {
+    let response = await $http.post({
+        route: `/items/${data.identifier}/resources/processing-status`,
+        body: { resources: props.uploads },
+    });
+    let { tasks } = await response.json();
+    let failedTasks = tasks.filter((t) => t.status === "failed");
+    if (failedTasks.length) emit("failed-tasks", failedTasks);
+    data.tasks = [...tasks];
+}
+function formatDate(date) {
+    return format(parseISO(date), "PPpp");
+}
 </script>

@@ -2,24 +2,24 @@
     <div class="my-2 flex flex-col space-y-2">
         <div class="flex flex-row">
             <uploader-component
-                :identifier="identifier"
-                @upload-started="failedTasks = []"
+                :identifier="data.identifier"
+                @upload-started="data.failedTasks = []"
                 @file-uploaded="fileUploaded"
                 @file-removed="fileRemoved"
             />
             <processing-status-component
                 class="px-2 flex-grow"
-                :uploads="uploads"
+                v-if="data.uploads.length"
+                :uploads="data.uploads"
                 @failed-tasks="storeFailedTasks"
-                v-if="uploads.length"
             />
 
-            <div class="px-2" v-if="!uploads.length">
-                <digi-vol-help-component v-if="help === 'digivol'" />
-                <tei-help-component v-if="help === 'ftp'" type="ftp" />
-                <tei-help-component v-if="help === 'tei'" type="tei" />
-                <tei-help-component v-if="help === 'word'" type="word" />
-                <image-help-component v-if="help === 'images'" />
+            <div class="px-2" v-if="!data.uploads.length">
+                <digi-vol-help-component v-if="data.help === 'digivol'" />
+                <tei-help-component v-if="data.help === 'ftp'" type="ftp" />
+                <tei-help-component v-if="data.help === 'tei'" type="tei" />
+                <tei-help-component v-if="data.help === 'word'" type="word" />
+                <image-help-component v-if="data.help === 'images'" />
                 <div class="bg-yellow-100 p-2 rounded flex flex-row">
                     <div class="text-3xl p-4 text-red-600">
                         <i class="fa-solid fa-exclamation-circle"></i>
@@ -32,14 +32,14 @@
         </div>
         <upload-wizard-component @show-help="showHelp" />
         <ul class="ml-10 list-disc">
-            <li v-for="(error, idx) of failedTasks" :key="idx">
+            <li v-for="(error, idx) of data.failedTasks" :key="idx">
                 <error-reporter-component :error="error" />
             </li>
         </ul>
     </div>
 </template>
 
-<script>
+<script setup>
 import UploaderComponent from "./Uploader.component.vue";
 import UploadWizardComponent from "./UploadWizard.component.vue";
 import DigiVolHelpComponent from "./HelpDigivol.component.vue";
@@ -48,39 +48,29 @@ import ImageHelpComponent from "./HelpImages.component.vue";
 import ProcessingStatusComponent from "./ProcessingStatus.component.vue";
 import ErrorReporterComponent from "./ErrorReporter.component.vue";
 import { uniqBy } from "lodash";
+import { reactive } from "vue";
+import { useRoute } from "vue-router";
+import { useStore } from "vuex";
+const $store = useStore();
+const $route = useRoute();
 
-export default {
-    components: {
-        UploaderComponent,
-        UploadWizardComponent,
-        DigiVolHelpComponent,
-        TeiHelpComponent,
-        ImageHelpComponent,
-        ProcessingStatusComponent,
-        ErrorReporterComponent,
-    },
-    data() {
-        return {
-            helpFileExtension: this.$store.state.configuration.ui?.filename?.helpExtension,
-            identifier: this.$route.params.identifier,
-            help: undefined,
-            uploads: [],
-            failedTasks: [],
-        };
-    },
-    methods: {
-        showHelp({ type }) {
-            this.help = type;
-        },
-        fileUploaded(data) {
-            this.uploads = uniqBy([...this.uploads, data], "resource");
-        },
-        fileRemoved(data) {
-            this.uploads = this.uploads.filter((r) => r.resource !== data.resource);
-        },
-        storeFailedTasks(tasks) {
-            this.failedTasks = [...tasks];
-        },
-    },
-};
+const data = reactive({
+    helpFileExtension: $store.state.configuration.ui?.filename?.helpExtension,
+    identifier: $route.params.identifier,
+    help: undefined,
+    uploads: [],
+    failedTasks: [],
+});
+function showHelp({ type }) {
+    data.help = type;
+}
+function fileUploaded(file) {
+    data.uploads = uniqBy([...data.uploads, file], "resource");
+}
+function fileRemoved(file) {
+    data.uploads = data.uploads.filter((r) => r.resource !== file.resource);
+}
+function storeFailedTasks(tasks) {
+    data.failedTasks = [...tasks];
+}
 </script>

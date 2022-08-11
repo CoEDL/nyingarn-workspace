@@ -3,6 +3,7 @@
         <div class="flex flex-row">
             <uploader-component
                 :identifier="identifier"
+                @upload-started="failedTasks = []"
                 @file-uploaded="fileUploaded"
                 @file-removed="fileRemoved"
             />
@@ -78,7 +79,7 @@ export default {
             this.uploads = this.uploads.filter((r) => r.resource !== data.resource);
         },
         storeFailedTasks(tasks) {
-            this.failedTasks = tasks;
+            this.failedTasks = [...tasks];
         },
     },
 };

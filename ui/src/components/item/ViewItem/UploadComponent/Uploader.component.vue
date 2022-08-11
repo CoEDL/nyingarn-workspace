@@ -25,7 +25,7 @@ const props = defineProps({
         required: true,
     },
 });
-const emit = defineEmits(["upload-success", "file-removed"]);
+const emit = defineEmits(["upload-started", "upload-success", "file-removed"]);
 const data = reactive({
     specialFileNameChecks: ["-digivol.csv", "-tei.xml"],
     show: true,
@@ -101,8 +101,10 @@ async function init() {
         // retryDelays: null,
     });
     const token = $http.getToken();
-    console.log(data.path);
     uppy.setMeta({ identifier: props.identifier, path: data.path, token });
+    uppy.on("upload", () => {
+        emit("upload-started");
+    });
     uppy.on("upload-success", (data) => {
         emit("file-uploaded", { itemId: props.identifier, resource: data.name });
     });

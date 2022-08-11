@@ -49,14 +49,3 @@ if [ "$resp" == "y" ] ; then
         -t arkisto/workspace-tusd:${VERSION} \
         -f Dockerfile.tus-build .
 fi
-
-read -p '>> Remove local container copies? [y|N] ' resp
-if [ "$resp" == "y" ] ; then
-    docker rmi arkisto/workspace-api:latest
-    docker rmi arkisto/workspace-api:${VERSION}
-    docker rmi arkisto/workspace-task-runner:latest
-    docker rmi arkisto/workspace-task-runner:${VERSION}
-    docker rmi arkisto/workspace-ui:latest
-    docker rmi arkisto/workspace-ui:${VERSION}
-    rm -rf docker-metadata
-fi

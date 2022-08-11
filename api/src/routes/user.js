@@ -48,6 +48,7 @@ async function getUsersRouteHandler(req, res, next) {
     let users = await getUsers({
         offset: req.query.offset,
         limit: req.query.limit,
+        orderBy: req.query.orderBy,
     });
     res.send(users);
     next();

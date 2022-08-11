@@ -1,11 +1,27 @@
 <template>
     <div class="flex flex-col">
-        <el-pagination
-            layout="prev, pager, next"
-            :total="total"
-            :page-size="limit"
-            @current-change="paginate"
-        ></el-pagination>
+        <div class="flex flex-row">
+            <el-pagination
+                layout="prev, pager, next"
+                :total="total"
+                :page-size="limit"
+                @current-change="paginate"
+            ></el-pagination>
+            <el-select
+                v-model="orderBy"
+                class="m-2"
+                placeholder="Order results by"
+                @change="getUsers()"
+            >
+                <el-option
+                    v-for="item in orderByOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                >
+                </el-option>
+            </el-select>
+        </div>
         <el-table :data="users" style="width: 100%">
             <el-table-column prop="email" label="Email" width="300" />
             <el-table-column prop="givenName" label="Given name" width="180" />
@@ -75,6 +91,13 @@ export default {
             offset: 0,
             limit: 10,
             loggedInUser: this.$store.state.user,
+            orderBy: "familyName",
+            orderByOptions: [
+                { label: "Order By: email", value: "email" },
+                { label: "Order By: Given Name", value: "givenName" },
+                { label: "Order By: Family Name", value: "familyName" },
+                { label: "Order By: ability to upload", value: "upload" },
+            ],
         };
     },
     mounted() {
@@ -86,7 +109,7 @@ export default {
         },
         async getUsers() {
             let response = await this.$http.get({
-                route: `/admin/users?offset=${this.offset}&limit=${this.limit}`,
+                route: `/admin/users?offset=${this.offset}&limit=${this.limit}&orderBy=${this.orderBy}`,
             });
             if (response.status !== 200) {
                 this.error = true;
@@ -97,6 +120,10 @@ export default {
         },
         paginate(page) {
             this.offset = (page - 1) * this.limit;
+            this.getUsers();
+        },
+        updateUsersOrderBy() {
+            this.offset = 0;
             this.getUsers();
         },
         async toggle({ action, user }) {

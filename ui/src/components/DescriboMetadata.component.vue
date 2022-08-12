@@ -44,7 +44,7 @@ async function init() {
     });
     let response = await $http.post({
         route: "/describo",
-        body: { folder: route.params.identifier, type: route.meta.type },
+        body: { identifier: route.params.identifier, type: route.meta.type },
     });
     data.url = (await response.json()).url;
     await new Promise((resolve) => setTimeout(resolve, 2000));

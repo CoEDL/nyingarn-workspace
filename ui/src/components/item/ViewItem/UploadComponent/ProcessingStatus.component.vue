@@ -10,19 +10,10 @@
             <el-table-column prop="status" label="Status" width="150" />
             <el-table-column prop="resource" label="Resource" />
         </el-table>
-        <div class="border-t-solid mt-4 h-72 overflow-scroll">
-            <div>Failed Tasks:</div>
-            <ul class="ml-10 list-disc">
-                <li v-for="(error, idx) of data.failedTasks" :key="idx">
-                    <error-reporter-component :error="error" />
-                </li>
-            </ul>
-        </div>
     </div>
 </template>
 
 <script setup>
-import ErrorReporterComponent from "./ErrorReporter.component.vue";
 import { format, parseISO } from "date-fns";
 import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
 import { useRoute } from "vue-router";
@@ -56,9 +47,8 @@ async function updateProcessingStatus() {
     });
     let { tasks } = await response.json();
     data.failedTasks = tasks.filter((t) => t.status === "failed");
-    if (data.failedTasks.length) {
-        console.log("failed tasks: ", JSON.stringify(data.failedTasks, null, 2));
-    }
+
+    emit("failed-tasks", data.failedTasks);
     data.tasks = tasks.filter((t) => t.status !== "failed");
 }
 function formatDate(date) {

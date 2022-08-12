@@ -13,6 +13,7 @@ export async function getUsers({ offset = 0, limit = 10, orderBy = "familyName" 
 }
 
 export async function getUser({ userId, email, orderBy }) {
+    let where = {};
     if (userId) where.id = userId;
     if (email) where.email = email;
     let user = await models.user.findOne({

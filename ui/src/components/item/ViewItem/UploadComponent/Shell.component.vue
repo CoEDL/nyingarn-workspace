@@ -11,6 +11,7 @@
                 class="px-2 flex-grow"
                 v-if="data.uploads.length"
                 :uploads="data.uploads"
+                @failed-tasks="storeFailedTasks"
             />
 
             <div class="px-2" v-if="!data.uploads.length">
@@ -30,10 +31,23 @@
             </div>
         </div>
         <upload-wizard-component @show-help="showHelp" />
+        <div
+            class="border-t border-solid p-4 mt-4 h-72 overflow-scroll"
+            v-if="data.failedTasks.length"
+        >
+            <div>Failed Tasks:</div>
+            <div v-for="error of data.failedTasks" :key="error.id">
+                <div class="flex flex-row">
+                    <div><i class="fa-solid fa-chevron-right"></i></div>
+                    <error-reporter-component :error="error" class="ml-2" />
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
+import ErrorReporterComponent from "./ErrorReporter.component.vue";
 import UploaderComponent from "./Uploader.component.vue";
 import UploadWizardComponent from "./UploadWizard.component.vue";
 import DigiVolHelpComponent from "./HelpDigivol.component.vue";
@@ -62,5 +76,11 @@ function fileUploaded(file) {
 }
 function fileRemoved(file) {
     data.uploads = data.uploads.filter((r) => r.resource !== file.resource);
+}
+function storeFailedTasks(tasks) {
+    data.failedTasks = [...tasks];
+    if (data.failedTasks.length) {
+        console.log("failed tasks: ", JSON.stringify(data.failedTasks, null, 2));
+    }
 }
 </script>

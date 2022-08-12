@@ -1,5 +1,6 @@
 <template>
     <div>
+        <div>Tasks:</div>
         <el-table :data="data.tasks" v-if="data.tasks.length" class="w-full" height="300">
             <el-table-column prop="updatedAt" label="Date" width="220">
                 <template #default="props">
@@ -10,6 +11,7 @@
             <el-table-column prop="resource" label="Resource" />
         </el-table>
         <div class="border-t-solid mt-4 h-72 overflow-scroll">
+            <div>Failed Tasks:</div>
             <ul class="ml-10 list-disc">
                 <li v-for="(error, idx) of data.failedTasks" :key="idx">
                     <error-reporter-component :error="error" />
@@ -54,6 +56,9 @@ async function updateProcessingStatus() {
     });
     let { tasks } = await response.json();
     data.failedTasks = tasks.filter((t) => t.status === "failed");
+    if (data.failedTasks.length) {
+        console.log("failed tasks: ", JSON.stringify(data.failedTasks, null, 2));
+    }
     data.tasks = tasks.filter((t) => t.status !== "failed");
 }
 function formatDate(date) {

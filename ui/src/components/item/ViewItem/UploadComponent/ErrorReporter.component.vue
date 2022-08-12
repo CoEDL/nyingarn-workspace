@@ -3,43 +3,43 @@
         <div class="flex flex-row">
             <div>
                 Error processing file:
-                <span class="text-red-600">{{ error.resource }}</span>
+                <span class="text-red-600">{{ props.error.resource }}</span>
             </div>
             <div class="ml-4">
-                <el-button @click="show = !show" size="small">
+                <el-button @click="data.show = !data.show" size="small">
                     <i class="fa-solid fa-chevron-right"></i>
                 </el-button>
             </div>
         </div>
-        <div v-if="show">
+        <div v-if="data.show">
             <pre class="text-sm w-full">
 
-    When reporting this problem to us please include the following: 
+    When reporting this problem to us please include the following information in the message: 
     
     item: {{ $route.params.identifier }}
-    file: {{ error.resource }} 
-    error: {{ error.data.error }}
+    file: {{ props.error.resource }} 
+    error: {{ props.error.data.error }}
 
-    Be sure to include the file that caused the error.
+    And send us the file that caused the error.
             </pre>
         </div>
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        error: {
-            type: Object,
-            required: true,
-        },
+<script setup>
+import { reactive } from "vue";
+import { useRoute } from "vue-router";
+const $route = useRoute();
+
+const props = defineProps({
+    error: {
+        type: Object,
+        required: true,
     },
-    data() {
-        return {
-            show: false,
-        };
-    },
-};
+});
+const data = reactive({
+    show: false,
+});
 </script>
 
 <style scoped>

@@ -254,9 +254,8 @@ export function groupFilesByResource({ identifier, files, naming }) {
     return { files: groupBy(resources, "resourceId") };
 }
 
-export async function getResourceProcessingStatus({ identifier, resources }) {
+export async function getResourceProcessingStatus({ identifier, resources, dateFrom }) {
     let dateTo = new Date();
-    let dateFrom = sub(dateTo, { minutes: 10 });
     return await models.task.findAll({
         where: {
             [Op.and]: {

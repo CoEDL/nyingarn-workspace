@@ -424,6 +424,7 @@ async function postResourceProcessingStatus(req, res, next) {
     let tasks = await getResourceProcessingStatus({
         identifier: req.item.id,
         resources: req.body.resources.map((r) => r.resource),
+        dateFrom: req.body.dateFrom,
     });
     tasks = tasks.map((t) => t.get());
     tasks = groupBy(tasks, "resource");

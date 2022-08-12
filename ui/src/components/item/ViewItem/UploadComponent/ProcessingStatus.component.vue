@@ -1,23 +1,26 @@
 <template>
     <div>
-        <el-table :data="data.tasks" v-if="data.tasks.length" class="w-full" height="500">
+        <el-table :data="data.tasks" v-if="data.tasks.length" class="w-full" height="300">
             <el-table-column prop="updatedAt" label="Date" width="220">
                 <template #default="props">
                     {{ formatDate(props.row.updatedAt) }}
                 </template>
             </el-table-column>
             <el-table-column prop="status" label="Status" width="150" />
-            <!-- <el-table-column prop="data" label="Data" width="150" type="expand">
-                <template #default="props">
-                    <pre>{{ props.row.data }}</pre>
-                </template>
-            </el-table-column> -->
             <el-table-column prop="resource" label="Resource" />
         </el-table>
+        <div class="border-t-solid mt-4 h-72 overflow-scroll">
+            <ul class="ml-10 list-disc">
+                <li v-for="(error, idx) of data.failedTasks" :key="idx">
+                    <error-reporter-component :error="error" />
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
 <script setup>
+import ErrorReporterComponent from "./ErrorReporter.component.vue";
 import { format, parseISO } from "date-fns";
 import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
 import { useRoute } from "vue-router";
@@ -35,6 +38,8 @@ const data = reactive({
     identifier: $route.params.identifier,
     interval: undefined,
     tasks: [],
+    failedTasks: [],
+    dateFrom: new Date(),
 });
 onMounted(() => {
     data.interval = setInterval(updateProcessingStatus, 2000);
@@ -45,12 +50,11 @@ onBeforeUnmount(() => {
 async function updateProcessingStatus() {
     let response = await $http.post({
         route: `/items/${data.identifier}/resources/processing-status`,
-        body: { resources: props.uploads },
+        body: { resources: props.uploads, dateFrom: data.dateFrom },
     });
     let { tasks } = await response.json();
-    let failedTasks = tasks.filter((t) => t.status === "failed");
-    if (failedTasks.length) emit("failed-tasks", failedTasks);
-    data.tasks = [...tasks];
+    data.failedTasks = tasks.filter((t) => t.status === "failed");
+    data.tasks = tasks.filter((t) => t.status !== "failed");
 }
 function formatDate(date) {
     return format(parseISO(date), "PPpp");

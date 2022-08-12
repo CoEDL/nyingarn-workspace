@@ -11,7 +11,6 @@
                 class="px-2 flex-grow"
                 v-if="data.uploads.length"
                 :uploads="data.uploads"
-                @failed-tasks="storeFailedTasks"
             />
 
             <div class="px-2" v-if="!data.uploads.length">
@@ -31,11 +30,6 @@
             </div>
         </div>
         <upload-wizard-component @show-help="showHelp" />
-        <ul class="ml-10 list-disc">
-            <li v-for="(error, idx) of data.failedTasks" :key="idx">
-                <error-reporter-component :error="error" />
-            </li>
-        </ul>
     </div>
 </template>
 
@@ -46,7 +40,6 @@ import DigiVolHelpComponent from "./HelpDigivol.component.vue";
 import TeiHelpComponent from "./HelpTEI.component.vue";
 import ImageHelpComponent from "./HelpImages.component.vue";
 import ProcessingStatusComponent from "./ProcessingStatus.component.vue";
-import ErrorReporterComponent from "./ErrorReporter.component.vue";
 import { uniqBy } from "lodash";
 import { reactive } from "vue";
 import { useRoute } from "vue-router";
@@ -69,8 +62,5 @@ function fileUploaded(file) {
 }
 function fileRemoved(file) {
     data.uploads = data.uploads.filter((r) => r.resource !== file.resource);
-}
-function storeFailedTasks(tasks) {
-    data.failedTasks = [...tasks];
 }
 </script>

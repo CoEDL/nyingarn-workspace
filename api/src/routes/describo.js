@@ -1,5 +1,5 @@
 import { loadConfiguration, getLogger } from "../common";
-import { route } from "../common";
+import { route, getStoreHandle } from "../common";
 import { BadRequestError } from "restify-errors";
 import fetch from "node-fetch";
 import models from "../models";
@@ -12,10 +12,11 @@ export function setupRoutes({ server }) {
 
 async function setupDescriboSessionRouteHandler(req, res, next) {
     let describo, sessionId;
+    let store = await getStoreHandle({ className: req.body.type, id: req.body.identifier });
     try {
         ({ describo, sessionId } = await __setupDescriboSession({
             session: req.session,
-            folder: req.body.folder,
+            folder: store.getItemPath(),
             type: req.body.type,
         }));
     } catch (error) {

@@ -37,7 +37,7 @@
         "@aws-sdk/client-textract": "^3.145.0",
         "@aws-sdk/lib-storage": "^3.145.0",
         "@aws-sdk/s3-request-presigner": "^3.145.0",
-        "@coedl/nocfl-js": "^1.8.1",
+        "@coedl/nocfl-js": "^1.9.0",
         "@root/walk": "^1.1.0",
         "cross-fetch": "^3.1.5",
         "csv-parse": "^5.3.0",

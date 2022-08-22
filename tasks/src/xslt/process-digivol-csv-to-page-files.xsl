@@ -34,15 +34,6 @@
 				<xsl:element name="surface">
 					<xsl:attribute name="facs" select=".('externalIdentifier')"/>
 					<xsl:attribute name="xml:id" select="$id"/>
-					<!-- capture any notes from transcriber and validator as XML comments -->
-					<xsl:if test=".('transcriberNotes')[normalize-space()]">
-						<xsl:sequence select="codepoints-to-string(10)"/>
-						<xsl:comment expand-text="true">{.('transcriberID')} (transcriber): {.('transcriberNotes')}</xsl:comment>
-					</xsl:if>
-					<xsl:if test=".('validatorNotes')[normalize-space()]">
-						<xsl:sequence select="codepoints-to-string(10)"/>
-						<xsl:comment expand-text="true">{.('validatorID')} (validator): {.('validatorNotes')}</xsl:comment>
-					</xsl:if>
 					<!-- TODO other processing? insert <lb/> elements at the end of each line? include data from any other CSV columns? -->
 					<!-- occurrenceRemarks column can contain markup: seen in BM1648A91-digivol.csv were <u> and <s>. 
 					This markup seems to be part of Nyingarn's guidelines for this particular document: 

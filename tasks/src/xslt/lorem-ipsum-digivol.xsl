@@ -18,20 +18,16 @@
 		<!-- read the CSV file as text -->
 		<xsl:variable name="text" select="unparsed-text($source-uri)"/>
 		
-		<!-- TODO use functions from the csv.xsl stylesheet to read these headings from the CSV file itself-->
-		<!--<xsl:variable name="column-headings" select="(
-			'taskID', 'taskURL', 'validationStatus', 'transcriberID', 'validatorID', 'externalIdentifier', 'exportComment', 
-			'dateTranscribed', 'dateValidated', 'occurrenceRemarks', 'transcriberNotes', 'validatorNotes'
-		)"/>-->
+		<!-- Read the column headings from the first line of the CSV file -->
 		<xsl:variable name="column-headings" select="csv:get-header-cells($text)"/>
 
 		<!-- parse the CSV to produce a sequence of maps, each representing one page -->
 		<xsl:variable name="rows" select="csv:parse($text)"/>
-
+		
 		<!-- output the column heading row -->
 		<xsl:value-of select="
 			string-join(
-				for $heading in $column-headings return '&quot;' || $heading || '&quot;',
+				for $heading in $column-headings return csv:escape($heading),
 				','
 			)
 		"/>

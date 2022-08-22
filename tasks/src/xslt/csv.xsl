@@ -16,11 +16,20 @@
 	</xsl:function>
 
 	<!-- read a "cell" of data from the CSV text -->
+	<!-- returns a string containing the raw cell data including the surrounding double quotes if the cell is quoted -->  
 	<xsl:function name="csv:get-cell">
 		<xsl:param name="text"/>
 		<xsl:choose>
+			<xsl:when test="not($text)">
+				<!-- no more text in the file, so this final cell is empty -->
+				<xsl:sequence select=" '' "/>
+			</xsl:when>
+			<xsl:when test="matches($text, '^[,\r\n]')">
+				<!-- next character is a comma or line ending, so this cell is empty -->
+				<xsl:sequence select=" '' "/>
+			</xsl:when>
 			<xsl:when test="substring($text, 1, 1) = $quote">
-				<!-- a quoted cell -->
+				<!-- start of a quoted cell -->
 				<xsl:variable name="remaining-text" select="substring($text, 2)"/>
 				<xsl:variable name="before-quote" select="substring-before($remaining-text, $quote)"/>
 				<xsl:variable name="after-quote" select="substring-after($remaining-text, $quote)"/>
@@ -36,8 +45,8 @@
 				</xsl:choose>
 			</xsl:when>
 			<xsl:otherwise>
-				<!-- not a quoted cell, so terminated by a comma or end of line -->
-				<xsl:sequence select="replace($text, '([^,\r\n]+)', '$1')"/>
+				<!-- not a quoted cell, so terminated by the next comma or end of line or end of file -->
+				<xsl:sequence select="replace($text, '^([^,\r\n]+).*$', '$1', 's')"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:function>
@@ -68,11 +77,20 @@
 		-->
 		<xsl:param name="text"/>
 		<xsl:variable name="raw-header-cells" select="csv:get-raw-line-cells($text)"/>
-		<xsl:variable name="header-cells" select="for $header in $raw-header-cells return csv:unescape($header)"/>
 		<!-- the CSV data starts after the header line -->
 		<xsl:variable name="header-line-length" select="csv:get-line-length($raw-header-cells)"/>
-		<xsl:variable name="data-text" select="substring($text, $header-line-length)"/>
+		<xsl:variable name="line-break-length" select="$text => substring($header-line-length + 1) => csv:get-line-break-length()"/>
+		<xsl:variable name="data-text" select="substring($text, 1 + $header-line-length + $line-break-length)"/>
+		<xsl:variable name="header-cells" select="for $header in $raw-header-cells return csv:unescape($header)"/>
 		<xsl:sequence select="csv:parse-data-lines($data-text, $header-cells)"/>
+	</xsl:function>
+	
+	<xsl:function name="csv:get-line-break-length">
+		<xsl:param name="text"/>
+		<!-- assumes that the first character of $text is the start of a line break; 
+		returns the full line break which is some sequence of CR and LF chars -->
+		<xsl:variable name="line-break" select="replace($text, '^([\r\n]+).*$', '$1', 's')"/>
+		<xsl:sequence select="$line-break => string-length()"/>
 	</xsl:function>
 
 	<xsl:function name="csv:get-header-cells" as="item()*">
@@ -89,7 +107,8 @@
 		<xsl:param name="header-cells"/>
 		<xsl:variable name="raw-data-cells" select="csv:get-raw-line-cells($text)"/>
 		<xsl:variable name="data-line-length" select="csv:get-line-length($raw-data-cells)"/>
-		<xsl:variable name="remaining-text" select="substring($text, $data-line-length)"/>
+		<xsl:variable name="line-break-length" select="$text => substring(1 + $data-line-length) => csv:get-line-break-length()"/>
+		<xsl:variable name="remaining-text" select="substring($text, 1 + $data-line-length + $line-break-length)"/>
 		<xsl:variable name="data-cells" select="for $cell in $raw-data-cells return csv:unescape($cell)"/>
 		<xsl:sequence select="
 			map:merge(
@@ -115,8 +134,6 @@
 			sum(for $cell in $line-cells return string-length($cell))
 			(: ... and comma separators :)
 			+ count($line-cells) - 1
-			(: ... and CRLF line ending :)
-			+ 2
 		"/>
 	</xsl:function>
 

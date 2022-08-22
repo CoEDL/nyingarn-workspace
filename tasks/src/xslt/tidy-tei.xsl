@@ -3,6 +3,7 @@
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     xmlns="http://www.tei-c.org/ns/1.0"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+    xmlns:css="https://www.w3.org/Style/CSS/"
 >
     <!--
 	Tidies up a TEI file.
@@ -11,7 +12,12 @@
 	Trims white space appearing before <lb/> elements.
 	Trims white space from the start of each line.
 	Discards <hi> elements with no @rend
+	Converts apparent page numbers to <fw>
+	Converts centered paragraphs to <label>
     -->
+
+    <!-- CSS declaration parsing -->
+    <xsl:import href="css.xsl"/>
 
     <!-- discard leading white space after a line break -->
     <xsl:template match="text()[contains(., codepoints-to-string(10))]" mode="tidy">
@@ -39,53 +45,89 @@
     	<xsl:apply-templates mode="tidy"/>
     </xsl:template>
     
-    <xsl:template match="hi/@xml:space[.='preserve']" mode="tidy"/>
+    <xsl:template match="seg[not(@*)]" mode="tidy">
+    	<xsl:apply-templates mode="tidy"/>
+    </xsl:template>
+    
+    <!-- 
+    Recognise a paragraph as a page number if it:  
+    	a) contains digits, and 
+    	b) consists entirely of digits and optional punctuation and whitespace, and
+    	c) appears at the start of the page
+    	d) is aligned right
+    -->
+    <xsl:template mode="tidy" match="p
+    	[matches(., '\p{Nd}+')]
+    	[matches(., '^[\s\p{P}\p{Nd}]+$')]
+    	[preceding-sibling::*[1]/self::pb]
+    	[css:parse-declaration-block(@style)('text-align')='right']
+    ">
+    	<fw type="page-number"><xsl:apply-templates mode="tidy"/></fw>
+    </xsl:template>
+    
+    <!-- recognise centered text as labels -->
+    <xsl:template mode="tidy" match="p[css:parse-declaration-block(@style)('text-align')='center']">
+    	<label><xsl:call-template name="merge-adjacent-identical-highlights"/></label>
+    </xsl:template>
+    
+    <xsl:template match="@xml:space[.='preserve']" mode="tidy"/>
     
     <!-- merge sequences of adjacent hi elements with the same @rend and @style values -->
     <!-- which can occur when adjacent hi elements originally had different @rend, but -->
     <!-- a pruning of @rend tokens has left them the same -->
-    <xsl:template match="*[hi]" mode="tidy">
+    <xsl:template match="*" mode="tidy">
     	<xsl:copy>
     		<xsl:apply-templates select="@*" mode="tidy"/>
-    		<xsl:for-each-group select="node()" composite="yes" group-adjacent="
-    			(: construct a stable grouping key by tokenizing @rend and @style and sorting the tokens :)
-    			array:sort(
-    				array{
-    					(
-    						self::hi/@rend => tokenize(),
-    						self::hi/@style => tokenize('\s*;\s*')
-    					)
-    				}
-    			)">
-    			<xsl:choose>
-    				<xsl:when test="self::hi">
-    					<!-- a group of hi elements which all have the same rendition and style -->
-    					<!-- TODO what about if adjacent hi elements have other attributes, eg. xml:id? -->
-    					<xsl:variable name="content">
-    						<xsl:apply-templates mode="tidy" select="current-group()/node()"/>
-    					</xsl:variable>
-    					<xsl:choose>
-    						<xsl:when test="@rend or @style">
-    							<!-- the highlight has some kind of formatting attached, so retain the element -->
-		    					<xsl:copy>
-		    						<xsl:apply-templates mode="tidy" select="@*"/>
-								<xsl:sequence select="$content"/>
-							</xsl:copy>
+    		<xsl:choose>
+    			<xsl:when test="hi">
+    				<xsl:call-template name="merge-adjacent-identical-highlights"/>
+    			</xsl:when>
+    			<xsl:otherwise>
+    				<xsl:apply-templates mode="tidy"/>
+    			</xsl:otherwise>
+    		</xsl:choose>
+    	</xsl:copy>
+    </xsl:template>
+    
+    <xsl:template name="merge-adjacent-identical-highlights">
+	<xsl:for-each-group select="node()" composite="yes" group-adjacent="
+		(: construct a stable grouping key by tokenizing @rend and @style and sorting the tokens :)
+		array:sort(
+			array{
+				(
+					self::hi/@rend => tokenize(),
+					self::hi/@style => tokenize('\s*;\s*')
+				)
+			}
+		)">
+		<xsl:choose>
+			<xsl:when test="self::hi">
+				<!-- a group of hi elements which all have the same rendition and style -->
+				<!-- TODO what about if adjacent hi elements have other attributes, eg. xml:id? -->
+				<xsl:variable name="content">
+					<xsl:apply-templates mode="tidy" select="current-group()/node()"/>
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="@rend or @style">
+						<!-- the highlight has some kind of formatting attached, so retain the element -->
+						<xsl:copy>
+							<xsl:apply-templates mode="tidy" select="@*"/>
+							<xsl:sequence select="$content"/>
+						</xsl:copy>
 						</xsl:when>
 						<xsl:otherwise>
 							<!-- the highlight has no formatting attached, so discard it, leaving its content -->
 							<xsl:sequence select="$content"/>
 						</xsl:otherwise>
 					</xsl:choose>
-    				</xsl:when>
-    				<xsl:otherwise>
-    					<!-- a disparate group of non-highlight elements -->
-    					<xsl:apply-templates mode="tidy" select="current-group()"/>
-    				</xsl:otherwise>
-    			</xsl:choose>
-    		</xsl:for-each-group>
-    	</xsl:copy>
-    </xsl:template>
+				</xsl:when>
+				<xsl:otherwise>
+					<!-- a disparate group of non-highlight elements -->
+					<xsl:apply-templates mode="tidy" select="current-group()"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:for-each-group>
+	</xsl:template>
 
     <!-- otherwise copy the document unchanged -->
     <xsl:mode name="tidy" on-no-match="shallow-copy"/>

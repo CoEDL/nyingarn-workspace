@@ -349,14 +349,23 @@ async function save() {
     }, 1500);
 }
 function formatDocument() {
-    let update = view.state.update({
-        changes: {
-            from: 0,
-            to: view.state.doc.length,
-            insert: format(view.state.doc.toString(), { indentation: "  ", collapseContent: true }),
-        },
-    });
-    view.update([update]);
+    let formattedDocument;
+    try {
+        formattedDocument = format(view.state.doc.toString(), {
+            indentation: "  ",
+            collapseContent: true,
+        });
+        let update = view.state.update({
+            changes: {
+                from: 0,
+                to: view.state.doc.length,
+                insert: formattedDocument,
+            },
+        });
+        view.update([update]);
+    } catch (error) {
+        // couldn't format - likely not an XML document
+    }
 }
 async function addElement(type) {
     let selections = view.state.selection.ranges.reverse();

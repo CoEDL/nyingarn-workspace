@@ -35,7 +35,7 @@ the markup and certain significant parts of the text.
 	<xsl:template match="text()[normalize-space()]" mode="lorem-ipsum">
 		<xsl:variable name="words" select="replace(., '^\s*(.+?)\s*$', '$1')"/>
 		<xsl:variable name="offset" select="accumulator-before('word-offset')"/>
-		<xsl:variable name="words-and-spaces" select="analyze-string(., '\w+')"/>
+		<xsl:variable name="words-and-spaces" select="analyze-string(., '[\p{L}]+')"/><!-- letters only (don't obfuscate numerals) -->
 		<xsl:sequence select="
 			string-join(
 				for $token in $words-and-spaces/* return

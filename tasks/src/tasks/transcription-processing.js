@@ -133,29 +133,17 @@ export async function __processDigivolTranscriptionXMLProcessor({
     sourceURI,
     output = undefined,
 }) {
-    // SaxonJS doesn't support the "windows-1252" encoding which is used by DigiVol, so we first create a copy
-    // of in the input CSV, re-encoded as UTF-8, process the UTF-8-encoded CSV file with our XSLT, and finally delete
-    // the UTF-8 encoded file.
-
-    let windowsEncodedFilename = sourceURI.replace("file://", "");
-    let utf8EncodedFilename = windowsEncodedFilename + ".utf-8.csv";
-    const inputStream = createReadStream(windowsEncodedFilename, "latin1");
-    const outputStream = createWriteStream(utf8EncodedFilename, "utf-8");
-    inputStream.pipe(outputStream);
-
     let configuration = await loadConfiguration();
     const transformationResults = await SaxonJS.transform(
         {
             stylesheetFileName: "src/xslt/process-digivol-csv-to-page-files.xsl.sef.json",
             templateParams: {
                 identifier: identifier,
-                "source-uri": utf8EncodedFilename,
+                "source-uri": sourceURI,
                 "page-identifier-regex": configuration.ui.filename.checkNameStructure,
             },
             baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
         },
         "async"
     );
-    // discard the temporarily re-encoded CSV file
-    remove(utf8EncodedFilename);
 }

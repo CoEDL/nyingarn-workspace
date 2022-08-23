@@ -15,7 +15,8 @@
 
 	OxGarage does not insert any newline characters in the TEI.
     -->
-    
+    <!-- CSS declaration parsing -->
+    <xsl:import href="css.xsl"/>
 
 	<!-- 
 	Of the typographical information which MSWord and OxGarage save in the form of 
@@ -31,6 +32,20 @@
     	<!-- the identifier is terminated by the first '.' in the value (to discard image file extensions such as .jpg) -->
 	<pb xml:id="{replace(., '^([^.]+).*', '$1')}"/>
     </xsl:template>
+    
+    <!-- a paragraph containing nothing but a page break indicator can be ignored, though the page-break should be processed -->
+    <!-- meaning the resulting pb element appears without a p wrapper element. -->
+    <xsl:template match="
+    	p[
+    		empty(
+    			node()[normalize-space()] except hi[@rend='Page']
+    		)
+    	]
+    " mode="docx-via-oxgarage">
+    	<xsl:apply-templates mode="docx-via-oxgarage"/>
+    </xsl:template>
+
+    <xsl:template match="@xml:space[.='preserve']" mode="docx-via-oxgarage"/>
 
     <!-- insert newline characters before each block element for improved readability -->
     <xsl:template match="div | head | p | item | label | note" mode="docx-via-oxgarage">
@@ -69,8 +84,8 @@
     	<xsl:param name="declaration-block"/>
     	<xsl:variable name="declarations" select="css:parse-declaration-block($declaration-block)"/>
     	<!-- OxGarage can sometimes output bogus "text-align: left" declarations, including along with "text-align: right" -->
-    	<!-- which we DO want to keep, so here we discard all "text-align: left" declarations -->
-    	<xsl:variable name="non-bogus-declarations" select="$declarations[not(.('text-align') = 'left')]"/>
+    	<!-- which we DO want to keep, so here we discard all "text-align: left", and "text-align: justify" declarations -->
+    	<xsl:variable name="non-bogus-declarations" select="$declarations[not(.('text-align') = ('left', 'justify'))]"/>
     	<!-- now filter out unwanted properties -->
     	<xsl:variable name="desired-properties" select="('color', 'text-align')"/>
     	<xsl:sequence select="
@@ -88,14 +103,4 @@
     	"/>
     </xsl:function>
     
-    <xsl:function name="css:parse-declaration-block" as="map(*)*">
-    	<xsl:param name="declaration-block"/>
-    	<xsl:sequence select="
-		for $declaration in $declaration-block => tokenize(';') return map:entry(
-			$declaration => substring-before(':') => normalize-space(),
-			$declaration => substring-after(':') => normalize-space()
-		)
-    	"/>
-    </xsl:function>
-
 </xsl:transform>

@@ -13,7 +13,7 @@ import Tus from "@uppy/tus";
 import "@uppy/core/dist/style.css";
 import "@uppy/dashboard/dist/style.css";
 import Uppy from "@uppy/core";
-import { ref, reactive, onMounted, inject } from "vue";
+import { ref, reactive, onMounted, inject, onBeforeUnmount } from "vue";
 import { useStore } from "vuex";
 const store = useStore();
 const $http = inject("$http");
@@ -36,6 +36,9 @@ const data = reactive({
 
 onMounted(() => {
     init();
+});
+onBeforeUnmount(() => {
+    data.uppy.close();
 });
 async function init() {
     await getItemPath();

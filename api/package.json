@@ -14,7 +14,7 @@
     "license": "GPL-3.0",
     "devDependencies": {
         "@babel/cli": "^7.18.10",
-        "@babel/core": "^7.18.10",
+        "@babel/core": "^7.18.13",
         "@babel/node": "^7.18.10",
         "@babel/plugin-proposal-optional-chaining": "^7.18.9",
         "@babel/preset-env": "^7.18.10",
@@ -32,15 +32,15 @@
         "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.145.0",
-        "@aws-sdk/lib-storage": "^3.145.0",
-        "@aws-sdk/s3-request-presigner": "^3.145.0",
-        "@coedl/nocfl-js": "^1.10.0",
+        "@aws-sdk/client-s3": "^3.154.0",
+        "@aws-sdk/lib-storage": "^3.154.0",
+        "@aws-sdk/s3-request-presigner": "^3.154.0",
+        "@coedl/nocfl-js": "^1.11.0",
         "cross-fetch": "^3.1.5",
-        "date-fns": "^2.29.1",
+        "date-fns": "^2.29.2",
         "foo-foo-mq": "^7.1.0",
         "fs-extra": "^10.1.0",
-        "jose": "^4.8.3",
+        "jose": "^4.9.0",
         "lodash": "^4.17.20",
         "mockdate": "^3.0.5",
         "openid-client": "^5.1.8",
@@ -49,7 +49,7 @@
         "regenerator-runtime": "^0.13.9",
         "restify": "^8.6.1",
         "restify-errors": "^8.0.2",
-        "sequelize": "^6.21.3",
+        "sequelize": "^6.21.4",
         "uuid": "^8.3.2",
         "winston": "^3.8.1"
     }

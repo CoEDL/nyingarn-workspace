@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>Tasks:</div>
-        <el-table :data="data.tasks" v-if="data.tasks.length" class="w-full" height="300">
+        <el-table :data="data.tasks" v-if="data.tasks.length" class="w-full" height="600">
             <el-table-column prop="updatedAt" label="Date" width="220">
                 <template #default="props">
                     {{ formatDate(props.row.updatedAt) }}

@@ -13,14 +13,16 @@
             </el-pagination>
         </div>
 
-        <div class="flex flex-row flex-wrap overflow-scroll" :style="{ height: data.panelHeight }">
-            <view-item-component
-                class="cursor-pointer m-2 h-80"
-                v-for="r in data.resources"
-                :key="r.name"
-                :resource="r.name"
-                @refresh="init"
-            />
+        <div :style="{ height: data.panelHeight }" class="overflow-scroll">
+            <div class="flex flex-row flex-wrap overflow-scroll">
+                <view-item-component
+                    class="cursor-pointer m-2 h-80"
+                    v-for="r in data.resources"
+                    :key="r.name"
+                    :resource="r.name"
+                    @refresh="init"
+                />
+            </div>
         </div>
     </div>
 </template>

@@ -13,13 +13,11 @@
 	Existing <pb/> elements are discarded and new <pb/> elements created from FTP's <fw> elements.
     -->
 
-    <!-- convert from-the-page's <fw> elements into <pb> with @facs -->
+    <!-- convert from-the-page's <fw> elements into <pb> with @xml:id -->
     <xsl:template match="fw" mode="from-the-page">
     	<!-- the identifier is terminated by the first '.' in the value (to discard image file extensions such as .jpg) -->
     	<xsl:variable name="id" select="replace(., '^([^.]+).*', '$1')"/>
-    	<!-- get the image file name from the fw value, and guess '.jpg' if no extension present -->
-    	<xsl:variable name="image-file" select="if (. => contains('.')) then . else . || '.jpg'"/>
-	<pb xml:id="{$id}" facs="{$image-file}"/>
+	<pb xml:id="{$id}"/>
     </xsl:template>
 
     <!-- discard xml:id attributes -->

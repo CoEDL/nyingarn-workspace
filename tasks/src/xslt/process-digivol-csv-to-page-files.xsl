@@ -32,9 +32,8 @@
 			<!-- write the page content to a file named for the @xml:id attribute of the <surface> with no xml declaration or indenting -->
 			<xsl:result-document href="{$id}.tei.xml" omit-xml-declaration="yes" indent="no">
 				<xsl:element name="surface">
-					<xsl:attribute name="facs" select=".('externalIdentifier')"/>
 					<xsl:attribute name="xml:id" select="$id"/>
-					<!-- TODO other processing? insert <lb/> elements at the end of each line? include data from any other CSV columns? -->
+					<xsl:sequence select="codepoints-to-string(10)"/>
 					<!-- occurrenceRemarks column can contain markup: seen in BM1648A91-digivol.csv were <u> and <s>. 
 					This markup seems to be part of Nyingarn's guidelines for this particular document: 
 					https://volunteer.ala.org.au//data/volunteer/tutorials/Nyingarn%20BM%20Tutorial2.pdf

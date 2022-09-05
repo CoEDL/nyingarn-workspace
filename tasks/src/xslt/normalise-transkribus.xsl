@@ -14,9 +14,9 @@
 	recorded are bogus, e.g. fontSize:0.0
     -->
 
-    <!-- move the image file identifier from the pb's @xml:id attribute to its @facs attribute, and trim the file extension from the @xml:id -->
+    <!-- trim the file extension from the @xml:id -->
     <xsl:template match="pb" mode="transkribus">
-	<pb xml:id="{replace(@xml:id, '(.*)\..+', '$1')}" facs="{@xml:id}"/>
+	<pb xml:id="{replace(@xml:id, '(.*)\..+', '$1')}"/>
     </xsl:template>
 
     <!-- discard lb @facs and @n attributes because they point nowhere and say nothing useful -->

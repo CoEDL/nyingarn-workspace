@@ -43,31 +43,28 @@
 					For now, replace with <u> with <ul> (from TEI Tite) and <s> with the standard TEI <del> element.
 					See https://tei-c.org/release/doc/tei-p5-exemplars/html/tei_tite.doc.html#typographical
 					-->
-					<!-- Attempt to parse the page content as an XML fragment (i.e. parsing any embedded markup). -->
+
+					<!-- Attempt to parse the page content as a sequence of XML fragments (i.e. parsing any embedded markup). -->
 					<!-- If the parse succeeds, transform the result to replace <u> and <s> elements with TEI elements. -->
 					<!-- If the parse fails (it may contain badly-formed XML markup, or it may simply contain angle brackets 
 					not intended as XML markup), then just use the plain text of the page. -->
 					
-					<!-- normalize the line-endings in the text; CRLF pairs should be reduced to just LF, as is normal in XML text -->
-					<xsl:variable name="page-content-plain-text" select=".('occurrenceRemarks') => translate(codepoints-to-string(13), '')"/>
-					<xsl:variable name="page-content">
-						<xsl:try>
-							<!-- parse the page content as XML -->
-							<xsl:variable name="page-content-xml-fragment" select="
-								.('occurrenceRemarks') => replace('&amp;', '&amp;amp;') => parse-xml-fragment()
-							"/>
-							<!-- normalize the digivol-sourced markup to standard TEI -->
-							<xsl:apply-templates mode="digivol" select="$page-content-xml-fragment"/>
-							<!-- if the parse failed, just use the plain text content -->
-							<xsl:catch>
-								<xsl:apply-templates mode="digivol" select="$page-content-plain-text"/>
-							</xsl:catch>
-						</xsl:try>
-					</xsl:variable>
-					<xsl:sequence select="codepoints-to-string(10)"/>
-					<xsl:sequence select="$page-content"/>
-					<xsl:element name="lb"/>
-					<xsl:sequence select="codepoints-to-string(10)"/>
+					<xsl:variable name="lines" select=".('occurrenceRemarks') => replace('&amp;', '&amp;amp;') => tokenize('\r\n|\r|\n')"/>
+					<xsl:for-each select="$lines">
+						<xsl:element name="line">
+							<xsl:try>
+								<!-- parse the line as XML -->
+								<xsl:variable name="line-content-xml-fragment" select="parse-xml-fragment(.)"/>
+								<!-- normalize the digivol-sourced markup to standard TEI -->
+								<xsl:apply-templates mode="digivol" select="$line-content-xml-fragment"/>
+								<!-- if the parse failed, just use the plain text content -->
+								<xsl:catch>
+									<xsl:apply-templates mode="digivol" select="."/>
+								</xsl:catch>
+							</xsl:try>
+						</xsl:element>
+						<xsl:sequence select="codepoints-to-string(10)"/>
+					</xsl:for-each>
 					<xsl:if test="not(map:contains(., 'occurrenceRemarks'))">
 						<xsl:message xsl:expand-text="yes">'occurrenceRemarks' column not found for record '{.('externalIdentifier')}'- no transcription</xsl:message>
 					</xsl:if>
@@ -100,6 +97,8 @@
 	</xsl:template>
 	
 	<!-- add line breaks at the end of each line -->
+	<!-- TODO wrap lines in <line> instead -->
+	<!-- see NewNorcia38-digivol.csv "[Page] 5" where end of lines are not recognised. Are they in fact not "\n" at all? maybe "\r"? or "[\r\n]"-->
 	<xsl:template mode="digivol" match="text()">
 		<xsl:analyze-string regex="\n" select=".">
 			<xsl:matching-substring><xsl:element name="lb"/><xsl:sequence select="codepoints-to-string(10)"/></xsl:matching-substring>

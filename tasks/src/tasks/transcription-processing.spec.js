@@ -858,7 +858,6 @@ describe(`Confirm malformed XML is rejected`, () => {
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.name).toBe("MalformedXMLFile");
-            console.log(error);
         }
     });
 });

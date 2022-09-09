@@ -43,5 +43,12 @@
     "name": "MalformedXMLFile",
     "messageTemplate": "Unable to parse the file as XML. Please open it in an XML-aware editor (e.g. oXygen) and fix any errors.",
     "remarks": "Error retrieving an XML resource, thrown by XPath doc() function when a resource is inaccessible or not well-formed. By assumption, the resource is not well-formed XML. See https://www.w3.org/TR/xpath-functions-31/#ERRFODC0002"
-  }
-]
+  },
+  {
+    "matchingProperties": {
+      "name": "XError"
+    },
+    "name": "UnexpectedXSLTError",
+    "messageTemplate": "An unexpected error occurred in XSLT code. Please report the following information: \nError ${code} in ${xsltModule} line ${xsltLineNr}:\n${message}",
+    "remarks": "This error definition is a 'catch-all' for errors thrown from XSLT; it should appear in this file AFTER any specific XError definitions"
+  }]

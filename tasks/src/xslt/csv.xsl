@@ -1,20 +1,31 @@
-<xsl:transform version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:csv="https://datatracker.ietf.org/doc/html/rfc4180" xmlns:map="http://www.w3.org/2005/xpath-functions/map">
+<xsl:transform version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+	xmlns:csv="https://datatracker.ietf.org/doc/html/rfc4180" 
+	xmlns:map="http://www.w3.org/2005/xpath-functions/map" 
+	xmlns:err="http://www.w3.org/2005/xqt-errors"
+	xmlns:nyingarn="https://nyingarn.net/ns/functions">
 
-	<xsl:function name="csv:doc" as="map(*)*">
-		<!-- Reads a CSV file and returns its contents as a sequence of maps -->
-		<xsl:param name="href"/>
-		<xsl:param name="encoding"/>
-		<xsl:variable name="text" select="unparsed-text($href, $encoding)"/>
-		<xsl:sequence select="csv:parse($text)"/>
-	</xsl:function>
+	<xsl:import href="error.xsl"/>
 	
 	<xsl:function name="csv:doc" as="map(*)*">
 		<!-- Reads a CSV file and returns its contents as a sequence of maps -->
 		<xsl:param name="href"/>
-		<xsl:variable name="text" select="unparsed-text($href)"/>
-		<xsl:sequence select="csv:parse($text)"/>
+		<xsl:try>
+			<xsl:variable name="text" select="unparsed-text($href)"/>
+			<xsl:sequence select="csv:parse($text)"/>
+			<!-- catch character encoding errors and throw Nyingarn encoding error -->
+			<xsl:catch errors="err:FOUT1190 err:FOUT1200" select="
+				nyingarn:error(
+					'character-encoding-error',
+					'Could not decode characters from the file',
+					map{
+						'code': $err:code,
+						'description': $err:description
+					}
+				)
+			"/>
+		</xsl:try>
 	</xsl:function>
-
+	
 	<!-- read a "cell" of data from the CSV text -->
 	<!-- returns a string containing the raw cell data including the surrounding double quotes if the cell is quoted -->  
 	<xsl:function name="csv:get-cell">

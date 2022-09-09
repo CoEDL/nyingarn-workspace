@@ -830,6 +830,38 @@ describe(`Confirm file extensions are removed`, () => {
         await remove(resourceDirectory);
     });
 });
+describe(`Confirm non-UTF-8-encoding of DigiVol CSV file is rejected`, () => {
+    it("should fail to ingest BM1648A91-digivol.csv as it's not encoded in UTF-8", async () => {
+        let identifier = "BM1648A91";
+        let directory = "Issue-digivol_upload_failure/BM1648A91";
+        let resource = "BM1648A91-digivol.csv";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
+
+        try {
+            await __processDigivolTranscriptionXMLProcessor({ identifier, sourceURI });
+            throw new Error("Stylesheet failed to throw an error!");
+        } catch (error) {
+            expect(error.name).toBe("CharacterEncodingError");
+        }
+    });
+});
+
+describe(`Confirm malformed XML is rejected`, () => {
+    it("should fail to ingest Grey_g_12_c_12-tei.xml as it's not well-formed XML", async () => {
+        let identifier = "Grey_g_12_c_12";
+        let directory = "Issue-tei_did_not_upload/Grey_g_12_c_12";
+        let resource = "Grey_g_12_c_12-tei.xml";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
+
+        try {
+            await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
+            throw new Error("Stylesheet failed to throw an error!");
+        } catch (error) {
+            expect(error.name).toBe("MalformedXMLFile");
+            console.log(error);
+        }
+    });
+});
 describe(`Confirm no valid pages found`, () => {
     it("should fail to ingest mackenzie-tei.xml as it contains no valid pages", async () => {
         let identifier = "mackenzie";
@@ -841,7 +873,8 @@ describe(`Confirm no valid pages found`, () => {
             await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
-            expect(error.message).toMatch("ERROR: no pages with suitable identifiers");
+            expect(error.name).toBe("NoPagesWithSuitableIdentifiers");
+            expect(error.errorObject['document-identifier']).toBe(identifier);
         }
     });
 
@@ -855,7 +888,7 @@ describe(`Confirm no valid pages found`, () => {
             await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
-            expect(error.message).toMatch("ERROR: unpaginated document");
+            expect(error.name).toBe("UnpaginatedDocument");
         }
     });
 
@@ -997,6 +1030,7 @@ describe(`Confirm that documents with duplicate page identifiers are handled sen
             await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
             throw new Error("Stylesheet failed to throw the expected error!");
         } catch (error) {
+            expect(error.name).toBe('DuplicatePageIdentifiers');
             expect(error.message).toMatch(/ERROR:.*Bates34-023/);
             expect(error.message).toMatch(/ERROR:.*Bates34-025/);
             expect(error.message).toMatch(/ERROR:.*Bates34-048/);
@@ -1013,6 +1047,7 @@ describe(`Confirm that documents with duplicate page identifiers are handled sen
             await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
             throw new Error("Stylesheet failed to throw the expected error!");
         } catch (error) {
+            expect(error.name).toBe('DuplicatePageIdentifiers');
             expect(error.message).toMatch(/ERROR:.*Bates35-0104/);
         }
     });

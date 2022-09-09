@@ -14,7 +14,7 @@
       "code": "Q{https://nyingarn.net/ns/errors}no-pages-with-suitable-identifiers"
     },
     "name": "NoPagesWithSuitableIdentifiers",
-    "messageTemplate": "The document did not contain any pages whose identifiers started with '${errorObject.document-identifier} and matched the regular expression '{errorObject.page-identifier-regex}'.",
+    "messageTemplate": "The document did not contain any pages whose identifiers started with '${errorObject.document-identifier}' and matched the regular expression '${errorObject.page-identifier-regex}'.",
     "remarks": "The document had page breaks in it but none of them matched the document's id"
   },  
   {

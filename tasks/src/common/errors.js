@@ -63,7 +63,7 @@ function expandTemplate(template, object) {
     )  ⇒ "Invalid date '2022-13-01' found in document bogus.doc"
     */
     const expansion = template.replace(
-        /\$\{(.+)\}/g,
+        /\$\{([^}]+)\}/g,
         function(match, propertyPath) {
             return getProperty(object, propertyPath);
         }

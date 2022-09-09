@@ -874,6 +874,7 @@ describe(`Confirm no valid pages found`, () => {
         } catch (error) {
             expect(error.name).toBe("NoPagesWithSuitableIdentifiers");
             expect(error.errorObject['document-identifier']).toBe(identifier);
+            expect(error.message).toMatch(identifier);
         }
     });
 

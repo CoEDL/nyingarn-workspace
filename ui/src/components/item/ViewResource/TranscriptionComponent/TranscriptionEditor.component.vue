@@ -143,7 +143,7 @@
                 </div>
             </div>
             <div class="">
-                <div ref="codemirror"></div>
+                <div ref="codemirror" class="cm-editor"></div>
             </div>
         </div>
     </div>
@@ -423,7 +423,7 @@ async function addElement(type) {
 }
 </script>
 
-<style>
+<style scoped>
 .cm-editor {
     font-size: 16px;
     height: calc(100vh - 200px);

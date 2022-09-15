@@ -10,7 +10,20 @@
                     <view-item-content-component v-if="data.activeTab === 'view'" />
                 </el-tab-pane>
                 <el-tab-pane label="Item Metadata" name="metadata">
-                    <describo-metadata-component v-if="data.activeTab === 'metadata'" />
+                    <!-- <describo-metadata-component v-if="data.activeTab === 'metadata'" /> -->
+                    <describo-crate-builder
+                        v-if="data.activeTab === 'metadata'"
+                        :crate="data.crate"
+                        :profile="data.profile"
+                        :lookup="lookup"
+                        :enable-context-editor="true"
+                        :enable-crate-preview="true"
+                        :enable-browse-entities="true"
+                        @save:crate="saveCrate"
+                        @save:crate:template="saveTemplate"
+                        @save:entity:template="saveTemplate"
+                    >
+                    </describo-crate-builder>
                 </el-tab-pane>
                 <el-tab-pane label="Associate to Collection" name="associate">
                     <item-members-component v-if="data.activeTab === 'associate'" />
@@ -36,6 +49,7 @@ import ItemMembersComponent from "./ItemMembers.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import { Lookup } from "./lookup-templates.js";
 const route = useRoute();
 const router = useRouter();
 const $http = inject("$http");
@@ -51,6 +65,9 @@ let data = reactive({
     routeWatcher: undefined,
     tabs: ["view", "metadata", "associate", "upload", "administration"],
     activeTab: "view",
+    crate: {},
+    profile: {},
+    templates: [],
 });
 onBeforeMount(async () => {
     await checkUserAccess();
@@ -58,7 +75,10 @@ onBeforeMount(async () => {
 onMounted(() => {
     data.routeWatcher = watch(route.path, updateRouteOnNav);
     updateRouteOnNav();
+    if (data.activeTab === "metadata") load();
 });
+const lookup = new Lookup({ templates: data.templates });
+
 async function checkUserAccess() {
     let response = await getItem({ $http, identifier: props.identifier });
     if (response.status === 403) {
@@ -68,6 +88,7 @@ async function checkUserAccess() {
     data.userIsPermitted = true;
 }
 function updateRouteOnNav() {
+    if (data.activeTab === "metadata") load();
     if (!route.name.match(/^items/)) {
         data.routeWatcher();
         return;
@@ -81,5 +102,30 @@ function updateRouteOnNav() {
 }
 function updateRouteOnTabSelect(tab) {
     router.push(tab.paneName);
+    if (tab.paneName === "metadata") load();
+}
+async function load() {
+    let response = await $http.get({
+        route: `/describo/rocrate/items/${route.params.identifier}`,
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`Unable to retrieve RO Crate file`);
+    }
+    data.crate = (await response.json()).rocrateFile;
+    response = await $http.get({
+        route: `/describo/profile/item`,
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`Unable to retrieve profile`);
+    }
+    data.profile = (await response.json()).profile;
+}
+function saveCrate(data) {
+    console.log("SAVE CRATE", JSON.stringify(data, null, 2));
+}
+function saveTemplate(template) {
+    console.log("SAVE TEMPLATE", JSON.stringify(template, null, 2));
+    data.templates.push(template);
+    console.log(JSON.stringify(data.templates, null, 2));
 }
 </script>

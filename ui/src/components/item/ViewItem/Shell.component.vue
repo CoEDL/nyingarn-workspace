@@ -17,7 +17,7 @@
                         :profile="data.profile"
                         :lookup="lookup"
                         :enable-context-editor="false"
-                        :enable-crate-preview="false"
+                        :enable-crate-preview="true"
                         :enable-browse-entities="false"
                         @save:crate="saveCrate"
                         @save:crate:template="saveTemplate"

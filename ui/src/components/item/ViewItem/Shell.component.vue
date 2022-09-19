@@ -13,6 +13,8 @@
                     <!-- <describo-metadata-component v-if="data.activeTab === 'metadata'" /> -->
                     <describo-crate-builder
                         v-if="data.activeTab === 'metadata'"
+                        :style="{ height: metadataPanelHeight }"
+                        class="overflow-scroll"
                         :crate="data.crate"
                         :profile="data.profile"
                         :lookup="lookup"
@@ -46,7 +48,7 @@ import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
 import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
 import ItemMembersComponent from "./ItemMembers.component.vue";
-import { reactive, onMounted, onBeforeMount, inject, watch } from "vue";
+import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { Lookup } from "./lookup-templates.js";
@@ -78,6 +80,9 @@ onMounted(() => {
     if (data.activeTab === "metadata") load();
 });
 const lookup = new Lookup({ templates: data.templates });
+const metadataPanelHeight = computed(() => {
+    return `${window.innerHeight - 140}px`;
+});
 
 async function checkUserAccess() {
     let response = await getItem({ $http, identifier: props.identifier });

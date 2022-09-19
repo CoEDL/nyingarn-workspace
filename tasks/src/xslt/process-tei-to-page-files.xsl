@@ -42,8 +42,11 @@
 		<xsl:if test="not(exists($surfaces))">
 			<xsl:sequence select="
 				nyingarn:error(
-					'unpaginated-document',
-					'Unpaginated document'
+					'unpaginated-document', (: error code :)
+					'Unpaginated document', (: stub error message :)
+					map{
+						'source-type': nyingarn:tei-source-type($source) (: e.g. 'docx-via-oxgarage', 'from-the-page', etc. :)
+					}
 				)
 			"/>
 		</xsl:if>
@@ -61,7 +64,8 @@
 					'No pages with suitable identifiers',
 					map{
 						'document-identifier': $identifier,
-						'page-identifier-regex': $page-identifier-regex
+						'page-identifier-regex': $page-identifier-regex,
+						'source-type': nyingarn:tei-source-type($source) (: e.g. 'docx-via-oxgarage', 'from-the-page', etc. :)
 					}
 				)
 			"/>
@@ -76,7 +80,8 @@
 					'duplicate-page-identifiers-found',
 					'Duplicate page identifiers found',
 					map{
-						'duplicate-identifiers': $duplicate-identifiers => string-join(', ')
+						'duplicate-identifiers': $duplicate-identifiers => string-join(', '),
+						'source-type': nyingarn:tei-source-type($source) (: e.g. 'docx-via-oxgarage', 'from-the-page', etc. :)
 					}
 				)
 			"/>

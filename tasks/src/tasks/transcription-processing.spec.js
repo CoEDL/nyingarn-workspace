@@ -109,7 +109,6 @@ describe(`Check that known good files are processed successfully`, () => {
             expectedFiles.forEach((file) => expect(contents).toContain(file));
             unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
         } catch (error) {
-            console.log(error);
             throw error;
         } finally {
             await remove(resourceDirectory);

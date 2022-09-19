@@ -19,7 +19,8 @@
 					'Could not decode characters from the file',
 					map{
 						'code': $err:code,
-						'description': $err:description
+						'description': $err:description,
+						'source-type': 'digivol'
 					}
 				)
 			"/>

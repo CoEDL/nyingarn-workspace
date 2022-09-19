@@ -6,7 +6,7 @@
     },
     "name": "CharacterEncodingError",
     "messageTemplate": "The character encoding of the file is not correct. The character encoding of the file must be UTF-8",
-    "remarks": "We expect and require UTF-8. This error in thrown in response to two different XPath errors both of which indicate a problem with a non-UTF-8 encoding."
+    "remarks": "We expect and require UTF-8. This error in thrown in response to two different XPath errors both of which indicate a problem with a non-UTF-8 encoding. This applies to digivol files and should link to a page about how not to stuff up the encoding of CSV files"
   },  
   {
     "matchingProperties": {
@@ -15,7 +15,39 @@
     },
     "name": "NoPagesWithSuitableIdentifiers",
     "messageTemplate": "The document did not contain any pages whose identifiers started with '${errorObject.document-identifier}' and matched the regular expression '${errorObject.page-identifier-regex}'.",
-    "remarks": "The document had page breaks in it but none of them matched the document's id"
+    "remarks": "The document had page breaks in it but none of them matched the document's id. "
+  },  
+  {
+    "matchingProperties": {
+      "name": "XError",
+      "errorObject.source-type": "digivol"
+    },
+    "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
+    "remarks": "Provides a link to a format-specific help page. "
+  },  
+  {
+    "matchingProperties": {
+      "name": "XError",
+      "errorObject.source-type": "digivol"
+    },
+    "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
+    "remarks": "Provides a link to a format-specific help page. "
+  },    
+  {
+    "matchingProperties": {
+      "name": "XError",
+      "errorObject.source-type": "transkribus"
+    },
+    "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
+    "remarks": "Provides a link to a format-specific help page. "
+  },    
+  {
+    "matchingProperties": {
+      "name": "XError",
+      "errorObject.source-type": "docx-via-oxgarage"
+    },
+    "url": "https://nyingarn.net/word-transcriptions/",
+    "remarks": "Provides a link to a format-specific help page. "
   },  
   {
     "matchingProperties": {
@@ -50,5 +82,5 @@
     },
     "name": "UnexpectedXSLTError",
     "messageTemplate": "An unexpected error occurred in XSLT code. Please report the following information: \nError ${code} in ${xsltModule} line ${xsltLineNr}:\n${message}",
-    "remarks": "This error definition is a 'catch-all' for errors thrown from XSLT; it should appear in this file AFTER any specific XError definitions"
+    "remarks": "This error definition is a 'catch-all' for errors thrown from XSLT"
   }]

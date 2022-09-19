@@ -30,8 +30,10 @@
 					'no-pages-with-suitable-identifiers',
 					'No pages with suitable identifiers',
 					map{
+						'source-type': 'digivol',
 						'document-identifier': $identifier,
-						'page-identifier-regex': $page-identifier-regex
+						'page-identifier-regex': $page-identifier-regex,
+						'source-type': 'digivol'
 					}
 				)
 			"/>

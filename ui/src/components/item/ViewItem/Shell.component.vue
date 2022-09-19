@@ -50,8 +50,8 @@ import { reactive, onMounted, onBeforeMount, inject, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { Lookup } from "./lookup-templates.js";
-const route = useRoute();
-const router = useRouter();
+const $route = useRoute();
+const $router = useRouter();
 const $http = inject("$http");
 
 let props = defineProps({
@@ -73,7 +73,7 @@ onBeforeMount(async () => {
     await checkUserAccess();
 });
 onMounted(() => {
-    data.routeWatcher = watch(route.path, updateRouteOnNav);
+    data.routeWatcher = watch($route.path, updateRouteOnNav);
     updateRouteOnNav();
     if (data.activeTab === "metadata") load();
 });
@@ -83,45 +83,55 @@ async function checkUserAccess() {
     let response = await getItem({ $http, identifier: props.identifier });
     if (response.status === 403) {
         ElMessage.error(`You don't have permission to access that item`);
-        return router.push("/dashboard");
+        return $router.push("/dashboard");
     }
     data.userIsPermitted = true;
 }
 function updateRouteOnNav() {
     if (data.activeTab === "metadata") load();
-    if (!route.name.match(/^items/)) {
+    if (!$route.name.match(/^items/)) {
         data.routeWatcher();
         return;
     }
-    let currentRouteEndpoint = route.path.split("/").pop();
+    let currentRouteEndpoint = $route.path.split("/").pop();
     if (data.tabs.includes(currentRouteEndpoint)) {
         data.activeTab = currentRouteEndpoint;
     } else {
-        router.replace(`${route.path}/${data.activeTab}`);
+        $router.replace(`${$route.path}/${data.activeTab}`);
     }
 }
 function updateRouteOnTabSelect(tab) {
-    router.push(tab.paneName);
+    $router.push(tab.paneName);
     if (tab.paneName === "metadata") load();
 }
 async function load() {
+    // load the crate file
     let response = await $http.get({
-        route: `/describo/rocrate/items/${route.params.identifier}`,
+        route: `/describo/rocrate/${$route.meta.type}/${$route.params.identifier}`,
     });
     if (response.status !== 200) {
         ElMessage.error(`Unable to retrieve RO Crate file`);
     }
     data.crate = (await response.json()).rocrateFile;
+
+    // load the profile
     response = await $http.get({
-        route: `/describo/profile/item`,
+        route: `/describo/profile/${$route.meta.type}`,
     });
     if (response.status !== 200) {
         ElMessage.error(`Unable to retrieve profile`);
     }
     data.profile = (await response.json()).profile;
 }
-function saveCrate(data) {
-    console.log("SAVE CRATE", JSON.stringify(data, null, 2));
+async function saveCrate(data) {
+    let response = await $http.put({
+        route: `/describo/rocrate/${$route.meta.type}/${$route.params.identifier}`,
+        body: { data },
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`Unable to retrieve RO Crate file`);
+    }
+    // console.log("SAVE CRATE", JSON.stringify(data, null, 2));
 }
 function saveTemplate(template) {
     console.log("SAVE TEMPLATE", JSON.stringify(template, null, 2));

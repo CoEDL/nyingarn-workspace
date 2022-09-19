@@ -129,12 +129,12 @@ async function saveCrate(data) {
         body: { data },
     });
     if (response.status !== 200) {
-        ElMessage.error(`Unable to retrieve RO Crate file`);
+        ElMessage.error(`Unable to save RO Crate file`);
     }
     // console.log("SAVE CRATE", JSON.stringify(data, null, 2));
 }
 function saveTemplate(template) {
-    console.log("SAVE TEMPLATE", JSON.stringify(template, null, 2));
+    // console.log("SAVE TEMPLATE", JSON.stringify(template, null, 2));
     data.templates.push(template);
     console.log(JSON.stringify(data.templates, null, 2));
 }

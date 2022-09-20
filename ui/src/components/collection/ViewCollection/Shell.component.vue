@@ -7,14 +7,8 @@
             </span>
             {{ props.identifier }}
         </div>
-        <div class="p-4" v-if="data.userIsPermitted">
+        <div class="px-6" v-if="data.userIsPermitted">
             <el-tabs v-model="data.activeTab" @tab-click="updateRouteOnTabSelect">
-                <el-tab-pane label="Collection Members" name="members">
-                    <view-collection-members-component
-                        :collection="data.collection"
-                        v-if="data.activeTab === 'members'"
-                    />
-                </el-tab-pane>
                 <el-tab-pane label="Collection Metadata" name="metadata">
                     <describo-crate-builder
                         v-if="data.activeTab === 'metadata'"
@@ -29,6 +23,12 @@
                         @save:crate="saveCrate"
                     >
                     </describo-crate-builder>
+                </el-tab-pane>
+                <el-tab-pane label="Collection Members" name="members">
+                    <view-collection-members-component
+                        :collection="data.collection"
+                        v-if="data.activeTab === 'members'"
+                    />
                 </el-tab-pane>
                 <el-tab-pane label="Associate Collections and Items" name="associate">
                     <collection-members-component v-if="data.activeTab === 'associate'" />
@@ -63,7 +63,7 @@ let data = reactive({
     userIsPermitted: false,
     routeWatcher: undefined,
     tabs: ["members", "metadata", "associate", "administration"],
-    activeTab: "members",
+    activeTab: "metadata",
     collection: {},
     crate: {},
     profile: {},

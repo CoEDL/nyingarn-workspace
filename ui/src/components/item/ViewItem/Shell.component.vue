@@ -16,14 +16,11 @@
                         class="overflow-scroll"
                         :crate="data.crate"
                         :profile="data.profile"
-                        :lookup="lookup"
                         :enable-context-editor="false"
                         :enable-crate-preview="true"
                         :enable-browse-entities="false"
                         :purge-unlinked-entities-before-save="true"
                         @save:crate="saveCrate"
-                        @save:crate:template="saveTemplate"
-                        @save:entity:template="saveTemplate"
                     >
                     </describo-crate-builder>
                 </el-tab-pane>
@@ -77,7 +74,6 @@ onMounted(() => {
     updateRouteOnNav();
     if (data.activeTab === "metadata") load();
 });
-const lookup = new Lookup({ templates: data.templates });
 const metadataPanelHeight = computed(() => {
     return `${window.innerHeight - 140}px`;
 });

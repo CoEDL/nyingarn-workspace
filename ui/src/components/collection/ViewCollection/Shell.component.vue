@@ -22,14 +22,11 @@
                         class="overflow-scroll"
                         :crate="data.crate"
                         :profile="data.profile"
-                        :lookup="lookup"
                         :enable-context-editor="false"
                         :enable-crate-preview="true"
                         :enable-browse-entities="false"
                         :purge-unlinked-entities-before-save="true"
                         @save:crate="saveCrate"
-                        @save:crate:template="saveTemplate"
-                        @save:entity:template="saveTemplate"
                     >
                     </describo-crate-builder>
                 </el-tab-pane>
@@ -52,7 +49,6 @@ import ViewCollectionMembersComponent from "./ViewCollectionMembers.component.vu
 import { ref, reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import { Lookup } from "../../lookup-templates.js";
 const $route = useRoute();
 const $router = useRouter();
 const $http = inject("$http");
@@ -71,7 +67,6 @@ let data = reactive({
     collection: {},
     crate: {},
     profile: {},
-    templates: [],
 });
 onBeforeMount(async () => {
     await checkUserAccess();
@@ -81,7 +76,6 @@ onMounted(() => {
     updateRouteOnNav();
     if (data.activeTab === "metadata") load();
 });
-const lookup = new Lookup({ templates: data.templates });
 const metadataPanelHeight = computed(() => {
     return `${window.innerHeight - 140}px`;
 });

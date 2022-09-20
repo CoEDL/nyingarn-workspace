@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-	<invite-user-component />
+        <invite-user-component />
     </div>
 </template>
 
@@ -8,10 +8,10 @@
 import InviteUserComponent from "./InviteUser.component.vue";
 export default {
     components: {
-	InviteUserComponent,
+        InviteUserComponent,
     },
     data() {
-	return {};
+        return {};
     },
     methods: {},
 };

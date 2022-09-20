@@ -105,7 +105,7 @@ export default {
             this.total = response.total;
             let collections = response.collections.map((c) => ({
                 ...c,
-                link: `/collections/${c.name}/members`,
+                link: `/collections/${c.name}/metadata`,
             }));
             collections = orderBy(collections, "name");
 

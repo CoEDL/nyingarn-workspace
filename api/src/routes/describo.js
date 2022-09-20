@@ -1,5 +1,6 @@
 import { route, getStoreHandle, getLogger, loadProfile } from "../common";
-import { uniqBy } from "lodash";
+import { uniqBy, isArray } from "lodash";
+import models from "../models";
 const log = getLogger();
 
 export function setupRoutes({ server }) {
@@ -11,7 +12,26 @@ export function setupRoutes({ server }) {
 
 // TODO: this code does not have tests
 async function postLinkItemsHandler(req, res, next) {
+    let source, target;
     for (let update of req.body.updates) {
+        console.log(update);
+        if (update.sourceType === "collection") {
+            source = await models.collection.findOne({ where: { identifier: update.source } });
+            if (update.targetType === "collection") {
+                target = await models.collection.findOne({
+                    where: { identifier: update.target },
+                });
+                await source.addSubCollection(target);
+            } else {
+                target = await models.item.findOne({ where: { identifier: update.targetType } });
+                await source.addItem(target);
+            }
+        } else if (update.sourceType === "item") {
+            source = await models.item.findOne({ where: { identifier: update.source } });
+            target = await models.collection.findOne({ where: { identifier: update.target } });
+            await source.addCollection(target);
+        }
+
         let store = await getStoreHandle({ id: update.source, className: update.sourceType });
         let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         let rootDescriptor = crate["@graph"].filter(
@@ -23,6 +43,7 @@ async function postLinkItemsHandler(req, res, next) {
 
                 // attach the property
                 if (!e[update.property]) e[update.property] = [];
+                if (!isArray(e[update.propery])) e[update.property] = [e[update.property]];
 
                 // add the link
                 e[update.property].push({

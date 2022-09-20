@@ -20,6 +20,7 @@
                         :enable-context-editor="false"
                         :enable-crate-preview="true"
                         :enable-browse-entities="false"
+                        :purge-unlinked-entities-before-save="true"
                         @save:crate="saveCrate"
                         @save:crate:template="saveTemplate"
                         @save:entity:template="saveTemplate"

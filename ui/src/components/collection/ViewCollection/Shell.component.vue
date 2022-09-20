@@ -26,6 +26,7 @@
                         :enable-context-editor="false"
                         :enable-crate-preview="true"
                         :enable-browse-entities="false"
+                        :purge-unlinked-entities-before-save="true"
                         @save:crate="saveCrate"
                         @save:crate:template="saveTemplate"
                         @save:entity:template="saveTemplate"
@@ -105,11 +106,11 @@ function updateRouteOnNav() {
     if (data.tabs.includes(currentRouteEndpoint)) {
         data.activeTab = currentRouteEndpoint;
     } else {
-        router.replace(`${$route.path}/${data.activeTab}`);
+        $router.replace(`${$route.path}/${data.activeTab}`);
     }
 }
 function updateRouteOnTabSelect(tab) {
-    router.push(tab.paneName);
+    $router.push(tab.paneName);
     if (tab.paneName === "metadata") load();
 }
 async function load() {

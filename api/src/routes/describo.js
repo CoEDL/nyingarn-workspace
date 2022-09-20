@@ -1,14 +1,42 @@
-import { loadConfiguration, getLogger, loadProfile } from "../common";
-import { route, getStoreHandle } from "../common";
-import { BadRequestError } from "restify-errors";
-import fetch from "node-fetch";
-import models from "../models";
+import { route, getStoreHandle, getLogger, loadProfile } from "../common";
+import { uniqBy } from "lodash";
 const log = getLogger();
 
 export function setupRoutes({ server }) {
+    server.post("/describo/link", route(postLinkItemsHandler));
     server.get("/describo/rocrate/:type/:identifier", route(getDescriboROCrate));
     server.put("/describo/rocrate/:type/:identifier", route(putDescriboROCrate));
     server.get("/describo/profile/:type", route(getDescriboProfile));
+}
+
+// TODO: this code does not have tests
+async function postLinkItemsHandler(req, res, next) {
+    for (let update of req.body.updates) {
+        let store = await getStoreHandle({ id: update.source, className: update.sourceType });
+        let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        let rootDescriptor = crate["@graph"].filter(
+            (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
+        )[0];
+        crate["@graph"] = crate["@graph"].map((e) => {
+            if (e["@id"] === rootDescriptor.about["@id"]) {
+                // the root dataset
+
+                // attach the property
+                if (!e[update.property]) e[update.property] = [];
+
+                // add the link
+                e[update.property].push({
+                    "@id": `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`,
+                    "@type": "URL",
+                });
+                e[update.property] = uniqBy(e[update.property], "@id");
+            }
+            return e;
+        });
+        await store.put({ json: crate, target: "ro-crate-metadata.json" });
+    }
+    res.send();
+    next();
 }
 
 // TODO: this code does not have tests

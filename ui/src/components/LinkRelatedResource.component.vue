@@ -23,7 +23,7 @@
 import { ElMessage } from "element-plus";
 import { reactive, onMounted, inject } from "vue";
 import { useRoute } from "vue-router";
-const route = useRoute();
+const $route = useRoute();
 const $http = inject("$http");
 
 const props = defineProps({
@@ -44,8 +44,6 @@ const props = defineProps({
 });
 const data = reactive({
     loading: false,
-    identifier: route.params.identifier,
-    type: route.path.match("collections") ? "collection" : "item",
     items: [],
 });
 onMounted(async () => {
@@ -67,10 +65,7 @@ async function getMyItems() {
     });
     if (response.status === 200) {
         response = await response.json();
-        let items = response.items;
-        if (route.path.match("/items")) {
-            items = items.filter((c) => c.name !== data.identifier);
-        }
+        let items = response.items.filter((c) => c.name !== $route.params.identifier);
         return items;
     }
 }
@@ -80,54 +75,33 @@ async function getMyCollections() {
     });
     if (response.status === 200) {
         response = await response.json();
-        let collections = response.collections;
-        if (route.path.match("/collections")) {
-            collections = collections.filter((c) => c.name !== data.identifier);
-        }
+        let collections = response.collections.filter((c) => c.name !== $route.params.identifier);
         return collections;
     }
 }
 async function linkItemToCollection(item) {
     data.loading = true;
     let reverseProperty = props.property === "hasMember" ? "memberOf" : "hasMember";
+    const updates = [
+        {
+            source: $route.params.identifier,
+            sourceType: $route.meta.type,
+            property: props.property,
+            target: item.name,
+            targetType: $route.meta.type === "item" ? "collection" : "item",
+        },
+        {
+            source: item.name,
+            sourceType: $route.meta.type === "item" ? "collection" : "item",
+            property: reverseProperty,
+            target: $route.params.identifier,
+            targetType: $route.meta.type,
+        },
+    ];
 
-    let updates = {
-        source: {
-            identifier: data.identifier,
-            type: data.type,
-            entities: [
-                {
-                    "@id": "./",
-                    "@type": "Dataset",
-                    [props.property]: [{ "@id": `https://catalog.nyingarn.net/view/${item.name}` }],
-                },
-                {
-                    "@id": `https://catalog.nyingarn.net/view/${item.name}`,
-                    "@type": "URL",
-                },
-            ],
-        },
-        target: {
-            identifier: item.name,
-            type: item.type,
-            entities: [
-                {
-                    "@id": "./",
-                    "@type": "Dataset",
-                    [reverseProperty]: [
-                        { "@id": `https://catalog.nyingarn.net/view/${data.identifier}` },
-                    ],
-                },
-                {
-                    "@id": `https://catalog.nyingarn.net/view/${data.identifier}`,
-                    "@type": "URL",
-                },
-            ],
-        },
-    };
     let response = await $http.post({
-        route: "/describo/update",
-        body: { updates, type: route.meta.type },
+        route: "/describo/link",
+        body: { updates },
     });
     if (response.status === 200) {
         ElMessage({

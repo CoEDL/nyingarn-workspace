@@ -10,7 +10,6 @@
                     <view-item-content-component v-if="data.activeTab === 'view'" />
                 </el-tab-pane>
                 <el-tab-pane label="Item Metadata" name="metadata">
-                    <!-- <describo-metadata-component v-if="data.activeTab === 'metadata'" /> -->
                     <describo-crate-builder
                         v-if="data.activeTab === 'metadata'"
                         :style="{ height: metadataPanelHeight }"
@@ -43,7 +42,6 @@
 
 <script setup>
 import { getItem } from "../item-services";
-import DescriboMetadataComponent from "@/components/DescriboMetadata.component.vue";
 import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
 import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
@@ -51,7 +49,7 @@ import ItemMembersComponent from "./ItemMembers.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import { Lookup } from "./lookup-templates.js";
+import { Lookup } from "../../lookup-templates.js";
 const $route = useRoute();
 const $router = useRouter();
 const $http = inject("$http");
@@ -69,7 +67,6 @@ let data = reactive({
     activeTab: "view",
     crate: {},
     profile: {},
-    templates: [],
 });
 onBeforeMount(async () => {
     await checkUserAccess();

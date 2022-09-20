@@ -4,6 +4,78 @@
         "description": "A collection profile for the NYINGARN project",
         "version": 0.1
     },
+    "hide": {
+        "Dataset": "hasMember"
+    },
+    "layouts": {
+        "Dataset": [
+            {
+                "name": "Core Metadata",
+                "description": "",
+                "inputs": ["identifier", "description", "language", "languageName", "subject"]
+            },
+            {
+                "name": "Location",
+                "description": "",
+                "inputs": ["location"]
+            },
+            {
+                "name": "Original Source Information",
+                "inputs": [
+                    "source",
+                    "extent",
+                    "publisher",
+                    "publicationYear",
+                    "yearCreated",
+                    "dateFreeText",
+                    "originalForm"
+                ]
+            },
+            {
+                "name": "Permissions",
+                "description": "",
+                "inputs": [
+                    "descendantsPermissions",
+                    "holdingInstitution",
+                    "rightsHolder",
+                    "copyrightStatus",
+                    "descendantsPermission"
+                ]
+            },
+            {
+                "name": "Who",
+                "description": "",
+                "inputs": [
+                    "annotator",
+                    "author",
+                    "compiler",
+                    "consultant",
+                    "data_inputter",
+                    "depositor",
+                    "developer",
+                    "editor",
+                    "illustrator",
+                    "interpreter",
+                    "interviewer",
+                    "participant",
+                    "performer",
+                    "photographer",
+                    "recorder",
+                    "register",
+                    "researcher",
+                    "research_participant",
+                    "responder",
+                    "signer",
+                    "singer",
+                    "speaker",
+                    "sponsor",
+                    "transcriber",
+                    "translator"
+                ]
+            }
+        ],
+        "Place": [{ "name": "important", "description": "", "inputs": ["geojson"] }]
+    },
     "classes": {
         "Dataset": {
             "definition": "override",
@@ -392,12 +464,5 @@
             ]
         }
     },
-    "enabledClasses": [
-        "Dataset",
-        "Person",
-        "Place",
-        "Organization",
-        "Language"
-    ]
+    "enabledClasses": ["Dataset", "Person", "Place", "Organization", "Language"]
 }
-

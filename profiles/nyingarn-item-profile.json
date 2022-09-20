@@ -5,6 +5,9 @@
         "version": 0.1,
         "warnMissingProperty": true
     },
+    "hide": {
+        "Dataset": "memberOf"
+    },
     "layouts": {
         "Dataset": [
             {
@@ -442,4 +445,3 @@
     },
     "enabledClasses": ["Dataset", "Person", "Organization", "Language"]
 }
-

@@ -47,7 +47,6 @@ import ItemMembersComponent from "./ItemMembers.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import { Lookup } from "../../lookup-templates.js";
 const $route = useRoute();
 const $router = useRouter();
 const $http = inject("$http");

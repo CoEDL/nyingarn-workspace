@@ -1,86 +1,87 @@
 [
-  {
-    "matchingProperties": {
-      "name": "XError",
-      "code": "Q{https://nyingarn.net/ns/errors}character-encoding-error"
+    {
+        "matchingProperties": {
+            "name": "XError",
+            "code": "Q{https://nyingarn.net/ns/errors}character-encoding-error"
+        },
+        "name": "CharacterEncodingError",
+        "messageTemplate": "The character encoding of the file is not correct. The character encoding of the file must be UTF-8",
+        "remarks": "We expect and require UTF-8. This error in thrown in response to two different XPath errors both of which indicate a problem with a non-UTF-8 encoding. This applies to digivol files and should link to a page about how not to stuff up the encoding of CSV files"
     },
-    "name": "CharacterEncodingError",
-    "messageTemplate": "The character encoding of the file is not correct. The character encoding of the file must be UTF-8",
-    "remarks": "We expect and require UTF-8. This error in thrown in response to two different XPath errors both of which indicate a problem with a non-UTF-8 encoding. This applies to digivol files and should link to a page about how not to stuff up the encoding of CSV files"
-  },  
-  {
-    "matchingProperties": {
-      "name": "XError",
-      "code": "Q{https://nyingarn.net/ns/errors}no-pages-with-suitable-identifiers"
+    {
+        "matchingProperties": {
+            "name": "XError",
+            "code": "Q{https://nyingarn.net/ns/errors}no-pages-with-suitable-identifiers"
+        },
+        "name": "NoPagesWithSuitableIdentifiers",
+        "messageTemplate": "The document did not contain any pages whose identifiers started with '${errorObject.document-identifier}' and matched the regular expression '${errorObject.page-identifier-regex}'.",
+        "remarks": "The document had page breaks in it but none of them matched the document's id. "
     },
-    "name": "NoPagesWithSuitableIdentifiers",
-    "messageTemplate": "The document did not contain any pages whose identifiers started with '${errorObject.document-identifier}' and matched the regular expression '${errorObject.page-identifier-regex}'.",
-    "remarks": "The document had page breaks in it but none of them matched the document's id. "
-  },  
-  {
-    "matchingProperties": {
-      "name": "XError",
-      "errorObject.source-type": "digivol"
+    {
+        "matchingProperties": {
+            "name": "XError",
+            "errorObject.source-type": "digivol"
+        },
+        "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
+        "remarks": "Provides a link to a format-specific help page. "
     },
-    "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
-    "remarks": "Provides a link to a format-specific help page. "
-  },  
-  {
-    "matchingProperties": {
-      "name": "XError",
-      "errorObject.source-type": "digivol"
+    {
+        "matchingProperties": {
+            "name": "XError",
+            "errorObject.source-type": "digivol"
+        },
+        "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
+        "remarks": "Provides a link to a format-specific help page. "
     },
-    "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
-    "remarks": "Provides a link to a format-specific help page. "
-  },    
-  {
-    "matchingProperties": {
-      "name": "XError",
-      "errorObject.source-type": "transkribus"
+    {
+        "matchingProperties": {
+            "name": "XError",
+            "errorObject.source-type": "transkribus"
+        },
+        "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
+        "remarks": "Provides a link to a format-specific help page. "
     },
-    "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
-    "remarks": "Provides a link to a format-specific help page. "
-  },    
-  {
-    "matchingProperties": {
-      "name": "XError",
-      "errorObject.source-type": "docx-via-oxgarage"
+    {
+        "matchingProperties": {
+            "name": "XError",
+            "errorObject.source-type": "docx-via-oxgarage"
+        },
+        "url": "https://nyingarn.net/word-transcriptions/",
+        "remarks": "Provides a link to a format-specific help page. "
     },
-    "url": "https://nyingarn.net/word-transcriptions/",
-    "remarks": "Provides a link to a format-specific help page. "
-  },  
-  {
-    "matchingProperties": {
-      "name": "XError",
-      "code": "Q{https://nyingarn.net/ns/errors}unpaginated-document"
+    {
+        "matchingProperties": {
+            "name": "XError",
+            "code": "Q{https://nyingarn.net/ns/errors}unpaginated-document"
+        },
+        "name": "UnpaginatedDocument",
+        "messageTemplate": "The document could not be ingested because it was not paginated.",
+        "remarks": "The document had no page breaks in it so it can't be split into stub surface files"
     },
-    "name": "UnpaginatedDocument",
-    "messageTemplate": "The document could not be ingested because it was not paginated.",
-    "remarks": "The document had no page breaks in it so it can't be split into stub surface files"
-  },
-  {
-    "matchingProperties": {
-      "name": "XError",
-      "code": "Q{https://nyingarn.net/ns/errors}duplicate-page-identifiers-found"
+    {
+        "matchingProperties": {
+            "name": "XError",
+            "code": "Q{https://nyingarn.net/ns/errors}duplicate-page-identifiers-found"
+        },
+        "name": "DuplicatePageIdentifiers",
+        "messageTemplate": "ERROR: all page identifiers must be unique, but the following duplicate page identifiers were found: ${errorObject.duplicate-identifiers}",
+        "remarks": "The SaxonJS.XError object has an 'errorObject' property containing properties passed from the XSLT"
     },
-    "name": "DuplicatePageIdentifiers",
-    "messageTemplate": "ERROR: all page identifiers must be unique, but the following duplicate page identifiers were found: ${errorObject.duplicate-identifiers}",
-    "remarks": "The SaxonJS.XError object has an 'errorObject' property containing properties passed from the XSLT"
-  },
-  {
-    "matchingProperties": {
-      "name": "XError",
-      "code": "FODC0002"
+    {
+        "matchingProperties": {
+            "name": "XError",
+            "code": "FODC0002"
+        },
+        "name": "MalformedXMLFile",
+        "messageTemplate": "Unable to parse the file as XML. Please open it in an XML-aware editor (e.g. oXygen) and fix any errors.",
+        "remarks": "Error retrieving an XML resource, thrown by XPath doc() function when a resource is inaccessible or not well-formed. By assumption, the resource is not well-formed XML. See https://www.w3.org/TR/xpath-functions-31/#ERRFODC0002"
     },
-    "name": "MalformedXMLFile",
-    "messageTemplate": "Unable to parse the file as XML. Please open it in an XML-aware editor (e.g. oXygen) and fix any errors.",
-    "remarks": "Error retrieving an XML resource, thrown by XPath doc() function when a resource is inaccessible or not well-formed. By assumption, the resource is not well-formed XML. See https://www.w3.org/TR/xpath-functions-31/#ERRFODC0002"
-  },
-  {
-    "matchingProperties": {
-      "name": "XError"
-    },
-    "name": "UnexpectedXSLTError",
-    "messageTemplate": "An unexpected error occurred in XSLT code. Please report the following information: \nError ${code} in ${xsltModule} line ${xsltLineNr}:\n${message}",
-    "remarks": "This error definition is a 'catch-all' for errors thrown from XSLT"
-  }]
+    {
+        "matchingProperties": {
+            "name": "XError"
+        },
+        "name": "UnexpectedXSLTError",
+        "messageTemplate": "An unexpected error occurred in XSLT code. Please report the following information: \nError ${code} in ${xsltModule} line ${xsltLineNr}:\n${message}",
+        "remarks": "This error definition is a 'catch-all' for errors thrown from XSLT"
+    }
+]

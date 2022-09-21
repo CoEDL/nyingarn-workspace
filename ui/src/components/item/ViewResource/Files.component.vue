@@ -1,13 +1,16 @@
 <template>
     <div>
-        <a id="link" :href="download.link" download v-if="download.link" class="hidden">
+        <a id="link" :href="data.download.link" download v-if="data.download.link" class="hidden">
             download file
         </a>
-        <el-table :data="files" style="width: 100%">
+        <el-table :data="data.files" style="width: 100%">
             <el-table-column prop="name" label="Name" width="800" />
             <el-table-column label="Operations">
                 <template #default="scope">
-                    <el-button @click="triggerDownload(scope.row)">
+                    <el-button
+                        @click="triggerDownload(scope.row)"
+                        v-if="!disableDownload(scope.row)"
+                    >
                         <i class="fa-solid fa-cloud-download-alt"></i
                     ></el-button>
                     <!-- <el-popconfirm
@@ -26,72 +29,74 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import { getResourceFiles, deleteResourceFile, getFileUrl } from "@/components/item/item-services";
 import { ElMessage } from "element-plus";
+import { reactive, onMounted, inject, nextTick } from "vue";
+import { useRoute } from "vue-router";
+const $route = useRoute();
+const $http = inject("$http");
 
-export default {
-    data() {
-        return {
-            identifier: this.$route.params.identifier,
-            resource: this.$route.params.resource,
-            files: [],
-            download: {
-                link: undefined,
-            },
+const data = reactive({
+    identifier: $route.params.identifier,
+    resource: $route.params.resource,
+    files: [],
+    download: {
+        link: undefined,
+    },
+});
+onMounted(async () => {
+    await init();
+});
+async function init() {
+    await getResources();
+}
+
+function disableDownload(file) {
+    return file.name.match("tei.xml");
+}
+async function getResources() {
+    let response = await getResourceFiles({
+        $http,
+        identifier: data.identifier,
+        resource: data.resource,
+    });
+    if (response.status === 200) {
+        data.files = (await response.json()).files.map((f) => ({ name: f }));
+    }
+}
+async function triggerDownload({ name }) {
+    let response = await getFileUrl({
+        $http,
+        identifier: data.identifier,
+        file: name,
+        download: true,
+    });
+    if (response.status === 200) {
+        let { link } = await response.json();
+        data.download = {
+            link,
         };
-    },
-    mounted() {
-        this.init();
-    },
-    methods: {
-        async init() {
-            await this.getResourceFiles();
-        },
-        async getResourceFiles() {
-            let response = await getResourceFiles({
-                $http: this.$http,
-                identifier: this.identifier,
-                resource: this.resource,
-            });
-            if (response.status === 200) {
-                this.files = (await response.json()).files.map((f) => ({ name: f }));
-            }
-        },
-        async triggerDownload({ name }) {
-            let response = await getFileUrl({
-                $http: this.$http,
-                identifier: this.identifier,
-                file: name,
-                download: true,
-            });
-            if (response.status === 200) {
-                let { link } = await response.json();
-                this.download = {
-                    link,
-                };
-                this.$nextTick(() => {
-                    let elem = document.getElementById("link");
-                    elem.click();
-                    this.download = {
-                        link: undefined,
-                    };
-                });
-            }
-        },
-        async triggerDelete({ name }) {
-            try {
-                await deleteResourceFile({
-                    $http: this.$http,
-                    identifier: this.identifier,
-                    resource: this.resource,
-                    file: name,
-                });
-                this.init();
-            } catch (error) {
-                ElMessage.error(`Something went wrong deleting this file`);
-            }
-        },
-    },
-};
+        nextTick(() => {
+            let elem = document.getElementById("link");
+            elem.click();
+            data.download = {
+                link: undefined,
+            };
+        });
+    }
+}
+async function triggerDelete({ name }) {
+    try {
+        await deleteResourceFile({
+            $http,
+            identifier: data.identifier,
+            resource: data.resource,
+            file: name,
+        });
+        init();
+    } catch (error) {
+        ElMessage.error(`Something went wrong deleting this file`);
+    }
+}
 </script>

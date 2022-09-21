@@ -61,7 +61,15 @@ export async function runTask(msg) {
             if (task.id) {
                 await updateTask({
                     taskId: task.id,
-                    data: { error: error.message },
+                    data: {
+                        name: error.name,
+                        code: error.code,
+                        message: error.message,
+                        url: error.url,
+                        sourceType: error.errorObject["source-type"],
+                        xsltLineNumber: error.xsltLineNr,
+                        xsltModule: error.xsltModule,
+                    },
                     status: "failed",
                 });
             }

@@ -12,15 +12,27 @@
             </div>
         </div>
         <div v-if="data.show">
+            <div v-if="data.error.url" class="my-2 text-blue-600">
+                <a :href="data.error.url" target="_blank">
+                    For more information see this link: {{ data.error.url }}.
+                </a>
+            </div>
             <pre class="text-sm w-full">
 
-    When reporting this problem to us please include the following information in the message: 
+    When reporting this problem to us please include the following information in the message (and send us the file that caused the error): 
     
     item: {{ $route.params.identifier }}
     file: {{ props.error.resource }} 
-    error: {{ props.error.data.error }}
+    error: {{ data.error.message }}
 
-    And send us the file that caused the error.
+    // Admin information
+    name: {{ data.error.name }}
+    code: {{ data.error.code }}
+    sourceType: {{ data.error.sourceType }}
+    xsltLineNumber: {{ data.error.xsltLineNumber }}
+    xsltModule: {{ data.error.xsltModule }}
+
+    
             </pre>
         </div>
     </div>
@@ -28,8 +40,7 @@
 
 <script setup>
 import { reactive } from "vue";
-import { useRoute } from "vue-router";
-const $route = useRoute();
+import { cloneDeep } from "lodash";
 
 const props = defineProps({
     error: {
@@ -39,6 +50,7 @@ const props = defineProps({
 });
 const data = reactive({
     show: false,
+    error: cloneDeep(props.error.data),
 });
 </script>
 

@@ -1,6 +1,5 @@
 <template>
     <div class="flex flex-col">
-        <el-button @click="getMyCollections">load</el-button>
         <el-table :data="data.items" v-loading="data.loading">
             <template #empty>You have no items. Get started by creating an item.</template>
             <el-table-column prop="name" label="Name"> </el-table-column>

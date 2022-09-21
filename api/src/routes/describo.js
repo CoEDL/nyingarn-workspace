@@ -1,11 +1,12 @@
 import { route, getStoreHandle, getLogger, loadProfile } from "../common";
-import { uniqBy, isArray } from "lodash";
+import { uniqBy, isArray, compact, has, flattenDeep } from "lodash";
 import models from "../models";
 const log = getLogger();
 
 export function setupRoutes({ server }) {
     server.post("/describo/link", route(postLinkItemsHandler));
     server.post("/describo/unlink", route(postUnlinkItemsHandler));
+    server.post("/describo/copy", route(postCopyCrateHandler));
     server.get("/describo/rocrate/:type/:identifier", route(getDescriboROCrate));
     server.put("/describo/rocrate/:type/:identifier", route(putDescriboROCrate));
     server.get("/describo/profile/:type", route(getDescriboProfile));
@@ -32,8 +33,16 @@ async function postLinkItemsHandler(req, res, next) {
     }
 
     for (let update of req.body.updates) {
+        const id = `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`;
+
         let store = await getStoreHandle({ id: update.source, className: update.sourceType });
-        let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        let crate;
+        try {
+            crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        } catch (error) {
+            crate = createDefaultROCrateFile({ name: update.source });
+            await store.put({ json: crate, target: "ro-crate-metadata.json" });
+        }
         let rootDescriptor = crate["@graph"].filter(
             (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
         )[0];
@@ -42,15 +51,16 @@ async function postLinkItemsHandler(req, res, next) {
                 // the root dataset
 
                 // attach the property
-                if (!e[update.property]) e[update.property] = [];
-                if (!isArray(e[update.propery])) e[update.property] = [e[update.property]];
+                e[update.property] = [e[update.property]];
+                e[update.property] = flattenDeep(e[update.property]);
 
                 // add the link
                 e[update.property].push({
-                    "@id": `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`,
+                    "@id": id,
                     "@type": "URL",
                 });
                 e[update.property] = uniqBy(e[update.property], "@id");
+                e[update.property] = compact(e[update.property]);
             }
             return e;
         });
@@ -79,8 +89,16 @@ async function postUnlinkItemsHandler(req, res, next) {
         await source.removeItem(target);
     }
     for (let update of req.body.updates) {
+        const id = `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`;
+
         let store = await getStoreHandle({ id: update.source, className: update.sourceType });
-        let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        let crate;
+        try {
+            crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        } catch (error) {
+            crate = createDefaultROCrateFile({ name: update.source });
+            await store.put({ json: crate, target: "ro-crate-metadata.json" });
+        }
         let rootDescriptor = crate["@graph"].filter(
             (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
         )[0];
@@ -89,17 +107,27 @@ async function postUnlinkItemsHandler(req, res, next) {
                 // the root dataset
 
                 // remove the association
-                if (!isArray[e[update.property]]) e[update.property] = [e[update.property]];
-                e[update.propery] = e[update.property].filter(
-                    (e) =>
-                        e["@id"] !==
-                        `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`
-                );
+                e[update.property] = [e[update.property]];
+                e[update.property] = flattenDeep(e[update.property]);
+                e[update.property] = e[update.property].filter((e) => e["@id"] !== id);
+                if (!e[update.property].length) delete e[update.property];
             }
             return e;
         });
+        crate["@graph"] = crate["@graph"].filter((e) => e["@id"] !== id);
         await store.put({ json: crate, target: "ro-crate-metadata.json" });
     }
+    res.send();
+    next();
+}
+
+// TODO: this code does not have tests
+async function postCopyCrateHandler(req, res, next) {
+    const copy = req.body.copy;
+    let store = await getStoreHandle({ id: copy.source, className: copy.sourceType });
+    let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+    store = await getStoreHandle({ id: copy.target, className: copy.sourceType });
+    await store.put({ json: crate, target: "ro-crate-metadata.json" });
     res.send();
     next();
 }
@@ -112,7 +140,9 @@ async function getDescriboROCrate(req, res, next) {
         rocrateFile = await store.getJSON({ target: "ro-crate-metadata.json" });
     } catch (error) {
         rocrateFile = createDefaultROCrateFile({ name: req.params.identifier });
+        await store.put({ json: rocrateFile, target: "ro-crate-metadata.json" });
     }
+    console.log("**** load crate", JSON.stringify(rocrateFile, null, 2));
     res.send({ rocrateFile });
     next();
 }

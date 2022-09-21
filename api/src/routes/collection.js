@@ -80,8 +80,6 @@ async function getCollectionsHandler(req, res, next) {
             ),
         };
     });
-    console.log(JSON.stringify(collections, null, 2));
-
     res.send({ total: count, collections });
     next();
 }

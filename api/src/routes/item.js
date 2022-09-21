@@ -96,7 +96,17 @@ async function getItemsHandler(req, res, next) {
     const offset = req.query.offset;
     const limit = req.query.limit;
     let { count, rows } = await getItems({ userId, offset, limit });
-    let items = rows.map((i) => ({ name: i.identifier, type: "item" }));
+    let items = rows.map((i) => ({
+        name: i.identifier,
+        type: "item",
+        collections: groupBy(
+            i.collections.map((c) => ({
+                type: "collection",
+                identifier: c.identifier,
+            })),
+            "identifier"
+        ),
+    }));
 
     res.send({ total: count, items });
     next();
@@ -326,18 +336,6 @@ async function deleteItemResourceHandler(req, res, next) {
     next();
 }
 
-// async function deleteItemResourceFileHandler(req, res, next) {
-//     const { identifier, file } = req.params;
-//     try {
-//         await deleteItemResourceFile({ identifier, file });
-//     } catch (error) {
-//         log.error(`Error deleting item file: ${identifier}/${file}`);
-//         return next(new InternalServerError());
-//     }
-//     res.send({});
-//     next();
-// }
-
 async function getItemTranscriptionHandler(req, res, next) {
     let content;
     let exists = await itemResourceExists({
@@ -372,20 +370,6 @@ async function getItemTranscriptionHandler(req, res, next) {
         res.send({ content });
         return next();
     }
-
-    // otherwise try to get the tesseract transcription
-    // exists = await itemResourceExists({
-    //     identifier: req.params.identifier,
-    //     resource: `${req.params.resource}.tesseract_ocr-ADMIN.txt`,
-    // });
-    // if (exists) {
-    //     content = await getItemResource({
-    //         identifier: req.params.identifier,
-    //         resource: `${req.params.resource}.tesseract_ocr-ADMIN.txt`,
-    //     });
-    //     res.send({ content });
-    //     return next();
-    // }
 
     res.send({ content: "" });
     return next();

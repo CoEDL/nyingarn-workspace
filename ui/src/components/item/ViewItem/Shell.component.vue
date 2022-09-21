@@ -10,7 +10,19 @@
                     <view-item-content-component v-if="data.activeTab === 'view'" />
                 </el-tab-pane>
                 <el-tab-pane label="Item Metadata" name="metadata">
-                    <describo-metadata-component v-if="data.activeTab === 'metadata'" />
+                    <describo-crate-builder
+                        v-if="data.activeTab === 'metadata'"
+                        :style="{ height: metadataPanelHeight }"
+                        class="overflow-scroll"
+                        :crate="data.crate"
+                        :profile="data.profile"
+                        :enable-context-editor="false"
+                        :enable-crate-preview="true"
+                        :enable-browse-entities="false"
+                        :purge-unlinked-entities-before-save="true"
+                        @save:crate="saveCrate"
+                    >
+                    </describo-crate-builder>
                 </el-tab-pane>
                 <el-tab-pane label="Associate to Collection" name="associate">
                     <item-members-component v-if="data.activeTab === 'associate'" />
@@ -28,16 +40,15 @@
 
 <script setup>
 import { getItem } from "../item-services";
-import DescriboMetadataComponent from "@/components/DescriboMetadata.component.vue";
 import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
 import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
 import ItemMembersComponent from "./ItemMembers.component.vue";
-import { reactive, onMounted, onBeforeMount, inject, watch } from "vue";
+import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-const route = useRoute();
-const router = useRouter();
+const $route = useRoute();
+const $router = useRouter();
 const $http = inject("$http");
 
 let props = defineProps({
@@ -51,35 +62,78 @@ let data = reactive({
     routeWatcher: undefined,
     tabs: ["view", "metadata", "associate", "upload", "administration"],
     activeTab: "view",
+    crate: {},
+    profile: {},
 });
 onBeforeMount(async () => {
     await checkUserAccess();
 });
 onMounted(() => {
-    data.routeWatcher = watch(route.path, updateRouteOnNav);
+    data.routeWatcher = watch($route.path, updateRouteOnNav);
     updateRouteOnNav();
+    if (data.activeTab === "metadata") load();
 });
+const metadataPanelHeight = computed(() => {
+    return `${window.innerHeight - 140}px`;
+});
+
 async function checkUserAccess() {
     let response = await getItem({ $http, identifier: props.identifier });
     if (response.status === 403) {
         ElMessage.error(`You don't have permission to access that item`);
-        return router.push("/dashboard");
+        return $router.push("/dashboard");
     }
     data.userIsPermitted = true;
 }
 function updateRouteOnNav() {
-    if (!route.name.match(/^items/)) {
+    if (data.activeTab === "metadata") load();
+    if (!$route.name.match(/^items/)) {
         data.routeWatcher();
         return;
     }
-    let currentRouteEndpoint = route.path.split("/").pop();
+    let currentRouteEndpoint = $route.path.split("/").pop();
     if (data.tabs.includes(currentRouteEndpoint)) {
         data.activeTab = currentRouteEndpoint;
     } else {
-        router.replace(`${route.path}/${data.activeTab}`);
+        $router.replace(`${$route.path}/${data.activeTab}`);
     }
 }
 function updateRouteOnTabSelect(tab) {
-    router.push(tab.paneName);
+    $router.push(tab.paneName);
+    if (tab.paneName === "metadata") load();
+}
+async function load() {
+    // load the crate file
+    let response = await $http.get({
+        route: `/describo/rocrate/${$route.meta.type}/${$route.params.identifier}`,
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`Unable to retrieve RO Crate file`);
+    }
+    data.crate = (await response.json()).rocrateFile;
+
+    // load the profile
+    response = await $http.get({
+        route: `/describo/profile/${$route.meta.type}`,
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`Unable to retrieve profile`);
+    }
+    data.profile = (await response.json()).profile;
+}
+async function saveCrate(data) {
+    let response = await $http.put({
+        route: `/describo/rocrate/${$route.meta.type}/${$route.params.identifier}`,
+        body: { data },
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`Unable to save RO Crate file`);
+    }
+    // console.log("SAVE CRATE", JSON.stringify(data, null, 2));
+}
+function saveTemplate(template) {
+    // console.log("SAVE TEMPLATE", JSON.stringify(template, null, 2));
+    data.templates.push(template);
+    console.log(JSON.stringify(data.templates, null, 2));
 }
 </script>

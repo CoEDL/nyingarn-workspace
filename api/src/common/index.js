@@ -1,6 +1,6 @@
 import path from "path";
 import { ensureDir } from "fs-extra";
-export { loadConfiguration, filterPrivateInformation } from "./configuration";
+export { loadConfiguration, loadProfile, filterPrivateInformation } from "./configuration";
 export { getLogger, logEvent } from "./logger";
 export { submitTask, registerTask } from "./task";
 export { getS3Handle, getStoreHandle } from "./getS3Handle";

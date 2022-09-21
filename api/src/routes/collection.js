@@ -6,7 +6,7 @@ import {
     InternalServerError,
 } from "restify-errors";
 import { route, logEvent, getLogger, getStoreHandle } from "../common";
-import { flattenDeep, compact } from "lodash";
+import { flattenDeep, compact, groupBy } from "lodash";
 import {
     getCollections,
     lookupCollectionByIdentifier,
@@ -57,13 +57,29 @@ async function getCollectionsHandler(req, res, next) {
     const userId = req.session.user.id;
     const offset = req.query.offset;
     const limit = req.query.limit;
-    let { count, rows } = await getCollections({ userId, offset, limit });
-    let collections = rows.map((c) => ({
-        name: c.identifier,
-        private: c.data.private,
-        type: "collection",
-    }));
-
+    let { count, rows } = await getCollections({
+        userId,
+        offset,
+        limit,
+    });
+    let collections = rows.map((c) => {
+        return {
+            name: c.identifier,
+            private: c.data.private,
+            type: "collection",
+            items: groupBy(
+                c.items.map((i) => ({ type: "item", identifier: i.identifier })),
+                "identifier"
+            ),
+            collections: groupBy(
+                c.subCollection.map((c) => ({
+                    type: "collection",
+                    identifier: c.identifier,
+                })),
+                "identifier"
+            ),
+        };
+    });
     res.send({ total: count, collections });
     next();
 }

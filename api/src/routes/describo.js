@@ -142,7 +142,6 @@ async function getDescriboROCrate(req, res, next) {
         rocrateFile = createDefaultROCrateFile({ name: req.params.identifier });
         await store.put({ json: rocrateFile, target: "ro-crate-metadata.json" });
     }
-    console.log("**** load crate", JSON.stringify(rocrateFile, null, 2));
     res.send({ rocrateFile });
     next();
 }

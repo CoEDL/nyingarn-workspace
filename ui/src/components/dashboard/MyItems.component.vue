@@ -30,6 +30,7 @@
                             @confirm="deleteItem(scope.row)"
                             confirmButtonType="danger"
                             cancelButtonType="primary"
+                            width="300"
                         >
                             <template #reference>
                                 <el-button type="danger" size="small">

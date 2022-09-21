@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import MyItemsComponent from "@/components/item/MyItems.component.vue";
-import MyCollectionsComponent from "@/components/collection/MyCollections.component.vue";
+import MyItemsComponent from "./MyItems.component.vue";
+import MyCollectionsComponent from "./MyCollections.component.vue";
 import TermsAndConditionsComponent from "./TermsAndConditions.component.vue";
 export default {
     components: {

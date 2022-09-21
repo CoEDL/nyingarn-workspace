@@ -1,21 +1,13 @@
 <template>
     <div class="flex flex-col">
-        <invite-user-component />
-        <reprocess-transcriptions-imports />
+        <invite-user-component class="bg-gray-200 p-4 my-2" />
+        <reprocess-transcriptions-imports class="bg-gray-200 p-4 my-2" />
+        <copy-crate-from-component type="items" class="bg-gray-200 p-4 my-2" />
     </div>
 </template>
 
-<script>
+<script setup>
 import InviteUserComponent from "./InviteUser.component.vue";
 import ReprocessTranscriptionsImports from "./ReprocessTranscriptionsImports.component.vue";
-export default {
-    components: {
-        InviteUserComponent,
-        ReprocessTranscriptionsImports,
-    },
-    data() {
-        return {};
-    },
-    methods: {},
-};
+import CopyCrateFromComponent from "../../../CopyCrateFrom.component.vue";
 </script>

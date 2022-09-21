@@ -8,10 +8,19 @@
                 <template #default="scope">
                     <el-button
                         type="primary"
+                        v-if="!isLinked(scope.row)"
                         @click="linkItemToCollection(scope.row)"
                         :disabled="data.loading"
                     >
                         <i class="fa-solid fa-link"></i>
+                    </el-button>
+                    <el-button
+                        v-if="isLinked(scope.row)"
+                        type="danger"
+                        @click="unlinkItemFromCollection(scope.row)"
+                        :disabled="data.loading"
+                    >
+                        <i class="fa-solid fa-unlink"></i>
                     </el-button>
                 </template>
             </el-table-column>
@@ -23,7 +32,7 @@
 import { ElMessage } from "element-plus";
 import { reactive, onMounted, inject } from "vue";
 import { useRoute } from "vue-router";
-const route = useRoute();
+const $route = useRoute();
 const $http = inject("$http");
 
 const props = defineProps({
@@ -44,11 +53,16 @@ const props = defineProps({
 });
 const data = reactive({
     loading: false,
-    identifier: route.params.identifier,
-    type: route.path.match("collections") ? "collection" : "item",
     items: [],
 });
 onMounted(async () => {
+    await init();
+});
+function isLinked(item) {
+    return item?.items?.[$route.params.identifier] || item?.collections?.[$route.params.identifier];
+}
+
+async function init() {
     if (props.link === "items") {
         let items = await getMyItems();
         data.items = [...items];
@@ -60,17 +74,14 @@ onMounted(async () => {
         let collections = await getMyCollections();
         data.items = [...items, ...collections];
     }
-});
+}
 async function getMyItems() {
     let response = await $http.get({
         route: `/items`,
     });
     if (response.status === 200) {
         response = await response.json();
-        let items = response.items;
-        if (route.path.match("/items")) {
-            items = items.filter((c) => c.name !== data.identifier);
-        }
+        let items = response.items.filter((c) => c.name !== $route.params.identifier);
         return items;
     }
 }
@@ -80,67 +91,64 @@ async function getMyCollections() {
     });
     if (response.status === 200) {
         response = await response.json();
-        let collections = response.collections;
-        if (route.path.match("/collections")) {
-            collections = collections.filter((c) => c.name !== data.identifier);
-        }
+        let collections = response.collections.filter((c) => c.name !== $route.params.identifier);
         return collections;
     }
 }
 async function linkItemToCollection(item) {
+    toggleLink({
+        item,
+        url: "/describo/link",
+        successMsg: "item linked",
+        errorMsg: "The was an issue linking the item",
+    });
+}
+async function unlinkItemFromCollection(item) {
+    toggleLink({
+        item,
+        url: "/describo/unlink",
+        successMsg: "item unlinked",
+        errorMsg: "The was an issue unlinking the item",
+    });
+}
+
+async function toggleLink({ item, url, successMsg, ErrorMsg }) {
     data.loading = true;
     let reverseProperty = props.property === "hasMember" ? "memberOf" : "hasMember";
+    const updates = [
+        {
+            source: $route.params.identifier,
+            sourceType: $route.meta.type,
+            property: props.property,
+            target: item.name,
+            targetType: item.type,
+        },
+        {
+            source: item.name,
+            sourceType: item.type,
+            property: reverseProperty,
+            target: $route.params.identifier,
+            targetType: $route.meta.type,
+        },
+    ];
 
-    let updates = {
-        source: {
-            identifier: data.identifier,
-            type: data.type,
-            entities: [
-                {
-                    "@id": "./",
-                    "@type": "Dataset",
-                    [props.property]: [{ "@id": `https://catalog.nyingarn.net/view/${item.name}` }],
-                },
-                {
-                    "@id": `https://catalog.nyingarn.net/view/${item.name}`,
-                    "@type": "URL",
-                },
-            ],
-        },
-        target: {
-            identifier: item.name,
-            type: item.type,
-            entities: [
-                {
-                    "@id": "./",
-                    "@type": "Dataset",
-                    [reverseProperty]: [
-                        { "@id": `https://catalog.nyingarn.net/view/${data.identifier}` },
-                    ],
-                },
-                {
-                    "@id": `https://catalog.nyingarn.net/view/${data.identifier}`,
-                    "@type": "URL",
-                },
-            ],
-        },
-    };
     let response = await $http.post({
-        route: "/describo/update",
-        body: { updates, type: route.meta.type },
+        route: url,
+        body: { updates },
     });
     if (response.status === 200) {
         ElMessage({
-            message: "item linked",
+            message: successMsg,
             type: "success",
         });
     } else {
         ElMessage({
-            message: "There was an issue creating the item link",
+            message: ErrorMsg,
             type: "error",
         });
-        console.error(await response.json());
     }
+
     data.loading = false;
+    init();
 }
 </script>

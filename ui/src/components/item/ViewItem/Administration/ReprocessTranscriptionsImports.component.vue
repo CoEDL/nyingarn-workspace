@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-gray-200 p-4 my-2 flex flex-col space-y-2">
-        <div class="text-sm text-gray-600">
+    <div class="flex flex-col space-y-2">
+        <div class="text-gray-600">
             If you delete a resource, reprocess the transcription files to re-extract the Digivol or
             TEI transcription.
         </div>

@@ -5,6 +5,7 @@ const log = getLogger();
 
 export function setupRoutes({ server }) {
     server.post("/describo/link", route(postLinkItemsHandler));
+    server.post("/describo/unlink", route(postUnlinkItemsHandler));
     server.get("/describo/rocrate/:type/:identifier", route(getDescriboROCrate));
     server.put("/describo/rocrate/:type/:identifier", route(putDescriboROCrate));
     server.get("/describo/profile/:type", route(getDescriboProfile));
@@ -12,26 +13,25 @@ export function setupRoutes({ server }) {
 
 // TODO: this code does not have tests
 async function postLinkItemsHandler(req, res, next) {
-    let source, target;
-    for (let update of req.body.updates) {
-        console.log(update);
-        if (update.sourceType === "collection") {
-            source = await models.collection.findOne({ where: { identifier: update.source } });
-            if (update.targetType === "collection") {
-                target = await models.collection.findOne({
-                    where: { identifier: update.target },
-                });
-                await source.addSubCollection(target);
-            } else {
-                target = await models.item.findOne({ where: { identifier: update.targetType } });
-                await source.addItem(target);
-            }
-        } else if (update.sourceType === "item") {
-            source = await models.item.findOne({ where: { identifier: update.source } });
-            target = await models.collection.findOne({ where: { identifier: update.target } });
-            await source.addCollection(target);
-        }
+    const updates = req.body.updates;
 
+    // add the database link between source and target
+    let source = await models[updates[0].sourceType].findOne({
+        where: { identifier: updates[0].source },
+    });
+    let target = await models[updates[0].targetType].findOne({
+        where: { identifier: updates[0].target },
+    });
+    if (updates[0].sourceType === "item") {
+        await source.addCollection(target);
+    } else if (updates[0].sourceType === "collection" && updates[0].targetType === "collection") {
+        await source.addSubCollection(target);
+        await target.addSubCollection(source);
+    } else if (updates[0].sourceType === "collection" && updates[0].targetType === "item") {
+        await source.addItem(target);
+    }
+
+    for (let update of req.body.updates) {
         let store = await getStoreHandle({ id: update.source, className: update.sourceType });
         let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         let rootDescriptor = crate["@graph"].filter(
@@ -51,6 +51,50 @@ async function postLinkItemsHandler(req, res, next) {
                     "@type": "URL",
                 });
                 e[update.property] = uniqBy(e[update.property], "@id");
+            }
+            return e;
+        });
+        await store.put({ json: crate, target: "ro-crate-metadata.json" });
+    }
+    res.send();
+    next();
+}
+
+// TODO: this code does not have tests
+async function postUnlinkItemsHandler(req, res, next) {
+    const updates = req.body.updates;
+
+    let source = await models[updates[0].sourceType].findOne({
+        where: { identifier: updates[0].source },
+    });
+    let target = await models[updates[0].targetType].findOne({
+        where: { identifier: updates[0].target },
+    });
+    if (updates[0].sourceType === "item") {
+        await source.removeCollection(target);
+    } else if (updates[0].sourceType === "collection" && updates[0].targetType === "collection") {
+        await source.removeSubCollection(target);
+        await target.removeSubCollection(source);
+    } else if (updates[0].sourceType === "collection" && updates[0].targetType === "item") {
+        await source.removeItem(target);
+    }
+    for (let update of req.body.updates) {
+        let store = await getStoreHandle({ id: update.source, className: update.sourceType });
+        let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        let rootDescriptor = crate["@graph"].filter(
+            (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
+        )[0];
+        crate["@graph"] = crate["@graph"].map((e) => {
+            if (e["@id"] === rootDescriptor.about["@id"]) {
+                // the root dataset
+
+                // remove the association
+                if (!isArray[e[update.property]]) e[update.property] = [e[update.property]];
+                e[update.propery] = e[update.property].filter(
+                    (e) =>
+                        e["@id"] !==
+                        `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`
+                );
             }
             return e;
         });

@@ -32,7 +32,7 @@
         </div>
         <upload-wizard-component @show-help="showHelp" />
         <div
-            class="border-t border-solid p-4 mt-4 h-72 overflow-scroll"
+            class="border-t border-solid p-4 mt-4 panel-height overflow-scroll"
             v-if="data.failedTasks.length"
         >
             <div>Failed Tasks:</div>
@@ -84,3 +84,9 @@ function storeFailedTasks(tasks) {
     }
 }
 </script>
+
+<style scoped>
+.panel-height {
+    height: 500px;
+}
+</style>

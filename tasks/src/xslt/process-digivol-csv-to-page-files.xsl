@@ -1,10 +1,12 @@
 <xsl:transform version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 	xmlns:csv="https://datatracker.ietf.org/doc/html/rfc4180" 
 	xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+	xmlns:nyingarn="https://nyingarn.net/ns/functions"
 	xmlns="http://www.tei-c.org/ns/1.0">
 	
 	<!-- CSV-parsing utility library -->
 	<xsl:import href="csv.xsl"/>
+	<xsl:import href="error.xsl"/>
 	
 	<xsl:template name="xsl:initial-template">
 		<!-- the identifier of the document in the Nyingarn workspace -->
@@ -23,7 +25,18 @@
 				[.('externalIdentifier') => matches($page-identifier-regex) ]
 		"/>
 		<xsl:if test="not(exists($exportable-surfaces))">
-			<xsl:message terminate="true" expand-text="true">ERROR: no pages with suitable identifiers. No pages had an identifier starting with {$identifier} and matching the regular expression "{$page-identifier-regex}".</xsl:message>
+			<xsl:sequence select="
+				nyingarn:error(
+					'no-pages-with-suitable-identifiers',
+					'No pages with suitable identifiers',
+					map{
+						'source-type': 'digivol',
+						'document-identifier': $identifier,
+						'page-identifier-regex': $page-identifier-regex,
+						'source-type': 'digivol'
+					}
+				)
+			"/>
 		</xsl:if>
 
 		<!-- transform each map to a TEI <surface> element and output it as a file -->

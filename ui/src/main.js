@@ -10,6 +10,7 @@ import App from "./App.vue";
 import router from "./routes";
 import { store } from "./store";
 import ElementPlus from "element-plus";
+import DescriboCrateBuilder from "@describo/crate-builder-component";
 import log from "loglevel";
 import prefix from "loglevel-plugin-prefix";
 const level = process.env.NODE_ENV === "development" ? "debug" : "warn";
@@ -32,6 +33,7 @@ import HTTPService from "./http.service";
         app.use(store);
         app.use(router);
         app.use(ElementPlus);
+        app.use(DescriboCrateBuilder);
         app.config.globalProperties.$http = new HTTPService({ router });
         app.provide("$http", app.config.globalProperties.$http);
 

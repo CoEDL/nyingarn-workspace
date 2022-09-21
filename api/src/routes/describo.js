@@ -1,141 +1,198 @@
-import { loadConfiguration, getLogger } from "../common";
-import { route, getStoreHandle } from "../common";
-import { BadRequestError } from "restify-errors";
-import fetch from "node-fetch";
+import { route, getStoreHandle, getLogger, loadProfile } from "../common";
+import { uniqBy, isArray, compact, has, flattenDeep } from "lodash";
 import models from "../models";
 const log = getLogger();
 
 export function setupRoutes({ server }) {
-    server.post("/describo", route(setupDescriboSessionRouteHandler));
-    server.post("/describo/update", route(postDescriboUpdateRouteHandler));
+    server.post("/describo/link", route(postLinkItemsHandler));
+    server.post("/describo/unlink", route(postUnlinkItemsHandler));
+    server.post("/describo/copy", route(postCopyCrateHandler));
+    server.get("/describo/rocrate/:type/:identifier", route(getDescriboROCrate));
+    server.put("/describo/rocrate/:type/:identifier", route(putDescriboROCrate));
+    server.get("/describo/profile/:type", route(getDescriboProfile));
 }
 
-async function setupDescriboSessionRouteHandler(req, res, next) {
-    let describo, sessionId;
-    let store = await getStoreHandle({ className: req.body.type, id: req.body.identifier });
-    try {
-        ({ describo, sessionId } = await __setupDescriboSession({
-            session: req.session,
-            folder: store.getItemPath(),
-            type: req.body.type,
-        }));
-    } catch (error) {
-        log.error(`There was a problem setting up a describo session: ${error.message}`);
-        return next(new BadRequestError(`There was a problem setting up a describo session`));
-    }
-    res.send({ url: `${describo.url}/application?sid=${sessionId}` });
-    next();
-}
+// TODO: this code does not have tests
+async function postLinkItemsHandler(req, res, next) {
+    const updates = req.body.updates;
 
-async function __setupDescriboSession({ session, folder, type = "item" }) {
-    const configuration = await loadConfiguration();
-    const describo = configuration.api.services.describo;
-    const s3 = configuration.api.services.s3;
-    const user = session.user;
-    folder = `${s3.bucket}/${folder}`;
-    const url = `${describo.url}/api/session/application`;
-    const body = {
-        name: `${user.givenName} ${user.familyName}`,
-        email: user.email,
-        service: {
-            s3: {
-                provider: s3.provider,
-                url: s3.endpointUrl,
-                awsAccessKeyId: s3.awsAccessKeyId,
-                awsSecretAccessKey: s3.awsSecretAccessKey,
-                region: s3.region,
-                folder,
-            },
-        },
-        configuration: {
-            allowProfileChange: false,
-            allowServiceChange: false,
-        },
-        profile: {
-            file: configuration.api.profiles[type],
-        },
-    };
-    let response = await fetch(url, {
-        method: "POST",
-        headers: {
-            authorization: `Bearer ${describo.authorization}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
+    // add the database link between source and target
+    let source = await models[updates[0].sourceType].findOne({
+        where: { identifier: updates[0].source },
     });
-    if (response.status !== 200) {
-        log.error(`There was a problem setting up a describo session: ${error.message}`);
-        throw new Error(`There was a problem setting up a describo session`);
+    let target = await models[updates[0].targetType].findOne({
+        where: { identifier: updates[0].target },
+    });
+    if (updates[0].sourceType === "item") {
+        await source.addCollection(target);
+    } else if (updates[0].sourceType === "collection" && updates[0].targetType === "collection") {
+        await source.addSubCollection(target);
+        await target.addSubCollection(source);
+    } else if (updates[0].sourceType === "collection" && updates[0].targetType === "item") {
+        await source.addItem(target);
     }
-    const sessionId = (await response.json()).sessionId;
-    return { describo, sessionId, folder };
+
+    for (let update of req.body.updates) {
+        const id = `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`;
+
+        let store = await getStoreHandle({ id: update.source, className: update.sourceType });
+        let crate;
+        try {
+            crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        } catch (error) {
+            crate = createDefaultROCrateFile({ name: update.source });
+            await store.put({ json: crate, target: "ro-crate-metadata.json" });
+        }
+        let rootDescriptor = crate["@graph"].filter(
+            (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
+        )[0];
+        crate["@graph"] = crate["@graph"].map((e) => {
+            if (e["@id"] === rootDescriptor.about["@id"]) {
+                // the root dataset
+
+                // attach the property
+                e[update.property] = [e[update.property]];
+                e[update.property] = flattenDeep(e[update.property]);
+
+                // add the link
+                e[update.property].push({
+                    "@id": id,
+                    "@type": "URL",
+                });
+                e[update.property] = uniqBy(e[update.property], "@id");
+                e[update.property] = compact(e[update.property]);
+            }
+            return e;
+        });
+        await store.put({ json: crate, target: "ro-crate-metadata.json" });
+    }
+    res.send();
+    next();
 }
 
-async function postDescriboUpdateRouteHandler(req, res, next) {
-    let src = req.body.updates.source;
-    let tgt = req.body.updates.target;
-    let source, target;
-    if (src.type === "collection") {
-        source = await models.collection.findOne({ where: { identifier: src.identifier } });
-        if (tgt.type === "collection") {
-            target = await models.collection.findOne({ where: { identifier: tgt.identifier } });
-            await source.addSubCollection(target);
-        } else {
-            target = await models.item.findOne({ where: { identifier: tgt.identifier } });
-            await source.addItem(target);
-        }
-    } else if (src.type === "item") {
-        source = await models.item.findOne({ where: { identifier: src.identifier } });
-        target = await models.collection.findOne({ where: { identifier: tgt.identifier } });
-        await source.addCollection(target);
+// TODO: this code does not have tests
+async function postUnlinkItemsHandler(req, res, next) {
+    const updates = req.body.updates;
+
+    let source = await models[updates[0].sourceType].findOne({
+        where: { identifier: updates[0].source },
+    });
+    let target = await models[updates[0].targetType].findOne({
+        where: { identifier: updates[0].target },
+    });
+    if (updates[0].sourceType === "item") {
+        await source.removeCollection(target);
+    } else if (updates[0].sourceType === "collection" && updates[0].targetType === "collection") {
+        await source.removeSubCollection(target);
+        await target.removeSubCollection(source);
+    } else if (updates[0].sourceType === "collection" && updates[0].targetType === "item") {
+        await source.removeItem(target);
     }
+    for (let update of req.body.updates) {
+        const id = `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`;
 
-    // console.log(JSON.stringify(req.body.updates, null, 2));
-
-    for (const update of ["source", "target"]) {
-        let describo, folder, sessionId;
-        folder = req.body.updates[update].identifier;
+        let store = await getStoreHandle({ id: update.source, className: update.sourceType });
+        let crate;
         try {
-            ({ describo, sessionId, folder } = await __setupDescriboSession({
-                session: req.session,
-                folder,
-                type: req.body.type,
-            }));
+            crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         } catch (error) {
-            log.error(`There was a problem setting up a describo session: ${error.message}`);
-            return next(new BadRequestError(`There was a problem setting up a describo session`));
+            crate = createDefaultROCrateFile({ name: update.source });
+            await store.put({ json: crate, target: "ro-crate-metadata.json" });
         }
+        let rootDescriptor = crate["@graph"].filter(
+            (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
+        )[0];
+        crate["@graph"] = crate["@graph"].map((e) => {
+            if (e["@id"] === rootDescriptor.about["@id"]) {
+                // the root dataset
 
-        let response = await fetch(`${describo.url}/api/load/s3`, {
-            method: "GET",
-            headers: {
-                Authorization: `sid ${sessionId}`,
-                "Content-Type": "application/json",
-            },
+                // remove the association
+                e[update.property] = [e[update.property]];
+                e[update.property] = flattenDeep(e[update.property]);
+                e[update.property] = e[update.property].filter((e) => e["@id"] !== id);
+                if (!e[update.property].length) delete e[update.property];
+            }
+            return e;
         });
-        if (response.status !== 200) {
-            console.log(error);
-            log.error(`Describo is unable to load that collection: ${error.message}`);
-            return next(new BadRequestError(`Describo is unable to load that collection`));
-        }
-
-        response = await fetch(`${describo.url}/api/session/entities`, {
-            method: "POST",
-            headers: {
-                Authorization: `sid ${sessionId}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(req.body.updates[update].entities),
-        });
-        if (response.status !== 200) {
-            log.error(
-                `Describo is unable to add those entities to the collection: ${error.message}`
-            );
-            return next(
-                new BadRequestError(`Describo is unable to add those entities to the collection`)
-            );
-        }
+        crate["@graph"] = crate["@graph"].filter((e) => e["@id"] !== id);
+        await store.put({ json: crate, target: "ro-crate-metadata.json" });
     }
-    res.send({});
+    res.send();
     next();
+}
+
+// TODO: this code does not have tests
+async function postCopyCrateHandler(req, res, next) {
+    const copy = req.body.copy;
+    let store = await getStoreHandle({ id: copy.source, className: copy.sourceType });
+    let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+    store = await getStoreHandle({ id: copy.target, className: copy.sourceType });
+    await store.put({ json: crate, target: "ro-crate-metadata.json" });
+    res.send();
+    next();
+}
+
+// TODO: this code does not have tests
+async function getDescriboROCrate(req, res, next) {
+    let store = await getStoreHandle({ id: req.params.identifier, className: req.params.type });
+    let rocrateFile;
+    try {
+        rocrateFile = await store.getJSON({ target: "ro-crate-metadata.json" });
+    } catch (error) {
+        rocrateFile = createDefaultROCrateFile({ name: req.params.identifier });
+        await store.put({ json: rocrateFile, target: "ro-crate-metadata.json" });
+    }
+    res.send({ rocrateFile });
+    next();
+}
+
+// TODO: this code does not have tests
+async function putDescriboROCrate(req, res, next) {
+    let store = await getStoreHandle({ id: req.params.identifier, className: req.params.type });
+    await store.put({ target: "ro-crate-metadata.json", json: req.body.data.crate });
+    res.send();
+    next();
+}
+
+// TODO: this code does not have tests
+async function getDescriboProfile(req, res, next) {
+    let profile = await loadProfile({ profile: `nyingarn-${req.params.type}-profile.json` });
+    res.send({ profile });
+    next();
+}
+
+function createDefaultROCrateFile({ name }) {
+    return {
+        "@context": [
+            "https://w3id.org/ro/crate/1.1/context",
+            {
+                "@vocab": "http://schema.org/",
+            },
+            {
+                txc: {
+                    "@id": "http://purl.archive.org/textcommons/terms#",
+                },
+            },
+            {
+                "@base": null,
+            },
+        ],
+        "@graph": [
+            {
+                "@id": "ro-crate-metadata.json",
+                "@type": "CreativeWork",
+                conformsTo: {
+                    "@id": "https://w3id.org/ro/crate/1.1/context",
+                },
+                about: {
+                    "@id": "./",
+                },
+            },
+            {
+                "@id": "./",
+                "@type": "Dataset",
+                name: name,
+            },
+        ],
+    };
 }

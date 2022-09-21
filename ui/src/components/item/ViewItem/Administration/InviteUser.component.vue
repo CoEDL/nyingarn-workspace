@@ -1,12 +1,8 @@
 <template>
     <div class="flex flex-col">
-        <view-item-users-component
-            :users="users"
-            class="bg-gray-200 p-4 my-2"
-            @refresh="getItemUsers"
-        />
+        <view-item-users-component :users="users" @refresh="getItemUsers" />
 
-        <div class="bg-gray-200 p-4 my-2">
+        <div class="mt-6">
             <div class="text-gray-600">Invite users to work on this item with you</div>
             <div class="flex flex-col my-2">
                 <div class="flex flex-row">

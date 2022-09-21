@@ -7,7 +7,7 @@
                     class="box-item"
                     effect="dark"
                     content="Add a paragraph"
-                    placement="top-start"
+                    placement="left"
                 >
                     <el-button @click="addElement('paragraph')" size="large" type="primary">
                         <i class="fa-solid fa-chevron-left"></i>
@@ -19,7 +19,7 @@
                     class="box-item"
                     effect="dark"
                     content="Underline the selection"
-                    placement="top-start"
+                    placement="left"
                 >
                     <el-button @click="addElement('underline')" size="large" type="primary">
                         <i class="fa-solid fa-underline"></i>
@@ -29,7 +29,7 @@
                     class="box-item"
                     effect="dark"
                     content="Strikethrough the selection"
-                    placement="top-start"
+                    placement="left"
                 >
                     <el-button @click="addElement('strikethrough')" size="large" type="primary">
                         <i class="fa-solid fa-strikethrough"></i>
@@ -39,7 +39,7 @@
                     class="box-item"
                     effect="dark"
                     content="Add a linebreak"
-                    placement="top-start"
+                    placement="left"
                 >
                     <el-button @click="addElement('linebreak')" size="large" type="primary">
                         <i class="fa-solid fa-chevron-left"></i>
@@ -51,7 +51,7 @@
                     class="box-item"
                     effect="dark"
                     content="Mark text as unclear"
-                    placement="top-start"
+                    placement="left"
                 >
                     <el-button @click="addElement('unclear')" size="large" type="primary">
                         unclear
@@ -143,7 +143,7 @@
                 </div>
             </div>
             <div class="">
-                <div ref="codemirror"></div>
+                <div ref="codemirror" class="cm-editor"></div>
             </div>
         </div>
     </div>
@@ -385,7 +385,7 @@ async function addElement(type) {
                 let changes = {
                     from: r.from,
                     to: r.to,
-                    insert: `<u>${view.state.sliceDoc(r.from, r.to)}</u>`,
+                    insert: `<hi rend="underline">${view.state.sliceDoc(r.from, r.to)}</hi>`,
                 };
                 view.dispatch({ changes });
             });
@@ -395,7 +395,7 @@ async function addElement(type) {
                 let changes = {
                     from: r.from,
                     to: r.to,
-                    insert: `<s>${view.state.sliceDoc(r.from, r.to)}</s>`,
+                    insert: `<hi rend="strikethrough"> ${view.state.sliceDoc(r.from, r.to)}</hi>`,
                 };
                 view.dispatch({ changes });
             });
@@ -423,7 +423,7 @@ async function addElement(type) {
 }
 </script>
 
-<style>
+<style scoped>
 .cm-editor {
     font-size: 16px;
     height: calc(100vh - 200px);

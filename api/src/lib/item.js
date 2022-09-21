@@ -31,7 +31,7 @@ export async function lookupItemByIdentifier({ identifier, userId }) {
 }
 
 export async function getItems({ userId, offset = 0, limit = 10 }) {
-    let include = [];
+    let include = [{ model: models.collection }];
     if (userId) include.push({ model: models.user, where: { id: userId } });
     return await models.item.findAndCountAll({
         offset,
@@ -105,12 +105,6 @@ export async function deleteItemResource({ identifier, resource }) {
     await store.delete({ prefix: resource });
     await markResourceComplete({ identifier, resource, complete: false });
 }
-
-// export async function deleteItemResourceFile({ identifier, file }) {
-//     let { bucket } = await getS3Handle();
-//     let target = path.join(identifier, file);
-//     await bucket.removeObjects({ prefix: target });
-// }
 
 export async function putItemResource({
     identifier,

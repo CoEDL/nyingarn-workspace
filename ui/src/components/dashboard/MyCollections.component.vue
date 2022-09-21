@@ -49,6 +49,7 @@
                             @confirm="deleteCollection(scope.row)"
                             confirmButtonType="danger"
                             cancelButtonType="primary"
+                            width="300"
                         >
                             <template #reference>
                                 <el-button type="danger" size="small">
@@ -70,7 +71,7 @@ import {
     getMyCollections,
     deleteCollection,
     toggleCollectionVisibility,
-} from "./collection-services";
+} from "../collection/collection-services";
 
 export default {
     data() {
@@ -105,7 +106,7 @@ export default {
             this.total = response.total;
             let collections = response.collections.map((c) => ({
                 ...c,
-                link: `/collections/${c.name}/members`,
+                link: `/collections/${c.name}/metadata`,
             }));
             collections = orderBy(collections, "name");
 

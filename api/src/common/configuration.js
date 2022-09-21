@@ -11,6 +11,10 @@ export async function loadConfiguration() {
     return configuration;
 }
 
+export async function loadProfile({ profile }) {
+    return await readJSON(`/srv/profiles/${profile}`);
+}
+
 export function filterPrivateInformation({ configuration }) {
     let services = Object.keys(configuration.api.authentication).map((service) => {
         service = {

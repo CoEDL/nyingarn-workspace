@@ -3,9 +3,11 @@ import SaxonJS from "saxon-js";
 import { createReadStream, createWriteStream, writeFile, appendFile, remove } from "fs-extra";
 import { parse } from "csv-parse";
 import { zipObject } from "lodash";
-import { getS3Handle, getLogger, loadConfiguration } from "../common";
+import { getS3Handle, getLogger, loadConfiguration, expandError } from "../common";
 import { removeOverlappingNewContent } from "./";
 const log = getLogger();
+
+
 
 export async function reconstituteTEIFile({ directory, identifier, resource }) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);
@@ -108,18 +110,23 @@ export async function __processTeiTranscriptionXMLProcessor({
 }) {
     /* identifier = e.g. "Bates23"; sourceURI = "file:///blah/blah/Bates23/Bates23-tei.xml" */
     let configuration = await loadConfiguration();
-    const transformationResults = await SaxonJS.transform(
-        {
-            stylesheetFileName: "src/xslt/process-tei-to-page-files.xsl.sef.json",
-            templateParams: {
-                identifier: identifier,
-                "source-uri": sourceURI,
-                "page-identifier-regex": configuration.ui.filename.checkNameStructure,
+    try {
+        const transformationResults = await SaxonJS.transform(
+            {
+                stylesheetFileName: "src/xslt/process-tei-to-page-files.xsl.sef.json",
+                templateParams: {
+                    identifier: identifier,
+                    "source-uri": sourceURI,
+                    "page-identifier-regex": configuration.ui.filename.checkNameStructure,
+                },
+                baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
             },
-            baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
-        },
-        "async"
-    );
+            "async"
+        );
+    } catch (error) {
+        decodeSaxonJSError(error); // unwrap the JSON-formatted error data in the JS XError object thrown by SaxonJS
+        throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
+    }
 }
 
 export async function processDigivolTranscription({ directory, identifier, resource }) {
@@ -134,16 +141,57 @@ export async function __processDigivolTranscriptionXMLProcessor({
     output = undefined,
 }) {
     let configuration = await loadConfiguration();
-    const transformationResults = await SaxonJS.transform(
-        {
-            stylesheetFileName: "src/xslt/process-digivol-csv-to-page-files.xsl.sef.json",
-            templateParams: {
-                identifier: identifier,
-                "source-uri": sourceURI,
-                "page-identifier-regex": configuration.ui.filename.checkNameStructure,
+    try {
+        const transformationResults = await SaxonJS.transform(
+            {
+                stylesheetFileName: "src/xslt/process-digivol-csv-to-page-files.xsl.sef.json",
+                templateParams: {
+                    identifier: identifier,
+                    "source-uri": sourceURI,
+                    "page-identifier-regex": configuration.ui.filename.checkNameStructure,
+                },
+                baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
             },
-            baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
-        },
-        "async"
-    );
+            "async"
+        );
+    } catch (error) {
+        decodeSaxonJSError(error); // unwrap the JSON-formatted error data in the JS XError object thrown by SaxonJS
+        throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
+    }
 }
+
+/*
+Tidy up the XError errors thrown by SaxonJS.
+
+These XError objects are thrown by SaxonJS API functions SaxonJS.transform and SaxonJS.XPath.evaluate in
+response to errors thrown in XSLT or XPath code due to syntax or runtime errors, or by XPath code deliberately
+using the XPath error() function to raise an application-level ("Nyingarn") error.
+
+The Nyingarn XSLT throws errors whose codes are in the namespace "https://nyingarn.net/ns/errors", and 
+where the error-object is an XDM map (a dictionary of name/value pairs).
+
+Nyingarn XSLT code uses the three-parameter form of the error function, in which the third parameter is a
+sequence of arbitrary XDM data items. SaxonJS's XError JavaScript objects contain a representation of these items
+inside an object property called errorObject. 
+
+Unfortunately, the errorObject represents those XDM items in SaxonJS's own opaque internal form, rather than 
+translated into standard primitive JS objects like Objects and Arrays, and this is impractical to convert. 
+See <https://saxonica.plan.io/issues/5678>
+
+So Nyingarn's XSLT error procedure serializes the error map as a JSON object, and throws an error whose 
+error-object is a single string containing that JSON.
+
+This function recognises those Nyingarn errors, extracts the string containing the JSON object, deserializes it to
+a simple JavaScript object, and stores it back in the XError object.
+*/
+function decodeSaxonJSError(error) {
+    if (error.errorObject && error.code.startsWith('Q{https://nyingarn.net/ns/errors}')) {
+        try {
+            error.errorObject = JSON.parse(error.errorObject['value']);
+        } catch (failedToDecodeErrorObject) {
+            console.log('decodeSaxonJSError failed to decode errorObject', error.errorObject);
+        }
+    }
+}
+
+

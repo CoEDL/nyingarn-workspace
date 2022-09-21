@@ -1,11 +1,13 @@
 <xsl:transform version="3.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xpath-default-namespace="http://www.tei-c.org/ns/1.0"
+	xmlns:nyingarn="https://nyingarn.net/ns/functions"
 	xmlns="http://www.tei-c.org/ns/1.0">
 	<!--
 	Processes a TEI file into a set of TEI fragments containing one page each.
 	The document is first normalised and tidied up.
 	Then document is split into a set of files each containing one page of transcript.
     -->
+	<xsl:import href="error.xsl"/>
 	<xsl:import href="tidy-tei.xsl"/>
 	<xsl:import href="paginate.xsl"/>
 	<xsl:import href="normalise.xsl"/>
@@ -38,27 +40,51 @@
 		<!-- write the surface elements out as separate files -->
 		<xsl:variable name="surfaces" select="$paginated/TEI/sourceDoc/surface"/>
 		<xsl:if test="not(exists($surfaces))">
-			<xsl:message terminate="true">ERROR: unpaginated document. No pages could be extracted from the file because none found in the document.</xsl:message>
+			<xsl:sequence select="
+				nyingarn:error(
+					'unpaginated-document', (: error code :)
+					'Unpaginated document', (: stub error message :)
+					map{
+						'source-type': nyingarn:tei-source-type($source) (: e.g. 'docx-via-oxgarage', 'from-the-page', etc. :)
+					}
+				)
+			"/>
 		</xsl:if>
 		<!-- exportable surfaces are those whose id matches the document's $identifier with a dash and a numeric suffix -->
 		<xsl:variable name="exportable-surfaces" select="
 		$surfaces
 			[@xml:id => starts-with($identifier || '-')] (: the surface's id must start with the id of the item, followed by a hyphen :)
 			[@xml:id => concat('.tei.xml') => matches($page-identifier-regex) ]
-	"/>
+		"/>
 		<xsl:if test="not(exists($exportable-surfaces))">
-			<xsl:message terminate="true" expand-text="yes">ERROR: no pages with suitable identifiers. No pages could be extracted from the file, because no pages were found in the document with an identifier which starts with "{$identifier}-" and which, with '.tei.xml' appended, matches the regular expression "{$page-identifier-regex}".</xsl:message>
+			<!-- throw an error -->
+			<xsl:sequence select="
+				nyingarn:error(
+					'no-pages-with-suitable-identifiers',
+					'No pages with suitable identifiers',
+					map{
+						'document-identifier': $identifier,
+						'page-identifier-regex': $page-identifier-regex,
+						'source-type': nyingarn:tei-source-type($source) (: e.g. 'docx-via-oxgarage', 'from-the-page', etc. :)
+					}
+				)
+			"/>
 		</xsl:if>
 		<!-- check to ensure that all the surface identifiers are unique -->
 		<xsl:variable name="surface-identifiers" select="$exportable-surfaces/@xml:id"/>
-		<xsl:variable name="distinct-surface-identifiers" select="distinct-values($surface-identifiers)"/>
+		<xsl:variable name="distinct-surface-identifiers" select="distinct-values($surface-identifiers) ! string()"/>
 		<xsl:if test="count($distinct-surface-identifiers) != count($surface-identifiers)">
-			<xsl:message terminate="true" expand-text="yes">ERROR: all page identifiers must be unique, but duplicate page identifiers were found. Duplicated: {
-				string-join(
-					for $identifier in $distinct-surface-identifiers return if (count($surface-identifiers[. = $identifier]) != 1) then $identifier else (),
-					', '
+			<xsl:variable name="duplicate-identifiers" select="$distinct-surface-identifiers[count($surface-identifiers[. = $identifier]) != 1]"/>
+			<xsl:sequence select="
+				nyingarn:error(
+					'duplicate-page-identifiers-found',
+					'Duplicate page identifiers found',
+					map{
+						'duplicate-identifiers': $duplicate-identifiers => string-join(', '),
+						'source-type': nyingarn:tei-source-type($source) (: e.g. 'docx-via-oxgarage', 'from-the-page', etc. :)
+					}
 				)
-			}.</xsl:message>
+			"/>
 		</xsl:if>
 		<xsl:for-each select="$exportable-surfaces">
 			<!-- write the page content to a file named for the @xml:id attribute of the <surface> with no xml declaration or indenting -->
@@ -81,7 +107,7 @@
 	</xsl:result-document>
     -->
 	</xsl:template>
-
+	
 	<!-- copy any other elements while discarding unused namespace declarations -->
 	<xsl:template match="*" mode="serialize">
 		<xsl:copy copy-namespaces="no">

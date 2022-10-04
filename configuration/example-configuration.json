@@ -68,9 +68,8 @@
                 "awsSecretAccessKey": "{ secret key }",
                 "region": "{ region }"
             },
-            "describo": {
-                "authorization": "{shared secret set in describo applications}",
-                "url": "https://describo.nyingarn.net"
+            "elastic": {
+                "host": "http://elastic:9200"
             }
         },
         "authentication": {

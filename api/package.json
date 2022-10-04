@@ -5,10 +5,11 @@
     "main": "index.js",
     "scripts": {
         "develop": "npm run develop:server",
-        "develop:server": "npm install && ./node_modules/.bin/nodemon --exec babel-node ./index.js",
+        "develop:server": "npm install && sleep 10 && npm run load:datapacks && ./node_modules/.bin/nodemon --exec babel-node ./index.js",
         "test": "./node_modules/.bin/jest --runInBand",
         "test:watch": "./node_modules/.bin/jest --watch --runInBand",
-        "build:production": "./node_modules/.bin/webpack --config webpack.production.js"
+        "build:production": "./node_modules/.bin/webpack --config webpack.production.js",
+        "load:datapacks": "sleep 10 && node ./load-data-packs.js"
     },
     "author": "Marco La Rosa",
     "license": "GPL-3.0",
@@ -36,6 +37,7 @@
         "@aws-sdk/lib-storage": "^3.171.0",
         "@aws-sdk/s3-request-presigner": "^3.173.0",
         "@coedl/nocfl-js": "^1.12.0",
+        "@describo/data-packs": "^0.7.1",
         "cross-fetch": "^3.1.5",
         "date-fns": "^2.29.3",
         "foo-foo-mq": "^7.1.0",

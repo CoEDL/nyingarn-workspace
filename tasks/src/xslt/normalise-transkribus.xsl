@@ -22,15 +22,20 @@
     <!-- discard lb @facs and @n attributes because they point nowhere and say nothing useful -->
     <xsl:template match="lb/@facs | lb/@n" mode="transkribus"/>
 
-    <!-- deal with hi/@rend, which may have some limited value (e.g. in the case of 'bold' text) -->
+    <!-- deal with hi/@rend, which may have some limited value (e.g. in the case of underlined text) -->
     <xsl:template match="hi/@rend" mode="transkribus">
 	<xsl:variable name="current-properties" select="tokenize(.)"/>
-	<xsl:variable name="unwanted-properties" select="( 'fontSize:0.0;', 'kerning:0;' )"/>
-	<xsl:variable name="retained-properties" select="$current-properties[not(.=$unwanted-properties)]"/>
+	<xsl:variable name="retained-properties" select="$current-properties ! $rend-mapping(.)"/>
 	<xsl:if test="exists($retained-properties)">
 		<xsl:attribute name="rend" select="string-join($retained-properties, ' ')"/>
 	</xsl:if>
     </xsl:template>
+    
+    <xsl:variable name="rend-mapping" select="
+    	map{
+    		'underlined:true;': 'underline'
+    	}
+    "/>
 
     <!-- otherwise copy the document unchanged -->
     <xsl:mode name="transkribus" on-no-match="shallow-copy"/>

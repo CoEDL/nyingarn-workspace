@@ -16,6 +16,7 @@
                         class="overflow-scroll"
                         :crate="data.crate"
                         :profile="data.profile"
+                        :lookup="lookup"
                         :enable-context-editor="false"
                         :enable-crate-preview="true"
                         :enable-browse-entities="false"
@@ -47,9 +48,11 @@ import ItemMembersComponent from "./ItemMembers.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import { Lookup } from "../../lookup.js";
 const $route = useRoute();
 const $router = useRouter();
 const $http = inject("$http");
+const lookup = new Lookup({ $http });
 
 let props = defineProps({
     identifier: {

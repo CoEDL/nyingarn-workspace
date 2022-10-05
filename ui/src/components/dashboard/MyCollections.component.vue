@@ -26,37 +26,50 @@
                         }}</router-link>
                     </template>
                 </el-table-column>
-                <el-table-column prop="private" label="Private" width="150">
+                <el-table-column label="Actions" width="150" align="center">
                     <template #default="scope">
-                        <el-button
-                            type="primary"
-                            size="small"
-                            @click="toggleCollectionVisibility(scope.row)"
-                        >
-                            <span v-show="scope.row.private">
-                                <i class="fa-solid fa-lock"></i>
-                            </span>
-                            <span v-show="!scope.row.private">
-                                <i class="fa-solid fa-lock-open"></i>
-                            </span>
-                        </el-button>
-                    </template>
-                </el-table-column>
-                <el-table-column label="Actions" width="100">
-                    <template #default="scope">
-                        <el-popconfirm
-                            title="Are you sure you want to delete this collection? All data will be removed and this can't be undone."
-                            @confirm="deleteCollection(scope.row)"
-                            confirmButtonType="danger"
-                            cancelButtonType="primary"
-                            width="300"
-                        >
-                            <template #reference>
-                                <el-button type="danger" size="small">
-                                    <i class="fa-solid fa-trash"></i>
+                        <div class="flex flex-row space-x-1">
+                            <div>
+                                <el-button
+                                    type="primary"
+                                    size="small"
+                                    @click="toggleCollectionVisibility(scope.row)"
+                                >
+                                    <span v-show="scope.row.private">
+                                        <i class="fa-solid fa-lock"></i>
+                                    </span>
+                                    <span v-show="!scope.row.private">
+                                        <i class="fa-solid fa-lock-open"></i>
+                                    </span>
                                 </el-button>
-                            </template>
-                        </el-popconfirm>
+                            </div>
+                            <div class="flex flex-row space-x-1">
+                                <div v-if="data.isAdmin">
+                                    <el-button
+                                        type="primary"
+                                        size="small"
+                                        @click="unlinkMe(scope.row)"
+                                    >
+                                        <i class="fa-solid fa-unlink"></i>
+                                    </el-button>
+                                </div>
+                                <div>
+                                    <el-popconfirm
+                                        title="Are you sure you want to delete this collection? All data will be removed and this can't be undone."
+                                        @confirm="deleteCollection(scope.row)"
+                                        confirmButtonType="danger"
+                                        cancelButtonType="primary"
+                                        width="300"
+                                    >
+                                        <template #reference>
+                                            <el-button type="danger" size="small">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </el-button>
+                                        </template>
+                                    </el-popconfirm>
+                                </div>
+                            </div>
+                        </div>
                     </template>
                 </el-table-column>
             </el-table>
@@ -69,6 +82,8 @@ import { ElMessage } from "element-plus";
 import { orderBy } from "lodash";
 import * as collectionServices from "../collection/collection-services";
 import { reactive, computed, onMounted, inject } from "vue";
+import { useStore } from "vuex";
+const store = useStore();
 const $http = inject("$http");
 
 const data = reactive({
@@ -76,6 +91,7 @@ const data = reactive({
     limit: 10,
     total: 0,
     collections: [],
+    isAdmin: store.state.user.administrator,
 });
 let tableHeight = computed(() => {
     if (window.innerWidth > 1280) {
@@ -122,5 +138,17 @@ async function toggleCollectionVisibility(collection) {
         identifier: collection.name,
     });
     await loadCollections();
+}
+async function unlinkMe(collection) {
+    try {
+        await collectionServices.detachUserFromCollection({
+            $http,
+            identifier: collection.name,
+            userId: store.state.user.id,
+        });
+        loadCollections();
+    } catch (error) {
+        ElMessage.error(`Something went wrong detaching you from this collection`);
+    }
 }
 </script>

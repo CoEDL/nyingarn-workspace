@@ -6,14 +6,14 @@
                 <div class="flex-grow"></div>
                 <el-pagination
                     layout="prev, pager, next"
-                    :page-size="limit"
-                    :total="total"
+                    :page-size="data.limit"
+                    :total="data.total"
                     @current-change="loadItems"
                 >
                 </el-pagination></div
         ></template>
         <div class="w-full">
-            <el-table :data="items" :height="tableHeight" size="small">
+            <el-table :data="data.items" :height="tableHeight" size="small">
                 <template #empty>You have no items. Get started by creating an item.</template>
                 <el-table-column prop="name" label="">
                     <template #default="scope">
@@ -45,77 +45,67 @@
     </el-card>
 </template>
 
-<script>
+<script setup>
 import { ElMessage } from "element-plus";
 import { orderBy } from "lodash";
+import * as itemServices from "../item/item-services";
+import { reactive, computed, onMounted, inject } from "vue";
+const $http = inject("$http");
 
-export default {
-    data() {
-        return {
-            page: 1,
-            limit: 10,
-            total: 0,
-            items: [],
-        };
-    },
-    computed: {
-        tableHeight() {
-            if (window.innerWidth > 1280) {
-                return window.innerHeight - 250;
-            } else {
-                return 300;
-            }
-        },
-    },
-    mounted() {
-        this.loadItems();
-    },
-    methods: {
-        async loadItems(p) {
-            if (p) this.page = p;
-            let offset = (this.page - 1) * this.limit;
-            let response = await this.$http.get({
-                route: `/items`,
-                params: { offset, limit: this.limit },
+const data = reactive({
+    page: 1,
+    limit: 10,
+    total: 0,
+    items: [],
+});
+let tableHeight = computed(() => {
+    if (window.innerWidth > 1280) {
+        return window.innerHeight - 250;
+    } else {
+        return 300;
+    }
+});
+onMounted(() => {
+    loadItems();
+});
+async function loadItems(p) {
+    if (p) data.page = p;
+    let offset = (data.page - 1) * data.limit;
+    let response = await itemServices.getMyItems({ $http, offset, limit: data.limit });
+    if (response.status !== 200) {
+        return;
+    }
+    response = await response.json();
+    data.total = response.total;
+    let items = response.items.map((i) => ({
+        ...i,
+        link: `/items/${i.name}/view`,
+        statistics: {},
+    }));
+    items = orderBy(items, "name");
+    data.items = [...items];
+
+    for (let item of data.items) {
+        response = await itemServices.getStatus({ $http, identifier: item.name });
+        if (response.status == 200) {
+            let { statistics } = await response.json();
+            item = {
+                ...item,
+                ...statistics,
+            };
+            data.items = data.items.map((i) => {
+                return i.name === item.name ? item : i;
             });
-            if (response.status !== 200) {
-                return;
-            }
-            response = await response.json();
-            this.total = response.total;
-            let items = response.items.map((i) => ({
-                ...i,
-                link: `/items/${i.name}/view`,
-                statistics: {},
-            }));
-            items = orderBy(items, "name");
-            this.items = [...items];
-
-            for (let item of this.items) {
-                response = await this.$http.get({ route: `/items/${item.name}/status` });
-                if (response.status == 200) {
-                    let { statistics } = await response.json();
-                    item = {
-                        ...item,
-                        ...statistics,
-                    };
-                    this.items = this.items.map((i) => {
-                        return i.name === item.name ? item : i;
-                    });
-                    await new Promise((resolve) => setTimeout(resolve, 10));
-                }
-            }
-        },
-        async deleteItem(item) {
-            try {
-                await this.$http.delete({
-                    route: `/items/${item.name}`,
-                });
-                this.loadItems();
-            } catch (error) {
-                ElMessage.error(`Something went wrong deleting this item`);
-            }
-        },
-    },
-};
+            await new Promise((resolve) => setTimeout(resolve, 10));
+        }
+    }
+}
+async function deleteItem(item) {
+    try {
+        await itemServices.deleteItem({ $http, identifier: item.name });
+        loadItems();
+    } catch (error) {
+        ElMessage.error(`Something went wrong deleting this item`);
+    }
+}
 </script>

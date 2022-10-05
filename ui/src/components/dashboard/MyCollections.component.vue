@@ -6,8 +6,8 @@
                 <div class="flex-grow"></div>
                 <el-pagination
                     layout="prev, pager, next"
-                    :page-size="limit"
-                    :total="total"
+                    :page-size="data.limit"
+                    :total="data.total"
                     @current-change="loadCollections"
                 >
                 </el-pagination>
@@ -15,7 +15,7 @@
         </template>
 
         <div class="w-full">
-            <el-table :data="collections" :height="tableHeight" size="small">
+            <el-table :data="data.collections" :height="tableHeight" size="small">
                 <template #empty
                     >You have no collections. Get started by creating a collection.</template
                 >
@@ -64,69 +64,63 @@
     </el-card>
 </template>
 
-<script>
+<script setup>
 import { ElMessage } from "element-plus";
 import { orderBy } from "lodash";
-import {
-    getMyCollections,
-    deleteCollection,
-    toggleCollectionVisibility,
-} from "../collection/collection-services";
+import * as collectionServices from "../collection/collection-services";
+import { reactive, computed, onMounted, inject } from "vue";
+const $http = inject("$http");
 
-export default {
-    data() {
-        return {
-            page: 1,
-            limit: 10,
-            total: 0,
-            collections: [],
-        };
-    },
-    computed: {
-        tableHeight() {
-            if (window.innerWidth > 1280) {
-                return window.innerHeight - 250;
-            } else {
-                return 300;
-            }
-        },
-    },
-    mounted() {
-        this.loadCollections(this.page);
-    },
-    methods: {
-        async loadCollections(p) {
-            this.page = p ? p : 1;
-            let offset = (this.page - 1) * this.limit;
-            let response = await getMyCollections({ $http: this.$http, offset, limit: this.limit });
-            if (response.status !== 200) {
-                return;
-            }
-            response = await response.json();
-            this.total = response.total;
-            let collections = response.collections.map((c) => ({
-                ...c,
-                link: `/collections/${c.name}/metadata`,
-            }));
-            collections = orderBy(collections, "name");
+const data = reactive({
+    page: 1,
+    limit: 10,
+    total: 0,
+    collections: [],
+});
+let tableHeight = computed(() => {
+    if (window.innerWidth > 1280) {
+        return window.innerHeight - 250;
+    } else {
+        return 300;
+    }
+});
+onMounted(() => {
+    loadCollections();
+});
+async function loadCollections(p) {
+    data.page = p ? p : 1;
+    let offset = (data.page - 1) * data.limit;
+    let response = await collectionServices.getMyCollections({
+        $http: $http,
+        offset,
+        limit: data.limit,
+    });
+    if (response.status !== 200) {
+        return;
+    }
+    response = await response.json();
+    data.total = response.total;
+    let collections = response.collections.map((c) => ({
+        ...c,
+        link: `/collections/${c.name}/metadata`,
+    }));
+    collections = orderBy(collections, "name");
 
-            this.collections = [...collections];
-        },
-        async deleteCollection(collection) {
-            try {
-                await deleteCollection({ $http: this.$http, identifier: collection.name });
-                this.loadCollections();
-            } catch (error) {
-                ElMessage.error(`Something went wrong deleting this collection`);
-            }
-        },
-        async toggleCollectionVisibility(collection) {
-            await toggleCollectionVisibility({
-                $http: this.$http,
-                identifier: collection.name,
-            });
-            await this.loadCollections();
-        },
-    },
-};
+    data.collections = [...collections];
+}
+async function deleteCollection(collection) {
+    try {
+        await collectionServices.deleteCollection({ $http, identifier: collection.name });
+        loadCollections();
+    } catch (error) {
+        ElMessage.error(`Something went wrong deleting this collection`);
+    }
+}
+async function toggleCollectionVisibility(collection) {
+    await collectionServices.toggleCollectionVisibility({
+        $http,
+        identifier: collection.name,
+    });
+    await loadCollections();
+}
 </script>

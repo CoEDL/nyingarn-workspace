@@ -29,6 +29,7 @@
                     <el-popconfirm
                         title="Are you sure you want to delete this resource?"
                         @confirm="deleteResource"
+                        width="300"
                     >
                         <template #reference>
                             <el-button type="danger">

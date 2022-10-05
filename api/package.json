@@ -51,6 +51,7 @@
         "regenerator-runtime": "^0.13.9",
         "restify": "^8.6.1",
         "restify-errors": "^8.0.2",
+        "saxon-js": "^2.5.0",
         "sequelize": "^6.23.0",
         "uuid": "^9.0.0",
         "winston": "^3.8.2"

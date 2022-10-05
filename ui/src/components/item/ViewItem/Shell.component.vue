@@ -72,7 +72,7 @@ onBeforeMount(async () => {
     await checkUserAccess();
 });
 onMounted(() => {
-    data.routeWatcher = watch($route.path, updateRouteOnNav);
+    data.routeWatcher = watch(() => $route.path, updateRouteOnNav);
     updateRouteOnNav();
     if (data.activeTab === "metadata") load();
 });

@@ -174,9 +174,9 @@ async function putItemInviteUserHandler(req, res, next) {
 
 async function putItemDetachUserHandler(req, res, next) {
     let user = await models.user.findOne({ where: { id: req.params.userId } });
-    if (user.administrator) {
-        return next(new ForbiddenError());
-    }
+    // if (user.administrator) {
+    //     return next(new ForbiddenError());
+    // }
     try {
         await models.item_user.destroy({ where: { userId: req.params.userId } });
         res.send({});

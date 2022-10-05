@@ -23,21 +23,30 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="total" label="Pages" width="100"> </el-table-column>
-                <el-table-column label="Actions" width="100">
+                <el-table-column label="Actions" width="100" align="center">
                     <template #default="scope">
-                        <el-popconfirm
-                            title="Are you sure you want to delete this item? All data will be removed and this can't be undone."
-                            @confirm="deleteItem(scope.row)"
-                            confirmButtonType="danger"
-                            cancelButtonType="primary"
-                            width="300"
-                        >
-                            <template #reference>
-                                <el-button type="danger" size="small">
-                                    <i class="fa-solid fa-trash"></i>
+                        <div class="flex flex-row space-x-1">
+                            <div v-if="data.isAdmin">
+                                <el-button type="primary" size="small" @click="unlinkMe(scope.row)">
+                                    <i class="fa-solid fa-unlink"></i>
                                 </el-button>
-                            </template>
-                        </el-popconfirm>
+                            </div>
+                            <div>
+                                <el-popconfirm
+                                    title="Are you sure you want to delete this item? All data will be removed and this can't be undone."
+                                    @confirm="deleteItem(scope.row)"
+                                    confirmButtonType="danger"
+                                    cancelButtonType="primary"
+                                    width="300"
+                                >
+                                    <template #reference>
+                                        <el-button type="danger" size="small">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </el-button>
+                                    </template>
+                                </el-popconfirm>
+                            </div>
+                        </div>
                     </template>
                 </el-table-column>
             </el-table>
@@ -50,6 +59,8 @@ import { ElMessage } from "element-plus";
 import { orderBy } from "lodash";
 import * as itemServices from "../item/item-services";
 import { reactive, computed, onMounted, inject } from "vue";
+import { useStore } from "vuex";
+const store = useStore();
 const $http = inject("$http");
 
 const data = reactive({
@@ -57,6 +68,7 @@ const data = reactive({
     limit: 10,
     total: 0,
     items: [],
+    isAdmin: store.state.user.administrator,
 });
 let tableHeight = computed(() => {
     if (window.innerWidth > 1280) {
@@ -106,6 +118,18 @@ async function deleteItem(item) {
         loadItems();
     } catch (error) {
         ElMessage.error(`Something went wrong deleting this item`);
+    }
+}
+async function unlinkMe(item) {
+    try {
+        await itemServices.detachUserFromItem({
+            $http,
+            identifier: item.name,
+            userId: store.state.user.id,
+        });
+        loadItems();
+    } catch (error) {
+        ElMessage.error(`Something went wrong detaching you from this item`);
     }
 }
 </script>

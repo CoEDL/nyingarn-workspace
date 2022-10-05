@@ -1,3 +1,10 @@
+export async function getMyItems({ $http, offset, limit }) {
+    return await $http.get({
+        route: `/items`,
+        params: { offset, limit },
+    });
+}
+
 export async function getItem({ $http, identifier }) {
     return await $http.get({
         route: `/items/${identifier}`,
@@ -10,6 +17,13 @@ export async function createItem({ $http, identifier }) {
         body: { identifier },
     });
 }
+
+export async function deleteItem({ $http, identifier }) {
+    return await $http.delete({
+        route: `/items/${identifier}`,
+    });
+}
+
 export async function getItemResources({ $http, identifier, offset, limit }) {
     return await $http.get({
         route: `/items/${identifier}/resources`,
@@ -24,9 +38,15 @@ export async function getResourceFiles({ $http, identifier, resource }) {
 }
 
 export async function getStatus({ $http, identifier, resource }) {
-    return await $http.get({
-        route: `/items/${identifier}/resources/${resource}/status`,
-    });
+    if (!resource) {
+        return await $http.get({
+            route: `/items/${identifier}/status`,
+        });
+    } else {
+        return await $http.get({
+            route: `/items/${identifier}/resources/${resource}/status`,
+        });
+    }
 }
 
 export async function getFileUrl({ $http, identifier, file, download = false }) {

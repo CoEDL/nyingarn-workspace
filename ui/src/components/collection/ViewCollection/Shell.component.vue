@@ -16,9 +16,10 @@
                         class="overflow-scroll"
                         :crate="data.crate"
                         :profile="data.profile"
+                        :lookup="lookup"
                         :enable-context-editor="false"
                         :enable-crate-preview="true"
-                        :enable-browse-entities="false"
+                        :enable-browse-entities="true"
                         :purge-unlinked-entities-before-save="true"
                         @save:crate="saveCrate"
                     >
@@ -49,9 +50,11 @@ import ViewCollectionMembersComponent from "./ViewCollectionMembers.component.vu
 import { ref, reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import { Lookup } from "../../lookup.js";
 const $route = useRoute();
 const $router = useRouter();
 const $http = inject("$http");
+const lookup = new Lookup({ $http });
 
 let props = defineProps({
     identifier: {

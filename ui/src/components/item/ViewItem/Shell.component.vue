@@ -19,7 +19,7 @@
                         :lookup="lookup"
                         :enable-context-editor="false"
                         :enable-crate-preview="true"
-                        :enable-browse-entities="false"
+                        :enable-browse-entities="true"
                         :purge-unlinked-entities-before-save="true"
                         @save:crate="saveCrate"
                     >

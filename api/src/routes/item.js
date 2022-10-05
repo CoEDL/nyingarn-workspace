@@ -183,7 +183,7 @@ async function putItemDetachUserHandler(req, res, next) {
     //     return next(new ForbiddenError());
     // }
     try {
-        await models.item_user.destroy({ where: { userId: req.params.userId } });
+        await req.item.removeUser([user]);
         res.send({});
         next();
     } catch (error) {

@@ -10,6 +10,7 @@ import { setupRoutes as setupCollectionRoutes } from "./collection";
 import { setupRoutes as setupDescriboRoutes } from "./describo";
 import { setupRoutes as setupDataRoutes } from "./data";
 import { setupRoutes as setupLogRoutes } from "./logs";
+import { setupRoutes as setupSearchRoutes } from "./search";
 import { loadConfiguration, filterPrivateInformation, route, routeAdmin } from "../common";
 import { readJSON } from "fs-extra";
 
@@ -68,4 +69,5 @@ export function setupRoutes({ server }) {
     setupDataRoutes({ server });
     setupDescriboRoutes({ server });
     setupLogRoutes({ server });
+    setupSearchRoutes({ server });
 }

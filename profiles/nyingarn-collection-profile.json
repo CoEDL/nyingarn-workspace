@@ -450,19 +450,21 @@
             ]
         },
         "Language": {
-            "definition": "override",
-            "subClassOf": [],
-            "inputs": [
-                {
-                    "id": "https://schema.org/name",
-                    "name": "name",
-                    "label": "name",
-                    "help": "The name of the organization",
-                    "multiple": false,
-                    "type": ["Text"]
-                }
-            ]
+            "definition": "override"
         }
     },
-    "enabledClasses": ["Dataset", "Person", "Place", "Organization", "Language"]
+    "enabledClasses": ["Dataset", "Person", "Place", "Organization", "Language"],
+    "lookup": {
+        "Language": {
+            "fields": [
+                "@id",
+                "name",
+                "alternateName",
+                "iso639-3",
+                "austlangCode",
+                "glottologCode",
+                "languageCode"
+            ]
+        }
+    }
 }

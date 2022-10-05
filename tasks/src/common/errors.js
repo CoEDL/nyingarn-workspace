@@ -28,39 +28,40 @@ export async function expandError(error) {
     •If the matching definition has a "name" or "url" property, it's simply copied to the error.
         
     */
-    
-    let errorDefinitions = await readJSON('/srv/configuration/error-definitions.json');
+
+    let errorDefinitions = await readJSON("/srv/configuration/error-definitions.json");
     // Find the error definitions matching this error in the error-definitions file, and
-    // sort the matching definitions by specificity, with the LEAST specific matches first. 
+    // sort the matching definitions by specificity, with the LEAST specific matches first.
     // We then process the matching error definitions in order of increasing specificity,
     // and copy their properties to the error object, thereby ensuring that the error
     // ends up with the MOST specific error message, error code, links, etc.
     let matchingErrorDefinitions = errorDefinitions
-        .filter(errorDefinition => errorMatchesDefinition(error, errorDefinition))
+        .filter((errorDefinition) => errorMatchesDefinition(error, errorDefinition))
         // If the comparator function returns a negative number then X comes before Y
-        .sort((x, y) => Object.keys(x.matchingProperties).length - Object.keys(y.matchingProperties).length);
+        .sort(
+            (x, y) =>
+                Object.keys(x.matchingProperties).length - Object.keys(y.matchingProperties).length
+        );
     // If a matching definition is found, use the error definition's message template to generate a new message property
     // console.log(`Expanding error ${JSON.stringify(error, null, "  ")}`);
     // console.log(`Found ${matchingErrorDefinitions.length} matching error definition(s)`);
-    matchingErrorDefinitions.forEach(
-        function(matchingErrorDefinition) {
-            // console.log(`Error definition: ${JSON.stringify(matchingErrorDefinition, null, "   ")}`);
-            // expand the error message using the template of the matching error definition
-            if (matchingErrorDefinition.messageTemplate !== undefined) {
-                error.message = expandTemplate(matchingErrorDefinition.messageTemplate, error);
-            }
-            // rename the error if the matching error definition provides a new name
-            if (matchingErrorDefinition.name !== undefined) {
-                error.name = matchingErrorDefinition.name;
-            }
-            // copy the url from the matching error definition
-            if (matchingErrorDefinition.url !== undefined) {
-                error.url = matchingErrorDefinition.url;
-            }
-            //console.log(`Error is now ${JSON.stringify(error, null, "   ")}`);
+    matchingErrorDefinitions.forEach(function (matchingErrorDefinition) {
+        // console.log(`Error definition: ${JSON.stringify(matchingErrorDefinition, null, "   ")}`);
+        // expand the error message using the template of the matching error definition
+        if (matchingErrorDefinition.messageTemplate !== undefined) {
+            error.message = expandTemplate(matchingErrorDefinition.messageTemplate, error);
         }
-    );
-    
+        // rename the error if the matching error definition provides a new name
+        if (matchingErrorDefinition.name !== undefined) {
+            error.name = matchingErrorDefinition.name;
+        }
+        // copy the url from the matching error definition
+        if (matchingErrorDefinition.url !== undefined) {
+            error.url = matchingErrorDefinition.url;
+        }
+        //console.log(`Error is now ${JSON.stringify(error, null, "   ")}`);
+    });
+
     // return the (possibly updated) error
     return error;
 }
@@ -69,12 +70,12 @@ function errorMatchesDefinition(error, errorDefinition) {
     // Tests whether the errorDefinition matches the error
     // for now, this is just a matter of checking that error has properties matching every one of
     // the properties in the errorDefinition's matchingProperties object.
-    // Potentially this could be extended to also check merely for the existence of certain properties, 
+    // Potentially this could be extended to also check merely for the existence of certain properties,
     // or to do regex matches on property values, etc, by adding 'has-properties' and 'regex-matching-properties'
     // to the error definitions.
-    return Object
-        .keys(errorDefinition.matchingProperties)
-        .every(key => getProperty(error, key) == errorDefinition.matchingProperties[key]);
+    return Object.keys(errorDefinition.matchingProperties).every(
+        (key) => getProperty(error, key) == errorDefinition.matchingProperties[key]
+    );
 }
 
 function expandTemplate(template, object) {
@@ -87,12 +88,9 @@ function expandTemplate(template, object) {
         }
     )  ⇒ "Invalid date '2022-13-01' found in document bogus.doc"
     */
-    const expansion = template.replace(
-        /\$\{([^}]+)\}/g,
-        function(match, propertyPath) {
-            return getProperty(object, propertyPath);
-        }
-    );
+    const expansion = template.replace(/\$\{([^}]+)\}/g, function (match, propertyPath) {
+        return getProperty(object, propertyPath);
+    });
     return expansion;
 }
 
@@ -103,8 +101,8 @@ e.g.
     getProperty({foo: {bar: 'baz'}}, 'foo.bar') ⇒ 'baz'
 */
 function getProperty(object, propertyPath) {
-    //console.log(`Getting property "${propertyPath}" from ${object}...`); 
-    let dotPosition = propertyPath.indexOf('.'); 
+    //console.log(`Getting property "${propertyPath}" from ${object}...`);
+    let dotPosition = propertyPath.indexOf(".");
     if (dotPosition == -1) {
         // simple property lookup
         return object[propertyPath];
@@ -119,4 +117,3 @@ function getProperty(object, propertyPath) {
         }
     }
 }
-

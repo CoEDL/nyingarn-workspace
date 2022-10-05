@@ -25,6 +25,7 @@ import {
     markResourceComplete,
     isResourceComplete,
 } from "../lib/item";
+import { transformDocument } from "../lib/transform";
 const log = getLogger();
 
 async function verifyItemAccess(req, res, next) {
@@ -69,6 +70,10 @@ export function setupRoutes({ server }) {
     server.get(
         "/items/:identifier/resources/:resource/transcription",
         routeItem(getItemTranscriptionHandler)
+    );
+    server.get(
+        "/items/:identifier/resources/:resource/transform",
+        routeItem(getTransformTeiDocumentHandler)
     );
     server.get("/items/:identifier/resources/:resource", routeItem(getItemResourceFileHandler));
     server.get(
@@ -415,4 +420,13 @@ async function postResourceProcessingStatus(req, res, next) {
     tasks = Object.keys(tasks).map((r) => tasks[r].shift());
     res.send({ tasks });
     next();
+}
+// TODO: this method does not have tests
+async function getTransformTeiDocumentHandler(req, res, next) {
+    const { identifier, resource } = req.params;
+    let store = await getStoreHandle({ id: identifier, className: "item" });
+    let document = await store.get({ target: `${resource}.tei.xml` });
+    document = await transformDocument({ document });
+    res.send({ document });
+    next;
 }

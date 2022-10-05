@@ -1,7 +1,6 @@
 import models from "../models";
 import { Op } from "sequelize";
-import { loadConfiguration, getS3Handle, getUserTempLocation } from "../common";
-import { getStoreHandle } from "../common";
+import { loadConfiguration, getS3Handle, getStoreHandle } from "../common";
 import path from "path";
 import { writeJson, remove } from "fs-extra";
 import { compact, groupBy, uniq, isNumber } from "lodash";

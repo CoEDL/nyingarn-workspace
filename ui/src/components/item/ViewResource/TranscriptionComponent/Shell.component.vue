@@ -11,11 +11,23 @@
         </div>
         <div class="resizer" id="resizer"></div>
         <div class="resize_container__right">
-            <transcription-editor
-                class="w-full h-full"
-                :data="data.files"
-                v-if="data.files.length"
-            />
+            <el-tabs type="border-card" v-model="data.activeTab">
+                <el-tab-pane label="write" name="write">
+                    <template #label>
+                        <span class="text-lg font-light text-gray-700">Write</span>
+                    </template>
+                    <transcription-editor
+                        v-if="data.files.length && data.activeTab === 'write'"
+                        :data="data.files"
+                    />
+                </el-tab-pane>
+                <el-tab-pane label="preview" name="preview">
+                    <template #label>
+                        <span class="text-lg font-light text-gray-700">Preview</span>
+                    </template>
+                    <preview-component v-if="data.files.length && data.activeTab === 'preview'" />
+                </el-tab-pane>
+            </el-tabs>
         </div>
     </div>
 </template>
@@ -23,12 +35,14 @@
 <script setup>
 import DisplayImageComponent from "./DisplayImage.component.vue";
 import TranscriptionEditor from "./TranscriptionEditor.component.vue";
+import PreviewComponent from "./Preview.component.vue";
 import { reactive, onMounted, inject } from "vue";
 import { useRoute } from "vue-router";
 const $route = useRoute();
 const $http = inject("$http");
 
 const data = reactive({
+    activeTab: "write",
     files: [],
     resizer: undefined,
     leftSide: undefined,
@@ -127,11 +141,6 @@ function mouseUpHandler() {
 .resize_container__left {
     /* Initially, the left takes 3/4 width */
     width: 35%;
-
-    /* Misc */
-    align-items: center;
-    display: flex;
-    justify-content: center;
 }
 .resizer {
     background-color: #cbd5e0;
@@ -142,10 +151,5 @@ function mouseUpHandler() {
 .resize_container__right {
     /* Take the remaining width */
     flex: 1;
-
-    /* Misc */
-    align-items: center;
-    display: flex;
-    justify-content: center;
 }
 </style>

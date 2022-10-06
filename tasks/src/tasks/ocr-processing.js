@@ -8,7 +8,13 @@ const {
     DetectDocumentTextCommand,
 } = require("@aws-sdk/client-textract");
 
-export async function runTextractOCR({ directory, identifier, resource, className = "item" }) {
+export async function runTextractOCR({
+    task = "text",
+    directory,
+    identifier,
+    resource,
+    className = "item",
+}) {
     let store = await getStoreHandle({ id: identifier, className });
     let storeResources = (await store.listResources()).map((r) => r.Key);
 
@@ -55,12 +61,21 @@ export async function runTextractOCR({ directory, identifier, resource, classNam
 
     const client = new TextractClient(awsConfiguration);
     let data = await readFile(source);
-    const params = {
+    let params;
+
+    params = {
         Document: {
             Bytes: data,
         },
     };
-    let command = new DetectDocumentTextCommand(params);
+
+    let command;
+    if (task === "text") {
+        command = new DetectDocumentTextCommand(params);
+    } else if (task === "table") {
+        params.FeatureTypes = ["TABLES"];
+        command = new AnalyzeDocumentCommand(params);
+    }
 
     data = await client.send(command);
     await writeJSON(target, data);

@@ -53,6 +53,7 @@ export class Lookup {
             // ---------------------------------------------------
             // let documents = [{json-ld object}, {json-ld object}, ...]
             // return { documents }
+            return [];
         }
     }
 

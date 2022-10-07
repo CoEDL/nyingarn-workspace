@@ -23,5 +23,6 @@ export async function transformDocument({ document }) {
         return document;
     } catch (error) {
         console.log(error);
+        return JSON.stringify({ error: error.message, code: error.code }, null, 2);
     }
 }

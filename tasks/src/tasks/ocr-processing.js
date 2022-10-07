@@ -1,6 +1,6 @@
 import path from "path";
 import { getLogger, loadConfiguration, getStoreHandle, Textract } from "../common";
-import { readFile, writeJSON, stat, readdir } from "fs-extra";
+import { readFile, writeFile, writeJSON, stat, readdir } from "fs-extra";
 const log = getLogger();
 const {
     TextractClient,
@@ -88,6 +88,6 @@ export async function runTextractOCR({
         document = textract.parseTables();
     }
     if (!(await store.pathExists({ path: targetTei }))) {
-        await writeJSON(targetTei, document);
+        await writeFile(targetTei, document.join("\n"));
     }
 }

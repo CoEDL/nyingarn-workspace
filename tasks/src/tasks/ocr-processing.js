@@ -1,5 +1,5 @@
 import path from "path";
-import { getLogger, loadConfiguration, getStoreHandle } from "../common";
+import { getLogger, loadConfiguration, getStoreHandle, Textract } from "../common";
 import { readFile, writeJSON, stat, readdir } from "fs-extra";
 const log = getLogger();
 const {
@@ -45,11 +45,12 @@ export async function runTextractOCR({
         .pop();
     const sourceBasename = path.basename(sourceImage, path.extname(sourceImage));
     const source = path.join(directory, identifier, sourceImage);
-    let target = path.join(
+    let targetOCROutput = path.join(
         directory,
         identifier,
         `${sourceBasename}.textract_ocr-${configuration.api.filenaming.adminTag}.json`
     );
+    let targetTei = path.join(directory, identifier, `${sourceBasename}.tei.xml`);
 
     let fileStat = await stat(source);
     if (fileStat.size > 10 * 1024 * 1024) {
@@ -77,6 +78,16 @@ export async function runTextractOCR({
         command = new AnalyzeDocumentCommand(params);
     }
 
-    data = await client.send(command);
-    await writeJSON(target, data);
+    let document = await client.send(command);
+    await writeJSON(targetOCROutput, document);
+
+    let textract = new Textract({ identifier, resource, document });
+    if (task === "text") {
+        document = textract.parseSimpleDocument();
+    } else if (task === "table") {
+        document = textract.parseTables();
+    }
+    if (!(await store.pathExists({ path: targetTei }))) {
+        await writeJSON(targetTei, document);
+    }
 }

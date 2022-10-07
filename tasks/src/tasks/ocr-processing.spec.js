@@ -1,115 +1,12 @@
 import path from "path";
 import { readdir, remove, readJSON } from "fs-extra";
-import { groupBy, orderBy, flattenDeep, compact } from "lodash";
 import { prepare, cleanup } from "./index.js";
 import { runTextractOCR } from "./ocr-processing";
-import { getStoreHandle, getS3Handle } from "../common";
+import { getStoreHandle, getS3Handle, Textract } from "../common";
 import Chance from "chance";
 const chance = new Chance();
 
-class Textract {
-    constructor({ identifier, resource, document }) {
-        this.document = document;
-        this.surface = `<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${identifier}-${resource}"></surface>`;
-        this.minConfidence = 70;
-    }
-    parseSimpleDocument() {
-        let words = this.document.Blocks.filter((b) => b.BlockType === "WORD");
-        let wordsGroupedById = groupBy(words, "Id");
-
-        let text = [];
-        let lines = this.document.Blocks.filter((b) => b.BlockType === "LINE").map((line) => {
-            line = line.Relationships.map((r) => {
-                return r.Ids.map((id) => {
-                    if (wordsGroupedById[id][0].Confidence > this.minConfidence) {
-                        return wordsGroupedById[id][0].Text;
-                    } else {
-                        return `<unclear>${wordsGroupedById[id][0].Text}</unclear>`;
-                    }
-                });
-            });
-            line = flattenDeep(line);
-            text.push(`<line>${line.join(" ")}</line>`);
-        });
-
-        return text;
-    }
-
-    parseTable() {
-        let wordInTable = [];
-
-        // get all the tables
-        let tables = this.document.Blocks.filter((b) => b.BlockType === "TABLE");
-        let words = this.document.Blocks.filter((b) => b.BlockType === "WORD");
-
-        let blocksGroupedById = groupBy(this.document.Blocks, "Id");
-        let wordsGroupedById = groupBy(words, "Id");
-
-        // for each table
-        tables = tables.map((table) => {
-            let cells = table.Relationships.filter((type) => type.Type === "CHILD")[0].Ids.map(
-                (id) => blocksGroupedById[id][0]
-            );
-
-            let rows = groupBy(cells, "RowIndex");
-            let t = ["<table>"];
-            for (let row of Object.keys(rows)) {
-                row = orderBy(rows[row], "ColumnIndex");
-
-                let cells = row.map((cell) => {
-                    cell = cell?.Relationships?.map((r) => {
-                        return r.Ids.map((id) => {
-                            wordInTable.push(wordsGroupedById[id][0]);
-                            if (wordsGroupedById[id][0].Confidence > this.minConfidence) {
-                                return wordsGroupedById[id][0].Text;
-                            } else {
-                                return `<unclear>${wordsGroupedById[id][0].Text}</unclear>`;
-                            }
-                        });
-                    });
-                    cell = flattenDeep(cell).join(" ");
-                    return `<cell>${cell}</cell>`;
-                });
-                t.push(`<row>`);
-                t.push(`${cells.join("")}`);
-                t.push(`</row>`);
-            }
-            t.push("</table>");
-            return t;
-        });
-
-        // extract the non tabular content
-        wordInTable = groupBy(wordInTable, "Id");
-        let text = [];
-        let lines = this.document.Blocks.filter((b) => b.BlockType === "LINE").map((line) => {
-            line = line.Relationships.map((r) => {
-                return r.Ids.map((id) => {
-                    if (!wordInTable[id]) {
-                        if (wordsGroupedById[id][0].Confidence > this.minConfidence) {
-                            return wordsGroupedById[id][0].Text;
-                        } else {
-                            return `<unclear>${wordsGroupedById[id][0].Text}</unclear>`;
-                        }
-                    }
-                });
-            });
-            line = flattenDeep(line);
-            line = compact(line);
-            if (line.length) {
-                text.push(`<line>${line.join(" ")}</line>`);
-            }
-        });
-
-        // console.log(wordInTable);
-        return [...text, ...flattenDeep(tables)];
-    }
-
-    extractWords() {
-        let words = this.document.Blocks.filter((b) => b.BlockType === "WORD");
-        // console.log(words);
-    }
-}
-describe(`Test `, () => {
+describe(`Test Textract OCR processing`, () => {
     let bucket;
     beforeAll(async () => {
         ({ bucket } = await getS3Handle());
@@ -136,6 +33,7 @@ describe(`Test `, () => {
 
         expect(contents.sort()).toEqual([
             "test-image-text.jpg",
+            "test-image-text.tei.xml",
             "test-image-text.textract_ocr-ADMIN.json",
         ]);
 
@@ -171,6 +69,7 @@ describe(`Test `, () => {
 
         expect(contents.sort()).toEqual([
             "test-image-table-1.jpg",
+            "test-image-table-1.tei.xml",
             "test-image-table-1.textract_ocr-ADMIN.json",
         ]);
 
@@ -188,12 +87,14 @@ describe(`Test `, () => {
         let textract = new Textract({ identifier, resource, document });
         let lines = textract.parseSimpleDocument();
         expect(lines).toEqual([
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
             "<line>Bounding Box</line>",
             "<line>A bounding box (BoundingBox) has the following properties:</line>",
             "<line>Height - The height of the bounding box as a ratio of the overall document page height.</line>",
             "<line>Left - The X coordinate of the top-left point of the bounding box as a ratio of the overall document page width.</line>",
             "<line>Top - The Y coordinate of the top-left point of the bounding box as a ratio of the overall document page height.</line>",
             "<line>Width - The width of the bounding box as a ratio of the overall document page width.</line>",
+            "</surface>",
         ]);
     });
     it(`should be able process a textract document with tables - sample 1`, async () => {
@@ -207,18 +108,18 @@ describe(`Test `, () => {
             path.join("src", "test-data", "textract-samples", "textract-sample-table-1.json")
         );
         let textract = new Textract({ identifier, resource, document });
-        let tables = textract.parseTable();
+        let tables = textract.parseTables();
         expect(tables).toEqual([
-            [
-                "<table>",
-                "<row>",
-                "<cell>A</cell><cell>B</cell><cell>1</cell><cell>2</cell>",
-                "</row>",
-                "<row>",
-                "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell>",
-                "</row>",
-                "</table>",
-            ],
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            "<table>",
+            "<row>",
+            "<cell>A</cell><cell>B</cell><cell>1</cell><cell>2</cell>",
+            "</row>",
+            "<row>",
+            "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell>",
+            "</row>",
+            "</table>",
+            "</surface>",
         ]);
     });
     it(`should be able process a textract document with tables - sample 2`, async () => {
@@ -232,18 +133,19 @@ describe(`Test `, () => {
             path.join("src", "test-data", "textract-samples", "textract-sample-table-2.json")
         );
         let textract = new Textract({ identifier, resource, document });
-        let tables = textract.parseTable();
+        let tables = textract.parseTables();
         expect(tables).toEqual([
-            [
-                "<table>",
-                "<row>",
-                "<cell>AA</cell><cell><unclear>B B</unclear></cell><cell>11</cell><cell>22</cell>",
-                "</row>",
-                "<row>",
-                "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell>",
-                "</row>",
-                "</table>",
-            ],
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            "<line>+</line>",
+            "<table>",
+            "<row>",
+            "<cell>AA</cell><cell><unclear>B B</unclear></cell><cell>11</cell><cell>22</cell>",
+            "</row>",
+            "<row>",
+            "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell>",
+            "</row>",
+            "</table>",
+            "</surface>",
         ]);
     });
     it(`should be able process a textract document with tables - sample 3`, async () => {
@@ -257,18 +159,19 @@ describe(`Test `, () => {
             path.join("src", "test-data", "textract-samples", "textract-sample-table-3.json")
         );
         let textract = new Textract({ identifier, resource, document });
-        let tables = textract.parseTable();
+        let tables = textract.parseTables();
         expect(tables).toEqual([
-            [
-                "<table>",
-                "<row>",
-                "<cell><unclear>AI</unclear> B</cell><cell>BA</cell><cell>12</cell><cell>21</cell><cell></cell>",
-                "</row>",
-                "<row>",
-                "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell><cell></cell>",
-                "</row>",
-                "</table>",
-            ],
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            "<line>+</line>",
+            "<table>",
+            "<row>",
+            "<cell><unclear>AI</unclear> B</cell><cell>BA</cell><cell>12</cell><cell>21</cell><cell></cell>",
+            "</row>",
+            "<row>",
+            "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell><cell></cell>",
+            "</row>",
+            "</table>",
+            "</surface>",
         ]);
     });
     it(`should be able process a textract document with tables - sample 4`, async () => {
@@ -282,31 +185,29 @@ describe(`Test `, () => {
             path.join("src", "test-data", "textract-samples", "textract-sample-table-4.json")
         );
         let textract = new Textract({ identifier, resource, document });
-        let tables = textract.parseTable();
+        let tables = textract.parseTables();
         expect(tables).toEqual([
-            [
-                "<table>",
-                "<row>",
-                "<cell>A</cell><cell>B</cell><cell>1</cell><cell>2</cell>",
-                "</row>",
-                "<row>",
-                "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell>",
-                "</row>",
-                "</table>",
-            ],
-            [
-                "<table>",
-                "<row>",
-                "<cell>A</cell><cell>B</cell><cell>1</cell><cell>2</cell>",
-                "</row>",
-                "<row>",
-                "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell>",
-                "</row>",
-                "</table>",
-            ],
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            "<table>",
+            "<row>",
+            "<cell>A</cell><cell>B</cell><cell>1</cell><cell>2</cell>",
+            "</row>",
+            "<row>",
+            "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell>",
+            "</row>",
+            "</table>",
+            "<table>",
+            "<row>",
+            "<cell>A</cell><cell>B</cell><cell>1</cell><cell>2</cell>",
+            "</row>",
+            "<row>",
+            "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell>",
+            "</row>",
+            "</table>",
+            "</surface>",
         ]);
     });
-    it.only(`should be able process a textract document with text and a table - sample 5`, async () => {
+    it(`should be able process a textract document with text and a table - sample 5`, async () => {
         // 1 line of text
         // 1 table
         // 2 rows
@@ -318,8 +219,20 @@ describe(`Test `, () => {
             path.join("src", "test-data", "textract-samples", "textract-sample-table-5.json")
         );
         let textract = new Textract({ identifier, resource, document });
-        let words = textract.extractWords();
-        let tables = textract.parseTable();
-        console.log(tables);
+        let data = textract.parseTables();
+        expect(data).toEqual([
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            "<line>The quick brown fox jumped over the lazy dog</line>",
+            "<line>+</line>",
+            "<table>",
+            "<row>",
+            "<cell>A</cell><cell>B</cell><cell>1</cell><cell>2</cell><cell></cell>",
+            "</row>",
+            "<row>",
+            "<cell>C</cell><cell>D</cell><cell>3</cell><cell>4</cell><cell></cell>",
+            "</row>",
+            "</table>",
+            "</surface>",
+        ]);
     });
 });

@@ -87,7 +87,7 @@ describe(`Test Textract OCR processing`, () => {
         let textract = new Textract({ identifier, resource, document });
         let lines = textract.parseSimpleDocument();
         expect(lines).toEqual([
-            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001">',
             "<line>Bounding Box</line>",
             "<line>A bounding box (BoundingBox) has the following properties:</line>",
             "<line>Height - The height of the bounding box as a ratio of the overall document page height.</line>",
@@ -110,7 +110,7 @@ describe(`Test Textract OCR processing`, () => {
         let textract = new Textract({ identifier, resource, document });
         let tables = textract.parseTables();
         expect(tables).toEqual([
-            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001">',
             "<table>",
             "<row>",
             "<cell>A</cell><cell>B</cell><cell>1</cell><cell>2</cell>",
@@ -135,7 +135,7 @@ describe(`Test Textract OCR processing`, () => {
         let textract = new Textract({ identifier, resource, document });
         let tables = textract.parseTables();
         expect(tables).toEqual([
-            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001">',
             "<line>+</line>",
             "<table>",
             "<row>",
@@ -161,7 +161,7 @@ describe(`Test Textract OCR processing`, () => {
         let textract = new Textract({ identifier, resource, document });
         let tables = textract.parseTables();
         expect(tables).toEqual([
-            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001">',
             "<line>+</line>",
             "<table>",
             "<row>",
@@ -187,7 +187,7 @@ describe(`Test Textract OCR processing`, () => {
         let textract = new Textract({ identifier, resource, document });
         let tables = textract.parseTables();
         expect(tables).toEqual([
-            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001">',
             "<table>",
             "<row>",
             "<cell>A</cell><cell>B</cell><cell>1</cell><cell>2</cell>",
@@ -221,7 +221,7 @@ describe(`Test Textract OCR processing`, () => {
         let textract = new Textract({ identifier, resource, document });
         let data = textract.parseTables();
         expect(data).toEqual([
-            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001"></surface>',
+            '<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="Bates34-001">',
             "<line>The quick brown fox jumped over the lazy dog</line>",
             "<line>+</line>",
             "<table>",

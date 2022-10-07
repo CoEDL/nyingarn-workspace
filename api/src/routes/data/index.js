@@ -17,7 +17,7 @@ function routeProcessing(handler) {
 export function setupRoutes({ server }) {
     server.get("/upload/pre-create", route(authenticateTusRequest));
     server.get("/upload/pre-create/:itemType/:identifier", route(getItemPath));
-    server.get("/upload/post-finish/:identifier/:resource", route(triggerProcessing));
+    server.get("/upload/post-finish/:identifier/:resource", routeProcessing(triggerProcessing));
     server.post("/process/post-finish/:identifier/:resource", routeProcessing(triggerProcessing));
     server.post(
         "/process/extract-table/:identifier/:resource",

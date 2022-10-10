@@ -21,6 +21,7 @@
             },
             {
                 "name": "Original Source Information",
+                "description": "",
                 "inputs": [
                     "source",
                     "extent",
@@ -400,57 +401,17 @@
         "Person": {
             "definition": "override",
             "subClassOf": [],
-            "inputs": [
-                {
-                    "id": "https://schema.org/name",
-                    "name": "name",
-                    "label": "name",
-                    "help": "The name the person",
-                    "required": true,
-                    "multiple": false,
-                    "type": ["Text"]
-                }
-            ]
+            "inputs": []
         },
         "Organization": {
             "definition": "override",
             "subClassOf": [],
-            "inputs": [
-                {
-                    "id": "https://schema.org/name",
-                    "name": "name",
-                    "label": "name",
-                    "help": "The name of the organization",
-                    "required": true,
-                    "multiple": false,
-                    "type": ["Text"]
-                }
-            ]
-        },
-        "Place": {
-            "definition": "override",
-            "subClassOf": [],
-            "inputs": [
-                {
-                    "id": "https://schema.org/name",
-                    "name": "name",
-                    "label": "name",
-                    "help": "The name of the organization",
-                    "multiple": false,
-                    "type": ["Text"]
-                },
-                {
-                    "id": "https://schema.org/geo",
-                    "name": "geo",
-                    "label": "Geo",
-                    "help": "The geo coordinates of the place",
-                    "multiple": false,
-                    "type": ["Geo"]
-                }
-            ]
+            "inputs": []
         },
         "Language": {
-            "definition": "override"
+            "definition": "override",
+            "subClassOf": [],
+            "inputs": []
         }
     },
     "enabledClasses": ["Dataset", "Person", "Place", "Organization", "Language"],
@@ -464,6 +425,10 @@
                 "austlangCode",
                 "glottologCode",
                 "languageCode"
+            ],
+            "datapacks": [
+                "https://raw.githubusercontent.com/describo/data-packs/master/data-packs/languages/glottolog-language-data-pack.json",
+                "https://raw.githubusercontent.com/describo/data-packs/master/data-packs/languages/austlang-language-data-pack.json"
             ]
         }
     }

@@ -438,17 +438,53 @@ async function addElement(type) {
     }
 }
 async function reprocessPageAsTable() {
+    const dateFrom = new Date();
     let response = await $http.post({
         route: `/process/extract-table/${$route.params.identifier}/${$route.params.resource}`,
     });
     if (response.status !== 200) {
         return;
     }
+    let taskId = (await response.json()).taskId;
+
     data.extractTableProcessing = true;
-    await new Promise((resolve) => setTimeout(resolve, 20000));
+    await new Promise((resolve) => setTimeout(resolve, 6000));
+    await checkProcessingStatus({
+        $http,
+        identifier: $route.params.identifier,
+        resources: [
+            { itemId: $route.params.identifier, resource: `${$route.params.resource}.jpg` },
+        ],
+        taskId,
+        dateFrom,
+    });
+
     let document = await loadTranscription();
     formatDocument(document);
     data.extractTableProcessing = false;
+
+    async function checkProcessingStatus({ $http, identifier, resources, taskId, dateFrom }) {
+        let response = await $http.post({
+            route: `/items/${identifier}/resources/processing-status`,
+            body: { resources, dateFrom },
+        });
+        let { tasks } = await response.json();
+        let task = tasks.filter((task) => task.id === taskId)[0];
+        if (!task) {
+            // no task found - do nothing
+        } else if (task.status !== "done" && task.status !== "failed") {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await checkProcessingStatus({
+                $http,
+                identifier: $route.params.identifier,
+                resources: [
+                    { itemId: $route.params.identifier, resource: `${$route.params.resource}.jpg` },
+                ],
+                taskId,
+                dateFrom,
+            });
+        }
+    }
 }
 </script>
 

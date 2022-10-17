@@ -38,10 +38,10 @@ export async function demandAdministrator(req, res, next) {
 }
 
 export async function requireIdentifierAccess(req, res, next) {
-    if (!req.body.identifier && !req.params.identifier) {
+    if (!req.body?.identifier && !req.params?.identifier) {
         return next(new ForbiddenError(`No identifier defined in body or params`));
     }
-    const identifier = req.body.identifier ? req.body.identifier : req.params.identifier;
+    const identifier = req.body?.identifier ? req.body?.identifier : req.params?.identifier;
     let item = await lookupItemByIdentifier({
         userId: req.session.user.id,
         identifier: identifier,
@@ -49,5 +49,6 @@ export async function requireIdentifierAccess(req, res, next) {
     if (!item) {
         return next(new ForbiddenError(`You don't have access to that item`));
     }
+    req.item = item;
     next();
 }

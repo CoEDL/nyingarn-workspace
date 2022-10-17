@@ -16,6 +16,7 @@ export function setupHandlers({ rabbit }) {
     rabbit.handle("process-image", runTask);
     rabbit.handle("process-digivol", runTask);
     rabbit.handle("process-tei", runTask);
+    rabbit.handle("extract-table", runTask);
 }
 
 export async function runTask(msg) {
@@ -43,6 +44,10 @@ export async function runTask(msg) {
                 await createWebFormats({ directory, identifier, resource });
                 await syncToBucket({ directory, identifier });
                 await runTextractOCR({ directory, identifier, resource });
+                break;
+            case "extract-table":
+                log.info(`Running 'extract-table' task for '${identifier}' in ${directory}`);
+                await runTextractOCR({ task: "table", directory, identifier, resource });
                 break;
         }
 

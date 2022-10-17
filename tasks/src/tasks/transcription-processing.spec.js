@@ -13,6 +13,15 @@ import { readdir, remove, ensureDir, pathExists } from "fs-extra";
 jest.setTimeout(20000); // 20s because the CSV processing test is slow
 
 describe(`Check that known good files are processed successfully`, () => {
+    let log, warn;
+    beforeAll(() => {
+        log = jest.spyOn(console, "log").mockImplementation(() => {});
+        warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+    });
+    afterAll(() => {
+        warn.mockReset();
+        log.mockReset();
+    });
     it("BM1648A91 - should be able to process a digivol csv file", async () => {
         let identifier = "BM1648A91";
         let directory = "Succeeds-digivol-upload/BM1648A91";
@@ -275,6 +284,15 @@ describe(`Check that known good files are processed successfully`, () => {
     });
 });
 describe(`Confirm file extensions are removed`, () => {
+    let log, warn;
+    beforeAll(() => {
+        log = jest.spyOn(console, "log").mockImplementation(() => {});
+        warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+    });
+    afterAll(() => {
+        warn.mockReset();
+        log.mockReset();
+    });
     it("should remove file extensions (e.g. .jpg) from page identifiers", async () => {
         let identifier = "c018660";
         let directory = "word-page-identifiers-with-extensions/c018660";
@@ -830,6 +848,15 @@ describe(`Confirm file extensions are removed`, () => {
     });
 });
 describe(`Confirm non-UTF-8-encoding of DigiVol CSV file is rejected`, () => {
+    let log, warn;
+    beforeAll(() => {
+        log = jest.spyOn(console, "log").mockImplementation(() => {});
+        warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+    });
+    afterAll(() => {
+        warn.mockReset();
+        log.mockReset();
+    });
     it("should fail to ingest BM1648A91-digivol.csv as it's not encoded in UTF-8", async () => {
         let identifier = "BM1648A91";
         let directory = "Issue-digivol_upload_failure/BM1648A91";
@@ -846,6 +873,15 @@ describe(`Confirm non-UTF-8-encoding of DigiVol CSV file is rejected`, () => {
 });
 
 describe(`Confirm malformed XML is rejected`, () => {
+    let log, warn;
+    beforeAll(() => {
+        log = jest.spyOn(console, "log").mockImplementation(() => {});
+        warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+    });
+    afterAll(() => {
+        warn.mockReset();
+        log.mockReset();
+    });
     it("should fail to ingest Grey_g_12_c_12-tei.xml as it's not well-formed XML", async () => {
         let identifier = "Grey_g_12_c_12";
         let directory = "Issue-tei_did_not_upload/Grey_g_12_c_12";
@@ -872,7 +908,7 @@ describe(`Confirm no valid pages found`, () => {
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.name).toBe("NoPagesWithSuitableIdentifiers");
-            expect(error.errorObject['document-identifier']).toBe(identifier);
+            expect(error.errorObject["document-identifier"]).toBe(identifier);
             expect(error.message).toMatch(identifier);
         }
     });
@@ -910,6 +946,15 @@ describe(`Confirm no valid pages found`, () => {
 */
 });
 describe(`Confirm that excessive TEI markup is removed`, () => {
+    let log, warn;
+    beforeAll(() => {
+        log = jest.spyOn(console, "log").mockImplementation(() => {});
+        warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+    });
+    afterAll(() => {
+        warn.mockReset();
+        log.mockReset();
+    });
     it("cleanup_of_msword_formatting - should be able to strip unwanted text formatting from a TEI file produced by OxGarage from a DOCX file", async () => {
         let identifier = "msword_formatting";
         let resource = "msword_formatting-tei.xml";
@@ -1019,6 +1064,15 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
     });
 });
 describe(`Confirm that documents with duplicate page identifiers are handled sensibly`, () => {
+    let log, warn;
+    beforeAll(() => {
+        log = jest.spyOn(console, "log").mockImplementation(() => {});
+        warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+    });
+    afterAll(() => {
+        warn.mockReset();
+        log.mockReset();
+    });
     it("Bates34 - should fail to ingest Bates34-tei.xml as it contains duplicate page identifiers", async () => {
         let identifier = "Bates34";
         let directory = "Issue-duplicate_page_identifiers/Bates34";
@@ -1029,7 +1083,7 @@ describe(`Confirm that documents with duplicate page identifiers are handled sen
             await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
             throw new Error("Stylesheet failed to throw the expected error!");
         } catch (error) {
-            expect(error.name).toBe('DuplicatePageIdentifiers');
+            expect(error.name).toBe("DuplicatePageIdentifiers");
             expect(error.message).toMatch(/ERROR:.*Bates34-023/);
             expect(error.message).toMatch(/ERROR:.*Bates34-025/);
             expect(error.message).toMatch(/ERROR:.*Bates34-048/);
@@ -1046,7 +1100,7 @@ describe(`Confirm that documents with duplicate page identifiers are handled sen
             await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
             throw new Error("Stylesheet failed to throw the expected error!");
         } catch (error) {
-            expect(error.name).toBe('DuplicatePageIdentifiers');
+            expect(error.name).toBe("DuplicatePageIdentifiers");
             expect(error.message).toMatch(/ERROR:.*Bates35-0104/);
         }
     });

@@ -1,5 +1,7 @@
 <template>
-    <div ref="previewPanel" :class="maxHeight" class="text-gray-200 font-light bg-gray-800"></div>
+    <div class="overflow-scroll" :style="{ height: height }">
+        <div ref="previewPanel" class="text-gray-200 font-light bg-gray-800"></div>
+    </div>
 </template>
 
 <script setup>
@@ -14,12 +16,7 @@ const previewPanel = ref(null);
 onMounted(() => {
     renderDocumentPreview();
 });
-let maxHeight = computed(() => {
-    return { "max-height": `${window.innerHeight - 300}px` };
-});
-let color = computed(() => {
-    return { color: `x` };
-});
+let height = `${window.innerHeight - 250}px`;
 
 async function renderDocumentPreview() {
     let response = await $http.get({

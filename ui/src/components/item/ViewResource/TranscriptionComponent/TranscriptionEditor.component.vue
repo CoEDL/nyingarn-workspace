@@ -1,6 +1,7 @@
 <template>
-    <div class="flex flex-row px-2">
+    <div class="flex flex-row px-2" v-loading="data.extractTableProcessing">
         <div class="flex flex-col">
+            <!-- left sidebar controls -->
             <div class="h-12"></div>
             <div class="flex flex-col space-y-2 items-end">
                 <el-tooltip
@@ -60,6 +61,7 @@
             </div>
         </div>
         <div class="flex flex-col flex-grow px-2">
+            <!-- topbar control -->
             <div class="flex flex-row mb-2 space-x-2">
                 <div>
                     <el-button @click="undoButton" type="primary" size="large">
@@ -123,6 +125,19 @@
                         <i class="fa-solid fa-code"></i>
                     </el-button>
                 </el-tooltip>
+
+                <el-popconfirm
+                    title="This will delete the current transcription. Are you sure you want to do this?"
+                    @confirm="reprocessPageAsTable"
+                    width="300"
+                >
+                    <template #reference>
+                        <el-button type="primary" size="large">
+                            <i class="fa-solid fa-gears"></i>
+                            &nbsp;extract table
+                        </el-button>
+                    </template>
+                </el-popconfirm>
                 <div class="flex-grow"></div>
                 <div>
                     <el-button
@@ -184,7 +199,6 @@ import { xml, xmlLanguage } from "@codemirror/lang-xml";
 import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
-import { isEmpty } from "lodash";
 import format from "xml-formatter";
 
 const $http = inject("$http");
@@ -196,6 +210,7 @@ const props = defineProps({
 });
 
 let data = reactive({
+    extractTableProcessing: false,
     ...$route.params,
     transcription: undefined,
     isComplete: false,
@@ -207,7 +222,7 @@ onBeforeMount(async () => {
     await resourceIsComplete();
 });
 onMounted(async () => {
-    await loadTranscription();
+    data.transcription = await loadTranscription();
     ({ view } = setupCodeMirror());
     nextTick(() => {
         formatDocument();
@@ -273,9 +288,9 @@ async function loadTranscription() {
         return;
     }
     try {
-        data.transcription = (await response.json()).content;
+        return (await response.json()).content;
     } catch (error) {
-        data.transcription = "";
+        return "";
     }
 }
 function undoButton() {
@@ -348,10 +363,11 @@ async function save() {
         data.saved = false;
     }, 1500);
 }
-function formatDocument() {
+function formatDocument(document) {
+    document = document ? document : view.state.doc.toString();
     let formattedDocument;
     try {
-        formattedDocument = format(view.state.doc.toString(), {
+        formattedDocument = format(document, {
             indentation: "  ",
             collapseContent: true,
         });
@@ -421,12 +437,61 @@ async function addElement(type) {
             break;
     }
 }
+async function reprocessPageAsTable() {
+    const dateFrom = new Date();
+    let response = await $http.post({
+        route: `/process/extract-table/${$route.params.identifier}/${$route.params.resource}`,
+    });
+    if (response.status !== 200) {
+        return;
+    }
+    let taskId = (await response.json()).taskId;
+
+    data.extractTableProcessing = true;
+    await new Promise((resolve) => setTimeout(resolve, 6000));
+    await checkProcessingStatus({
+        $http,
+        identifier: $route.params.identifier,
+        resources: [
+            { itemId: $route.params.identifier, resource: `${$route.params.resource}.jpg` },
+        ],
+        taskId,
+        dateFrom,
+    });
+
+    let document = await loadTranscription();
+    formatDocument(document);
+    data.extractTableProcessing = false;
+
+    async function checkProcessingStatus({ $http, identifier, resources, taskId, dateFrom }) {
+        let response = await $http.post({
+            route: `/items/${identifier}/resources/processing-status`,
+            body: { resources, dateFrom },
+        });
+        let { tasks } = await response.json();
+        let task = tasks.filter((task) => task.id === taskId)[0];
+        if (!task) {
+            // no task found - do nothing
+        } else if (task.status !== "done" && task.status !== "failed") {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await checkProcessingStatus({
+                $http,
+                identifier: $route.params.identifier,
+                resources: [
+                    { itemId: $route.params.identifier, resource: `${$route.params.resource}.jpg` },
+                ],
+                taskId,
+                dateFrom,
+            });
+        }
+    }
+}
 </script>
 
 <style scoped>
 .cm-editor {
     font-size: 16px;
-    height: calc(100vh - 200px);
+    height: calc(100vh - 250px);
     overflow: scroll;
 }
 </style>

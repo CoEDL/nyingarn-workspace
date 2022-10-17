@@ -30,4 +30,5 @@ export async function submitTask({ item, name, body }) {
         type: name,
         body: { ...body, identifier: item.identifier, task },
     });
+    return task;
 }

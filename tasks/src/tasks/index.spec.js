@@ -49,7 +49,7 @@ describe(`Test `, () => {
         const task = {
             id: chance.word(),
         };
-        const resource = "test-image.jpg";
+        const resource = "test-image-text.jpg";
 
         let store = await getStoreHandle({ id: identifier, className: "test" });
         await store.createItem();
@@ -61,7 +61,7 @@ describe(`Test `, () => {
         let directory = await prepare({ identifier, task, resource, className: "test" });
 
         let contents = await readdir(path.join(directory, identifier));
-        expect(contents).toEqual(["test-image.jpg"]);
+        expect(contents).toEqual([resource]);
 
         await remove(directory);
         await bucket.removeObjects({ prefix: store.getItemPath() });
@@ -71,7 +71,7 @@ describe(`Test `, () => {
         const task = {
             id: chance.word(),
         };
-        const resource = "test-image.jpg";
+        const resource = "test-image-text.jpg";
 
         let store = await getStoreHandle({ id: identifier, className: "test" });
         await store.createItem();
@@ -91,7 +91,7 @@ describe(`Test `, () => {
             "nocfl.identifier.json",
             "nocfl.inventory.json",
             "ro-crate-metadata.json",
-            "test-image.jpg",
+            resource,
         ]);
         await bucket.removeObjects({ prefix: store.getItemPath() });
     });
@@ -100,7 +100,7 @@ describe(`Test `, () => {
         const task = {
             id: chance.word(),
         };
-        const resource = "test-image.jpg";
+        const resource = "test-image-text.jpg";
 
         let store = await getStoreHandle({ id: identifier, className: "test" });
         await store.createItem();
@@ -129,7 +129,7 @@ describe(`Test `, () => {
             "nocfl.identifier.json",
             "nocfl.inventory.json",
             "ro-crate-metadata.json",
-            "test-image.jpg",
+            resource,
         ]);
         await remove(directory);
         await bucket.removeObjects({ prefix: store.getItemPath() });

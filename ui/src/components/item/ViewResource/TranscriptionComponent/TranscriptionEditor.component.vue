@@ -76,38 +76,6 @@
                 <el-tooltip
                     class="box-item"
                     effect="dark"
-                    content="Mark the transcription as in progress"
-                    placement="top-start"
-                >
-                    <div v-show="!data.isComplete">
-                        <el-button
-                            @click="markComplete({ status: true })"
-                            type="warning"
-                            size="large"
-                        >
-                            in progress
-                        </el-button>
-                    </div>
-                </el-tooltip>
-                <el-tooltip
-                    class="box-item"
-                    effect="dark"
-                    content="Mark the transcription as complete"
-                    placement="top-start"
-                >
-                    <div v-show="data.isComplete">
-                        <el-button
-                            @click="markComplete({ status: false })"
-                            type="success"
-                            size="large"
-                        >
-                            complete
-                        </el-button>
-                    </div>
-                </el-tooltip>
-                <el-tooltip
-                    class="box-item"
-                    effect="dark"
                     content="Delete the transcription"
                     placement="top-start"
                 >
@@ -139,6 +107,19 @@
                     </template>
                 </el-popconfirm>
                 <div class="flex-grow"></div>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Mark the transcription as complete"
+                    placement="top-start"
+                >
+                    <el-switch
+                        v-model="data.isComplete"
+                        active-text="Complete"
+                        inactive-text="In progress"
+                        @change="markComplete"
+                    />
+                </el-tooltip>
                 <div>
                     <el-button
                         @click="save"
@@ -305,13 +286,13 @@ function redoButton() {
         dispatch: view.dispatch,
     });
 }
-async function markComplete({ status }) {
+async function markComplete(status) {
     let response = await $http.put({
         route: `/items/${data.identifier}/resources/${data.resource}/status`,
         params: { complete: status },
     });
     if (response.status === 200) {
-        data.isComplete = !data.isComplete;
+        data.isComplete = status;
     }
 }
 async function resourceIsComplete() {

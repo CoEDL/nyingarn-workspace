@@ -64,21 +64,24 @@ export async function runTask(msg) {
         try {
             await cleanupAfterFailure({ directory, identifier });
             if (task.id) {
+                const data = {
+                    name: error.name,
+                    code: error.code,
+                    message: error.message,
+                };
+                if (error.url) data.url = error.url;
+                if (error.errorObject) data.sourceType = error.errorObject["source-type"];
+                if (error.xsltLineNr) data.xsltLineNumber = error.xsltLineNr;
+                if (error.xsltModule) data.xsltModule = error.xsltModule;
                 await updateTask({
                     taskId: task.id,
-                    data: {
-                        name: error.name,
-                        code: error.code,
-                        message: error.message,
-                        url: error.url,
-                        sourceType: error.errorObject["source-type"],
-                        xsltLineNumber: error.xsltLineNr,
-                        xsltModule: error.xsltModule,
-                    },
+                    data,
                     status: "failed",
                 });
             }
-        } catch (error) {}
+        } catch (error) {
+            console.log(error);
+        }
     }
     msg.ack();
 }

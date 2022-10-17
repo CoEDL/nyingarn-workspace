@@ -39,12 +39,12 @@ async function extractTableHandler(req, res, next) {
     const name = "extract-table";
 
     log.info(`Process: ${identifier}/${resource}`);
-    await submitTask({
+    let task = await submitTask({
         name,
         item: req.item,
         body: { resource },
     });
 
-    res.send({});
+    res.send({ taskId: task.id });
     next();
 }

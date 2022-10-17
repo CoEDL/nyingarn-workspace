@@ -287,10 +287,18 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "http://schema.org/language",
-                    "name": "language",
-                    "label": "",
+                    "id": "http://schema.org/contentLanguage",
+                    "name": "contentLanguage",
+                    "label": "Content Language",
                     "help": "AIATSIS standard language code",
+                    "multiple": true,
+                    "type": ["Language"]
+                },
+                {
+                    "id": "http://schema.org/subjectLanguage",
+                    "name": "subjectLanguage",
+                    "label": "Subject Language",
+                    "help": "Other languages",
                     "multiple": true,
                     "type": ["Language"]
                 },

@@ -12,7 +12,14 @@
             {
                 "name": "Core Metadata",
                 "description": "",
-                "inputs": ["identifier", "description", "language", "languageName", "subject"]
+                "inputs": [
+                    "identifier",
+                    "description",
+                    "contentLanguage",
+                    "subjectLanguage",
+                    "languageName",
+                    "subject"
+                ]
             },
             {
                 "name": "Location",
@@ -290,7 +297,7 @@
                     "id": "http://schema.org/contentLanguage",
                     "name": "contentLanguage",
                     "label": "Content Language",
-                    "help": "AIATSIS standard language code",
+                    "help": "The Indigenous language(s) that are the subject of the document. Use the AIATSIS language definition.",
                     "multiple": true,
                     "type": ["Language"]
                 },
@@ -298,7 +305,7 @@
                     "id": "http://schema.org/subjectLanguage",
                     "name": "subjectLanguage",
                     "label": "Subject Language",
-                    "help": "Other languages",
+                    "help": "The other language(s) used in the document (e.g. English).",
                     "multiple": true,
                     "type": ["Language"]
                 },

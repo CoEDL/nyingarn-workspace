@@ -19,20 +19,20 @@
             </div>
             <pre class="text-sm w-full">
 
-    When reporting this problem to us please include the following information in the message (and send us the file that caused the error): 
-    
-    item: {{ $route.params.identifier }}
-    file: {{ props.error.resource }} 
-    error: {{ data.error.message }}
+    When reporting this problem to us please include the following information in the message (and send us the file that caused the error):
 
+    item: {{ $route.params.identifier }}
+    file: {{ props.error.resource }}
+    error: {{ data.error.message }}
+            </pre>
+
+            <pre v-if="data.error.code && data.error.sourceType">
     // Admin information
     name: {{ data.error.name }}
     code: {{ data.error.code }}
     sourceType: {{ data.error.sourceType }}
     xsltLineNumber: {{ data.error.xsltLineNumber }}
     xsltModule: {{ data.error.xsltModule }}
-
-    
             </pre>
         </div>
     </div>

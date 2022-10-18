@@ -189,7 +189,7 @@ services:
         command:
             [
                 "/wait-for-it.sh",
-                "app:8080",
+                "api:8080",
                 "-t",
                 "10",
                 "--",

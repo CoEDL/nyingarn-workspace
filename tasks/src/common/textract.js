@@ -19,9 +19,11 @@ export class Textract {
             line = line.Relationships.map((r) => {
                 return r.Ids.map((id) => {
                     if (this.wordsGroupedById[id][0].Confidence > this.minConfidence) {
-                        return this.wordsGroupedById[id][0].Text;
+                        return this.escape(this.wordsGroupedById[id][0].Text);
                     } else {
-                        return `<unclear>${this.wordsGroupedById[id][0].Text}</unclear>`;
+                        return `<unclear>${this.escape(
+                            this.wordsGroupedById[id][0].Text
+                        )}</unclear>`;
                     }
                 });
             });
@@ -53,9 +55,11 @@ export class Textract {
                         return r.Ids.map((id) => {
                             wordInTable.push(id);
                             if (this.wordsGroupedById[id][0].Confidence > this.minConfidence) {
-                                return this.wordsGroupedById[id][0].Text;
+                                return this.escape(this.wordsGroupedById[id][0].Text);
                             } else {
-                                return `<unclear>${this.wordsGroupedById[id][0].Text}</unclear>`;
+                                return `<unclear>${this.escape(
+                                    this.wordsGroupedById[id][0].Text
+                                )}</unclear>`;
                             }
                         });
                     });
@@ -77,9 +81,11 @@ export class Textract {
                 return r.Ids.map((id) => {
                     if (!wordInTable.includes(id)) {
                         if (this.wordsGroupedById[id][0].Confidence > this.minConfidence) {
-                            return this.wordsGroupedById[id][0].Text;
+                            return this.escape(this.wordsGroupedById[id][0].Text);
                         } else {
-                            return `<unclear>${this.wordsGroupedById[id][0].Text}</unclear>`;
+                            return `<unclear>${this.escape(
+                                this.wordsGroupedById[id][0].Text
+                            )}</unclear>`;
                         }
                     }
                 });
@@ -92,5 +98,12 @@ export class Textract {
         });
 
         return [this.surface, ...text, ...flattenDeep(tables), "</surface>"];
+    }
+
+    escape(text) {
+        text = text.replaceAll(/&/g, "&amp;");
+        text = text.replaceAll(/</g, "&lt;");
+        text = text.replaceAll(/>/g, "&rt;");
+        return text;
     }
 }

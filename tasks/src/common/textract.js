@@ -101,9 +101,9 @@ export class Textract {
     }
 
     escape(text) {
-        text = text.replaceAll(/&/g, "&amp;");
-        text = text.replaceAll(/</g, "&lt;");
-        text = text.replaceAll(/>/g, "&rt;");
+        text = text.replace(/&/g, "&amp;");
+        text = text.replace(/</g, "&lt;");
+        text = text.replace(/>/g, "&rt;");
         return text;
     }
 }

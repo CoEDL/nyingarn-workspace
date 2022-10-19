@@ -19,6 +19,7 @@
         "@babel/node": "^7.19.1",
         "@babel/plugin-proposal-optional-chaining": "^7.18.9",
         "@babel/preset-env": "^7.19.4",
+        "@coedl/nocfl-js": "^1.14.3",
         "babel-jest": "^29.2.1",
         "babel-loader": "^8.2.5",
         "chance": "^1.1.9",
@@ -33,7 +34,6 @@
         "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
-        "@coedl/nocfl-js": "^1.14.1",
         "@describo/data-packs": "^0.7.1",
         "cross-fetch": "^3.1.5",
         "date-fns": "^2.29.3",

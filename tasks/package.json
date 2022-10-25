@@ -33,12 +33,12 @@
         "xslt3": "^2.5.0"
     },
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.192.0",
-        "@aws-sdk/client-textract": "^3.192.0",
-        "@aws-sdk/lib-storage": "^3.192.0",
-        "@aws-sdk/s3-request-presigner": "^3.192.0",
-        "@aws-sdk/util-endpoints": "^3.192.0",
-        "@coedl/nocfl-js": "^1.14.3",
+        "@aws-sdk/client-s3": "^3.194.0",
+        "@aws-sdk/client-textract": "^3.195.0",
+        "@aws-sdk/lib-storage": "^3.194.0",
+        "@aws-sdk/s3-request-presigner": "^3.194.0",
+        "@aws-sdk/util-endpoints": "^3.194.0",
+        "@coedl/nocfl-js": "^1.15.0",
         "@root/walk": "^1.1.0",
         "cross-fetch": "^3.1.5",
         "csv-parse": "^5.3.1",

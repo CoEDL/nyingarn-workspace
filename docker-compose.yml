@@ -174,8 +174,6 @@ services:
                 hard: 65536
         cap_add:
             - IPC_LOCK
-        ports:
-            - 9200:9200
 
     edge:
         image: nginx:latest

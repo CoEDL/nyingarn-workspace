@@ -53,7 +53,7 @@ export async function processTEIToPageFilesAsStrings({ directory, identifier, re
 export async function processTeiTranscription({ directory, identifier, resource }) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);
     await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
-    // await removeOverlappingNewContent({ directory, identifier, resource });
+    await removeOverlappingNewContent({ directory, identifier, resource });
 }
 
 /*

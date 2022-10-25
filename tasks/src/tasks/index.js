@@ -65,6 +65,7 @@ export async function syncToBucket({ directory, identifier, className = "item" }
     directory = path.join(directory, identifier);
 
     let batch = [];
+
     await walk(directory, async (err, pathname, dirent) => {
         if (dirent.isFile()) {
             log.debug(`Uploading: ${path.relative(directory, pathname)} to the store`);

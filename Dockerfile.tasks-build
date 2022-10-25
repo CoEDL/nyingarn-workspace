@@ -18,5 +18,5 @@ COPY --from=tasks-builder /srv/tasks/package.json /srv/package.json
 COPY --from=tasks-builder /srv/tasks/package-lock.json /srv/package-lock.json
 RUN npm install
 COPY --from=tasks-builder /srv/tasks/dist/ /srv/
-COPY tasks/src/xslt /srv/src/xslt
-CMD [ "node", "./server.bundle.js" ]  
+COPY tasks/src/xslt /srv/tasks/src/xslt
+CMD [ "node", "./server.bundle.js" ]

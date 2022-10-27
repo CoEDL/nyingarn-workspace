@@ -56,7 +56,7 @@ export async function registerAllFiles({ id, className, crate }) {
     });
 
     // upload the new crate file
-    return crate;
+    return { crate, filesAdded: filesToAdd };
 
     function getMimeType(filename) {
         let mimetype = mime.lookup(filename);

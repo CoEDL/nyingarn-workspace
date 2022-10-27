@@ -141,13 +141,13 @@ async function getDescriboROCrate(req, res, next) {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
     } catch (error) {
         crate = createDefaultROCrateFile({ name: req.params.identifier });
-        await store.put({ json: crate, target: "ro-crate-metadata.json" });
     }
     crate = await registerAllFiles({
         id: req.params.identifier,
         className: req.params.type,
         crate,
     });
+    store.put({ target: "ro-crate-metadata.json", json: crate });
     res.send({ crate });
     next();
 }

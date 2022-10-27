@@ -12,6 +12,7 @@
                 <el-tab-pane label="Item Metadata" name="metadata">
                     <describo-crate-builder
                         v-if="data.activeTab === 'metadata'"
+                        v-loading="data.metadataLoading"
                         :style="{ height: metadataPanelHeight }"
                         class="overflow-scroll"
                         :crate="data.crate"
@@ -21,6 +22,7 @@
                         :enable-crate-preview="true"
                         :enable-browse-entities="true"
                         :purge-unlinked-entities-before-save="true"
+                        @ready="data.metadataLoading = false"
                         @save:crate="saveCrate"
                     >
                     </describo-crate-builder>
@@ -65,6 +67,7 @@ let data = reactive({
     routeWatcher: undefined,
     tabs: ["view", "metadata", "associate", "upload", "administration"],
     activeTab: "view",
+    metadataLoading: false,
     crate: {},
     profile: {},
 });
@@ -106,6 +109,8 @@ function updateRouteOnTabSelect(tab) {
     if (tab.paneName === "metadata") load();
 }
 async function load() {
+    data.metadataLoading = true;
+
     // load the crate file
     let response = await $http.get({
         route: `/describo/rocrate/${$route.meta.type}/${$route.params.identifier}`,
@@ -113,7 +118,7 @@ async function load() {
     if (response.status !== 200) {
         ElMessage.error(`Unable to retrieve RO Crate file`);
     }
-    data.crate = (await response.json()).rocrateFile;
+    data.crate = (await response.json()).crate;
 
     // load the profile
     response = await $http.get({

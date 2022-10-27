@@ -1,6 +1,7 @@
 import { route, getStoreHandle, getLogger, loadProfile } from "../common";
 import { uniqBy, isArray, compact, has, flattenDeep } from "lodash";
 import models from "../models";
+import { registerAllFiles } from "../lib/crate-tools.js";
 const log = getLogger();
 
 export function setupRoutes({ server }) {
@@ -135,14 +136,19 @@ async function postCopyCrateHandler(req, res, next) {
 // TODO: this code does not have tests
 async function getDescriboROCrate(req, res, next) {
     let store = await getStoreHandle({ id: req.params.identifier, className: req.params.type });
-    let rocrateFile;
+    let crate;
     try {
-        rocrateFile = await store.getJSON({ target: "ro-crate-metadata.json" });
+        crate = await store.getJSON({ target: "ro-crate-metadata.json" });
     } catch (error) {
-        rocrateFile = createDefaultROCrateFile({ name: req.params.identifier });
-        await store.put({ json: rocrateFile, target: "ro-crate-metadata.json" });
+        crate = createDefaultROCrateFile({ name: req.params.identifier });
+        await store.put({ json: crate, target: "ro-crate-metadata.json" });
     }
-    res.send({ rocrateFile });
+    crate = await registerAllFiles({
+        id: req.params.identifier,
+        className: req.params.type,
+        crate,
+    });
+    res.send({ crate });
     next();
 }
 

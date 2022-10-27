@@ -13,7 +13,6 @@ import { setupRoutes as setupLogRoutes } from "./logs";
 import { setupRoutes as setupSearchRoutes } from "./search";
 import { loadConfiguration, filterPrivateInformation, route, routeAdmin } from "../common";
 import { readJSON } from "fs-extra";
-
 export function setupRoutes({ server }) {
     if (process.env.NODE_ENV === "development") {
         server.get(

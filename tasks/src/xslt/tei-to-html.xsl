@@ -150,7 +150,7 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:for-each select="1 to @quantity">
-					<xsl:text> </xsl:text>
+					<xsl:value-of select="codepoints-to-string(160)"/>
 				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>

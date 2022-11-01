@@ -8,6 +8,7 @@
 	Then document is split into a set of files each containing one page of transcript.
     -->
 	<xsl:import href="error.xsl"/>
+	<xsl:import href="infer-semantics.xsl"/>
 	<xsl:import href="tidy-tei.xsl"/>
 	<xsl:import href="paginate.xsl"/>
 	<xsl:import href="normalise.xsl"/>
@@ -29,9 +30,13 @@
 		<xsl:variable name="tidied">
 			<xsl:apply-templates select="$normalised" mode="tidy"/>
 		</xsl:variable>
+		<!-- recognise certain formatting and textual patterns in the text and upconvert them to semantic TEI elements -->
+		<xsl:variable name="upconverted">
+			<xsl:apply-templates select="$tidied" mode="infer-semantics"/>
+		</xsl:variable>
 		<!-- split the div elements by "bubbling up" any pb elements they contain so that the pb elements are in between div elements rather than within them -->
 		<xsl:variable name="bubbled">
-			<xsl:apply-templates select="$tidied" mode="bubble-pagebreaks"/>
+			<xsl:apply-templates select="$upconverted" mode="bubble-pagebreaks"/>
 		</xsl:variable>
 		<!-- paginate the document by creating a facsimile element and populating it with surface elements containing the content which was delimited by a pair of page break elements -->
 		<xsl:variable name="paginated">

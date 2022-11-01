@@ -86,9 +86,9 @@
 		</xsl:for-each>
 	</xsl:template>
 	
-	<!-- a <u> element corresponds to a TEI Tite <ul> (underline) element -->
+	<!-- a <u> element corresponds to an underlined highlight element -->
 	<xsl:template mode="digivol" match="u">
-		<xsl:element name="ul"><xsl:apply-templates mode="digivol"/></xsl:element>
+		<xsl:element name="hi"><xsl:attribute name="rend">underline</xsl:attribute><xsl:apply-templates mode="digivol"/></xsl:element>
 	</xsl:template>
 	
 	<!-- an <s> (strikethrough) element corresponds to a TEI <del> (deletion) element --> 

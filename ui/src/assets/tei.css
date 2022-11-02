@@ -19,3 +19,26 @@
 .rend-strikethrough {
     text-decoration: line-through;
 }
+
+/* tables */
+table.tei-table {
+    table-layout: auto;
+    border-collapse: collapse;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+td.tei-cell {
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgb(191, 191, 191);
+    padding: 0.25em 0.5em;
+}
+
+/* unclear */
+.tei-unclear {
+    text-decoration-style: wavy;
+    text-decoration-line: underline;
+    text-decoration-color: red;
+}

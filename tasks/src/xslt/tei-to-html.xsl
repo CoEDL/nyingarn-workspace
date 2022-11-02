@@ -110,13 +110,17 @@
 		<xsl:attribute name="title" select="
 			string-join(
 				(
-					'illegible; reason:',
+					'unclear; reason:',
 					@reason,
 					@extent
 				),
 				' '
 			)
 		"/>
+	</xsl:template>
+	<xsl:template match="unclear" mode="create-attributes">
+		<xsl:next-match/>
+		<xsl:attribute name="title">unclear</xsl:attribute>
 	</xsl:template>
 	
 	<!-- abbreviations -->

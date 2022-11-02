@@ -12,8 +12,6 @@
 	Trims white space appearing before <lb/> elements.
 	Trims white space from the start of each line.
 	Discards <hi> elements with no @rend
-	Converts apparent page numbers to <fw>
-	Converts centered paragraphs to <label>
     -->
 
     <!-- CSS declaration parsing -->

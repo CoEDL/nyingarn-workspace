@@ -6,14 +6,13 @@
     xmlns:css="https://www.w3.org/Style/CSS/"
 >
     <!--
-	Tidies up a TEI file.
+	Infers semantics which are implicit in a TEI file and encodes them explicitly.
+	
 	This is generic processing applicable to TEI files from any source.
-
-	Trims white space appearing before <lb/> elements.
-	Trims white space from the start of each line.
-	Discards <hi> elements with no @rend
+	
 	Converts apparent page numbers to <fw>
 	Converts centered paragraphs to <label>
+	Converts text formatted with a strikethrough into <del>
     -->
 
     <!-- CSS declaration parsing -->

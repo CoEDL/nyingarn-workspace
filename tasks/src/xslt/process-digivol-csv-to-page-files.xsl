@@ -32,8 +32,7 @@
 					map{
 						'source-type': 'digivol',
 						'document-identifier': $identifier,
-						'page-identifier-regex': $page-identifier-regex,
-						'source-type': 'digivol'
+						'page-identifier-regex': $page-identifier-regex
 					}
 				)
 			"/>
@@ -44,7 +43,7 @@
 			<xsl:variable name="id" select=".('externalIdentifier') => substring-before('.')"/>
 			<!-- write the page content to a file named for the @xml:id attribute of the <surface> with no xml declaration or indenting -->
 			<xsl:result-document href="{$id}.tei.xml" omit-xml-declaration="yes" indent="no">
-				<xsl:element name="surface">
+				<xsl:element name="surface" expand-text="yes">
 					<xsl:attribute name="xml:id" select="$id"/>
 					<xsl:sequence select="codepoints-to-string(10)"/>
 					<!-- occurrenceRemarks column can contain markup: seen in BM1648A91-digivol.csv were <u> and <s>. 
@@ -79,7 +78,7 @@
 						<xsl:sequence select="codepoints-to-string(10)"/>
 					</xsl:for-each>
 					<xsl:if test="not(map:contains(., 'occurrenceRemarks'))">
-						<xsl:message xsl:expand-text="yes">'occurrenceRemarks' column not found for record '{.('externalIdentifier')}'- no transcription</xsl:message>
+						<xsl:message>'occurrenceRemarks' column not found for record '{.('externalIdentifier')}'- no transcription</xsl:message>
 					</xsl:if>
 				</xsl:element>
 			</xsl:result-document>
@@ -97,13 +96,13 @@
 	</xsl:template>
 	
 	<!-- other element markup should be removed but logged -->
-	<xsl:template mode="digivol" match="*">
+	<xsl:template mode="digivol" match="*" expand-text="yes">
 		<!-- found some other element! -->
 		<xsl:variable name="unrecognised-element-name" select="local-name()"/>
 		<xsl:variable name="unrecognised-elements" select="//*[local-name() = $unrecognised-element-name]"/>
 		<!-- log an unrecognised element the first time it is seen -->
 		<xsl:if test=". eq $unrecognised-elements[1]">
-			<xsl:message xsl:expand-text="yes">Unrecognised XML element &lt;{$unrecognised-element-name}&gt;. Number of times found: {count($unrecognised-elements)}.</xsl:message>
+			<xsl:message>Unrecognised XML element &lt;{$unrecognised-element-name}&gt;. Number of times found: {count($unrecognised-elements)}.</xsl:message>
 		</xsl:if>
 		<!-- include the content of the unrecognised element -->
 		<xsl:apply-templates mode="digivol"/>

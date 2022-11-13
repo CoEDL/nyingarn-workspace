@@ -5,6 +5,8 @@
 	xmlns="http://www.w3.org/1999/xhtml"
 	xpath-default-namespace="http://www.tei-c.org/ns/1.0">
 	
+	<xsl:output indent="yes"/>
+	
 	<!-- https://www.tei-c.org/release/doc/tei-p5-doc/en/html/ST.html#STBTC -->
 	<!-- TEI "phrase-level", model.global.edit, "gLike", and "lLike" elements are mapped to html:span -->
 	<!-- Also tei:q, tei:quote -->
@@ -40,6 +42,82 @@
 		</xsl:element>
 	</xsl:template>
 	
+	<xsl:template match="/">
+		<xsl:variable name="text-in-columns">
+			<xsl:apply-templates mode="bubble-milestones"/>
+		</xsl:variable>
+		<div class="tei">
+			<xsl:for-each-group select="$text-in-columns/node()" group-starting-with="milestone[@unit='column'][@n='1']">
+				<!-- determine the number of columns in this group -->
+				<xsl:variable name="column-milestones" select="current-group()[self::milestone[@unit='column']]"/>
+				<xsl:variable name="column-count" select="if ($column-milestones) then count($column-milestones) else 1"/>
+				<div class="tei-column-group">
+					<xsl:for-each-group select="current-group()" group-starting-with="milestone[@unit='column']">
+						<div class="tei-column">
+							<xsl:apply-templates select="current-group()"/>
+						</div>
+					</xsl:for-each-group>
+				</div>
+			</xsl:for-each-group>
+		</div>
+	</xsl:template>
+	
+	<xsl:mode on-no-match="shallow-copy" name="bubble-milestones"/>
+	
+<xsl:template match="*" mode="bubble-milestones">
+	<xsl:variable name="container" select="."/>
+	<xsl:variable name="columnar-content">
+	    <xsl:apply-templates mode="bubble-milestones"/>
+	</xsl:variable>
+	<!-- any of the container element's milestone descendants will have "bubbled up" to the level of direct children of the container -->
+	<xsl:variable name="milestones" select="$columnar-content/milestone[@unit='column']"/>
+	<xsl:choose>
+	    <xsl:when test="$milestones">
+		<!-- the container element contains milestones so will need to be split around those milestone elements,
+		except that if the preceding siblings of the FIRST milestone are empty or white space, i.e. the
+		first page is at the top of the container, then the milestone may simply be moved to be before the
+		container element rather than splitting it -->
+		<xsl:variable name="first-milestone-at-top-of-container" select="$milestones[1][not(preceding-sibling::node()[normalize-space()])]"/>
+		<xsl:choose>
+		    <xsl:when test="$first-milestone-at-top-of-container">
+			<xsl:sequence select="$milestones[1]"/>
+			<xsl:copy select="$container">
+			    <xsl:copy-of select="$container/@*"/>
+			    <xsl:sequence select="$columnar-content/node()[preceding-sibling::milestone[@unit='column'][1] is $first-milestone-at-top-of-container][not(self::milestone[@unit='column'])]"/>
+			</xsl:copy>
+		    </xsl:when>
+		    <xsl:otherwise>
+			<!-- create the initial fragment of the original container element -->
+			<xsl:copy select="$container">
+			    <xsl:copy-of select="$container/@*"/>
+			    <xsl:attribute name="part">I</xsl:attribute><!-- I = initial part -->
+			    <!-- output the portion of the columnar content preceding the first milestone -->
+			    <xsl:sequence select="$columnar-content/node()[following-sibling::milestone[@unit='column'][1] is $milestones[1]]"/>
+			</xsl:copy>
+		    </xsl:otherwise>
+		</xsl:choose>
+
+		<!-- create the remaining fragments of the container element, interspersed with the milestone elements which have divided them -->
+		<xsl:for-each select="$columnar-content/milestone[@unit='column'] except $first-milestone-at-top-of-container">
+		    <xsl:variable name="milestone" select="."/>
+		    <xsl:copy-of select="$milestone"/>
+		    <xsl:copy select="$container">
+			<xsl:copy-of select="$container/@*"/>
+			<xsl:attribute name="part" select="if ($milestone/following-sibling::milestone) then 'M' (:medial:) else 'F' (:final:)"/>
+			<!-- output the portion of the columnar content following this milestone but before the next milestone -->
+			<xsl:sequence select="$columnar-content/node()[preceding-sibling::milestone[@unit='column'][1] is $milestone][not(self::milestone[@unit='column'])]"/>
+		    </xsl:copy>
+		</xsl:for-each>
+	    </xsl:when>
+	    <xsl:otherwise>
+		<!-- container element had no milestone descendants, so it does not need to be split -->
+		<xsl:sequence select="$container"/>
+	    </xsl:otherwise>
+	</xsl:choose>
+
+    </xsl:template>
+    
+	
 	<!-- non-phrase-level TEI elements (plus author and title within the item description) are mapped to html:div -->
 	<xsl:template match="*">
 		<xsl:element name="div">
@@ -57,7 +135,8 @@
 					concat('tei-', local-name()),
 					for $type in tokenize(@type) return concat('type-', $type),
 					for $place in tokenize(@place) return concat('place-', $place),
-					for $rend in tokenize(@rend) return concat('rend-', $rend)
+					for $rend in tokenize(@rend) return concat('rend-', $rend),
+					for $unit in @unit return concat('unit-', $unit)
 				),
 				' '
 			)
@@ -110,13 +189,17 @@
 		<xsl:attribute name="title" select="
 			string-join(
 				(
-					'illegible; reason:',
+					'unclear; reason:',
 					@reason,
 					@extent
 				),
 				' '
 			)
 		"/>
+	</xsl:template>
+	<xsl:template match="unclear" mode="create-attributes">
+		<xsl:next-match/>
+		<xsl:attribute name="title">unclear</xsl:attribute>
 	</xsl:template>
 	
 	<!-- abbreviations -->

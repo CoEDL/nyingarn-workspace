@@ -987,13 +987,18 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
             options
         );
         let underlinedOnly = SaxonJS.XPath.evaluate("//*[@rend = 'underline']", resultDoc, options);
-        let struckOutOnly = SaxonJS.XPath.evaluate(
-            "//*[@rend = 'strikethrough']",
+        let struckOut = SaxonJS.XPath.evaluate(
+            "//*[contains-token(@rend, 'strikethrough')]",
             resultDoc,
             options
         );
-        let underlinedAndStruckOut = SaxonJS.XPath.evaluate(
-            "//*[every $token in ('underline', 'strikethrough') satisfies $token = tokenize(@rend)]",
+        let deleted = SaxonJS.XPath.evaluate(
+            "//del",
+            resultDoc,
+            options
+        );
+        let underlinedAndDeleted = SaxonJS.XPath.evaluate(
+            "//del[contains-token(@rend, 'underline')]",
             resultDoc,
             options
         );
@@ -1022,10 +1027,12 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
         expect(normalStyled).toBeNull();
         // every set of adjacent identically-formatted highlights should have been merged into a single highlight
         expect(adjacentIdenticallyFormattedHighlights).toBeNull();
-        // there should be elements which are just underlined, elements which are just strikethrough, and some which are both
+        // there should be elements which are just underlined, elements which are deleted, and some which are both
         expect(underlinedOnly).not.toBeNull();
-        expect(struckOutOnly).not.toBeNull();
-        expect(underlinedAndStruckOut).not.toBeNull();
+        expect(deleted).not.toBeNull();
+        expect(underlinedAndDeleted).not.toBeNull();
+        // there should be no elements which are 'strikethrough' because they should all have been converted to del elements
+        expect(struckOut).toBeNull();
         // the full textual content (ignoring white space) of the source document should be preserved in the result document
         expect(sourceWords).toEqual(resultWords);
 

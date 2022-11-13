@@ -12,8 +12,6 @@
 	Trims white space appearing before <lb/> elements.
 	Trims white space from the start of each line.
 	Discards <hi> elements with no @rend
-	Converts apparent page numbers to <fw>
-	Converts centered paragraphs to <label>
     -->
 
     <!-- CSS declaration parsing -->
@@ -44,30 +42,9 @@
     <xsl:template match="hi[not(@rend or @style)]" mode="tidy">
     	<xsl:apply-templates mode="tidy"/>
     </xsl:template>
-    
+        
     <xsl:template match="seg[not(@*)]" mode="tidy">
     	<xsl:apply-templates mode="tidy"/>
-    </xsl:template>
-    
-    <!-- 
-    Recognise a paragraph as a page number if it:  
-    	a) contains digits, and 
-    	b) consists entirely of digits and optional punctuation and whitespace, and
-    	c) appears at the start of the page
-    	d) is aligned right
-    -->
-    <xsl:template mode="tidy" match="p
-    	[matches(., '\p{Nd}+')]
-    	[matches(., '^[\s\p{P}\p{Nd}]+$')]
-    	[preceding-sibling::*[1]/self::pb]
-    	[css:parse-declaration-block(@style)('text-align')='right']
-    ">
-    	<fw type="page-number"><xsl:apply-templates mode="tidy"/></fw>
-    </xsl:template>
-    
-    <!-- recognise centered text as labels -->
-    <xsl:template mode="tidy" match="p[css:parse-declaration-block(@style)('text-align')='center']">
-    	<label><xsl:call-template name="merge-adjacent-identical-highlights"/></label>
     </xsl:template>
     
     <xsl:template match="@xml:space[.='preserve']" mode="tidy"/>

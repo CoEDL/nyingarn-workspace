@@ -72,3 +72,8 @@ td.tei-cell {
     text-decoration-line: underline;
     text-decoration-color: red;
 }
+
+/* deletion */
+.tei-del {
+	text-decoration: line-through;
+}

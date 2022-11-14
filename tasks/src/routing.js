@@ -4,6 +4,7 @@ import {
     processDigivolTranscription,
     processTeiTranscription,
 } from "./tasks/transcription-processing.js";
+import { assembleTeiDocument } from "./tasks/assemble-tei.js";
 import { prepare, cleanup, cleanupAfterFailure, syncToBucket } from "./tasks/index.js";
 import { log } from "/srv/api/src/common/index.js";
 import { updateTask, deleteTask } from "./common/task.js";
@@ -49,6 +50,12 @@ export async function runTask(msg) {
             case "extract-table":
                 log.info(`Running 'extract-table' task for '${identifier}' in ${directory}`);
                 await runTextractOCR({ task: "table", directory, identifier, resource });
+                break;
+            case "assemble-tei-document":
+                log.info(
+                    `Running 'assemble-tei-document' task for '${identifier}' in ${directory}`
+                );
+                await assembleTeiDocument({ task, identifier, directory });
                 break;
         }
 

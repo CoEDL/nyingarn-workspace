@@ -1,10 +1,11 @@
-export { createImageThumbnail, createWebFormats } from "./image-processing";
-export { runTesseractOCR, runTextractOCR } from "./ocr-processing";
+export { createImageThumbnail, createWebFormats } from "./image-processing.js";
+export { runTesseractOCR, runTextractOCR } from "./ocr-processing.js";
 export {
     processDigivolTranscription,
     processFtpTeiTranscription,
     processTeiTranscription,
-} from "./transcription-processing";
+} from "./transcription-processing.js";
+export { assembleTeiDocument } from "./assemble-tei.js";
 
 import path from "path";
 import { getLogger, getStoreHandle } from "../common";

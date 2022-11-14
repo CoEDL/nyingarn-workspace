@@ -8,8 +8,9 @@ import {
     cleanup,
     syncToBucket,
     cleanupAfterFailure,
-} from "./tasks";
-import { getLogger, updateTask, deleteTask } from "./common";
+    assembleTeiDocument,
+} from "./tasks/index.js";
+import { getLogger, updateTask, deleteTask } from "./common/index.js";
 const log = getLogger();
 
 export function setupHandlers({ rabbit }) {
@@ -17,6 +18,7 @@ export function setupHandlers({ rabbit }) {
     rabbit.handle("process-digivol", runTask);
     rabbit.handle("process-tei", runTask);
     rabbit.handle("extract-table", runTask);
+    rabbit.handle("assemble-tei-document", runTask);
 }
 
 export async function runTask(msg) {
@@ -48,6 +50,12 @@ export async function runTask(msg) {
             case "extract-table":
                 log.info(`Running 'extract-table' task for '${identifier}' in ${directory}`);
                 await runTextractOCR({ task: "table", directory, identifier, resource });
+                break;
+            case "assemble-tei-document":
+                log.info(
+                    `Running 'assemble-tei-document' task for '${identifier}' in ${directory}`
+                );
+                await assembleTeiDocument({ task, identifier, directory });
                 break;
         }
 

@@ -11,7 +11,7 @@
     "layouts": {
         "Dataset": [
             {
-                "name": "Core Metadata",
+                "name": "About",
                 "description": "",
                 "inputs": [
                     "identifier",
@@ -22,11 +22,7 @@
                     "subject"
                 ]
             },
-            {
-                "name": "Location",
-                "description": "",
-                "inputs": ["location"]
-            },
+
             {
                 "name": "Original Source Information",
                 "description": "",
@@ -40,6 +36,7 @@
                     "originalForm"
                 ]
             },
+
             {
                 "name": "Permissions",
                 "description": "",
@@ -81,6 +78,11 @@
                     "transcriber",
                     "translator"
                 ]
+            },
+            {
+                "name": "Location",
+                "description": "",
+                "inputs": ["location"]
             }
         ],
         "Place": [{ "name": "important", "description": "", "inputs": ["geojson"] }]

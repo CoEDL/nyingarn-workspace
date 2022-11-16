@@ -121,7 +121,6 @@ async function getItemPath() {
     let response = await $http.get({ route: `/upload/pre-create/item/${props.identifier}` });
     if (response.status === 200) {
         data.path = (await response.json()).path;
-        console.log(data.path);
     } else {
         data.error = true;
     }

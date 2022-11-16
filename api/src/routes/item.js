@@ -421,6 +421,7 @@ async function postResourceProcessingStatus(req, res, next) {
     res.send({ tasks });
     next();
 }
+
 // TODO: this method does not have tests
 async function getTransformTeiDocumentHandler(req, res, next) {
     const { identifier, resource } = req.params;

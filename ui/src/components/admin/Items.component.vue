@@ -1,5 +1,8 @@
 <template>
-    <div class="flex flex-col space-y-2 xl:flex-row xl:space-x-2 xl:space-y-0">
+    <div
+        class="flex flex-col space-y-2 xl:flex-row xl:space-x-2 xl:space-y-0"
+        v-loading="data.loading"
+    >
         <el-card class="box-card xl:w-1/2">
             <template #header>
                 <div class="card-header flex flex-row">
@@ -48,13 +51,13 @@
 </template>
 
 <script setup>
-import { ElLoading } from "element-plus";
 import { reactive, computed, onMounted, inject, nextTick } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const $http = inject("$http");
 
 let data = reactive({
+    loading: false,
     items: [],
     collections: [],
 });
@@ -70,22 +73,18 @@ onMounted(() => {
 });
 
 async function init() {
-    const loading = ElLoading.service({
-        lock: true,
-        text: "Loading",
-        background: "rgba(0, 0, 0, 0.7)",
-    });
+    data.loading = true;
     let response = await $http.get({ route: "/admin/entries" });
     if (response.status !== 200) {
         // report error
+        data.loading = false;
+        return;
     }
     let { items, collections } = await response.json();
     data.items = [...items];
     data.collections = [...collections];
 
-    nextTick(() => {
-        loading.close();
-    });
+    data.loading = false;
 }
 async function connectItem(item) {
     await $http.put({ route: `/admin/items/${item.name}/connect-user` });

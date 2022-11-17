@@ -33,7 +33,6 @@ export function setupRoutes({ server }) {
         res.send({
             ui: configuration.ui,
             processing: configuration.api.processing,
-            teiMarkupControls: await readJSON(configuration.api.teiMarkupControls),
             authentication: Object.keys(configuration.api.authentication),
         });
         next();

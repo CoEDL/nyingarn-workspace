@@ -11,8 +11,8 @@
                 </el-tab-pane>
                 <el-tab-pane label="Item Metadata" name="metadata">
                     <describo-crate-builder
-                        v-if="data.activeTab === 'metadata'"
-                        v-loading="data.metadataLoading"
+                        v-if="data.activeTab === 'metadata' && data.metadataComponent.display"
+                        v-loading="data.metadataComponent.loading"
                         :style="{ height: metadataPanelHeight }"
                         class="overflow-scroll"
                         :crate="data.crate"
@@ -22,7 +22,7 @@
                         :enable-crate-preview="true"
                         :enable-browse-entities="true"
                         :purge-unlinked-entities-before-save="true"
-                        @ready="data.metadataLoading = false"
+                        @ready="data.metadataComponent.loading = false"
                         @save:crate="saveCrate"
                     >
                     </describo-crate-builder>
@@ -67,7 +67,10 @@ let data = reactive({
     routeWatcher: undefined,
     tabs: ["view", "metadata", "associate", "upload", "administration"],
     activeTab: "view",
-    metadataLoading: false,
+    metadataComponent: {
+        display: false,
+        loading: false,
+    },
     crate: {},
     profile: {},
 });
@@ -77,7 +80,7 @@ onBeforeMount(async () => {
 onMounted(() => {
     data.routeWatcher = watch(() => $route.path, updateRouteOnNav);
     updateRouteOnNav();
-    if (data.activeTab === "metadata") load();
+    if (data.activeTab === "metadata") loadMetadata();
 });
 const metadataPanelHeight = computed(() => {
     return `${window.innerHeight - 140}px`;
@@ -92,7 +95,8 @@ async function checkUserAccess() {
     data.userIsPermitted = true;
 }
 function updateRouteOnNav() {
-    if (data.activeTab === "metadata") load();
+    data.metadataComponent.display = false;
+    if (data.activeTab === "metadata") loadMetadata();
     if (!$route.name.match(/^items/)) {
         data.routeWatcher();
         return;
@@ -105,11 +109,17 @@ function updateRouteOnNav() {
     }
 }
 function updateRouteOnTabSelect(tab) {
+    data.metadataComponent.display = false;
     $router.push(tab.paneName);
-    if (tab.paneName === "metadata") load();
+    if (tab.paneName === "metadata") loadMetadata();
+}
+async function loadMetadata() {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    data.metadataComponent.display = true;
+    await load();
 }
 async function load() {
-    data.metadataLoading = true;
+    data.metadataComponent.loading = true;
 
     // load the crate file
     let response = await $http.get({

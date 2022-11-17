@@ -4,58 +4,55 @@
             <!-- left sidebar controls -->
             <div class="h-12"></div>
             <div class="flex flex-col space-y-2 items-end">
+                <div class="flex flex-row space-x-3">
+                    <div class="text-2xl">
+                        <i class="fa-solid fa-minus"></i>
+                    </div>
+                    <el-switch
+                        v-model="data.markupControl"
+                        active-value="add"
+                        inactive-value="remove"
+                    />
+                    <div class="text-2xl">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                </div>
                 <el-tooltip
+                    v-for="(control, idx) of data.controls"
+                    :key="idx"
                     class="box-item"
                     effect="dark"
-                    content="Add a paragraph"
+                    :content="control.help"
+                    raw-content
                     placement="left"
                 >
-                    <el-button @click="addElement('paragraph')" size="large" type="primary">
-                        <i class="fa-solid fa-chevron-left"></i>
-                        <span class="pb-1">p</span>
-                        <i class="fa-solid fa-chevron-right"></i>
+                    <el-button
+                        @click="
+                            data.markupControl === 'add'
+                                ? data.editorControls.add(control.markup)
+                                : data.editorControls.remove(control.markup)
+                        "
+                        size="large"
+                        :type="data.markupControl === 'add' ? 'primary' : 'danger'"
+                    >
+                        <span v-html="control.icon" v-if="control.icon"></span>
+                        <span v-if="control.text">{{ control.text }}</span>
                     </el-button>
                 </el-tooltip>
                 <el-tooltip
+                    v-if="data.markupControl === 'remove'"
                     class="box-item"
                     effect="dark"
-                    content="Underline the selection"
+                    content="Remove all XML markup from the document."
+                    raw-content
                     placement="left"
                 >
-                    <el-button @click="addElement('underline')" size="large" type="primary">
-                        <i class="fa-solid fa-underline"></i>
-                    </el-button>
-                </el-tooltip>
-                <el-tooltip
-                    class="box-item"
-                    effect="dark"
-                    content="Strikethrough the selection"
-                    placement="left"
-                >
-                    <el-button @click="addElement('strikethrough')" size="large" type="primary">
-                        <i class="fa-solid fa-strikethrough"></i>
-                    </el-button>
-                </el-tooltip>
-                <el-tooltip
-                    class="box-item"
-                    effect="dark"
-                    content="Add a linebreak"
-                    placement="left"
-                >
-                    <el-button @click="addElement('linebreak')" size="large" type="primary">
-                        <i class="fa-solid fa-chevron-left"></i>
-                        <span class="">lb</span>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </el-button>
-                </el-tooltip>
-                <el-tooltip
-                    class="box-item"
-                    effect="dark"
-                    content="Mark text as unclear"
-                    placement="left"
-                >
-                    <el-button @click="addElement('unclear')" size="large" type="primary">
-                        unclear
+                    <el-button
+                        @click="data.editorControls.removeAllMarkup()"
+                        size="large"
+                        type="danger"
+                    >
+                        <i class="fa-solid fa-code"></i>
                     </el-button>
                 </el-tooltip>
             </div>
@@ -64,12 +61,12 @@
             <!-- topbar control -->
             <div class="flex flex-row mb-2 space-x-2">
                 <div>
-                    <el-button @click="undoButton" type="primary" size="large">
+                    <el-button @click="undo" type="primary" size="large">
                         <i class="fa-solid fa-undo"></i>
                     </el-button>
                 </div>
                 <div>
-                    <el-button @click="redoButton" type="primary" size="large">
+                    <el-button @click="redo" type="primary" size="large">
                         <i class="fa-solid fa-redo"></i>
                     </el-button>
                 </div>
@@ -146,38 +143,21 @@
 </template>
 
 <script setup>
-import {
-    EditorView,
-    keymap,
-    highlightSpecialChars,
-    drawSelection,
-    highlightActiveLine,
-    dropCursor,
-    rectangularSelection,
-    crosshairCursor,
-    lineNumbers,
-    highlightActiveLineGutter,
-} from "@codemirror/view";
-import { EditorState, Text, Transaction } from "@codemirror/state";
-import {
-    defaultHighlightStyle,
-    syntaxHighlighting,
-    indentOnInput,
-    bracketMatching,
-    foldGutter,
-    foldKeymap,
-} from "@codemirror/language";
-import { defaultKeymap, history, historyKeymap, undo, redo } from "@codemirror/commands";
-import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
+import { EditorView, basicSetup } from "codemirror";
+import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
-import {
-    autocompletion,
-    completionKeymap,
-    closeBrackets,
-    closeBracketsKeymap,
-} from "@codemirror/autocomplete";
 import { xml, xmlLanguage } from "@codemirror/lang-xml";
-import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount, nextTick } from "vue";
+import { CodemirrorEditorControls } from "./codemirror-editor.js";
+import {
+    ref,
+    reactive,
+    shallowRef,
+    inject,
+    onMounted,
+    onBeforeMount,
+    onBeforeUnmount,
+    nextTick,
+} from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import format from "xml-formatter";
@@ -196,17 +176,19 @@ let data = reactive({
     transcription: undefined,
     isComplete: false,
     saved: false,
-    tei: $store.state.configuration.teiMarkupControls.controls,
+    markupControl: "add",
+    editorContols: {},
+    controls: $store.state.configuration.ui.teiEditorControls,
 });
 
 onBeforeMount(async () => {
-    await resourceIsComplete();
+    await checkIfResourceIsComplete();
 });
 onMounted(async () => {
     data.transcription = await loadTranscription();
     ({ view } = setupCodeMirror());
     nextTick(() => {
-        formatDocument();
+        new CodemirrorEditorControls({ view }).formatDocument({});
     });
 });
 onBeforeUnmount(async () => {
@@ -219,43 +201,14 @@ let view;
 function setupCodeMirror() {
     const initialState = EditorState.create({
         doc: data.transcription,
-        extensions: [
-            EditorView.lineWrapping,
-            lineNumbers(),
-            highlightActiveLineGutter(),
-            highlightSpecialChars(),
-            history(),
-            foldGutter(),
-            drawSelection(),
-            dropCursor(),
-            EditorState.allowMultipleSelections.of(true),
-            indentOnInput(),
-            syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-            bracketMatching(),
-            closeBrackets(),
-            autocompletion(),
-            rectangularSelection(),
-            crosshairCursor(),
-            highlightActiveLine(),
-            highlightSelectionMatches(),
-            oneDark,
-            keymap.of([
-                ...closeBracketsKeymap,
-                ...defaultKeymap,
-                ...searchKeymap,
-                ...historyKeymap,
-                ...foldKeymap,
-                ...completionKeymap,
-            ]),
-            xml(),
-            xmlLanguage,
-        ],
+        extensions: [basicSetup, EditorView.lineWrapping, oneDark, xml(), xmlLanguage],
     });
 
     const view = new EditorView({
         state: initialState,
         parent: codemirror.value,
     });
+    data.editorControls = new CodemirrorEditorControls({ view });
     return { view };
 }
 async function loadTranscription() {
@@ -274,17 +227,11 @@ async function loadTranscription() {
         return "";
     }
 }
-function undoButton() {
-    undo({
-        state: view.state,
-        dispatch: view.dispatch,
-    });
+function undo() {
+    new CodemirrorEditorControls({ view }).undo();
 }
-function redoButton() {
-    redo({
-        state: view.state,
-        dispatch: view.dispatch,
-    });
+function redo() {
+    new CodemirrorEditorControls({ view }).redo();
 }
 async function markComplete(status) {
     let response = await $http.put({
@@ -295,7 +242,7 @@ async function markComplete(status) {
         data.isComplete = status;
     }
 }
-async function resourceIsComplete() {
+async function checkIfResourceIsComplete() {
     let response = await $http.get({
         route: `/items/${data.identifier}/resources/${data.resource}/status`,
     });
@@ -305,30 +252,12 @@ async function resourceIsComplete() {
     }
 }
 function deleteTranscription() {
-    let update = view.state.update({
-        changes: {
-            from: 0,
-            to: view.state.doc.length,
-            insert: "",
-        },
-    });
-    view.update([update]);
+    new CodemirrorEditorControls({ view }).delete();
 }
 function convertToTei() {
-    let document = view.state.doc.toString().split("\n");
-    if (document[0].match(/^\<surface xmlns=/)) return;
-    let tei = [`<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${$route.params.resource}">`];
-    tei = [...tei, ...document.map((l) => `<p>${l}</p>`), "</surface>"];
-    let update = view.state.update({
-        changes: {
-            from: 0,
-            to: view.state.doc.length,
-            insert: tei.join("\n"),
-        },
-    });
-    view.update([update]);
+    new CodemirrorEditorControls({ view }).convertToTei({ $route });
     nextTick(() => {
-        formatDocument();
+        new CodemirrorEditorControls({ view }).formatDocument({});
     });
 }
 async function save() {
@@ -338,86 +267,13 @@ async function save() {
         body: { datafiles: props.data, document },
     });
     data.saved = true;
-    if (document) formatDocument();
+    new CodemirrorEditorControls({ view }).formatDocument({});
 
     setTimeout(() => {
         data.saved = false;
     }, 1500);
 }
-function formatDocument(document) {
-    document = document ? document : view.state.doc.toString();
-    let formattedDocument;
-    try {
-        formattedDocument = format(document, {
-            indentation: "  ",
-            collapseContent: true,
-        });
-        let update = view.state.update({
-            changes: {
-                from: 0,
-                to: view.state.doc.length,
-                insert: formattedDocument,
-            },
-        });
-        view.update([update]);
-    } catch (error) {
-        // couldn't format - likely not an XML document
-    }
-}
-async function addElement(type) {
-    let selections = view.state.selection.ranges.reverse();
-    switch (type) {
-        case "paragraph":
-            selections.forEach((r) => {
-                let changes = {
-                    from: r.from,
-                    to: r.to,
-                    insert: `<p>${view.state.sliceDoc(r.from, r.to)}</p>`,
-                };
-                view.dispatch({ changes });
-            });
-            break;
-        case "underline":
-            selections.forEach((r) => {
-                let changes = {
-                    from: r.from,
-                    to: r.to,
-                    insert: `<hi rend="underline">${view.state.sliceDoc(r.from, r.to)}</hi>`,
-                };
-                view.dispatch({ changes });
-            });
-            break;
-        case "strikethrough":
-            selections.forEach((r) => {
-                let changes = {
-                    from: r.from,
-                    to: r.to,
-                    insert: `<hi rend="strikethrough"> ${view.state.sliceDoc(r.from, r.to)}</hi>`,
-                };
-                view.dispatch({ changes });
-            });
-            break;
-        case "linebreak":
-            selections.forEach((r) => {
-                let changes = {
-                    from: r.to,
-                    insert: `<lb/>`,
-                };
-                view.dispatch({ changes });
-            });
-            break;
-        case "unclear":
-            selections.forEach((r) => {
-                let changes = {
-                    from: r.from,
-                    to: r.to,
-                    insert: `<unclear>${view.state.sliceDoc(r.from, r.to)}</unclear>`,
-                };
-                view.dispatch({ changes });
-            });
-            break;
-    }
-}
+
 async function reprocessPageAsTable() {
     const dateFrom = new Date();
     let response = await $http.post({
@@ -441,7 +297,7 @@ async function reprocessPageAsTable() {
     });
 
     let document = await loadTranscription();
-    formatDocument(document);
+    new CodemirrorEditorControls({ view }).formatDocument({ document });
     data.extractTableProcessing = false;
 
     async function checkProcessingStatus({ $http, identifier, resources, taskId, dateFrom }) {

@@ -63,14 +63,21 @@ export class CodemirrorEditorControls {
         this.applyMarkup({ element, pre, post });
     }
     applyMarkup({ element = undefined, pre = undefined, post = undefined }) {
-        let selections = this.view.state.selection.ranges.reverse();
+        let selections = this.view.state.selection.ranges;
+
         let changes = selections.map((r) => {
+            let insert;
+            if (element) {
+                insert = `<${element}>${this.view.state.sliceDoc(r.from, r.to)}</${element}>`;
+            } else if (pre && !post) {
+                insert = `${pre}${this.view.state.sliceDoc(r.from, r.to)}`;
+            } else if (pre && post) {
+                insert = `${pre}${this.view.state.sliceDoc(r.from, r.to)}${post}`;
+            }
             let change = {
                 from: r.from,
                 to: r.to,
-                insert: element
-                    ? `<${element}>${this.view.state.sliceDoc(r.from, r.to)}</${element}>`
-                    : `${pre}${this.view.state.sliceDoc(r.from, r.to)}${post}`,
+                insert,
             };
             return change;
         });
@@ -80,7 +87,7 @@ export class CodemirrorEditorControls {
         this.removeMarkup({ element, pre, post });
     }
     removeMarkup({ element = undefined, pre = undefined, post = undefined }) {
-        let selections = this.view.state.selection.ranges.reverse();
+        let selections = this.view.state.selection.ranges;
         let changes = selections.map((r) => {
             let content = this.view.state.sliceDoc(r.from, r.to);
             const elementPreRe = new RegExp(`<${element}>`, "gi");
@@ -105,7 +112,6 @@ export class CodemirrorEditorControls {
     removeAllMarkup() {
         let changes;
         let selections = this.view.state.selection.ranges;
-        console.log(selections);
         if (selections.length === 1 && selections[0].from === selections[0].to) {
             let document = this.view.state.doc.toString();
             const lines = document.split("\n").map((line) => {

@@ -3,7 +3,7 @@
         <div class="flex flex-col">
             <!-- left sidebar controls -->
             <div class="h-12"></div>
-            <div class="flex flex-col space-y-2 items-end">
+            <div class="flex flex-col space-y-2 items-end max-height">
                 <div class="flex flex-row space-x-3">
                     <div class="text-2xl">
                         <i class="fa-solid fa-minus"></i>
@@ -22,7 +22,7 @@
                     :key="idx"
                     class="box-item"
                     effect="dark"
-                    :content="control.help"
+                    :content="data.markupControl === 'add' ? control.help : 'Remove the markup'"
                     raw-content
                     placement="left"
                 >
@@ -43,7 +43,7 @@
                     v-if="data.markupControl === 'remove'"
                     class="box-item"
                     effect="dark"
-                    content="Remove all XML markup from the document."
+                    content="Remove all XML markup from the document or selection."
                     raw-content
                     placement="left"
                 >
@@ -59,7 +59,7 @@
         </div>
         <div class="flex flex-col flex-grow px-2">
             <!-- topbar control -->
-            <div class="flex flex-row mb-2 space-x-2">
+            <div class="flex flex-row mb-2 space-x-2 max-width-half">
                 <div>
                     <el-button @click="undo" type="primary" size="large">
                         <i class="fa-solid fa-undo"></i>
@@ -88,6 +88,16 @@
                 >
                     <el-button @click="convertToTei" type="primary" size="large">
                         <i class="fa-solid fa-code"></i>
+                    </el-button>
+                </el-tooltip>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Format the document"
+                    placement="top-start"
+                >
+                    <el-button @click="format" type="primary" size="large">
+                        format document
                     </el-button>
                 </el-tooltip>
 
@@ -148,19 +158,9 @@ import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { xml, xmlLanguage } from "@codemirror/lang-xml";
 import { CodemirrorEditorControls } from "./codemirror-editor.js";
-import {
-    ref,
-    reactive,
-    shallowRef,
-    inject,
-    onMounted,
-    onBeforeMount,
-    onBeforeUnmount,
-    nextTick,
-} from "vue";
+import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
-import format from "xml-formatter";
 
 const $http = inject("$http");
 const $route = useRoute();
@@ -260,6 +260,9 @@ function convertToTei() {
         new CodemirrorEditorControls({ view }).formatDocument({});
     });
 }
+function format() {
+    new CodemirrorEditorControls({ view }).formatDocument({});
+}
 async function save() {
     let document = view.state.doc.toString();
     await $http.put({
@@ -329,6 +332,16 @@ async function reprocessPageAsTable() {
 .cm-editor {
     font-size: 16px;
     height: calc(100vh - 250px);
+    overflow: scroll;
+    max-width: calc(100vw / 2);
+}
+
+.max-width-half {
+    max-width: calc(100vw / 2);
+    overflow: scroll;
+}
+.max-height {
+    max-height: calc(100vh - 300px);
     overflow: scroll;
 }
 </style>

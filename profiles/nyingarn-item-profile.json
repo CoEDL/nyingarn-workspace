@@ -6,7 +6,7 @@
         "warnMissingProperty": true
     },
     "hide": {
-        "Dataset": ["memberOf"]
+        "Dataset": [""]
     },
     "layouts": {
         "Dataset": [

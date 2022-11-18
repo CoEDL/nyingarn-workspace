@@ -11,7 +11,8 @@
             <el-tabs v-model="data.activeTab" @tab-click="updateRouteOnTabSelect">
                 <el-tab-pane label="Collection Metadata" name="metadata">
                     <describo-crate-builder
-                        v-if="data.activeTab === 'metadata'"
+                        v-if="data.activeTab === 'metadata' && data.metadataComponent.display"
+                        v-loading="data.metadataComponent.loading"
                         :style="{ height: metadataPanelHeight }"
                         class="overflow-scroll"
                         :crate="data.crate"
@@ -21,6 +22,7 @@
                         :enable-crate-preview="true"
                         :enable-browse-entities="true"
                         :purge-unlinked-entities-before-save="true"
+                        @ready="data.metadataComponent.loading = false"
                         @save:crate="saveCrate"
                     >
                     </describo-crate-builder>
@@ -51,6 +53,7 @@ import { ref, reactive, onMounted, onBeforeMount, inject, watch, computed } from
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { Lookup } from "../../lookup.js";
+import { debounce } from "lodash";
 const $route = useRoute();
 const $router = useRouter();
 const $http = inject("$http");
@@ -67,9 +70,14 @@ let data = reactive({
     routeWatcher: undefined,
     tabs: ["members", "metadata", "associate", "administration"],
     activeTab: "metadata",
+    metadataComponent: {
+        display: false,
+        loading: false,
+    },
     collection: {},
     crate: {},
     profile: {},
+    debouncedLoad: debounce(load, 300),
 });
 onBeforeMount(async () => {
     await checkUserAccess();
@@ -77,7 +85,7 @@ onBeforeMount(async () => {
 onMounted(() => {
     data.routeWatcher = watch(() => $route.path, updateRouteOnNav);
     updateRouteOnNav();
-    if (data.activeTab === "metadata") load();
+    if (data.activeTab === "metadata") loadMetadata();
 });
 const metadataPanelHeight = computed(() => {
     return `${window.innerHeight - 140}px`;
@@ -94,7 +102,8 @@ async function checkUserAccess() {
     data.userIsPermitted = true;
 }
 function updateRouteOnNav() {
-    if (data.activeTab === "metadata") load();
+    data.metadataComponent.display = false;
+    if (data.activeTab === "metadata") loadMetadata();
     if (!$route.name.match(/^collections/)) {
         data.routeWatcher();
         return;
@@ -107,10 +116,19 @@ function updateRouteOnNav() {
     }
 }
 function updateRouteOnTabSelect(tab) {
+    data.metadataComponent.display = false;
     $router.push(tab.paneName);
-    if (tab.paneName === "metadata") load();
+    if (tab.paneName === "metadata") loadMetadata();
+}
+async function loadMetadata() {
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    data.metadataComponent.display = true;
+    await data.debouncedLoad();
 }
 async function load() {
+    if (!$route.meta.type && !$route.params.identifier) return;
+    data.metadataComponent.loading = true;
+
     // load the crate file
     let response = await $http.get({
         route: `/describo/rocrate/${$route.meta.type}/${$route.params.identifier}`,
@@ -118,7 +136,7 @@ async function load() {
     if (response.status !== 200) {
         ElMessage.error(`Unable to retrieve RO Crate file`);
     }
-    data.crate = (await response.json()).rocrateFile;
+    data.crate = (await response.json()).crate;
 
     // load the profile
     response = await $http.get({

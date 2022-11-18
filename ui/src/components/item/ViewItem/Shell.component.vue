@@ -51,6 +51,7 @@ import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { Lookup } from "../../lookup.js";
+import { debounce } from "lodash";
 const $route = useRoute();
 const $router = useRouter();
 const $http = inject("$http");
@@ -73,6 +74,7 @@ let data = reactive({
     },
     crate: {},
     profile: {},
+    debouncedLoad: debounce(load, 300),
 });
 onBeforeMount(async () => {
     await checkUserAccess();
@@ -114,11 +116,12 @@ function updateRouteOnTabSelect(tab) {
     if (tab.paneName === "metadata") loadMetadata();
 }
 async function loadMetadata() {
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 400));
     data.metadataComponent.display = true;
-    await load();
+    await data.debouncedLoad();
 }
 async function load() {
+    if (!$route.meta.type && !$route.params.identifier) return;
     data.metadataComponent.loading = true;
 
     // load the crate file

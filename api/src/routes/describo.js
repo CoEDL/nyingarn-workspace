@@ -136,17 +136,30 @@ async function postCopyCrateHandler(req, res, next) {
 // TODO: this code does not have tests
 async function getDescriboROCrate(req, res, next) {
     let store = await getStoreHandle({ id: req.params.identifier, className: req.params.type });
+
     let crate, filesAdded;
     try {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
     } catch (error) {
         crate = createDefaultROCrateFile({ name: req.params.identifier });
     }
-    ({ crate, filesAdded } = await registerAllFiles({
-        id: req.params.identifier,
-        className: req.params.type,
-        crate,
-    }));
+    try {
+        ({ crate, filesAdded } = await registerAllFiles({
+            id: req.params.identifier,
+            className: req.params.type,
+            crate,
+        }));
+    } catch (error) {
+        // the crate is broken! mint a brand new one and do this setup again
+        crate = createDefaultROCrateFile({ name: req.params.identifier });
+        await store.put({ target: "ro-crate-metadata.json", json: crate });
+
+        ({ crate, filesAdded } = await registerAllFiles({
+            id: req.params.identifier,
+            className: req.params.type,
+            crate,
+        }));
+    }
     if (filesAdded.length) {
         await store.put({ target: "ro-crate-metadata.json", json: crate });
     }

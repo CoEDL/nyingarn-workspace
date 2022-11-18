@@ -8,13 +8,15 @@ export async function registerAllFiles({ id, className, crate }) {
     let store = await getStoreHandle({ id, className });
 
     // get list of files in the bucket
-    const files = (await store.listResources()).filter((file) => {
+    let files = (await store.listResources()).filter((file) => {
         return ![
             "ro-crate-metadata.json",
             "nocfl.inventory.json",
             "nocfl.identifier.json",
         ].includes(file.Key);
     });
+    files = files.filter((file) => !file.Key.match(/^\./));
+    if (!files.length) return { crate, filesAdded: [] };
 
     // determine which files not already registered in the crate
     const filesInBucket = files.map((file) => file.Key);

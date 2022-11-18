@@ -9,7 +9,6 @@
                     <div>Items</div>
                 </div>
             </template>
-            <el-button @click="init">load</el-button>
             <el-table :data="data.items" :height="tableHeight">
                 <template #empty> No items have been found. </template>
                 <el-table-column prop="name" label="Name">

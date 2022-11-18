@@ -27,9 +27,9 @@
                     >
                     </describo-crate-builder>
                 </el-tab-pane>
-                <el-tab-pane label="Associate to Collection" name="associate">
+                <!-- <el-tab-pane label="Associate to Collection" name="associate">
                     <item-members-component v-if="data.activeTab === 'associate'" />
-                </el-tab-pane>
+                </el-tab-pane> -->
                 <el-tab-pane label="Upload Data" name="upload">
                     <upload-component v-if="data.activeTab === 'upload'" />
                 </el-tab-pane>

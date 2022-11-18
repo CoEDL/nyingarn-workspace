@@ -121,7 +121,7 @@ async function connectCollection(collection) {
     await $http.put({ route: `/admin/collections/${collection.name}/connect-user` });
     data.collections = data.collections.map((c) => {
         if (c.name === collection.name) c.connected = true;
-        return i;
+        return c;
     });
 }
 function loadCollection(collection) {

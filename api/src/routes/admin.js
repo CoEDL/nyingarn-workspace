@@ -1,11 +1,12 @@
 import path from "path";
 import { routeAdmin, loadFiles, listObjects, getLogger, loadConfiguration } from "../common";
 import { groupBy } from "lodash";
-import { createItem, lookupItemByIdentifier, linkItemToUser } from "../lib/item";
+import { createItem, lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item";
 import {
     createCollection,
     lookupCollectionByIdentifier,
     linkCollectionToUser,
+    getCollections,
 } from "../lib/collection";
 const log = getLogger();
 
@@ -21,11 +22,19 @@ export function setupRoutes({ server }) {
 async function getAdminEntriesHandler(req, res, next) {
     const configuration = await loadConfiguration();
 
+    const myItems = (await getItems({ userId: req.session.user.id, limit: undefined })).rows.map(
+        (item) => item.identifier
+    );
     let items = (await listObjects({ prefix: `/${configuration.api.domain}/item` })) || [];
+    items = items.map((i) => ({ name: i, connected: myItems.includes(i) }));
+
+    const myCollections = (
+        await getCollections({ userId: req.session.user.id, limit: undefined })
+    ).rows.map((collection) => collection.identifier);
     let collections =
         (await listObjects({ prefix: `/${configuration.api.domain}/collection` })) || [];
-    items = items.map((i) => ({ name: i }));
-    collections = collections.map((c) => ({ name: c }));
+    collections = collections.map((c) => ({ name: c, connected: myCollections.includes(c) }));
+
     res.send({ items, collections });
     next();
 }

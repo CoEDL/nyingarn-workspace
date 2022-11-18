@@ -30,14 +30,18 @@ export async function lookupItemByIdentifier({ identifier, userId }) {
 }
 
 export async function getItems({ userId, offset = 0, limit = 10 }) {
+    const query = {
+        order: [["identifier", "ASC"]],
+    };
     let include = [{ model: models.collection }];
     if (userId) include.push({ model: models.user, where: { id: userId } });
-    return await models.item.findAndCountAll({
-        offset,
-        limit,
-        include,
-        order: [["identifier", "ASC"]],
-    });
+    if (limit) {
+        query.offset = offset;
+        query.limit = limit;
+    }
+    query.include = include;
+
+    return await models.item.findAndCountAll(query);
 }
 
 export async function createItem({ identifier, userId }) {

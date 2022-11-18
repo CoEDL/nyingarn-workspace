@@ -13,6 +13,13 @@ export function setupRoutes({ server }) {
     server.get("/describo/profile/:type", route(getDescriboProfile));
 }
 
+function assembleUrl({ targetType, identifier }) {
+    if (targetType === "collection") {
+        return `https://catalog.nyingarn.net/collections/${identifier}`;
+    } else if (targetType === "item") {
+        return `https://catalog.nyingarn.net/items/${identifier}`;
+    }
+}
 // TODO: this code does not have tests
 async function postLinkItemsHandler(req, res, next) {
     const updates = req.body.updates;
@@ -34,7 +41,7 @@ async function postLinkItemsHandler(req, res, next) {
     }
 
     for (let update of req.body.updates) {
-        const id = `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`;
+        const id = assembleUrl({ targetType: update.targetType, identifier: update.target });
 
         let store = await getStoreHandle({ id: update.source, className: update.sourceType });
         let crate;
@@ -90,7 +97,7 @@ async function postUnlinkItemsHandler(req, res, next) {
         await source.removeItem(target);
     }
     for (let update of req.body.updates) {
-        const id = `https://catalog.nyingarn.net/view/${update.targetType}/${update.target}`;
+        const id = assembleUrl({ targetType: update.targetType, identifier: update.target });
 
         let store = await getStoreHandle({ id: update.source, className: update.sourceType });
         let crate;
@@ -110,7 +117,7 @@ async function postUnlinkItemsHandler(req, res, next) {
                 // remove the association
                 e[update.property] = [e[update.property]];
                 e[update.property] = flattenDeep(e[update.property]);
-                e[update.property] = e[update.property].filter((e) => e["@id"] !== id);
+                e[update.property] = e[update.property].filter((e) => e?.["@id"] !== id);
                 if (!e[update.property].length) delete e[update.property];
             }
             return e;

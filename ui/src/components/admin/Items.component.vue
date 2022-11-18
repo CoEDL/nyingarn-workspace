@@ -9,15 +9,28 @@
                     <div>Items</div>
                 </div>
             </template>
-            <el-table :data="data.items" :height="tableHeight" size="small">
+            <el-button @click="init">load</el-button>
+            <el-table :data="data.items" :height="tableHeight">
                 <template #empty> No items have been found. </template>
-                <el-table-column prop="name" label="Name"> </el-table-column>
-                <el-table-column label="Actions" width="100">
+                <el-table-column prop="name" label="Name">
                     <template #default="scope">
-                        <div class="flex flex-row">
-                            <el-button type="primary" @click="connectItem(scope.row)" size="small">
-                                connect
-                            </el-button>
+                        <div
+                            :class="{ 'cursor-pointer': scope.row.connected }"
+                            @click="loadItem(scope.row)"
+                        >
+                            {{ scope.row.name }}
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="Actions" width="200">
+                    <template #default="scope">
+                        <div class="flex flex-row space-x-2">
+                            <div v-if="!scope.row.connected">
+                                <el-button type="primary" @click="connectItem(scope.row)">
+                                    connect
+                                </el-button>
+                            </div>
+                            <div v-else>connected</div>
                         </div>
                     </template>
                 </el-table-column>
@@ -29,19 +42,27 @@
                     <div>Collections</div>
                 </div>
             </template>
-            <el-table :data="data.collections" :height="tableHeight" size="small">
+            <el-table :data="data.collections" :height="tableHeight">
                 <template #empty> No collections have been found. </template>
-                <el-table-column prop="name" label="Name"> </el-table-column>
+                <el-table-column prop="name" label="Name">
+                    <template #default="scope">
+                        <div
+                            :class="{ 'cursor-pointer': scope.row.connected }"
+                            @click="loadCollection(scope.row)"
+                        >
+                            {{ scope.row.name }}
+                        </div>
+                    </template>
+                </el-table-column>
                 <el-table-column label="Actions" width="100">
                     <template #default="scope">
                         <div class="flex flex-row">
-                            <el-button
-                                type="primary"
-                                @click="connectCollection(scope.row)"
-                                size="small"
-                            >
-                                connect
-                            </el-button>
+                            <div v-if="!scope.row.connected">
+                                <el-button type="primary" @click="connectCollection(scope.row)">
+                                    connect
+                                </el-button>
+                            </div>
+                            <div v-else>connected</div>
                         </div>
                     </template>
                 </el-table-column>
@@ -88,10 +109,22 @@ async function init() {
 }
 async function connectItem(item) {
     await $http.put({ route: `/admin/items/${item.name}/connect-user` });
+    data.items = data.items.map((i) => {
+        if (i.name === item.name) i.connected = true;
+        return i;
+    });
+}
+function loadItem(item) {
     router.push(`/items/${item.name}/view`);
 }
 async function connectCollection(collection) {
     await $http.put({ route: `/admin/collections/${collection.name}/connect-user` });
+    data.collections = data.collections.map((c) => {
+        if (c.name === collection.name) c.connected = true;
+        return i;
+    });
+}
+function loadCollection(collection) {
     router.push(`/collections/${collection.name}/metadata`);
 }
 </script>

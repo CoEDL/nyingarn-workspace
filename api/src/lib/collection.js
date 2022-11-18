@@ -15,14 +15,18 @@ export async function lookupCollectionByIdentifier({ identifier, userId }) {
 }
 
 export async function getCollections({ userId, offset = 0, limit = 10 }) {
+    const query = {
+        order: [["identifier", "ASC"]],
+    };
     let include = [{ model: models.item }, { model: models.collection, as: "subCollection" }];
     if (userId) include.push({ model: models.user, where: { id: userId } });
-    let collections = await models.collection.findAndCountAll({
-        offset,
-        limit,
-        include,
-        order: [["identifier", "ASC"]],
-    });
+    if (limit) {
+        query.offset = offset;
+        query.limit = limit;
+    }
+    query.include = include;
+
+    let collections = await models.collection.findAndCountAll(query);
     return collections;
 }
 

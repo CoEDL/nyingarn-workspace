@@ -115,6 +115,7 @@ export class CodemirrorEditorControls {
         if (selections.length === 1 && selections[0].from === selections[0].to) {
             let document = this.view.state.doc.toString();
             const lines = document.split("\n").map((line) => {
+                if (line.match(/surface/)) return line;
                 line = line
                     .replace(/<.*?>/g, "")
                     .replace(/<\/.*?>/g, "")

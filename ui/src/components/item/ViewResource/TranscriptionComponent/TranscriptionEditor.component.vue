@@ -59,7 +59,40 @@
         </div>
         <div class="flex flex-col flex-grow px-2">
             <!-- topbar control -->
-            <div class="flex flex-row mb-2 space-x-2 max-width-half">
+            <div class="flex flex-row space-x-2">
+                <div>
+                    <el-button
+                        @click="save"
+                        :type="data.saved ? 'success' : 'primary'"
+                        size="large"
+                        :disabled="data.saved"
+                    >
+                        <div v-show="data.saved">
+                            <i class="fa-solid fa-check"></i>
+                            &nbsp;saved
+                        </div>
+                        <div v-show="!data.saved">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            &nbsp;save
+                        </div>
+                    </el-button>
+                </div>
+                <div class="flex flex-grow"></div>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    content="Mark the transcription as complete"
+                    placement="top-start"
+                >
+                    <el-switch
+                        v-model="data.isComplete"
+                        active-text="Complete"
+                        inactive-text="In progress"
+                        @change="markComplete"
+                    />
+                </el-tooltip>
+            </div>
+            <div class="flex flex-row space-x-2 py-4 min-max-width overflow-scroll">
                 <div>
                     <el-button @click="undo" type="primary" size="large">
                         <i class="fa-solid fa-undo"></i>
@@ -100,7 +133,6 @@
                         format document
                     </el-button>
                 </el-tooltip>
-
                 <el-popconfirm
                     title="This will delete the current transcription. Are you sure you want to do this?"
                     @confirm="reprocessPageAsTable"
@@ -113,40 +145,9 @@
                         </el-button>
                     </template>
                 </el-popconfirm>
-                <div class="flex-grow"></div>
-                <el-tooltip
-                    class="box-item"
-                    effect="dark"
-                    content="Mark the transcription as complete"
-                    placement="top-start"
-                >
-                    <el-switch
-                        v-model="data.isComplete"
-                        active-text="Complete"
-                        inactive-text="In progress"
-                        @change="markComplete"
-                    />
-                </el-tooltip>
-                <div>
-                    <el-button
-                        @click="save"
-                        :type="data.saved ? 'success' : 'primary'"
-                        size="large"
-                        :disabled="data.saved"
-                    >
-                        <div v-show="data.saved">
-                            <i class="fa-solid fa-check"></i>
-                            &nbsp;saved
-                        </div>
-                        <div v-show="!data.saved">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            &nbsp;save
-                        </div>
-                    </el-button>
-                </div>
             </div>
-            <div class="">
-                <div ref="codemirror" class="cm-editor"></div>
+            <div class="editor min-max-width overflow-scroll">
+                <div ref="codemirror"></div>
             </div>
         </div>
     </div>
@@ -329,16 +330,14 @@ async function reprocessPageAsTable() {
 </script>
 
 <style scoped>
-.cm-editor {
+.editor {
     font-size: 16px;
-    height: calc(100vh - 250px);
-    overflow: scroll;
-    max-width: calc(100vw / 2);
+    height: calc(100vh - 320px);
 }
 
-.max-width-half {
-    max-width: calc(100vw / 2);
-    overflow: scroll;
+.min-max-width {
+    min-width: 500px;
+    /* max-width: calc(100vw / 2); */
 }
 .max-height {
     max-height: calc(100vh - 300px);

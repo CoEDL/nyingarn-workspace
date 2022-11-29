@@ -1,6 +1,10 @@
 // these endpoints will only return data they are responsible for
 //
-import previewStylesheet from "../common/tei-to-html.xsl.sef.json";
+import { readFile } from "fs/promises";
+const previewStylesheet = JSON.parse(
+    await readFile(new URL("../common/tei-to-html.xsl.sef.json", import.meta.url))
+);
+// import previewStylesheet from "../common/tei-to-html.xsl.sef.json" assert { type: "json" };
 import SaxonJS from "saxon-js";
 
 export async function transformDocument({ document }) {

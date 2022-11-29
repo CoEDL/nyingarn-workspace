@@ -1,21 +1,38 @@
-require("regenerator-runtime");
-const restify = require("restify");
-const server = restify.createServer();
-const models = require("./src/models");
-const { loadConfiguration, getLogger } = require("./src/common");
-const { setupRoutes } = require("./src/routes");
+import("regenerator-runtime");
+// const restify = require("restify");
+// const server = restify.createServer();
+import models from "./src/models/index.js";
+import { loadConfiguration, getLogger } from "./src/common/index.js";
+import { setupRoutes as setupBaseRoutes } from "./src/routes/base.js";
+import { setupRoutes as setupAdminRoutes } from "./src/routes/admin.js";
+import { setupRoutes as setupAuthRoutes } from "./src/routes/auth.js";
+import { setupRoutes as setupCollectionRoutes } from "./src/routes/collection.js";
+import { setupRoutes as setupDescriboRoutes } from "./src/routes/describo.js";
+import { setupRoutes as setupItemRoutes } from "./src/routes/item.js";
+import { setupRoutes as setupLogRoutes } from "./src/routes/logs.js";
+import { setupRoutes as setupSearchRoutes } from "./src/routes/search.js";
+import { setupRoutes as setupUserRoutes } from "./src/routes/user.js";
 const log = getLogger();
-const rabbit = require("foo-foo-mq");
+import rabbit from "foo-foo-mq";
 
-// DEVELOPER NOTE
-//
-//  Do not import fetch anywhere in your code. Use global.fetch
-//   instead.
-//
-//  This way, jest fetch mock will override fetch when you need it to.
-global.fetch = require("node-fetch");
+import Fastify from "fastify";
+import fastifyCompress from "@fastify/compress";
+import cors from "@fastify/cors";
+import fastifySensible from "@fastify/sensible";
+const envToLogger = {
+    development: {
+        transport: {
+            target: "pino-pretty",
+            options: { ignore: "reqId,req.hostname,req.remoteAddress,req.remotePort" },
+        },
+    },
+    production: true,
+    test: false,
+};
+const fastify = Fastify({ logger: envToLogger[process.env.NODE_ENV] });
 
-(async () => {
+main();
+async function main() {
     let configuration;
     try {
         configuration = await loadConfiguration();
@@ -23,39 +40,42 @@ global.fetch = require("node-fetch");
         log.error("configuration.json not found - stopping now");
         process.exit();
     }
-    await models.sequelize.sync();
-    global.rabbit = await initialiseRabbit({ configuration });
 
-    if (process.env?.LOG_LEVEL === "debug") {
-        server.use((req, res, next) => {
-            log.debug(`${req.route.method}: ${req.route.path}`);
-            return next();
-        });
+    if (process.env.NODE_ENV === "development") {
+        fastify.register(cors, { origin: "*" });
     }
-    server.use(restify.plugins.dateParser());
-    server.use(restify.plugins.queryParser());
-    server.use(restify.plugins.jsonp());
-    server.use(restify.plugins.gzipResponse());
-    server.use(
-        restify.plugins.bodyParser({
-            maxBodySize: 0,
-            mapParams: true,
-            mapFiles: false,
-            overrideParams: false,
-            multiples: true,
-            hash: "sha1",
-            rejectUnknown: true,
-            requestBodyOnGet: false,
-            reviver: undefined,
-            maxFieldsSize: 2 * 1024 * 1024,
-        })
-    );
-    setupRoutes({ server });
-
-    server.listen("8080", function () {
-        log.info(`ready on ${server.url}`);
+    fastify.register(fastifySensible);
+    fastify.register(fastifyCompress);
+    fastify.addHook("onRequest", async (req, res) => {
+        configuration = await loadConfiguration();
+        req.session = {
+            configuration,
+        };
+        global.testing = req.headers.testing;
     });
-})();
+    fastify.addHook("onReady", async () => {
+        const rabbit = await initialiseRabbit({ configuration });
+        await models.sequelize.sync();
+        fastify.decorate("models", models);
+        fastify.decorate("rabbit", rabbit);
+    });
+    fastify.register(setupBaseRoutes);
+    fastify.register(setupAdminRoutes);
+    fastify.register(setupAuthRoutes);
+    fastify.register(setupCollectionRoutes);
+    fastify.register(setupDescriboRoutes);
+    fastify.register(setupItemRoutes);
+    fastify.register(setupLogRoutes);
+    fastify.register(setupSearchRoutes);
+    fastify.register(setupUserRoutes);
+
+    fastify.listen({ port: 8080, host: "0.0.0.0" }, function (err, address) {
+        if (err) {
+            fastify.log.error(err);
+            process.exit(1);
+        }
+    });
+}
 
 async function initialiseRabbit({ configuration }) {
     await rabbit.configure({

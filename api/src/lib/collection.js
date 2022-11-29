@@ -1,5 +1,5 @@
-import models from "../models";
-import { getStoreHandle } from "../common";
+import models from "../models/index.js";
+import { getStoreHandle } from "../common/index.js";
 
 export async function lookupCollectionByIdentifier({ identifier, userId }) {
     let clause = {

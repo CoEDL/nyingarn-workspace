@@ -1,13 +1,22 @@
-import { loadConfiguration } from "../common";
-import { writeJSON } from "fs-extra";
-import { cloneDeep } from "lodash";
-import models from "../models";
-const chance = require("chance").Chance();
-import { range } from "lodash";
-import { createItem } from "../lib/item";
+import { loadConfiguration } from "./configuration.js";
+import fsExtraPkg from "fs-extra";
+const { writeJSON } = fsExtraPkg;
+import models from "../models/index.js";
+import Chance from "chance";
+const chance = Chance();
+import lodashPkg from "lodash";
+const { range, cloneDeep } = lodashPkg;
+import { createItem } from "../lib/item.js";
 
 export const host = `http://localhost:8080`;
 
+export function headers(session) {
+    return {
+        authorization: `Bearer ${session.token}`,
+        "Content-Type": "application/json",
+        testing: true,
+    };
+}
 export async function setupBeforeAll({ adminEmails = [] }) {
     let configuration = await loadConfiguration();
 

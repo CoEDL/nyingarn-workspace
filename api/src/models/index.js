@@ -1,9 +1,14 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const basename = path.basename(__filename);
-const Sequelize = require("sequelize");
+import Sequelize from "sequelize";
+import user from "./user.js";
+import session from "./session.js";
+import item from "./item.js";
+import collection from "./collection.js";
+import task from "./task.js";
+import log from "./log.js";
+import itemUser from "./item_user.js";
+
 const models = {};
 
 let config = {
@@ -31,15 +36,7 @@ let sequelize = new Sequelize(
     config.db
 );
 
-let modules = [
-    require("./user.js"),
-    require("./session.js"),
-    require("./item.js"),
-    require("./task.js"),
-    require("./collection.js"),
-    require("./log.js"),
-    require("./item_user"),
-];
+let modules = [user, session, item, collection, task, log, itemUser];
 
 // Initialize models
 modules.forEach((module) => {
@@ -57,4 +54,4 @@ Object.keys(models).forEach((key) => {
 models.sequelize = sequelize;
 models.Sequelize = Sequelize;
 
-module.exports = models;
+export default models;

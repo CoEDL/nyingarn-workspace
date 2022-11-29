@@ -1,5 +1,5 @@
-import models from "../models";
-const { Op } = require("sequelize");
+import models from "../models/index.js";
+import { Op } from "sequelize";
 
 export async function getLogs({ limit = 10, offset = 0, level, dateFrom, dateTo }) {
     let where = {};

@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function (sequelize, DataTypes) {
+export default function (sequelize, DataTypes) {
     let ItemUser = sequelize.define(
         "item_user",
         {
@@ -14,4 +14,4 @@ module.exports = function (sequelize, DataTypes) {
     ItemUser.associate = function (models) {};
 
     return ItemUser;
-};
+}

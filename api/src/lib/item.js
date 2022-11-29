@@ -1,9 +1,11 @@
-import models from "../models";
+import models from "../models/index.js";
 import { Op } from "sequelize";
-import { loadConfiguration, getS3Handle, getStoreHandle } from "../common";
+import { loadConfiguration, getS3Handle, getStoreHandle } from "../common/index.js";
 import path from "path";
-import { writeJson, remove } from "fs-extra";
-import { compact, groupBy, uniq, isNumber } from "lodash";
+import fsExtraPkg from "fs-extra";
+const { writeJson, remove } = fsExtraPkg;
+import lodashPkg from "lodash";
+const { compact, groupBy, uniq, isNumber } = lodashPkg;
 import { sub } from "date-fns";
 const completedResources = ".completed-resources.json";
 const specialFiles = [

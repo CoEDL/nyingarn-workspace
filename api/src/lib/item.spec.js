@@ -119,7 +119,7 @@ describe("Item management tests", () => {
         let items = await getItems({ userId: user.id, offset: 10 });
         expect(items.rows.length).toEqual(0);
         items = await getItems({ userId: user.id, limit: 0 });
-        expect(items.rows.length).toEqual(0);
+        expect(items.rows.length).toEqual(1);
 
         await item.destroy();
     });

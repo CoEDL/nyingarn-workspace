@@ -1,12 +1,7 @@
-import models from "../models";
-import {
-    BadRequestError,
-    ForbiddenError,
-    NotFoundError,
-    InternalServerError,
-} from "restify-errors";
-import { route, logEvent, getLogger, getStoreHandle } from "../common";
-import { groupBy, flattenDeep, compact, isEmpty } from "lodash";
+import models from "../models/index.js";
+import { logEvent, getLogger, getStoreHandle, demandAuthenticatedUser } from "../common/index.js";
+import lodashPkg from "lodash";
+const { groupBy, isEmpty } = lodashPkg;
 import {
     createItem,
     lookupItemByIdentifier,
@@ -24,79 +19,68 @@ import {
     statItemFile,
     markResourceComplete,
     isResourceComplete,
-} from "../lib/item";
-import { transformDocument } from "../lib/transform";
+} from "../lib/item.js";
+import { transformDocument } from "../lib/transform.js";
 const log = getLogger();
 
-async function verifyItemAccess(req, res, next) {
+// function routeItem(handler) {
+//     return compact(flattenDeep([...route(), verifyItemAccess, handler]));
+// }
+
+export function setupRoutes(fastify, options, done) {
+    fastify.addHook("preHandler", demandAuthenticatedUser);
+    fastify.addHook("preHandler", verifyItemAccess);
+
+    fastify.get("/items", getItemsHandler);
+    fastify.get("/items/:identifier", getItemHandler);
+    fastify.post("/items", postItemHandler);
+    fastify.put("/items/:identifier/attach-user", putItemInviteUserHandler);
+    fastify.put("/items/:identifier/detach-user", putItemDetachUserHandler);
+    fastify.get("/items/:identifier/users", getItemUsers);
+    fastify.delete("/items/:identifier", deleteItemHandler);
+    fastify.get("/items/:identifier/status", getItemStatisticsHandler);
+    fastify.get("/items/:identifier/resources", getItemResourcesHandler);
+    fastify.put("/items/:identifier/reprocess-imports", putReprocessImports);
+    fastify.get("/items/:identifier/resources/:resource/files", getResourceFilesListHandler);
+    fastify.get(
+        "/items/:identifier/resources/:resource/status",
+        getResourceProcessingStatusHandler
+    );
+    fastify.put("/items/:identifier/resources/:resource/status", putResourceCompleteHandler);
+    fastify.get(
+        "/items/:identifier/resources/:resource/transcription",
+        getItemTranscriptionHandler
+    );
+    fastify.get("/items/:identifier/resources/:resource/transform", getTransformTeiDocumentHandler);
+    fastify.get("/items/:identifier/resources/:resource", getItemResourceFileHandler);
+    fastify.get("/items/:identifier/resources/:file/link", getItemResourceFileLinkHandler);
+    fastify.delete("/items/:identifier/resources/:resource", deleteItemResourceHandler);
+    // fastify.delete(
+    //     "/items/:identifier/resources/:resource/:file",
+    //     deleteItemResourceFileHandler
+    // );
+    fastify.put(
+        "/items/:identifier/resources/:resource/saveTranscription",
+        saveItemTranscriptionHandler
+    );
+    fastify.post("/items/:identifier/resources/processing-status", postResourceProcessingStatus);
+    done();
+}
+
+async function verifyItemAccess(req, res) {
+    if (!req.params.identifier) return;
+
     let item = await lookupItemByIdentifier({
         identifier: req.params.identifier,
         userId: req.session.user.id,
     });
     if (!item) {
-        return next(new ForbiddenError(`You don't have permission to access this endpoint`));
+        return res.forbidden(`You don't have permission to access this endpoint`);
     }
-    req.item = item;
-    next();
-}
-function routeItem(handler) {
-    return compact(flattenDeep([...route(), verifyItemAccess, handler]));
+    req.session.item = item;
 }
 
-export function setupRoutes({ server }) {
-    // user routes
-    server.get("/items", route(getItemsHandler));
-    server.get("/items/:identifier", routeItem(getItemHandler));
-    server.post("/items", route(postItemHandler));
-    server.put("/items/:identifier/attach-user", routeItem(putItemInviteUserHandler));
-    server.put("/items/:identifier/detach-user", routeItem(putItemDetachUserHandler));
-    server.get("/items/:identifier/users", routeItem(getItemUsers));
-    server.del("/items/:identifier", routeItem(deleteItemHandler));
-    server.get("/items/:identifier/status", routeItem(getItemStatisticsHandler));
-    server.get("/items/:identifier/resources", routeItem(getItemResourcesHandler));
-    server.put("/items/:identifier/reprocess-imports", routeItem(putReprocessImports));
-    server.get(
-        "/items/:identifier/resources/:resource/files",
-        routeItem(getResourceFilesListHandler)
-    );
-    server.get(
-        "/items/:identifier/resources/:resource/status",
-        routeItem(getResourceProcessingStatusHandler)
-    );
-    server.put(
-        "/items/:identifier/resources/:resource/status",
-        routeItem(putResourceCompleteHandler)
-    );
-    server.get(
-        "/items/:identifier/resources/:resource/transcription",
-        routeItem(getItemTranscriptionHandler)
-    );
-    server.get(
-        "/items/:identifier/resources/:resource/transform",
-        routeItem(getTransformTeiDocumentHandler)
-    );
-    server.get("/items/:identifier/resources/:resource", routeItem(getItemResourceFileHandler));
-    server.get(
-        "/items/:identifier/resources/:file/link",
-        routeItem(getItemResourceFileLinkHandler)
-    );
-    server.del("/items/:identifier/resources/:resource", routeItem(deleteItemResourceHandler));
-    // server.del(
-    //     "/items/:identifier/resources/:resource/:file",
-    //     routeItem(deleteItemResourceFileHandler)
-    // );
-    server.put(
-        "/items/:identifier/resources/:resource/saveTranscription",
-        routeItem(saveItemTranscriptionHandler)
-    );
-
-    server.post(
-        "/items/:identifier/resources/processing-status",
-        routeItem(postResourceProcessingStatus)
-    );
-}
-
-async function getItemsHandler(req, res, next) {
+async function getItemsHandler(req) {
     const userId = req.session.user.id;
     const offset = req.query.offset;
     const limit = req.query.limit;
@@ -113,18 +97,16 @@ async function getItemsHandler(req, res, next) {
         ),
     }));
 
-    res.send({ total: count, items });
-    next();
+    return { total: count, items };
 }
 
-async function getItemHandler(req, res, next) {
-    res.send({ item: req.item.get() });
-    next();
+async function getItemHandler(req) {
+    return { item: req.session.item.get() };
 }
 
-async function postItemHandler(req, res, next) {
+async function postItemHandler(req, res) {
     if (!req.body.identifier) {
-        return next(new BadRequestError(`itemId not defined`));
+        return res.badRequest(`itemId not defined`);
     }
     // is that identifier already in use?
     let item = await lookupItemByIdentifier({
@@ -150,49 +132,43 @@ async function postItemHandler(req, res, next) {
                 owner: req.session.user.email,
                 text: `Creating new item with identifier ${req.body.identifier} failed. Item belongs to someone else.`,
             });
-            return next(new ForbiddenError(`That identifier is already taken`));
+            return res.forbidden(`That identifier is already taken`);
         }
     }
 
-    res.send({ item: item.get() });
-    next();
+    return { item: item.get() };
 }
 
-async function putItemInviteUserHandler(req, res, next) {
+async function putItemInviteUserHandler(req, res) {
     let user = await models.user.findOne({ where: { email: req.params.email } });
     if (!user) {
-        return next(new NotFoundError());
+        return res.notFound();
     }
     try {
-        await linkItemToUser({ itemId: req.item.id, userId: user.id });
+        await linkItemToUser({ itemId: req.session.item.id, userId: user.id });
         await logEvent({
             level: "info",
             owner: req.session.user.email,
-            text: `User '${req.session.user.email}' invited '${user.email}' to '${req.item.identifier}'`,
+            text: `User '${req.session.user.email}' invited '${user.email}' to '${req.session.item.identifier}'`,
         });
-        res.send({});
-        next();
+        return {};
     } catch (error) {
-        return next(new InternalServerError());
+        return res.internalServerError();
     }
 }
 
-async function putItemDetachUserHandler(req, res, next) {
+async function putItemDetachUserHandler(req, res) {
     let user = await models.user.findOne({ where: { id: req.params.userId } });
-    // if (user.administrator) {
-    //     return next(new ForbiddenError());
-    // }
     try {
-        await req.item.removeUser([user]);
-        res.send({});
-        next();
+        await req.session.item.removeUser([user]);
+        return {};
     } catch (error) {
-        return next(new InternalServerError());
+        return res.internalServerError();
     }
 }
 
-async function getItemUsers(req, res, next) {
-    let users = await req.item.getUsers();
+async function getItemUsers(req) {
+    let users = await req.session.tem.getUsers();
     users = users.map((u) => {
         return {
             id: u.id,
@@ -203,13 +179,12 @@ async function getItemUsers(req, res, next) {
             loggedin: req.session.user.id === u.id ? true : false,
         };
     });
-    res.send({ users });
-    next();
+    return { users };
 }
 
-async function deleteItemHandler(req, res, next) {
+async function deleteItemHandler(req, res) {
     try {
-        await deleteItem({ id: req.item.id });
+        await deleteItem({ id: req.session.item.id });
         let store = await getStoreHandle({ id: req.params.identifier, className: "item" });
         await store.deleteItem();
         await logEvent({
@@ -219,23 +194,21 @@ async function deleteItemHandler(req, res, next) {
         });
     } catch (error) {
         log.error(`Error deleting item with id: '${req.params.identifier}'`);
-        return next(new InternalServerError());
+        return res.internalServerError();
     }
-    res.send({});
-    next();
+    return {};
 }
 
-async function getItemStatisticsHandler(req, res, next) {
+async function getItemStatisticsHandler(req) {
     let { resources, total } = await listItemResources({
         identifier: req.params.identifier,
         groupByResource: true,
     });
     let statistics = { total };
-    res.send({ statistics });
-    next();
+    return { statistics };
 }
 
-async function getResourceProcessingStatusHandler(req, res, next) {
+async function getResourceProcessingStatusHandler(req) {
     let completed = {};
     const { identifier, resource } = req.params;
 
@@ -259,18 +232,16 @@ async function getResourceProcessingStatusHandler(req, res, next) {
         files.filter((f) => f.match(/\.textract_ocr/)).length === 1 ? true : false;
     completed[resource].tei =
         files.filter((f) => f.match(/\.tei\.xml/)).length === 1 ? true : false;
-    res.send({ completed: completed[resource] });
-    next();
+    return { completed: completed[resource] };
 }
 
-async function putResourceCompleteHandler(req, res, next) {
+async function putResourceCompleteHandler(req) {
     const { identifier, resource } = req.params;
     await markResourceComplete({ identifier, resource, ...req.query });
-    res.send({});
-    next();
+    return {};
 }
 
-async function getItemResourcesHandler(req, res, next) {
+async function getItemResourcesHandler(req) {
     let query = {
         identifier: req.params.identifier,
     };
@@ -281,11 +252,11 @@ async function getItemResourcesHandler(req, res, next) {
         resources = [];
         total = 0;
     }
-    res.send({ resources, total });
-    next();
+    return { resources, total };
 }
 
-async function putReprocessImports(req, res, next) {
+async function putReprocessImports(req) {
+    const { identifier } = req.params;
     const files = [
         `${req.item.identifier}-tei.xml`,
         `${req.item.identifier}-tei.xml`,
@@ -294,37 +265,34 @@ async function putReprocessImports(req, res, next) {
 
     let imports = [];
     for (let file of files) {
-        let exists = await statItemFile({ identifier: req.item.identifier, file });
+        let exists = await statItemFile({ identifier, file });
         if (exists) imports.push(file);
     }
 
-    res.send({ imports });
-    next();
+    return { imports };
 }
 
-async function getResourceFilesListHandler(req, res, next) {
+async function getResourceFilesListHandler(req) {
     let { files } = await listItemResourceFiles({
         identifier: req.params.identifier,
         resource: req.params.resource,
     });
-    res.send({ files });
-    next();
+    return { files };
 }
 
-async function getItemResourceFileHandler(req, res, next) {
+async function getItemResourceFileHandler(req, res) {
     try {
         let content = await getItemResource({
             identifier: req.params.identifier,
             resource: req.params.resource,
         });
-        res.send({ content });
-        next();
+        return { content };
     } catch (error) {
-        return next(new NotFoundError());
+        return res.notFound();
     }
 }
 
-async function deleteItemResourceHandler(req, res, next) {
+async function deleteItemResourceHandler(req, res) {
     const { identifier, resource } = req.params;
     try {
         await deleteItemResource({ identifier, resource });
@@ -333,15 +301,14 @@ async function deleteItemResourceHandler(req, res, next) {
             owner: req.session.user.email,
             text: `User deleted resource: '${identifier}/${resource}'`,
         });
+        return {};
     } catch (error) {
         log.error(`Error deleting item resource: '${identifier}/${resource}'`);
-        return next(new InternalServerError());
+        return res.internalServerError();
     }
-    res.send({});
-    next();
 }
 
-async function getItemTranscriptionHandler(req, res, next) {
+async function getItemTranscriptionHandler(req) {
     let content;
     let exists = await itemResourceExists({
         identifier: req.params.identifier,
@@ -354,8 +321,7 @@ async function getItemTranscriptionHandler(req, res, next) {
             resource: `${req.params.resource}.tei.xml`,
         });
 
-        res.send({ content });
-        return next();
+        return { content };
     }
 
     // otherwise try to get the textract transcription
@@ -372,62 +338,56 @@ async function getItemTranscriptionHandler(req, res, next) {
             .Blocks.filter((b) => b.BlockType === "LINE")
             .map((b) => b.Text)
             .join("\n");
-        res.send({ content });
-        return next();
+        return { content };
     }
 
-    res.send({ content: "" });
-    return next();
+    return { content: "" };
 }
 
-async function getItemResourceFileLinkHandler(req, res, next) {
+async function getItemResourceFileLinkHandler(req, res) {
     try {
         let link = await getItemResourceLink({
             identifier: req.params.identifier,
             resource: req.params.file,
             download: req.query.download,
         });
-        res.send({ link });
-        next();
+        return { link };
     } catch (error) {
-        return next(new NotFoundError());
+        return res.notFound();
     }
 }
 
-async function saveItemTranscriptionHandler(req, res, next) {
+async function saveItemTranscriptionHandler(req, res) {
     const { identifier, resource, datafiles, document } = req.params;
     let file = `${resource}.tei.xml`;
     try {
         if (!isEmpty(document)) {
             await putItemResource({ identifier, resource: file, content: document });
         }
+        return {};
     } catch (error) {
         log.error(`Error saving transcription: ${error.message}`);
-        return next(new InternalServerError());
+        return res.internalServerError();
     }
-    res.send({});
-    next();
 }
 
-async function postResourceProcessingStatus(req, res, next) {
+async function postResourceProcessingStatus(req) {
     let tasks = await getResourceProcessingStatus({
-        identifier: req.item.id,
+        identifier: req.params.identifier,
         resources: req.body.resources.map((r) => r.resource),
         dateFrom: req.body.dateFrom,
     });
     tasks = tasks.map((t) => t.get());
     tasks = groupBy(tasks, "resource");
     tasks = Object.keys(tasks).map((r) => tasks[r].shift());
-    res.send({ tasks });
-    next();
+    return { tasks };
 }
 
 // TODO: this method does not have tests
-async function getTransformTeiDocumentHandler(req, res, next) {
+async function getTransformTeiDocumentHandler(req) {
     const { identifier, resource } = req.params;
     let store = await getStoreHandle({ id: identifier, className: "item" });
     let document = await store.get({ target: `${resource}.tei.xml` });
     document = await transformDocument({ document });
-    res.send({ document });
-    next;
+    return { document };
 }

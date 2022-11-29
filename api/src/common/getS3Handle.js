@@ -1,5 +1,5 @@
-import { loadConfiguration } from ".";
-import { S3, Bucket } from "./s3";
+import { loadConfiguration } from "./configuration.js";
+import { S3, Bucket } from "./s3.js";
 import { Store } from "@coedl/nocfl-js";
 
 export async function getS3Handle() {

@@ -312,19 +312,6 @@ describe("Collection management route tests", () => {
         });
         expect(collection.users.length).toEqual(1);
 
-        // should fail to detach self as admin
-        response = await fetch(`${host}/collections/${identifier}/detach-user`, {
-            method: "PUT",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                userId: user2.id,
-            }),
-        });
-        expect(response.status).toEqual(403);
-
         await deleteCollection({ id: collection.id });
         await user.destroy();
         await user2.destroy();
@@ -429,7 +416,6 @@ describe("Collection management route tests", () => {
         });
         expect(response.status).toEqual(200);
     });
-
     it("should be able to toggle collection visibility", async () => {
         let user = {
             email: userEmail,

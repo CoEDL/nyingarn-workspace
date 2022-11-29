@@ -1,5 +1,5 @@
-import { loadConfiguration } from ".";
-import models from "../models";
+import { loadConfiguration } from "./configuration.js";
+import models from "../models/index.js";
 
 export async function registerTask({ itemId, status, resource, name, data }) {
     const statuses = ["in progress", "done", "failed"];

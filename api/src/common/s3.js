@@ -13,8 +13,10 @@ import {
 } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { createReadStream, createWriteStream, readdir, ensureDir, stat } from "fs-extra";
-import { isEmpty } from "lodash";
+import fsExtraPkg from "fs-extra";
+const { createReadStream, createWriteStream, readdir, ensureDir, stat } = fsExtraPkg;
+import lodashPkg from "lodash";
+const { isEmpty } = lodashPkg;
 // const AWS = require("aws-sdk");
 import path from "path";
 const MB = 1024 * 1024;

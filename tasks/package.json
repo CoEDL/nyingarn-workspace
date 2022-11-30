@@ -2,7 +2,10 @@
     "name": "tasks",
     "version": "0.36.0",
     "description": "",
+    "author": "Marco La Rosa",
     "main": "index.js",
+    "license": "GPL-3.0",
+    "type": "module",
     "scripts": {
         "develop": "npm run develop:server",
         "develop:server": "npm install && ./node_modules/.bin/nodemon --exec babel-node ./index.js",
@@ -10,8 +13,6 @@
         "test:watch": "./node_modules/.bin/jest --watch --runInBand",
         "build:production": "./node_modules/.bin/webpack --config webpack.production.js"
     },
-    "author": "Marco La Rosa",
-    "license": "GPL-3.0",
     "devDependencies": {
         "@babel/cli": "^7.19.3",
         "@babel/core": "^7.20.2",

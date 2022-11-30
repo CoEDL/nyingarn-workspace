@@ -1,16 +1,8 @@
-export { createImageThumbnail, createWebFormats } from "./image-processing";
-export { runTesseractOCR, runTextractOCR } from "./ocr-processing";
-export {
-    processDigivolTranscription,
-    processFtpTeiTranscription,
-    processTeiTranscription,
-} from "./transcription-processing";
-
 import path from "path";
-import { getLogger, getStoreHandle } from "../common";
-import { ensureDir, remove, pathExists, readdir } from "fs-extra";
+import { log, getStoreHandle } from "/srv/api/src/common/index.js";
+import fsExtraPkg from "fs-extra";
+const { ensureDir, remove, pathExists, readdir } = fsExtraPkg;
 import { walk } from "@root/walk";
-const log = getLogger();
 
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const thumbnailHeight = 300;

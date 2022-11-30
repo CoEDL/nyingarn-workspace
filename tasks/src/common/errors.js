@@ -1,32 +1,33 @@
-import { readJSON } from "fs-extra";
+import fsExtraPkg from "fs-extra";
+const { readJSON } = fsExtraPkg;
 
 export async function expandError(error) {
-    /* 
-    
-    The error-definitions.json file lists various types of recognisable Error, and for each type of Error, 
+    /*
+
+    The error-definitions.json file lists various types of recognisable Error, and for each type of Error,
     it provides a number of properties which can be used to decorate or "expand" any errors of that type.
-    
-    A given entry in the error-definitions array matches a given Error object if the Error has properties 
+
+    A given entry in the error-definitions array matches a given Error object if the Error has properties
     that match ALL the properties in the definition's 'matchingProperties' object.
-    
+
     NB The keys in the 'matchingProperties' object are effectively pathnames with "." as a delimiter.
-    e.g. a key such as 'errorObject.foo' would get the 'errorObject' property of the currrent error, and 
+    e.g. a key such as 'errorObject.foo' would get the 'errorObject' property of the currrent error, and
     then return the 'foo' property of that object.
-    
+
     ALL matching definitions will be used to expand the original error.
-    
-    The matching definitions are processed in order of increasing specificity, i.e. definitions with more 
+
+    The matching definitions are processed in order of increasing specificity, i.e. definitions with more
     "matchingProperties" are more specific so they will be processed last. This ensures that the expanded
-    error ends up with the most specific error message, code, links, etc, from all its matching definitions. 
-    If two definitions have the same specificity, then the one which appears later in the file overrides the 
+    error ends up with the most specific error message, code, links, etc, from all its matching definitions.
+    If two definitions have the same specificity, then the one which appears later in the file overrides the
     earlier one.
-    
-    •If the matching definition has a "messageTemplate" property, it's treated as a template, 
+
+    •If the matching definition has a "messageTemplate" property, it's treated as a template,
         containing placeholders that refer to properties of the error; expanding the template dereferences
-        those property names, and produces a new error message that's assigned to the error's "message" 
+        those property names, and produces a new error message that's assigned to the error's "message"
         property. For details of how the placeholders work, see the expandTemplate function below.
     •If the matching definition has a "name" or "url" property, it's simply copied to the error.
-        
+
     */
 
     let errorDefinitions = await readJSON("/srv/configuration/error-definitions.json");
@@ -79,11 +80,11 @@ function errorMatchesDefinition(error, errorDefinition) {
 }
 
 function expandTemplate(template, object) {
-    /* Expand the template string, replacing values enclosed in braces with the correspondingly-named property of object, e.g. 
+    /* Expand the template string, replacing values enclosed in braces with the correspondingly-named property of object, e.g.
     expandTemplate(
-        "Invalid date '${date}' found in document {document}", 
+        "Invalid date '${date}' found in document {document}",
         {
-            'invalid-date': '2022-13-01', 
+            'invalid-date': '2022-13-01',
             'document': 'bogus.doc'
         }
     )  ⇒ "Invalid date '2022-13-01' found in document bogus.doc"

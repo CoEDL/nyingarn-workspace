@@ -1,9 +1,8 @@
 import sharp from "sharp";
 import path from "path";
-import { getLogger } from "../common";
+import { log } from "/srv/api/src/common/index.js";
 import { remove } from "fs-extra";
-const log = getLogger();
-import { thumbnailHeight } from "./";
+import { thumbnailHeight } from "./index.js";
 
 export async function createImageThumbnail({ directory, identifier, resource }) {
     let resourceBasename = path.basename(resource, path.extname(resource));

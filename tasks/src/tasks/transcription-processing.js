@@ -1,11 +1,8 @@
 import path from "path";
 import SaxonJS from "saxon-js";
-import { createReadStream, createWriteStream, writeFile, appendFile, remove } from "fs-extra";
-import { parse } from "csv-parse";
-import { zipObject } from "lodash";
-import { getS3Handle, getLogger, loadConfiguration, expandError } from "../common";
-import { removeOverlappingNewContent } from "./";
-const log = getLogger();
+import { log, loadConfiguration } from "/srv/api/src/common/index.js";
+import { expandError } from "../common/errors.js";
+import { removeOverlappingNewContent } from "./index.js";
 
 export async function reconstituteTEIFile({ directory, identifier, resource }) {
     let sourceURI = "file://" + path.join(directory, identifier, resource);

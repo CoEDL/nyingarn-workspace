@@ -1,16 +1,12 @@
+import { createImageThumbnail, createWebFormats } from "./tasks/image-processing.js";
+import { runTextractOCR } from "./tasks/ocr-processing.js";
 import {
-    createImageThumbnail,
-    createWebFormats,
-    runTextractOCR,
     processDigivolTranscription,
     processTeiTranscription,
-    prepare,
-    cleanup,
-    syncToBucket,
-    cleanupAfterFailure,
-} from "./tasks";
-import { getLogger, updateTask, deleteTask } from "./common";
-const log = getLogger();
+} from "./tasks/transcription-processing.js";
+import { prepare, cleanup, cleanupAfterFailure, syncToBucket } from "./tasks/index.js";
+import { log } from "/srv/api/src/common/index.js";
+import { updateTask, deleteTask } from "./common/task.js";
 
 export function setupHandlers({ rabbit }) {
     rabbit.handle("process-image", runTask);

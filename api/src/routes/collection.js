@@ -79,7 +79,7 @@ async function getCollectionHandler(req) {
             type: "collection",
         })),
     ];
-    return { collection: { ...req.collection.get(), members } };
+    return { collection: { ...req.session.collection.get(), members } };
 }
 
 async function postCollectionHandler(req, res) {
@@ -121,7 +121,7 @@ async function postCollectionHandler(req, res) {
 }
 
 async function putCollectionInviteUserHandler(req, res) {
-    let user = await models.user.findOne({ where: { email: req.params.email } });
+    let user = await models.user.findOne({ where: { email: req.body.email } });
     if (!user) {
         return res.notFound();
     }
@@ -139,7 +139,7 @@ async function putCollectionInviteUserHandler(req, res) {
 }
 
 async function putCollectionDetachUserHandler(req, res) {
-    let user = await models.user.findOne({ where: { id: req.params.userId } });
+    let user = await models.user.findOne({ where: { id: req.body.userId } });
     try {
         await req.session.collection.removeUser([user]);
         return {};

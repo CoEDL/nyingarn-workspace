@@ -8,30 +8,35 @@ import {
     createAllowedUserStubAccounts,
 } from "./user";
 const chance = require("chance").Chance();
-import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "../common";
+import { TestSetup } from "../common";
 
 describe("User management tests", () => {
-    let users, configuration;
-    const userEmail = chance.email();
-    const adminEmail = chance.email();
+    let configuration, users, userEmail, adminEmail, bucket;
+    let identifier, store;
+    const tester = new TestSetup();
+
     beforeAll(async () => {
-        configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
+        ({ userEmail, adminEmail, configuration, bucket } = await tester.setupBeforeAll());
+        users = await tester.setupUsers({ emails: [userEmail], adminEmails: [adminEmail] });
     });
     beforeEach(async () => {
-        users = await setupBeforeEach({ emails: [userEmail] });
+        identifier = chance.word();
     });
     afterEach(async () => {
-        await teardownAfterEach({ users });
+        try {
+            await store.deleteItem();
+        } catch (error) {}
     });
     afterAll(async () => {
-        await teardownAfterAll(configuration);
+        await tester.purgeUsers({ users });
+        await tester.teardownAfterAll(configuration);
     });
     it("should be able to get a list of users", async () => {
-        let userDef = users[0];
+        let user = users.filter((u) => !u.administrator)[0];
         // expect to find two users
         let accounts = await getUsers({});
-        expect(accounts.users.length).toEqual(1);
-        expect(accounts.users[0].email).toEqual(userDef.email);
+        expect(accounts.users.length).toEqual(2);
+        expect(accounts.users[0].email).toEqual(user.email);
 
         // expect to find no users
         accounts = await getUsers({ offset: 10 });
@@ -42,19 +47,18 @@ describe("User management tests", () => {
         expect(accounts.users.length).toEqual(0);
     });
     it("should be able to get a specified user", async () => {
-        let userDef = users[0];
+        let userDef = users.filter((u) => !u.administrator)[0];
         let user = await getUser({ userId: userDef.id });
         expect(user.email).toEqual(userDef.email);
 
         user = await getUser({ email: userDef.email });
         expect(user.email).toEqual(userDef.email);
-        await user.destroy();
 
         user = await getUser({ email: chance.word() });
         expect(user).toBeNull;
     });
     it("should be able to set up a normal user account", async () => {
-        //  create stubb account
+        //  create stub account
         let email = chance.email();
         let users = await createAllowedUserStubAccounts({ emails: [email] });
 
@@ -67,7 +71,6 @@ describe("User management tests", () => {
             admin: false,
         });
         expect(user.email).toEqual(users[0].email);
-        await user.destroy();
     });
     it("should be able to set up an admin user account", async () => {
         //  create admin user account
@@ -78,11 +81,10 @@ describe("User management tests", () => {
             upload: false,
         });
         expect(user.email).toEqual(adminEmail);
-        await user.destroy();
     });
     it("should be able to lock a user", async () => {
-        let userDef = users[0];
-        let user = await getUser({ userId: userDef.id });
+        let user = users.filter((u) => !u.administrator)[0];
+
         user = await toggleUserCapability({
             userId: user.id,
             capability: "lock",
@@ -94,11 +96,10 @@ describe("User management tests", () => {
             capability: "lock",
         });
         expect(user.locked).toEqual(false);
-        await user.destroy();
     });
     it("should be able to toggle a user as an admin", async () => {
-        let userDef = users[0];
-        let user = await getUser({ userId: userDef.id });
+        let user = users.filter((u) => !u.administrator)[0];
+
         user = await toggleUserCapability({
             userId: user.id,
             capability: "upload",
@@ -110,11 +111,9 @@ describe("User management tests", () => {
             capability: "upload",
         });
         expect(user.upload).toEqual(false);
-        await user.destroy();
     });
     it("should be able to toggle user upload privileges", async () => {
-        let userDef = users[0];
-        let user = await getUser({ userId: userDef.id });
+        let user = users.filter((u) => !u.administrator)[0];
         user = await toggleUserCapability({
             userId: user.id,
             capability: "admin",
@@ -126,7 +125,6 @@ describe("User management tests", () => {
             capability: "admin",
         });
         expect(user.administrator).toEqual(false);
-        await user.destroy();
     });
     it("should be able to create user stub accounts", async () => {
         let emails = [chance.email()];
@@ -139,6 +137,5 @@ describe("User management tests", () => {
         emails = [email, email];
         users = await createAllowedUserStubAccounts({ emails });
         expect(users.length).toEqual(1);
-        for (let user of users) await user.destroy();
     });
 });

@@ -1,5 +1,4 @@
 require("regenerator-runtime");
-import { getS3Handle, getStoreHandle } from "../common";
 import {
     createCollection,
     getCollections,
@@ -9,19 +8,18 @@ import {
     toggleCollectionVisibility,
 } from "./collection";
 const chance = require("chance").Chance();
-import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "../common";
+import { getStoreHandle, TestSetup } from "../common";
 
 describe("Collection management tests", () => {
-    let users, configuration, bucket;
-    const userEmail = chance.email();
-    const adminEmail = chance.email();
+    let configuration, users, userEmail, adminEmail, bucket;
     let identifier, store;
+    const tester = new TestSetup();
+
     beforeAll(async () => {
-        configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
-        ({ bucket } = await getS3Handle());
+        ({ userEmail, adminEmail, configuration, bucket } = await tester.setupBeforeAll());
+        users = await tester.setupUsers({ emails: [userEmail], adminEmails: [adminEmail] });
     });
     beforeEach(async () => {
-        users = await setupBeforeEach({ emails: [userEmail, chance.email()] });
         identifier = chance.word();
         store = await getStoreHandle({
             id: identifier,
@@ -29,15 +27,17 @@ describe("Collection management tests", () => {
         });
     });
     afterEach(async () => {
-        await teardownAfterEach({ users });
-        await bucket.removeObjects({ prefix: store.getItemPath() });
+        try {
+            await store.deleteItem();
+        } catch (error) {}
     });
     afterAll(async () => {
-        await teardownAfterAll(configuration);
+        await tester.purgeUsers({ users });
+        await tester.teardownAfterAll(configuration);
     });
-    it("should be able to create a new collection", async () => {
-        let user = users[0];
 
+    it("should be able to create a new collection", async () => {
+        let user = users.filter((u) => !u.administrator)[0];
         let collection = await createCollection({ identifier, userId: user.id });
         expect(collection.identifier).toEqual(identifier);
         let files = await store.listResources({});
@@ -51,7 +51,7 @@ describe("Collection management tests", () => {
         await collection.destroy();
     });
     it("should fail to create a new collection - identifier conflict", async () => {
-        let user = users[0];
+        let user = users.filter((u) => !u.administrator)[0];
         let collection = await createCollection({ identifier, userId: user.id });
 
         // conflicting collection identifier
@@ -63,7 +63,7 @@ describe("Collection management tests", () => {
         await collection.destroy();
     });
     it("should be able to list my collections", async () => {
-        let user = users[0];
+        let user = users.filter((u) => !u.administrator)[0];
         let collection = await createCollection({ identifier, userId: user.id });
 
         let collections = await getCollections({ userId: user.id });
@@ -72,7 +72,7 @@ describe("Collection management tests", () => {
         await collection.destroy();
     });
     it("should be able to lookup a collection by identifier", async () => {
-        let user = users[0];
+        let user = users.filter((u) => !u.administrator)[0];
         let collection = await createCollection({ identifier, userId: user.id });
 
         collection = await lookupCollectionByIdentifier({ identifier });
@@ -84,7 +84,7 @@ describe("Collection management tests", () => {
         await collection.destroy();
     });
     it("should be able to link a collection to another user", async () => {
-        let user = users[0];
+        let user = users.filter((u) => !u.administrator)[0];
         let collection = await createCollection({ identifier, userId: user.id });
 
         await linkCollectionToUser({ collectionId: collection.id, userId: users[1].id });
@@ -95,7 +95,7 @@ describe("Collection management tests", () => {
         await collection.destroy();
     });
     it("should be able to delete a collection", async () => {
-        let user = users[0];
+        let user = users.filter((u) => !u.administrator)[0];
         let collection = await createCollection({ identifier, userId: user.id });
         await deleteCollection({ id: collection.id });
 
@@ -103,7 +103,7 @@ describe("Collection management tests", () => {
         expect(collection).toBeNull;
     });
     it("should be able to toggle collection visibility", async () => {
-        let user = users[0];
+        let user = users.filter((u) => !u.administrator)[0];
         let collection = await createCollection({ identifier, userId: user.id });
         expect(collection.identifier).toEqual(identifier);
         expect(collection.data.private).toBeTrue;

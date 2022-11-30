@@ -10,16 +10,7 @@ export {
     requireIdentifierAccess,
 } from "./middleware.js";
 export { generateToken, verifyToken } from "./jwt.js";
-export {
-    host,
-    headers,
-    setupBeforeAll,
-    setupBeforeEach,
-    teardownAfterAll,
-    teardownAfterEach,
-    generateLogs,
-    setupTestItem,
-} from "./test-utils.js";
+export { host, headers, TestSetup, generateLogs, setupTestItem } from "./test-utils.js";
 
 import path from "path";
 import { getS3Handle } from "./getS3Handle.js";

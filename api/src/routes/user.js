@@ -117,6 +117,7 @@ async function putUserToggleCapabilityRouteHandler(req, res) {
         });
         return {};
     } catch (error) {
+        console.log(error.message);
         logEvent({
             level: "error",
             owner: req.session.user.email,

@@ -140,7 +140,7 @@ async function postItemHandler(req, res) {
 }
 
 async function putItemInviteUserHandler(req, res) {
-    let user = await models.user.findOne({ where: { email: req.params.email } });
+    let user = await models.user.findOne({ where: { email: req.body.email } });
     if (!user) {
         return res.notFound();
     }
@@ -158,7 +158,7 @@ async function putItemInviteUserHandler(req, res) {
 }
 
 async function putItemDetachUserHandler(req, res) {
-    let user = await models.user.findOne({ where: { id: req.params.userId } });
+    let user = await models.user.findOne({ where: { id: req.body.userId } });
     try {
         await req.session.item.removeUser([user]);
         return {};
@@ -168,7 +168,7 @@ async function putItemDetachUserHandler(req, res) {
 }
 
 async function getItemUsers(req) {
-    let users = await req.session.tem.getUsers();
+    let users = await req.session.item.getUsers();
     users = users.map((u) => {
         return {
             id: u.id,
@@ -382,7 +382,6 @@ async function postResourceProcessingStatus(req) {
     tasks = Object.keys(tasks).map((r) => tasks[r].shift());
     return { tasks };
 }
-
 // TODO: this method does not have tests
 async function getTransformTeiDocumentHandler(req) {
     const { identifier, resource } = req.params;

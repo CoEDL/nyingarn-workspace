@@ -5,7 +5,7 @@ import { demandAuthenticatedUser, filterPrivateInformation } from "../common/ind
 export function setupRoutes(fastify, options, done) {
     fastify.get("/", () => ({}));
     fastify.get("/configuration", async (req) => {
-        const configuration = req.session.configuration;
+        let configuration = req.session.configuration;
         configuration = filterPrivateInformation({ configuration });
         return {
             ui: configuration.ui,

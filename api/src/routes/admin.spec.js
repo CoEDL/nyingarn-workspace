@@ -3,37 +3,37 @@ import { createSession } from "../lib/session.js";
 import Chance from "chance";
 const chance = Chance();
 import fetch from "cross-fetch";
-import {
-    host,
-    headers,
-    setupBeforeAll,
-    setupBeforeEach,
-    teardownAfterAll,
-    teardownAfterEach,
-    setupTestItem,
-    getS3Handle,
-} from "../common/index.js";
+import { getStoreHandle, TestSetup, headers, host } from "../common";
+
 import lodashPkg from "lodash";
 const { isArray } = lodashPkg;
 
 describe("Admin route tests", () => {
-    let configuration, users, bucket, session, user;
-    const userEmail = chance.email();
-    const adminEmail = chance.email();
+    let configuration, users, userEmail, adminEmail, bucket;
+    let identifier, store;
+    const tester = new TestSetup();
+
     beforeAll(async () => {
-        configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
-        ({ bucket } = await getS3Handle());
+        ({ userEmail, adminEmail, configuration, bucket } = await tester.setupBeforeAll());
+        users = await tester.setupUsers({ emails: [userEmail], adminEmails: [adminEmail] });
     });
     beforeEach(async () => {
-        users = await setupBeforeEach({ emails: [userEmail], adminEmails: [adminEmail] });
-        session = await createSession({ user: users.filter((u) => u.administrator)[0] });
+        identifier = chance.word();
+        store = await getStoreHandle({
+            id: identifier,
+            className: "collection",
+        });
     });
     afterEach(async () => {
-        await teardownAfterEach({ users });
+        try {
+            await store.deleteItem();
+        } catch (error) {}
     });
     afterAll(async () => {
-        await teardownAfterAll(configuration);
+        await tester.purgeUsers({ users });
+        await tester.teardownAfterAll(configuration);
     });
+
     it("should be able to access the admin route endpoint", async () => {
         let user = users.filter((u) => u.administrator)[0];
         let session = await createSession({ user });
@@ -53,6 +53,8 @@ describe("Admin route tests", () => {
         expect(response.status).toEqual(403);
     });
     it("should be able to get a list of all items and collections", async () => {
+        let user = users.filter((u) => u.administrator)[0];
+        let session = await createSession({ user });
         let response = await fetch(`${host}/admin/entries`, {
             method: "GET",
             headers: headers(session),

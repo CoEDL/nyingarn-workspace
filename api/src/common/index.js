@@ -1,5 +1,5 @@
 export { loadConfiguration, loadProfile, filterPrivateInformation } from "./configuration.js";
-export { getLogger, logEvent } from "./logger.js";
+export { getLogger, logEvent, log } from "./logger.js";
 export { submitTask, registerTask } from "./task.js";
 export { getS3Handle, getStoreHandle } from "./getS3Handle.js";
 export {

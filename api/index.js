@@ -12,6 +12,7 @@ import { setupRoutes as setupItemRoutes } from "./src/routes/item.js";
 import { setupRoutes as setupLogRoutes } from "./src/routes/logs.js";
 import { setupRoutes as setupSearchRoutes } from "./src/routes/search.js";
 import { setupRoutes as setupUserRoutes } from "./src/routes/user.js";
+import { setupRoutes as setupDataRoutes } from "./src/routes/data/index.js";
 const log = getLogger();
 import rabbit from "foo-foo-mq";
 
@@ -68,6 +69,7 @@ async function main() {
     fastify.register(setupLogRoutes);
     fastify.register(setupSearchRoutes);
     fastify.register(setupUserRoutes);
+    fastify.register(setupDataRoutes);
 
     fastify.listen({ port: 8080, host: "0.0.0.0" }, function (err, address) {
         if (err) {

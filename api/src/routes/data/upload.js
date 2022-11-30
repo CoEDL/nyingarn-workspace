@@ -1,24 +1,23 @@
-import { log } from "./";
-import { submitTask, getStoreHandle } from "../../common";
+import { submitTask, getStoreHandle, log } from "../../common/index.js";
 
-export async function authenticateTusRequest(req, res, next) {
+export async function authenticateTusRequest(req, res) {
     if (!req.session.user.upload) {
-        return next(new UnauthorizedError());
+        return res.unauthorized();
     }
-    res.send({});
-    next();
+    return {};
 }
 
-export async function getItemPath(req, res, next) {
+export async function getItemPath(req, res) {
+    if (!req.params.identifier) return;
+
     if (!req.session.user.upload) {
-        return next(new UnauthorizedError());
+        return res.unauthorized();
     }
     let store = await getStoreHandle({ id: req.params.identifier, className: req.params.itemType });
-    res.send({ path: store.getItemPath() });
-    next();
+    return { path: store.getItemPath() };
 }
 
-export async function triggerProcessing(req, res, next) {
+export async function triggerProcessing(req) {
     // await new Promise((resolve) => setTimeout(resolve, 15000));
 
     const identifier = req.params.identifier;
@@ -42,6 +41,5 @@ export async function triggerProcessing(req, res, next) {
         body: { resource },
     });
 
-    res.send({});
-    return next();
+    return {};
 }

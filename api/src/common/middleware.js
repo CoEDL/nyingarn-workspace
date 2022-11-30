@@ -32,7 +32,7 @@ export async function demandAdministrator(req, res) {
     }
 }
 
-export async function requireIdentifierAccess(req, res, next) {
+export async function requireIdentifierAccess(req, res) {
     if (!req.body?.identifier && !req.params?.identifier) {
         return res.badRequest(`No identifier defined in body or params`);
     }
@@ -44,6 +44,5 @@ export async function requireIdentifierAccess(req, res, next) {
     if (!item) {
         return res.forbidden(`You don't have access to that item`);
     }
-    req.item = item;
-    next();
+    req.session.item = item;
 }

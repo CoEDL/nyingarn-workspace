@@ -3,10 +3,10 @@
 import {
     S3Client,
     HeadBucketCommand,
+    CreateBucketCommand,
     HeadObjectCommand,
     ListBucketsCommand,
     GetObjectCommand,
-    PutObjectCommand,
     CopyObjectCommand,
     ListObjectsV2Command,
     DeleteObjectsCommand,
@@ -49,6 +49,11 @@ export class S3 {
     async bucketExists({ bucket }) {
         bucket = bucket ? bucket : this.bucket;
         const command = new HeadBucketCommand({ Bucket: bucket });
+        return (await this.client.send(command)).$metadata.httpStatusCode === 200;
+    }
+
+    async createBucket({ bucket }) {
+        const command = new CreateBucketCommand({ Bucket: bucket });
         return (await this.client.send(command)).$metadata.httpStatusCode === 200;
     }
 }

@@ -20,8 +20,8 @@
 	<pb xml:id="{$id}"/>
     </xsl:template>
 
-    <!-- discard xml:id attributes -->
-    <xsl:template match="@xml:id" mode="from-the-page"/>
+    <!-- discard xml:id attributes in the text -->
+    <xsl:template match="(p|div)/@xml:id" mode="from-the-page"/>
 
     <!-- discard FTP's <pb> elements because their <fw> is our source of truth -->
     <xsl:template match="pb" mode="from-the-page"/>

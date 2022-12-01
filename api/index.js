@@ -2,7 +2,7 @@ import("regenerator-runtime");
 // const restify = require("restify");
 // const server = restify.createServer();
 import models from "./src/models/index.js";
-import { loadConfiguration, getLogger } from "./src/common/index.js";
+import { loadConfiguration, log } from "./src/common/index.js";
 import { setupRoutes as setupBaseRoutes } from "./src/routes/base.js";
 import { setupRoutes as setupAdminRoutes } from "./src/routes/admin.js";
 import { setupRoutes as setupAuthRoutes } from "./src/routes/auth.js";
@@ -13,7 +13,6 @@ import { setupRoutes as setupLogRoutes } from "./src/routes/logs.js";
 import { setupRoutes as setupSearchRoutes } from "./src/routes/search.js";
 import { setupRoutes as setupUserRoutes } from "./src/routes/user.js";
 import { setupRoutes as setupDataRoutes } from "./src/routes/data/index.js";
-const log = getLogger();
 import rabbit from "foo-foo-mq";
 
 import Fastify from "fastify";

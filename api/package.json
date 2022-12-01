@@ -11,7 +11,7 @@
         "develop:server": "npm install && sleep 10 && npm run load:datapacks && ./node_modules/.bin/nodemon --exec babel-node ./index.js",
         "test": "./node_modules/.bin/jest --runInBand",
         "test:watch": "./node_modules/.bin/jest --watch --runInBand",
-        "build:production": "./node_modules/.bin/webpack --config webpack.production.js",
+        "build:production": "./node_modules/.bin/webpack --config webpack.production.cjs",
         "load:datapacks": "sleep 10 && node ./load-data-packs.js"
     },
     "devDependencies": {
@@ -19,6 +19,7 @@
         "@babel/core": "^7.20.5",
         "@babel/node": "^7.20.5",
         "@babel/plugin-proposal-optional-chaining": "^7.18.9",
+        "@babel/plugin-syntax-import-assertions": "^7.20.0",
         "@babel/preset-env": "^7.20.2",
         "babel-jest": "^29.3.1",
         "babel-loader": "^9.1.0",

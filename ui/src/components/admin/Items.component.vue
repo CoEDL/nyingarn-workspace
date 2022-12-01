@@ -114,7 +114,7 @@ async function connectItem(item) {
     });
 }
 function loadItem(item) {
-    router.push(`/items/${item.name}/view`);
+    if (item.connected) router.push(`/items/${item.name}/view`);
 }
 async function connectCollection(collection) {
     await $http.put({ route: `/admin/collections/${collection.name}/connect-user` });
@@ -124,6 +124,6 @@ async function connectCollection(collection) {
     });
 }
 function loadCollection(collection) {
-    router.push(`/collections/${collection.name}/metadata`);
+    if (collection.connected) router.push(`/collections/${collection.name}/metadata`);
 }
 </script>

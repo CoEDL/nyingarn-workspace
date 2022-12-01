@@ -11,6 +11,13 @@ if [ -z "$GITHUB_USERNAME" ] ; then
     echo "Please provide your github username."
     exit -1
 fi
+echo ""
+echo "Logging in to Github Container Registry"
+echo " Provide a personal access token with the appropriate permissions"
+echo ""
+docker login ghcr.io --username GITHUB_USERNAME
+[[ $? != 0 ]] && echo "Login to Github Container Registry failed" && exit -1
+
 
 read -p '>> Tag the repo (select N if you are still testing the builds)? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
@@ -28,13 +35,6 @@ fi
 
 read -p '>> Build the containers and push to docker hub? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
-
-    echo ""
-    echo "Logging in to Github Container Registry"
-    echo " Provide a personal access token with the appropriate permissions"
-    echo ""
-    docker login ghcr.io --username GITHUB_USERNAME
-
     docker buildx build --push --rm --platform=linux/amd64,linux/arm64 \
         -t ghcr.io/coedl/nyingarn-workspace-api:latest \
         -t ghcr.io/coedl/nyingarn-workspace-api:${VERSION} \

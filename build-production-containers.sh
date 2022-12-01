@@ -5,7 +5,6 @@ if [ "$#" != 1 ] ; then
     exit -1
 fi
 VERSION="${1}"
-mkdir docker-metadata
 
 read -p '>> Tag the repo (select N if you are still testing the builds)? [y|N] ' resp
 if [ "$resp" == "y" ] ; then

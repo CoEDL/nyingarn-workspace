@@ -1,0 +1,1080 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd" xml:lang="EN" xml:id="export" n="hw0024">
+
+<teiHeader>
+  <fileDesc>
+    <titleStmt>
+      <title type="full">
+        <title type="main">hw0024 Notes from J. C. McLeod</title>
+        <title type="desc"/>
+      </title>
+      <author>
+        <persName/>
+      </author>
+    </titleStmt>
+
+    <editionStmt>
+      <edition>Edition created from new transcripts of this manuscript.</edition>
+      <respStmt xml:id="AU2146">
+        <resp>Initial upload of this work's facsimile images and metadata to FromThePage for editing</resp>
+        <persName/>
+      </respStmt>
+
+      <respStmt xml:id="OU840">
+        <resp>Administrator of the Howitt and Fison Papers transcription project on FromThePage</resp>
+        <persName/>
+      </respStmt>
+
+        <respStmt xml:id="U2146">
+          <persName>ALourie</persName>
+            <resp>
+              made 96 edits between
+              <date type="first_edit" when="2019-09-08T12:46:00Z">September  8, 2019</date> and
+              <date type="last_edit" when="2021-06-09T11:47:18Z">June  9, 2021</date>.
+            </resp>
+        </respStmt>
+        <respStmt xml:id="U213662">
+          <persName>Kurnai</persName>
+            <resp>
+              made 16 edits between
+              <date type="first_edit" when="2019-09-22T08:42:46Z">September 22, 2019</date> and
+              <date type="last_edit" when="2019-09-23T03:22:55Z">September 23, 2019</date>.
+            </resp>
+        </respStmt>
+        <respStmt xml:id="U3402">
+          <persName>Ted Ryan</persName>
+            <resp>
+              made 2 edits between
+              <date type="first_edit" when="2019-09-09T04:25:33Z">September  9, 2019</date> and
+              <date type="last_edit" when="2019-09-09T04:41:37Z">September  9, 2019</date>.
+            </resp>
+        </respStmt>
+
+
+
+    </editionStmt>
+
+    <publicationStmt>
+    <publisher>Dynamic TEI export from FromThePage (version 22.10)</publisher>
+      <availability>
+        <p/>
+      </availability>
+      <date when="2022-11-14T00:03:22+00:00">November 14, 2022</date>
+    </publicationStmt>
+
+    <sourceDesc>
+      <msDesc>
+        <msIdentifier>
+            
+        <idno>hw0024</idno><institution>State Library of Victoria</institution></msIdentifier>
+        <physDesc><p/></physDesc>
+        <history>
+          <origin>
+            <placeName/>
+          </origin>
+          <provenance/>
+        </history>
+      </msDesc>
+
+        <listPerson>
+            <person xml:id="S94966">
+              <persName>A. W. Howitt</persName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C410">People</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS94966P0">http://adb.anu.edu.au/biography/howitt-alfred-william-510
+</p>
+
+
+                </note>
+            </person>
+            <person xml:id="S91624">
+              <persName>John Campbell Macleod </persName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C410">People</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS91624P0">MacLeod moved to Gunaikurnai Country in the 1840s, with his father and brothers. They leased a range of stations across what became Gippsland. In May 1861, MacLeod was appointed Honorary Correspondent of the Central Board for watching the interests of the Aborigines. At this stage MacLeod was identified as living at Buchan River in Gipps Land. John Bulmer headed to Buchan when he came to Gippsland from Melbourne in 1861, guided by Brabralung man Tulaba. Guardian of the Aborigines, William Thomas, had determined a site near MacLeod’s station at Buchan River would be a good place for an Aboriginal reserve. However, Bulmer reported the local Brabralung people suggested Bulmer accompany them to Bung Yarnda where they were going fishing. It was here, at what became known as Lake Tyers, that Bulmer set up the Aboriginal reserve. Bulmer noted that MacLeod’s sister had taught local Brabralung women how to sew and that men were employed as stock riders by MacLeod.<lb/>
+By March 1862 MacLeod was at Orbost and continued as Honorary Correspondent. MacLeod first claimed the Orbost run in 1847 and moved between it and a run at Ensay and Buchan over the years. MacLeod and his brothers experienced violence on a number of fronts in these early years as settlers contested poorly acknowledged and formalised land claims and Gunaikurnai people resisted incursions by the settlers on their Country and retaliated against violence against their people. In 1861 an overseer at MacLeod’s run Ensay was shot and killed by a neighbour, accused of taking cattle from the neighbour’s property. Some time around 1850-1851, the cook at MacLeod’s Orbost station, Dan Moylan or Dan Dempsey, was killed by Krauatungulung people in retaliation for the abduction, and rape of a young female. Local settlers formed a group to seek out Aboriginal people in revenge and killed between 15 to 20 people in the vicinity of Brodribb River. Another settler remembered that John’s brother, Norman, gathered a group of settlers from Sale to retaliate an attack on himself as he attempted to mount his horse (where this attack happened is not identified, but given he went to Sale, it was most likely around that area). After the killing of Aboriginal people in retaliation for Dan the cook’s death, a surviving Aboriginal boy was brought to the Orbost station and raised there. <lb/>
+Historian Peter Gardner has written on and off over the past few decades about the history of Gippsland, with a particular focus on the shared history between settlers and Aboriginal people. His research and his regular revisiting of the materials to add and question the information and conclusions he has drawn is impressive. Gardner noted most recently regarding the MacLeods and massacres of Gunaikurnai in Gippsland, that there were two massacres that could be linked to the MacLeods – one at Mille or Milly creek on the Brodribb river and the ‘Slaughterhouse’ massacre north of Buchan. The University of Newcastle Colonial Frontiers mapping project links the Mille creek massacre with revenge for the death of Dan. The Slaughterhouse massacre resulted in around 15 to 20 Aboriginal people dead. Both sources note the secrecy over decades around these acts of violence, especially the Slaughterhouse massacre.<lb/>
+MacLeod was a friend of the Howitt’s from the 1860s, visiting them when they were living at Omeo. MacLeod’s encounter of his pursuing Aboriginal people for killing livestock does not describe a massacre, but does indicate the tensions that existed between Gunaikurnai and settlers and presents MacLeod as dogged in his pursuit of the Gunaikurnai. <lb/>
+References:<lb/>
+Government Gazette’, The Age, 14 May 1861, p. 6, accessed 22 June 2020, https://nla.gov.au/nla.news-article154886511<lb/>
+John Bulmer, Papers, Museums Victoria, XM921, p. 2. and XM922, p. 48.<lb/>
+‘Early Days of Orbost’, Gippsland Times, 1 March 1837, p. 6, accessed 20 June 2020, http://nla.gov.au/nla.news-article63016690<lb/>
+‘Civil Sittings, Thursday May 23’, Gippsland Guardian, 31 May 1861, p. 3, accessed 20 June 2020, http://nla.gov.au/nla.news-article109904525<lb/>
+‘Supreme Court’, Gippsland Guardian, 31 May 1861, pp. 2-3, accessed 20 June 2020, http://nla.gov.au/nla.news-article109904527<lb/>
+‘News and Notes’, The Star, 13 April 1861, p. 2, accessed 20 June 2020, http://nla.gov.au/nla.news-article66338520<lb/>
+https://c21ch.newcastle.edu.au/colonialmassacres/detail.php?r=555<lb/>
+https://c21ch.newcastle.edu.au/colonialmassacres/detail.php?r=554<lb/>
+Liney Howitt, ‘Letter to Mary Howitt’, 14 January 1866, Omeo, A W Howitt papers, State Library of Victoria, Manuscript collection, MS9356, Box 1046/2a item 2.<lb/>
+A W Howitt, ‘Letter to Mary Howitt’, 14 January 1866, A W Howitt papers State Library of Victoria, Manuscript collection, MS9356, Box 1046/2a item 1.<lb/>
+Margaret Carlyon, ‘Notes on the History of Orbost’, Orbost &amp; District Historical Society Newsletter, July 2007, p. 2.<lb/>
+Gardner, Peter (2015) ‘Some Random notes on the Massacres 2000-2015’, Peter Gardner website, accessed 20 June 2020, https://petergardner.info/publications/<lb/>
+Gardner, Peter (1979) ‘Two East Gippsland Massacres Revisited – A Study in Folk History and its Interpretation’, Oral History Association of Australia Journal, no. 1, pp. 97-105.<lb/>
+Heritage Council Victoria, ‘Little Dan the Cook Grave’, Victorian Heritage Database Report, accessed 20 June 2020, https://vhd.heritagecouncil.vic.gov.au/places/14036/download-report<lb/>
+‘Claims to leases of Crown Land beyond the Settled Districts – Gipps Land District’, The Melbourne Argus, 22 August 1848, p. 4, accessed 20 June 2020, http://nla.gov.au/nla.news-article4764524
+</p>
+
+<p xml:id="OTPS91624P1"/>
+                </note>
+            </person>
+            <person xml:id="S61751">
+              <persName>William Walsh</persName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C410">People</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS61751P0">Most likely the Walsh who was in charge of the 1st Division of Native Police sent into Gippsland in 1848. In 1851 Walsh was put on trial for shooting Lieutenant William Dana in 1851. Walsh was found guilty and sentenced to 7 years hard labour. <lb/>
+Reference:<lb/>
+Commandant Dana, 'Letter to La Trobe', 15 December 1848, Transmits report of the conduct etc of Native Police, PROV, Inward Registered Correspondence, file 48/2594.<lb/>
+http://nla.gov.au/nla.news-article226354556<lb/>
+http://nla.gov.au/nla.news-article91917511<lb/>
+http://nla.gov.au/nla.news-article684950<lb/>
+Marie Fels, Good Men and True: The Aboriginal Police of the Port Phillip District, 1837-1853, unpublished PhD thesis, University of Melbourne, 1986, pp. 206-208.
+</p>
+
+
+                </note>
+            </person>
+            <person xml:id="S26184">
+              <persName>Ulmin</persName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C410">People</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS26184P0">Ulmin came from Omeo, according to J C McLeod. In 1848 he was living with McLeod at Buchan.
+</p>
+
+
+                </note>
+            </person>
+            <person xml:id="S52991">
+              <persName>Bungil woorin</persName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C410">People</ptr>
+                    </ab>
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C623">Language Term</ptr>
+                    </ab>
+                </note>
+            </person>
+            <person xml:id="S26188">
+              <persName>Billy Simpson</persName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C410">People</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS26188P0">Possibly worked with J C MacLeod.
+</p>
+
+
+                </note>
+            </person>
+        </listPerson>
+
+        <listPlace>
+            <place xml:id="S39497">
+              <placeName>Gippsland</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS39497P0">Much of Gippsland is on Gunaikurnai Country
+</p>
+
+
+                </note>
+            </place>
+            <place xml:id="S52988">
+              <placeName>Heart</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS52988P0">The Heart Station, on Gunaikurnai Country near Sale, Gippsland. 
+</p>
+
+
+                </note>
+            </place>
+            <place xml:id="S61752">
+              <placeName>Marlay Point</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS61752P0">On Gunaikurnai Country in Gippsland
+</p>
+
+
+                </note>
+            </place>
+            <place xml:id="S13203">
+              <placeName>Omeo</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS13203P0">Town in north eastern Victoria 
+</p>
+
+
+                </note>
+            </place>
+            <place xml:id="S16886">
+              <placeName>Buchan</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS16886P0">On Gunaikurnai Country in Gippsland, Victoria
+</p>
+
+
+                </note>
+            </place>
+            <place xml:id="S17753">
+              <placeName>Snowy River</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+            </place>
+            <place xml:id="S52989">
+              <placeName>Duroc</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+            </place>
+            <place xml:id="S52990">
+              <placeName>Snowy River station</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+            </place>
+            <place xml:id="S26185">
+              <placeName>90 mile beach</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS26185P0">On Gunaikurnai Country in Gippsland, Victoria
+</p>
+
+
+                </note>
+            </place>
+            <place xml:id="S17587">
+              <placeName>McLennans Strait</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS17587P0">A waterway between Lake Wellington and Hollands Landing on Gunaikurnai Country in Gippsland
+</p>
+
+
+                </note>
+            </place>
+            <place xml:id="S17041">
+              <placeName>Cape Howe</placeName>
+                <note type="categorization">
+                  Categories:
+                    <ab>
+                      <ptr ana="#category #leaf #root" target="#C411">Places</ptr>
+                    </ab>
+                </note>
+                <note type="article">
+                    <p xml:id="OTPS17041P0">In far east Gippsland, Victoria
+</p>
+
+
+                </note>
+            </place>
+        </listPlace>
+    </sourceDesc>
+
+  </fileDesc>
+
+    <encodingDesc>
+      <classDecl>
+        <taxonomy>
+<category xml:id="C494">
+<catDesc>Cultural/Linguistic Group</catDesc>
+          <category xml:id="S70927">
+            <catDesc>
+              <term>Bidawal</term>
+              <idno>105866</idno>
+              <note type="categorization">Categories:<ab><ptr ana="#category #leaf #root" target="#C494">Cultural/Linguistic Group</ptr></ab>
+              </note>
+              <gloss><p xml:id="OTPSD70927P0">A language and group of far east Gippsland.<lb/>
+AIATSIS Code: S49<lb/>
+AIATSIS Reference name: Bidawal.  <lb/>
+See: https://collection.aiatsis.gov.au/austlang/language/s49
+</p>
+
+</gloss>
+            </catDesc>
+          </category>
+</category>
+<category xml:id="C623">
+<catDesc>Language Term</catDesc>
+          <category xml:id="S52991">
+            <catDesc>
+              <term>Bungil woorin</term>
+              <note type="categorization">Categories:<ab><ptr ana="#category #leaf #root" target="#C410">People</ptr></ab>
+<ab><ptr ana="#category #leaf #root" target="#C623">Language Term</ptr></ab>
+              </note>
+            </catDesc>
+          </category>
+</category>
+<category xml:id="C410">
+<catDesc>People</catDesc>
+<category xml:id="C410S52991">
+<catDesc>
+<term><rs ref="S52991">Bungil woorin</rs></term>
+</catDesc>
+</category>
+</category>
+<category xml:id="C690">
+<catDesc>Social Category</catDesc>
+</category>
+</taxonomy>
+
+      </classDecl>
+    </encodingDesc>
+
+
+  <profileDesc>
+  
+
+
+      <langUsage>
+        <language ident="eng">English</language>
+      </langUsage>
+  </profileDesc>
+
+  <revisionDesc>
+    <listChange ordered="true">
+        <change xml:id="CHG119" who="U2146" when="2021-06-09T11:47:18Z" target="#P581755">
+          Version 18 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG118" who="U2146" when="2021-06-09T11:46:05Z" target="#P581755">
+          Version 17 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG117" who="U2146" when="2021-06-08T13:14:43Z" target="#P581753">
+          Version 80 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG116" who="U2146" when="2021-06-08T13:13:42Z" target="#P581753">
+          Version 79 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG115" who="U2146" when="2021-02-23T02:49:16Z" target="#P581753">
+          Version 78 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG114" who="U2146" when="2021-02-08T12:55:08Z" target="#P581753">
+          Version 77 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG113" who="U2146" when="2021-02-08T12:55:07Z" target="#P581753">
+          Version 76 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG112" who="U2146" when="2021-02-08T01:38:26Z" target="#P581753">
+          Version 75 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG111" who="U2146" when="2021-02-08T01:38:25Z" target="#P581753">
+          Version 74 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG110" who="U2146" when="2021-02-07T11:41:35Z" target="#P581753">
+          Version 73 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG109" who="U2146" when="2021-01-27T01:18:08Z" target="#P581753">
+          Version 72 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG108" who="U2146" when="2021-01-27T01:16:56Z" target="#P581753">
+          Version 71 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG107" who="U2146" when="2021-01-27T01:06:13Z" target="#P581753">
+          Version 70 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG106" who="U2146" when="2021-01-27T01:06:11Z" target="#P581753">
+          Version 69 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG105" who="U2146" when="2021-01-11T01:59:59Z" target="#P581753">
+          Version 68 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG104" who="U2146" when="2020-12-15T23:55:53Z" target="#P581753">
+          Version 67 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG103" who="U2146" when="2020-12-15T23:49:06Z" target="#P581753">
+          Version 66 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG102" who="U2146" when="2020-12-15T23:37:25Z" target="#P581753">
+          Version 65 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG101" who="U2146" when="2020-12-15T23:37:24Z" target="#P581753">
+          Version 64 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG100" who="U2146" when="2020-12-14T06:19:23Z" target="#P581753">
+          Version 63 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG99" who="U2146" when="2020-12-14T02:57:31Z" target="#P581753">
+          Version 62 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG98" who="U2146" when="2020-12-10T23:22:01Z" target="#P581753">
+          Version 61 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG97" who="U2146" when="2020-12-10T12:21:32Z" target="#P581753">
+          Version 60 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG96" who="U2146" when="2020-12-10T11:41:36Z" target="#P581753">
+          Version 59 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG95" who="U2146" when="2020-12-10T07:51:13Z" target="#P581753">
+          Version 58 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG94" who="U2146" when="2020-12-10T07:51:12Z" target="#P581753">
+          Version 57 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG93" who="U2146" when="2020-12-09T06:57:25Z" target="#P581753">
+          Version 56 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG92" who="U2146" when="2020-11-13T11:06:07Z" target="#P581753">
+          Version 55 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG91" who="U2146" when="2020-11-13T11:06:06Z" target="#P581753">
+          Version 54 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG90" who="U2146" when="2020-11-13T11:03:42Z" target="#P581753">
+          Version 53 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG89" who="U2146" when="2020-11-13T11:03:41Z" target="#P581753">
+          Version 52 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG88" who="U2146" when="2020-10-22T11:06:42Z" target="#P581753">
+          Version 51 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG87" who="U2146" when="2020-10-14T07:19:13Z" target="#P581753">
+          Version 50 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG86" who="U2146" when="2020-10-14T07:01:31Z" target="#P581753">
+          Version 49 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG85" who="U2146" when="2020-10-13T02:06:42Z" target="#P581755">
+          Version 16 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG84" who="U2146" when="2020-10-08T07:43:43Z" target="#P581753">
+          Version 48 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG83" who="U2146" when="2020-10-08T07:29:50Z" target="#P581753">
+          Version 47 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG82" who="U2146" when="2020-10-07T07:28:01Z" target="#P581753">
+          Version 46 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG81" who="U2146" when="2020-10-07T07:15:56Z" target="#P581753">
+          Version 45 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG80" who="U2146" when="2020-09-02T01:32:20Z" target="#P581753">
+          Version 44 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG79" who="U2146" when="2020-08-25T12:19:35Z" target="#P581753">
+          Version 43 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG78" who="U2146" when="2020-08-25T12:14:25Z" target="#P581753">
+          Version 42 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG77" who="U2146" when="2020-08-24T07:13:33Z" target="#P581753">
+          Version 41 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG76" who="U2146" when="2020-08-20T11:20:07Z" target="#P581753">
+          Version 40 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG75" who="U2146" when="2020-08-13T05:06:37Z" target="#P581753">
+          Version 39 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG74" who="U2146" when="2020-08-13T04:38:22Z" target="#P581753">
+          Version 38 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG73" who="U2146" when="2020-08-13T04:38:21Z" target="#P581753">
+          Version 37 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG72" who="U2146" when="2020-07-24T02:43:22Z" target="#P581753">
+          Version 36 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG71" who="U2146" when="2020-07-24T02:43:21Z" target="#P581753">
+          Version 35 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG70" who="U2146" when="2020-07-24T00:49:07Z" target="#P581753">
+          Version 34 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG69" who="U2146" when="2020-07-24T00:49:06Z" target="#P581753">
+          Version 33 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG68" who="U2146" when="2020-07-24T00:47:21Z" target="#P581753">
+          Version 32 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG67" who="U2146" when="2020-07-23T05:26:40Z" target="#P581753">
+          Version 31 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG66" who="U2146" when="2020-07-23T01:56:32Z" target="#P581753">
+          Version 30 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG65" who="U2146" when="2020-07-14T06:16:46Z" target="#P581753">
+          Version 29 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG64" who="U2146" when="2020-07-14T06:00:30Z" target="#P581753">
+          Version 28 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG63" who="U2146" when="2020-06-19T02:22:35Z" target="#P581753">
+          Version 27 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG62" who="U2146" when="2020-06-19T02:12:59Z" target="#P581753">
+          Version 26 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG61" who="U2146" when="2020-06-19T02:07:17Z" target="#P581753">
+          Version 25 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG60" who="U2146" when="2020-06-19T02:06:52Z" target="#P581753">
+          Version 24 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG59" who="U2146" when="2020-06-19T02:05:43Z" target="#P581753">
+          Version 23 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG58" who="U2146" when="2020-06-04T10:03:52Z" target="#P581753">
+          Version 22 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG57" who="U2146" when="2020-06-04T07:04:30Z" target="#P581753">
+          Version 21 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG56" who="U2146" when="2020-06-04T06:55:40Z" target="#P581753">
+          Version 20 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG55" who="U2146" when="2020-05-13T04:50:36Z" target="#P581755">
+          Version 15 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG54" who="U2146" when="2020-05-13T04:47:40Z" target="#P581755">
+          Version 14 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG53" who="U2146" when="2020-05-07T05:17:56Z" target="#P581753">
+          Version 19 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG52" who="U2146" when="2020-05-07T04:34:35Z" target="#P581753">
+          Version 18 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG51" who="U2146" when="2020-04-06T13:20:06Z" target="#P581753">
+          Version 17 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG50" who="U2146" when="2020-04-06T12:49:32Z" target="#P581753">
+          Version 16 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG49" who="U2146" when="2020-03-30T00:35:39Z" target="#P581753">
+          Version 15 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG48" who="U2146" when="2020-03-19T04:13:39Z" target="#P581753">
+          Version 14 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG47" who="U2146" when="2020-03-19T03:54:59Z" target="#P581753">
+          Version 13 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG46" who="U2146" when="2020-03-19T03:51:32Z" target="#P581753">
+          Version 12 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG45" who="U2146" when="2020-03-19T03:09:35Z" target="#P581753">
+          Version 11 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG44" who="U2146" when="2020-03-10T05:21:22Z" target="#P581753">
+          Version 10 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG43" who="U2146" when="2019-12-06T11:47:18Z" target="#P581753">
+          Version 9 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG42" who="U2146" when="2019-11-18T10:37:20Z" target="#P581753">
+          Version 8 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG41" who="U2146" when="2019-11-15T04:06:29Z" target="#P581753">
+          Version 7 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG40" who="U2146" when="2019-11-15T04:04:36Z" target="#P581753">
+          Version 6 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG39" who="U2146" when="2019-11-11T06:58:36Z" target="#P581755">
+          Version 13 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG38" who="U2146" when="2019-09-30T06:09:30Z" target="#P581755">
+          Version 12 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG37" who="U2146" when="2019-09-30T06:07:43Z" target="#P581755">
+          Version 11 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG36" who="U2146" when="2019-09-30T06:06:50Z" target="#P581755">
+          Version 10 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG35" who="U2146" when="2019-09-25T13:39:14Z" target="#P581758">
+          Version 1 of page "6":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG34" who="U2146" when="2019-09-25T13:38:32Z" target="#P581757">
+          Version 2 of page "5":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG33" who="U2146" when="2019-09-25T13:37:24Z" target="#P581757">
+          Version 1 of page "5":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG32" who="U2146" when="2019-09-25T13:26:38Z" target="#P581756">
+          Version 3 of page "4":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG31" who="U2146" when="2019-09-25T13:07:50Z" target="#P581755">
+          Version 9 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG30" who="U2146" when="2019-09-25T13:07:33Z" target="#P581755">
+          Version 8 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG29" who="U2146" when="2019-09-25T12:20:20Z" target="#P581754">
+          Version 10 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG28" who="U2146" when="2019-09-25T11:57:20Z" target="#P581753">
+          Version 5 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG27" who="U2146" when="2019-09-25T11:34:45Z" target="#P581753">
+          Version 4 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG26" who="U213662" when="2019-09-23T03:22:55Z" target="#P581755">
+          Version 7 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG25" who="U213662" when="2019-09-23T03:16:05Z" target="#P581755">
+          Version 6 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG24" who="U213662" when="2019-09-23T03:13:42Z" target="#P581755">
+          Version 5 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG23" who="U213662" when="2019-09-23T03:01:19Z" target="#P581755">
+          Version 4 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG22" who="U213662" when="2019-09-23T03:00:10Z" target="#P581755">
+          Version 3 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG21" who="U213662" when="2019-09-23T02:48:00Z" target="#P581755">
+          Version 2 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG20" who="U213662" when="2019-09-23T02:13:26Z" target="#P581755">
+          Version 1 of page "3":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG19" who="U213662" when="2019-09-23T01:55:19Z" target="#P581754">
+          Version 9 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG18" who="U213662" when="2019-09-23T01:33:54Z" target="#P581754">
+          Version 8 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG17" who="U213662" when="2019-09-23T01:23:51Z" target="#P581754">
+          Version 7 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG16" who="U213662" when="2019-09-23T01:17:21Z" target="#P581754">
+          Version 6 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG15" who="U213662" when="2019-09-22T08:59:49Z" target="#P581754">
+          Version 5 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG14" who="U213662" when="2019-09-22T08:55:13Z" target="#P581754">
+          Version 4 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG13" who="U213662" when="2019-09-22T08:50:34Z" target="#P581754">
+          Version 3 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG12" who="U213662" when="2019-09-22T08:43:18Z" target="#P581754">
+          Version 2 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG11" who="U213662" when="2019-09-22T08:42:46Z" target="#P581754">
+          Version 1 of page "2":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG10" who="U3402" when="2019-09-09T04:41:37Z" target="#P581753">
+          Version 3 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG9" who="U3402" when="2019-09-09T04:25:33Z" target="#P581753">
+          Version 2 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG8" who="U2146" when="2019-09-08T12:48:18Z" target="#P581756">
+          Version 2 of page "4":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG7" who="U2146" when="2019-09-08T12:46:47Z" target="#P581756">
+          Version 1 of page "4":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG6" who="U2146" when="2019-09-08T12:46:00Z" target="#P581753">
+          Version 1 of page "1":
+            Changes to page transcript.
+        </change>
+        <change xml:id="CHG5" who="U2146" when="2019-09-08T12:38:25Z" target="#P581758">
+          Version 0 of page "6":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG4" who="U2146" when="2019-09-08T12:38:24Z" target="#P581757">
+          Version 0 of page "5":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG3" who="U2146" when="2019-09-08T12:38:23Z" target="#P581756">
+          Version 0 of page "4":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG2" who="U2146" when="2019-09-08T12:38:23Z" target="#P581755">
+          Version 0 of page "3":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG1" who="U2146" when="2019-09-08T12:38:22Z" target="#P581754">
+          Version 0 of page "2":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+        <change xml:id="CHG0" who="U2146" when="2019-09-08T12:38:21Z" target="#P581753">
+          Version 0 of page "1":
+            Empty transcript -- probably initial upload of page facsimile.
+        </change>
+    <change when="2022-11-22T11:28:50.734507+10:00">Enhanced with additional metadata drawn from <ref target="https://howittandfison.org/document/hw0024/1"> the Howitt and Fison website</ref>.</change></listChange>
+  </revisionDesc>
+</teiHeader>
+
+<text>
+  <body>
+        <pb xml:id="F581753" n="1" facs="http://fromthepage.com/image-service/581753/full/full/0/default.jpg"/>
+        <div xml:id="OTP581753">
+        <fw>hw0024-001</fw>
+        <p xml:id="OTP581753P0">[written at top of page]<lb/>
+Written down by <rs ref="#S94966">A. W. Howitt</rs> from<lb/>
+the account by <rs ref="#S91624">J. C. Macleod</rs> of the <lb/>
+early settlement of <rs ref="#S39497">Gippsland</rs>.
+</p>
+
+<p xml:id="OTP581753P1"><rs ref="#S91624">J C McLeod</rs>
+</p>
+
+<p xml:id="OTP581753P2">[In April 1849 - crossed out] About Xmas 48 <rs ref="#S61751">Wash</rs> of the Black Police<lb/>
+reported finding part of a bible at the <rs ref="#S52988">Hart</rs> - near a <lb/>
+place called <rs ref="#S61752">Marly Point</rs>.  He found it at a Blacks <lb/>
+camp - where he thought he saw a [black- crossed out] white woman<lb/>
+among the gins.  A great many people went out to <lb/>
+see if they could find her.  I  went out with a black <lb/>
+fellow <rs ref="#S26184">Ulmin</rs> of <rs ref="#S13203">Omeo</rs> who was then living with <lb/>
+me at <rs ref="#S16886">Buchan</rs>. We went poking about – partly <lb/>
+to catch a gin for him and to see if I could find the <lb/>
+white woman. The Blacks greatest wish was to get a gin.<lb/>
+- It was said she was down at the <rs ref="#S17753">Snowy river</rs><lb/>
+- that the blacks had removed her out of the way <lb/>
+of the whites to a place called [Dooruck - crossed out] <rs ref="#S52989">Duroc</rs>.  <lb/>
+In looking for the blacks we found what is now <lb/>
+called the <rs ref="#S52990">Snowy River station</rs>. The country at that time <lb/>
+looked beautiful covered with grass and nice <lb/>
+lightwood trees, and emus in lots. We found any <lb/>
+number of blacks – we came on a lot camped on a piece <lb/>
+of clear ground, open forest – they had never been disturbed <lb/>
+there; we sneaked up on foot and caught an old <lb/>
+man and three boys – the old man was old <rs ref="#S52991">Bungil <lb/>
+woorin</rs> – or Brokensun. They were frightened out of their <lb/>
+lives. The other two men and two gins ran right away <lb/>
+from us. We thought it best after making friends with <lb/>
+our captives to clear out. Finding no trace of the
+</p>
+
+<p xml:id="OTP581753P3"/>
+        </div>
+        <pb xml:id="F581754" n="2" facs="http://fromthepage.com/image-service/581754/full/full/0/default.jpg"/>
+        <div xml:id="OTP581754">
+        <fw>hw0024-002</fw>
+        <p xml:id="OTP581754P0"><lb/>
+2<lb/>
+white woman – and no traces of whites but two letters cut<lb/>
+in a tree W G.- we went back and shortly after I went<lb/>
+up with cattle and took possession.
+</p>
+
+<p xml:id="OTP581754P1">Through old Bunjil woorin and the two boys, when <lb/>
+I went the second day there I made friends with all the<lb/>
+blacks. Old Bunjil woorin and I changed names - I took<lb/>
+his and called him Jacob, he give me two children<lb/>
+a young gin [two y- crossed out] four years old and a boy two years old. <lb/>
+They were a nuisance to him because he could not <lb/>
+feed them. The old wretch bothered me out of my life <lb/>
+he used to come at 3 o’clock in the morning and sing out <lb/>
+Phoebe canyu  ganyuce - that is Phoebe – the little gin <lb/>
+is hungry – This old man brought in all the tribe <lb/>
+about 70 men and 30 women and 15 or 16 children<lb/>
+– it was the largest muster I ever saw there. The children <lb/>
+were the most miserable little wretches I ever saw, with <lb/>
+bellies like washing tubs and legs as thin as your finger <lb/>
+– they looked like distorted frogs?. I used to laugh at them <lb/>
+for hours. I then made enquiries about the white woman<lb/>
+thinking they had her planted - I found there had<lb/>
+been one among them and that she landed in a boat<lb/>
+in the <rs ref="#S26185">90 mile beach</rs> with two white men. One of the <lb/>
+white men went mad and they killed him to get<lb/>
+rid of him. I could never trace what became of the<lb/>
+other. The woman was drowned with her two half cast
+</p>
+
+<p xml:id="OTP581754P2"/>
+        </div>
+        <pb xml:id="F581755" n="3" facs="http://fromthepage.com/image-service/581755/full/full/0/default.jpg"/>
+        <div xml:id="OTP581755">
+        <fw>hw0024-003</fw>
+        <p xml:id="OTP581755P0"/><p xml:id="OTP581755P1">3<lb/>
+children by the upsetting of a boat in <rs ref="#S17587">McLennans<lb/>
+Straight</rs>.  I gathered this at different times. They used<lb/>
+to describe her as a tall women with long very black hair <lb/>
+reaching to her waist - a great sign of beauty with them. <lb/>
+After getting the blacks in they were very quiet for<lb/>
+10 days or a fortnight - used to bring me fish for which<lb/>
+for which I gave them beef or potatoes or any little thing I could <lb/>
+spare – till one night they all disappeared but two or<lb/>
+three old men who remained as spies. Two or three <lb/>
+days after I found these old fellows had changed their <lb/>
+camp into a little mound near the river and a <lb/>
+short time after we found a bullocks head the only <lb/>
+remains of a beast that had been speared and <lb/>
+taken away. The old blacks said it was not them <lb/>
+but the <rs ref="#S70927">Bidwall</rs> blacks – who by the way are still <lb/>
+wild and have never been brought in – they live <lb/>
+somewhere out to this day towards <rs ref="#S17041">Cape Howe</rs>. <lb/>
+We went after the blacks when we found [?but we had none?] <lb/>
+killed – I and <rs ref="#S26188">Billy Simpson</rs>, and a black boy went out on<lb/>
+foot each armed with a double gun each. After a <lb/>
+walk of five tiring miles we fell in with them but they <lb/>
+were over the river. I knew them as the very tribe that<lb/>
+had been at our place. They were sitting by this fire<lb/>
+with the spears stuck in the ground - they were scraping<lb/>
+and ressing possum skins.
+</p>
+
+
+        </div>
+        <pb xml:id="F581756" n="4" facs="http://fromthepage.com/image-service/581756/full/full/0/default.jpg"/>
+        <div xml:id="OTP581756">
+        <fw>hw0024-004</fw>
+        <p xml:id="OTP581756P0"/><p xml:id="OTP581756P1">4<lb/>
+We wanted them to come over the river but they <lb/>
+said the river was too high. My black boy and I both <lb/>
+understood enough of their language to make them<lb/>
+understand us and to understand them. They said <lb/>
+there were no bullocks. They were in high glee, dancing <lb/>
+and slapping their legs at us as a token of defiance. <lb/>
+They thought they were out of reach so I gave them a shot,<lb/>
+it struck in the mud and sent it all over them. <lb/>
+They ran into the scrub frightened out of their lives. <lb/>
+After a time out they came again, singing “Knart <lb/>
+bun, a burry burrya nyu, Knart bun jerrumbuddy <lb/>
+boorlooka nyu” – that is – “Don’t shoot me, I didn’t spear <lb/>
+the bullock”. So we fired three rounds over their heads and <lb/>
+they cleared out into a dense scrub and reeds.<lb/>
+From this time they set to work – in one week <lb/>
+- rainy weather, they killed 20 to 30. We could not go out.<lb/>
+I only had 2 white men, a black and myself on the <lb/>
+station and one man was laid up with reumatism [sic],<lb/>
+and another was shepherding and the third and I <lb/>
+were doing our best to get a hut up. The black boy <lb/>
+was afraid to go away from the hut. All this time the <lb/>
+blacks were working away at the cattle so that when we <lb/>
+rode out Sunday we found that they had killed 15 or <lb/>
+20 of out quietest cows. Most part they only took the<lb/>
+tongues, kidneys and tails and left the rest for the crows
+</p>
+
+<p xml:id="OTP581756P2"/>
+        </div>
+        <pb xml:id="F581757" n="5" facs="http://fromthepage.com/image-service/581757/full/full/0/default.jpg"/>
+        <div xml:id="OTP581757">
+        <fw>hw0024-005</fw>
+        <p xml:id="OTP581757P0">5<lb/>
+They left the rest for the crows - their friends who they <lb/>
+believe brought them fire. They call them narroot. <lb/>
+We were out for days but could never fall across them. <lb/>
+They could get over the river and through the high ferns <lb/>
+like wallabies – we had flying shots but never got <lb/>
+any. The very next thing we found they had killed a lot <lb/>
+of cattle at the bottom end of the run. I went down <lb/>
+to see as I did not believe my black boy. I rode down <lb/>
+unarmed as I had a young horse, About two miles or <lb/>
+more from the hut I saw a native dog and having <lb/>
+no gun took out my stirrup leather intending to <lb/>
+kill him with the iron – my horse took fright a [sic] pitched<lb/>
+me and the saddle on the ground. Instantly the scrub <lb/>
+between me and the river seemed alive with blacks <lb/>
+– I am sure the whole tribe were there, the yells made <lb/>
+my flesh creep. I was in a deuce of a fright but I always <lb/>
+had a brace of pistols in my belt and this was known <lb/>
+to the blacks – so I took out a round brass tinderbox <lb/>
+and holding it like a pistol made the best of my <lb/>
+way home and although they followed me up in the scrub <lb/>
+I never saw one – I think the fright was mutual <lb/>
+– they were afraid to show up in reach of my supposed <lb/>
+pistol and could not use their spears in the <lb/>
+scrub.<lb/>
+When I got home we went out armed but could <lb/>
+not fall in with any of them<lb/>
+
+</p>
+
+
+        </div>
+        <pb xml:id="F581758" n="6" facs="http://fromthepage.com/image-service/581758/full/full/0/default.jpg"/>
+        <div xml:id="OTP581758">
+        <fw>hw0024-006</fw>
+        <p xml:id="OTP581758P0">[this page does not need to be transcribed]
+</p>
+
+
+        </div>
+  </body>
+</text>
+</TEI>

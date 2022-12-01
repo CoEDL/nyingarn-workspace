@@ -99,18 +99,22 @@
 			</xsl:result-document>
 		</xsl:for-each>
 
-		<!-- debug -->
-		<!--
+		<!-- debug --><!--
+	<xsl:result-document href="normalised.xml" omit-xml-declaration="yes" indent="yes">
+	    <xsl:sequence select="$normalised"/>
+	</xsl:result-document>
 	<xsl:result-document href="tidied.xml" omit-xml-declaration="yes" indent="yes">
 	    <xsl:sequence select="$tidied"/>
+	</xsl:result-document>
+	<xsl:result-document href="upconverted.xml" omit-xml-declaration="yes" indent="yes">
+	    <xsl:sequence select="$upconverted"/>
 	</xsl:result-document>
 	<xsl:result-document href="bubbled.xml" omit-xml-declaration="yes" indent="yes">
 	    <xsl:sequence select="$bubbled"/>
 	</xsl:result-document>
 	<xsl:result-document href="paginated.xml" omit-xml-declaration="yes" indent="yes">
 	    <xsl:sequence select="$paginated"/>
-	</xsl:result-document>
-    -->
+	</xsl:result-document>-->
 	</xsl:template>
 	
 	<!-- copy any other elements while discarding unused namespace declarations -->

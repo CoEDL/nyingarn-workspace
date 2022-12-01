@@ -1069,6 +1069,41 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
         // delete the result document
         remove(output);
     });
+    it("should replace rs elements in hw0024 with placeName and persName github issue 123", async () => {
+        let identifier = "hw0024";
+        let resource = "hw0024-tei.xml";
+        let directory = "issue-123-FtP-ingestion-with-people-and-places/hw0024";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
+        let outputFolder = "test-output";
+        let output = path.join(__dirname, "../test-data", directory, outputFolder);
+        await ensureDir(output);
+        // use TEI as the default namespace so our XPath expressions are more concise
+        let options = { xpathDefaultNamespace: "http://www.tei-c.org/ns/1.0" };
+
+        await __processTeiTranscriptionXMLProcessor({
+            identifier,
+            sourceURI,
+            output: "file://" + output + "/",
+        });
+        let resultFile = path.join(output, "hw0024-001.tei.xml");
+        let resultDoc = await SaxonJS.getResource({ file: resultFile, type: "xml" });
+        // check the following input has been transformed:
+        // <rs ref="#S26184">Ulmin</rs> of <rs ref="#S13203">Omeo</rs>
+        let persName = SaxonJS.XPath.evaluate(
+            "//persName[@ref='#S26184'][.='Ulmin']",
+            resultDoc,
+            options
+        );
+        expect(persName).not.toBeNull();
+        let placeName = SaxonJS.XPath.evaluate(
+            "//placeName[@ref='#S13203'][.='Omeo']",
+            resultDoc,
+            options
+        );
+        expect(placeName).not.toBeNull();
+        // delete the result document
+        remove(output);
+    });
 });
 describe(`Confirm that documents with duplicate page identifiers are handled sensibly`, () => {
     let log, warn;

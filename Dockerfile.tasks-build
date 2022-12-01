@@ -7,5 +7,7 @@ RUN apt-get update && apt-get install -y  postgresql-client ca-certificates
 COPY tasks /srv/tasks
 COPY api /srv/api
 WORKDIR /srv/tasks
-RUN npm install
+RUN cd /src/tasks && npm install
+RUN cd /src/api && npm install
+
 CMD [ "node", "/srv/tasks/index.js" ]

@@ -1,14 +1,16 @@
-import { route, getLogger, loadConfiguration } from "../common";
+import { demandAuthenticatedUser, loadConfiguration } from "../common/index.js";
 import fetch from "cross-fetch";
-const log = getLogger();
 
-export function setupRoutes({ server }) {
-    server.post("/search/datapacks", route(postSearchDataPacksHandler));
+export function setupRoutes(fastify, options, done) {
+    fastify.addHook("preHandler", demandAuthenticatedUser);
+
+    fastify.post("/search/datapacks", postSearchDataPacksHandler);
+    done();
 }
 
 // TODO: this code does not have tests
-async function postSearchDataPacksHandler(req, res, next) {
-    const configuration = await loadConfiguration();
+async function postSearchDataPacksHandler(req) {
+    const configuration = req.session.configuration;
     let response = await fetch(`${configuration.api.services.elastic.host}/_search`, {
         method: "POST",
         headers: {
@@ -17,6 +19,5 @@ async function postSearchDataPacksHandler(req, res, next) {
         body: JSON.stringify(req.body.query),
     });
     response = await response.json();
-    res.send(response);
-    next();
+    return response;
 }

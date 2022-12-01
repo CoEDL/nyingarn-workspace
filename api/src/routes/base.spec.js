@@ -3,13 +3,7 @@ import fetch from "node-fetch";
 import { createUser } from "../lib/user";
 import { loadConfiguration, generateToken } from "../common";
 const chance = require("chance").Chance();
-import {
-    host,
-    setupBeforeAll,
-    setupBeforeEach,
-    teardownAfterAll,
-    teardownAfterEach,
-} from "../common";
+import { getStoreHandle, TestSetup, headers, host } from "../common";
 
 describe("Test loading the configuration", () => {
     test("it should be able to load the default configuration for the environment", async () => {
@@ -21,21 +15,31 @@ describe("Test loading the configuration", () => {
 });
 
 describe("Test the /authenticated endpoint", () => {
-    let users, configuration;
-    const userEmail = chance.email();
-    const adminEmail = chance.email();
+    let configuration, users, userEmail, adminEmail, bucket;
+    let identifier, store;
+    const tester = new TestSetup();
+
     beforeAll(async () => {
-        configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
+        ({ userEmail, adminEmail, configuration, bucket } = await tester.setupBeforeAll());
+        users = await tester.setupUsers({ emails: [userEmail], adminEmails: [adminEmail] });
     });
     beforeEach(async () => {
-        users = await setupBeforeEach({ emails: [userEmail] });
+        identifier = chance.word();
+        store = await getStoreHandle({
+            id: identifier,
+            className: "collection",
+        });
     });
     afterEach(async () => {
-        await teardownAfterEach({ users });
+        try {
+            await store.deleteItem();
+        } catch (error) {}
     });
     afterAll(async () => {
-        await teardownAfterAll(configuration);
+        await tester.purgeUsers({ users });
+        await tester.teardownAfterAll(configuration);
     });
+
     test("it should be ok", async () => {
         let configuration = await loadConfiguration();
         let user = users[0];

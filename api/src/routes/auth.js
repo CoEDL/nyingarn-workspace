@@ -1,25 +1,25 @@
-import { BadRequestError, UnauthorizedError, ServiceUnavailableError } from "restify-errors";
-import { loadConfiguration, getLogger, logEvent } from "../common";
+import { getLogger, logEvent } from "../common/index.js";
 import { jwtVerify, createRemoteJWKSet } from "jose";
 import { Issuer, generators } from "openid-client";
-import { createUser } from "../lib/user";
-import { createSession } from "../lib/session";
-import models from "../models";
+import { createUser } from "../lib/user.js";
+import { createSession } from "../lib/session.js";
+import models from "../models/index.js";
 const log = getLogger();
 
-export function setupRoutes({ server }) {
-    server.get("/auth/:provider/login", getLoginUrlRouteHandler);
-    server.post("/auth/:provider/code", getOauthTokenRouteHandler);
+export function setupRoutes(fastify, options, done) {
+    fastify.get("/auth/:provider/login", getLoginUrlRouteHandler);
+    fastify.post("/auth/:provider/code", getOauthTokenRouteHandler);
+    done();
 }
 
-async function getLoginUrlRouteHandler(req, res, next) {
+async function getLoginUrlRouteHandler(req, res) {
     const provider = req.params.provider;
 
-    let configuration = await loadConfiguration();
-    configuration = configuration.api.authentication[provider];
+    // let configuration = await loadConfiguration();
+    const configuration = req.session.configuration.api.authentication[provider];
     try {
     } catch (error) {
-        return next(new ServiceUnavailableError());
+        return res.internalServerError();
     }
     let issuer = await Issuer.discover(configuration.discover);
     const client = new issuer.Client({
@@ -37,17 +37,16 @@ async function getLoginUrlRouteHandler(req, res, next) {
         code_challenge_method,
         state: provider,
     });
-    res.send({ url, code_verifier });
-    next();
+    return { url, code_verifier };
 }
 
-async function getOauthTokenRouteHandler(req, res, next) {
+async function getOauthTokenRouteHandler(req, res) {
     const provider = req.params.provider;
     if (!req.body.code) {
-        return next(new BadRequestError(`Code not provided`));
+        return res.badRequest(`Code not provided`);
     }
 
-    let configuration = await loadConfiguration();
+    const configuration = req.session.configuration;
     let { token, jwks } = await getOauthToken({
         provider,
         code: req.body.code,
@@ -62,7 +61,7 @@ async function getOauthTokenRouteHandler(req, res, next) {
         try {
             user = await createUser(userData);
         } catch (error) {
-            return next(new UnauthorizedError());
+            return res.unauthorized();
         }
     } else {
         // normal user account - are we allowing access
@@ -75,7 +74,7 @@ async function getOauthTokenRouteHandler(req, res, next) {
                 owner: userData.email,
                 text: `The account for '${userData.email}' is not permitted. Denying user login.`,
             });
-            return next(new UnauthorizedError());
+            return res.unauthorized();
         }
         if (user?.locked) {
             log.info(`The account for '${user.email}' is locked. Denying user login.`);
@@ -85,7 +84,7 @@ async function getOauthTokenRouteHandler(req, res, next) {
                 text: `The account for '${user.email}' is locked. Denying user login.`,
             });
             // user account exists but user is locked
-            return next(new UnauthorizedError());
+            return res.unauthorized();
         }
         if (!user?.provider || !user.givenName) {
             // user account looks like a stub account - create it properly
@@ -98,15 +97,14 @@ async function getOauthTokenRouteHandler(req, res, next) {
             try {
                 user = await createUser(userData);
             } catch (error) {
-                return next(new UnauthorizedError());
+                return res.unauthorized();
             }
         }
     }
     log.debug(`Creating session for ${user.email}`);
     let session = await createSession({ user });
 
-    res.send({ token: session.token });
-    next();
+    return { token: session.token };
 }
 
 async function getOauthToken({ provider, code, code_verifier, configuration }) {

@@ -1,6 +1,7 @@
-import models from "../models";
-import { loadConfiguration } from "../common";
-import { uniqBy } from "lodash";
+import models from "../models/index.js";
+import { loadConfiguration } from "../common/index.js";
+import lodashPkg from "lodash";
+const { uniqBy } = lodashPkg;
 
 export async function getUsers({ offset = 0, limit = 10, orderBy = "familyName" }) {
     let direction = orderBy === "upload" ? "DESC" : "ASC NULLS LAST";

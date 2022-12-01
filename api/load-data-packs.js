@@ -1,4 +1,4 @@
-const { IndexDataPacks } = require("@describo/data-packs");
+import { IndexDataPacks } from "@describo/data-packs";
 
 main();
 async function main() {

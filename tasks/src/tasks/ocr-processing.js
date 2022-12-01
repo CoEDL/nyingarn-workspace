@@ -1,12 +1,13 @@
 import path from "path";
-import { getLogger, loadConfiguration, getStoreHandle, Textract } from "../common";
-import { readFile, writeFile, writeJSON, stat, readdir } from "fs-extra";
-const log = getLogger();
-const {
+import { log, loadConfiguration, getStoreHandle } from "/srv/api/src/common/index.js";
+import { Textract } from "../common/textract.js";
+import fsExtraPkg from "fs-extra";
+const { readFile, writeFile, writeJSON, stat, readdir } = fsExtraPkg;
+import {
     TextractClient,
     AnalyzeDocumentCommand,
     DetectDocumentTextCommand,
-} = require("@aws-sdk/client-textract");
+} from "@aws-sdk/client-textract";
 
 export async function runTextractOCR({
     task = "text",

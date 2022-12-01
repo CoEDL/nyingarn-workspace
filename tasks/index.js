@@ -1,7 +1,7 @@
-const rabbit = require("foo-foo-mq");
-const { loadConfiguration } = require("./src/common");
-const { setupHandlers } = require("./src/routing");
-const models = require("/srv/api/src/models");
+import rabbit from "foo-foo-mq";
+import { loadConfiguration } from "/srv/api/src/common/index.js";
+import { setupHandlers } from "./src/routing.js";
+import models from "/srv/api/src/models/index.js";
 setupHandlers({ rabbit });
 
 main();

@@ -4,84 +4,73 @@ import models from "../models";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";
 import { createSession } from "../lib/session";
-import { host, setupBeforeAll, teardownAfterAll } from "../common";
+import { TestSetup, headers, host } from "../common";
 
 describe("User management route tests as admin", () => {
-    let configuration, users;
-    const adminEmail = chance.email();
-    let user, session;
+    let users, userEmail, adminEmail;
+    const tester = new TestSetup();
+
     beforeAll(async () => {
-        configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
-    });
-    beforeEach(async () => {
-        user = await createUser({ email: adminEmail, provider: "unset" });
-        session = await createSession({ user });
-    });
-    afterEach(async () => {
-        try {
-            await user.destroy();
-        } catch (error) {}
+        ({ userEmail, adminEmail } = await tester.setupBeforeAll());
+        users = await tester.setupUsers({ emails: [userEmail], adminEmails: [adminEmail] });
     });
     afterAll(async () => {
-        await teardownAfterAll(configuration);
+        await tester.purgeUsers({ users });
     });
     it("should be able to get a list of users", async () => {
-        // expect to find one user
+        // expect to find two users
+        let user = users.filter((u) => u.administrator)[0];
+        let session = await createSession({ user });
+
         let response = await fetch(`${host}/admin/users`, {
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
+            headers: headers(session),
         });
         expect(response.status).toEqual(200);
-        ({ users } = await response.json());
-        expect(users.length).toEqual(1);
+        response = await response.json();
+        expect(response.users.length).toEqual(2);
     });
     it("should be able to invite users", async () => {
         let email = chance.email();
+
+        let user = users.filter((u) => u.administrator)[0];
+        let session = await createSession({ user });
         let response = await fetch(`${host}/admin/users`, {
             method: "POST",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
+            headers: headers(session),
             body: JSON.stringify({ emails: [email] }),
         });
         expect(response.status).toEqual(200);
 
         response = await fetch(`${host}/admin/users`, {
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
+            headers: headers(session),
         });
-        let { users } = await response.json();
-        for (let user of users) {
-            await models.user.destroy({ where: { id: user.id } });
-        }
+        response = await response.json();
+        await models.user.destroy({ where: { email } });
     });
     it("should be able to toggle a user capability", async () => {
-        let response = await fetch(`${host}/admin/users/${user.id}/upload`, {
+        let user = users.filter((u) => u.administrator)[0];
+        let user2 = users.filter((u) => !u.administrator)[0];
+        let session = await createSession({ user });
+
+        let response = await fetch(`${host}/admin/users/${user2.id}/upload`, {
             method: "PUT",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
+            headers: headers(session),
+            body: JSON.stringify({}),
         });
         expect(response.status).toEqual(200);
         user = await models.user.findOne({ where: { id: user.id } });
         expect(user.upload).toEqual(false);
     });
     it("should be able to delete a user", async () => {
-        let response = await fetch(`${host}/admin/users/${user.id}`, {
+        let user = users.filter((u) => u.administrator)[0];
+        let user2 = users.filter((u) => !u.administrator)[0];
+        let session = await createSession({ user });
+        let response = await fetch(`${host}/admin/users/${user2.id}`, {
             method: "DELETE",
-            headers: {
-                authorization: `Bearer ${session.token}`,
-                "Content-Type": "application/json",
-            },
+            headers: headers(session),
         });
         expect(response.status).toEqual(200);
-        user = await models.user.findOne({ where: { id: user.id } });
+        user = await models.user.findOne({ where: { id: user2.id } });
         expect(user).toEqual(null);
     });
 });

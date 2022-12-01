@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function (sequelize, DataTypes) {
+export default function (sequelize, DataTypes) {
     let Item = sequelize.define(
         "item",
         {
@@ -26,11 +26,11 @@ module.exports = function (sequelize, DataTypes) {
     );
     Item.associate = function (models) {
         Item.belongsToMany(models.user, {
-            through: 'item_users',
+            through: "item_users",
         });
         Item.hasMany(models.task, { onDelete: "cascade", hooks: true });
         Item.belongsToMany(models.collection, { through: "collection_items" });
     };
 
     return Item;
-};
+}

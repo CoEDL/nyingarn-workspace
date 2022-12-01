@@ -7,7 +7,6 @@ import {
 } from "./transcription-processing";
 import SaxonJS from "saxon-js";
 import path from "path";
-import { range } from "lodash";
 import { readdir, remove, ensureDir, pathExists } from "fs-extra";
 
 jest.setTimeout(20000); // 20s because the CSV processing test is slow
@@ -992,11 +991,7 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
             resultDoc,
             options
         );
-        let deleted = SaxonJS.XPath.evaluate(
-            "//del",
-            resultDoc,
-            options
-        );
+        let deleted = SaxonJS.XPath.evaluate("//del", resultDoc, options);
         let underlinedAndDeleted = SaxonJS.XPath.evaluate(
             "//del[contains-token(@rend, 'underline')]",
             resultDoc,

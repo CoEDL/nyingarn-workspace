@@ -1,7 +1,8 @@
 import { getStoreHandle } from "../common/index.js";
 import path from "path";
 import mime from "mime-types";
-import { difference } from "lodash";
+import lodashPkg from "lodash";
+const { difference } = lodashPkg;
 
 // TODO: this code does not have tests
 export async function registerAllFiles({ id, className, crate }) {

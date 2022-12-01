@@ -6,6 +6,12 @@ if [ "$#" != 1 ] ; then
 fi
 VERSION="${1}"
 
+read -p '>> What is your github username? ' GITHUB_USERNAME
+if [ -z "$GITHUB_USERNAME" ] ; then
+    echo "Please provide your github username."
+    exit -1
+fi
+
 read -p '>> Tag the repo (select N if you are still testing the builds)? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
     cd api
@@ -22,16 +28,21 @@ fi
 
 read -p '>> Build the containers and push to docker hub? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
-    docker login
+
+    echo ""
+    echo "Logging in to Github Container Registry"
+    echo " Provide a personal access token with the appropriate permissions"
+    echo ""
+    docker login ghcr.io --username GITHUB_USERNAME
 
     docker buildx build --push --rm --platform=linux/amd64,linux/arm64 \
-        -t arkisto/workspace-api:latest \
-        -t arkisto/workspace-api:${VERSION} \
+        -t ghcr.io/coedl/nyingarn-workspace-api:latest \
+        -t ghcr.io/coedl/nyingarn-workspace-api:${VERSION} \
         -f Dockerfile.api-build .
 
     docker buildx build --push --rm --platform=linux/amd64,linux/arm64 \
-        -t arkisto/workspace-task-runner:latest \
-        -t arkisto/workspace-task-runner:${VERSION} \
+        -t ghcr.io/coedl/nyingarn-workspace-task-runner:latest \
+        -t ghcr.io/coedl/nyingarn-workspace-task-runner:${VERSION} \
         -f Dockerfile.tasks-build .
 
     docker run -it --rm \
@@ -39,12 +50,12 @@ if [ "$resp" == "y" ] ; then
         -v ui_node_modules:/srv/ui/node_modules \
         -w /srv/ui node:14-buster bash -l -c "npm run build"
     docker buildx build --push --rm --platform linux/amd64,linux/arm64 \
-        -t arkisto/workspace-ui:latest \
-        -t arkisto/workspace-ui:${VERSION} \
+        -t ghcr.io/coedl/nyingarn-workspace-ui:latest \
+        -t ghcr.io/coedl/nyingarn-workspace-ui:${VERSION} \
         -f Dockerfile.ui-build .
 
     docker buildx build --push --rm --platform linux/amd64,linux/arm64 \
-        -t arkisto/workspace-tusd:latest \
-        -t arkisto/workspace-tusd:${VERSION} \
+        -t ghcr.io/coedl/nyingarn-workspace-tusd:latest \
+        -t ghcr.io/coedl/nyingarn-workspace-tusd:${VERSION} \
         -f Dockerfile.tus-build .
 fi

@@ -7,6 +7,10 @@ RUN npm run build:production
 
 FROM node:18-bullseye-slim
 WORKDIR /srv
+LABEL org.opencontainers.image.source=https://github.com/CoEDL/nyingarn-workspace
+LABEL org.opencontainers.image.description="The Nyingarn Workspace Tasks container"
+LABEL org.opencontainers.image.licenses=GPLv3
+
 RUN apt-get update && apt-get install -y ca-certificates
 COPY --from=tasks-builder /srv/tasks/package.json /srv/package.json
 COPY --from=tasks-builder /srv/tasks/package-lock.json /srv/package-lock.json

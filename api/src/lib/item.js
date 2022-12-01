@@ -253,12 +253,12 @@ export function groupFilesByResource({ identifier, files, naming }) {
     return { files: groupBy(resources, "resourceId") };
 }
 
-export async function getResourceProcessingStatus({ identifier, resources, dateFrom }) {
+export async function getResourceProcessingStatus({ itemId, resources, dateFrom }) {
     let dateTo = new Date();
     return await models.task.findAll({
         where: {
             [Op.and]: {
-                itemId: identifier,
+                itemId,
                 updatedAt: {
                     [Op.between]: [dateFrom, dateTo],
                 },

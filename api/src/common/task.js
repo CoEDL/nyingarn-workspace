@@ -17,8 +17,8 @@ export async function registerTask({ itemId, status, resource, name, data }) {
     }
 }
 
-export async function submitTask({ item, name, body }) {
-    let configuration = await loadConfiguration();
+export async function submitTask({ rabbit, configuration, item, name, body }) {
+    // let configuration = await loadConfiguration();
     let task = await registerTask({
         itemId: item.id,
         resource: body.resource,
@@ -26,7 +26,7 @@ export async function submitTask({ item, name, body }) {
         name,
         data: { resource: body.resource },
     });
-    global.rabbit.publish(configuration.api.processing.exchange, {
+    rabbit.publish(configuration.api.processing.exchange, {
         type: name,
         body: { ...body, identifier: item.identifier, task },
     });

@@ -373,7 +373,7 @@ async function saveItemTranscriptionHandler(req, res) {
 
 async function postResourceProcessingStatus(req) {
     let tasks = await getResourceProcessingStatus({
-        identifier: req.params.identifier,
+        itemId: req.session.item.id,
         resources: req.body.resources.map((r) => r.resource),
         dateFrom: req.body.dateFrom,
     });

@@ -11,34 +11,50 @@ import { authenticateTusRequest, triggerProcessing, getItemPath } from "./upload
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
-    fastify.addHook("preHandler", requireIdentifierAccess);
 
     fastify.get("/upload/pre-create", authenticateTusRequest);
-    fastify.get("/upload/pre-create/:itemType/:identifier", getItemPath);
-    fastify.get("/upload/post-finish/:identifier/:resource", triggerProcessing);
-    fastify.post("/process/post-finish/:identifier/:resource", triggerProcessing);
-    fastify.post("/process/extract-table/:identifier/:resource", extractTableHandler);
+    fastify.get(
+        "/upload/pre-create/:itemType/:identifier",
+        { preHandler: requireIdentifierAccess },
+        getItemPath
+    );
+    fastify.get(
+        "/upload/post-finish/:identifier/:resource",
+        { preHandler: requireIdentifierAccess },
+        triggerProcessing
+    );
+    fastify.post(
+        "/process/post-finish/:identifier/:resource",
+        { preHandler: requireIdentifierAccess },
+        triggerProcessing
+    );
+    fastify.post(
+        "/process/extract-table/:identifier/:resource",
+        { preHandler: requireIdentifierAccess },
+        extractTableHandler
+    );
     done();
 }
 
 async function extractTableHandler(req) {
-    let teiFile = `${req.params.resource}.tei.xml`;
-    let textractFile = `${req.params.resource}.textract_ocr-ADMIN.json`;
-    req.params.resource = `${req.params.resource}.jpg`;
+    const { identifier, resource } = req.params;
 
-    let store = await getStoreHandle({ id: req.params.identifier, className: "item" });
+    const teiFile = `${resource}.tei.xml`;
+    const textractFile = `${resource}.textract_ocr-ADMIN.json`;
+    const imageFile = `${resource}.jpg`;
+
+    let store = await getStoreHandle({ id: identifier, className: "item" });
     await store.delete({ target: teiFile });
     await store.delete({ target: textractFile });
-
-    const identifier = req.params.identifier;
-    const resource = req.params.resource;
     const name = "extract-table";
 
     log.info(`Process: ${identifier}/${resource}`);
-    let task = await submitTask({
+    await submitTask({
+        rabbit: this.rabbit,
+        configuration: req.session.configuration,
+        item: req.session.item,
         name,
-        item: req.item,
-        body: { resource },
+        body: { resource: imageFile },
     });
 
     return { taskId: task.id };

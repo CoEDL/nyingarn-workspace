@@ -10,8 +10,7 @@
         "develop": "npm run develop:server",
         "develop:server": "npm install && ./node_modules/.bin/nodemon --exec babel-node ./index.js",
         "test": "./node_modules/.bin/jest --runInBand",
-        "test:watch": "./node_modules/.bin/jest --watch --runInBand",
-        "build:production": "./node_modules/.bin/webpack --config webpack.production.cjs"
+        "test:watch": "./node_modules/.bin/jest --watch --runInBand"
     },
     "devDependencies": {
         "@babel/cli": "^7.19.3",

@@ -11,7 +11,6 @@
         "develop:server": "npm install && sleep 10 && npm run load:datapacks && ./node_modules/.bin/nodemon --exec babel-node ./index.js",
         "test": "./node_modules/.bin/jest --runInBand",
         "test:watch": "./node_modules/.bin/jest --watch --runInBand",
-        "build:production": "./node_modules/.bin/webpack --config webpack.production.cjs",
         "load:datapacks": "sleep 10 && node ./load-data-packs.js"
     },
     "devDependencies": {

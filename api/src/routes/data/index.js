@@ -49,7 +49,7 @@ async function extractTableHandler(req) {
     const name = "extract-table";
 
     log.info(`Process: ${identifier}/${resource}`);
-    await submitTask({
+    let task = await submitTask({
         rabbit: this.rabbit,
         configuration: req.session.configuration,
         item: req.session.item,

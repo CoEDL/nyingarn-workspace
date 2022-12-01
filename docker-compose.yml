@@ -65,7 +65,7 @@ services:
             - 15672:15672
 
     rabbit-worker1:
-        image: node:14-buster
+        image: node:18-bullseye
         hostname: worker1
         restart: always
         working_dir: /srv/tasks

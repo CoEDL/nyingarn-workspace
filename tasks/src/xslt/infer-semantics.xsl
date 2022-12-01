@@ -13,11 +13,29 @@
 	Converts apparent page numbers to <fw>
 	Converts centered paragraphs to <label>
 	Converts text formatted with a strikethrough into <del>
+	Converts rs to placeName or persName if it refers to a place or person, respecfively
     -->
 
     <!-- CSS declaration parsing -->
     <xsl:import href="css.xsl"/>
     
+    <!-- upgrade rs elements which refer to person and place elements into persName and placeName respectively -->
+    <xsl:key name="authority-record-by-id" match="(person|place)[@xml:id]" use="@xml:id"/>
+    <xsl:template match="rs[starts-with(@ref, '#')]" mode="infer-semantics" expand-text="yes">
+    	<xsl:variable name="name-type" select="
+    		let
+    			$referred-element := key('authority-record-by-id', substring-after(@ref, '#'))
+    		return
+			if ($referred-element/self::place) then 'placeName'
+			else if ($referred-element/self::person) then 'persName'
+			else 'rs' 
+	"/>
+	<xsl:element name="{$name-type}">
+		<xsl:copy-of select="@*"/>
+		<xsl:apply-templates mode="infer-semantics"/>
+	</xsl:element>
+    </xsl:template>
+
     <!-- recognise struck out text as a deletion -->
     <xsl:template match="hi[contains-token(@rend, 'strikethrough')]" mode="infer-semantics">
     	<xsl:element name="del">

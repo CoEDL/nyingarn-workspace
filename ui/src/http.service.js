@@ -60,7 +60,7 @@ export default class HTTPService {
         return response;
     }
 
-    async post({ route, params, headers = null, body }) {
+    async post({ route, params, headers = null, body = {} }) {
         let queryString;
         if (!headers) headers = await this.getHeaders();
         if (params) {
@@ -76,7 +76,7 @@ export default class HTTPService {
         return response;
     }
 
-    async put({ route, params, headers = null, body }) {
+    async put({ route, params, headers = null, body = {} }) {
         let queryString;
         if (!headers) headers = await this.getHeaders();
         if (params) {

@@ -1,62 +1,72 @@
 <template>
     <div class="flex flex-col">
-        <view-item-users-component :users="users" @refresh="getItemUsers" />
+        <view-item-users-component :users="data.users" @refresh="loadItemUsers" />
 
         <div class="mt-6">
             <div class="text-gray-600">Invite users to work on this item with you</div>
             <div class="flex flex-col my-2">
                 <div class="flex flex-row">
                     <div class="flex-grow">
-                        <el-input v-model="email" placeholder="Search by user email address" />
+                        <el-input
+                            type="textarea"
+                            rows="5"
+                            v-model="data.emails"
+                            placeholder="Search by user email address"
+                        />
                     </div>
                     <div>
-                        <el-button @click="attachUser">attach user</el-button>
+                        <el-button @click="attachUsers">attach user</el-button>
                     </div>
                 </div>
                 <div class="text-xs text-gray-600">
                     Invite users by their email address. You will need to provide their email
-                    exactly as the system knows it in order to find them.
+                    exactly as the system knows it in order to find them. Specify multiple users by
+                    comma or one per line.
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<script>
+<script setup>
 import { attachUser, getItemUsers } from "@/components/item/item-services";
 import ViewItemUsersComponent from "./ViewItemUsers.component.vue";
+import { flattenDeep } from "lodash";
+import { reactive, onMounted, inject } from "vue";
+import { useRoute } from "vue-router";
+const $route = useRoute();
+const $http = inject("$http");
 
-export default {
-    components: {
-        ViewItemUsersComponent,
-    },
-    data() {
-        return { identifier: this.$route.params.identifier, email: undefined, users: [] };
-    },
-    mounted() {
-        this.getItemUsers();
-    },
-    methods: {
-        async attachUser() {
-            let response = await attachUser({
-                $http: this.$http,
-                identifier: this.identifier,
-                email: this.email,
+const data = reactive({
+    emails: undefined,
+    users: [],
+});
+onMounted(() => {
+    loadItemUsers();
+});
+async function attachUsers() {
+    let emails = data.emails.split("\n").map((line) => line.split(",").map((e) => e.trim()));
+    emails = flattenDeep(emails);
+    await Promise.all(
+        emails.map((email) => {
+            return attachUser({
+                $http,
+                identifier: $route.params.identifier,
+                email,
             });
-            if (response.status === 200) {
-                this.getItemUsers();
-            }
-            this.email = undefined;
-        },
-        async getItemUsers() {
-            let response = await getItemUsers({
-                $http: this.$http,
-                identifier: this.identifier,
-            });
-            if (response.status === 200) {
-                this.users = (await response.json()).users;
-            }
-        },
-    },
-};
+        })
+        // data.emails = undefined;
+    );
+    loadItemUsers();
+    data.emails = undefined;
+}
+async function loadItemUsers() {
+    let response = await getItemUsers({
+        $http,
+        identifier: $route.params.identifier,
+    });
+    if (response.status === 200) {
+        data.users = (await response.json()).users;
+    }
+}
 </script>

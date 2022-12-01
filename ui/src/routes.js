@@ -139,6 +139,11 @@ const routes = [
         path: "/callback-aaf-login",
         component: CallbackOauthLogin,
     },
+    {
+        name: "callback-oauth-login",
+        path: "/callback-oauth-login",
+        component: CallbackOauthLogin,
+    },
 ];
 
 const router = createRouter({

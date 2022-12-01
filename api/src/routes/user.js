@@ -1,28 +1,55 @@
-import { InternalServerError } from "restify-errors";
-import { routeAdmin, route, logEvent, getLogger } from "../common";
+import {
+    routeAdmin,
+    route,
+    logEvent,
+    demandAdministrator,
+    demandAuthenticatedUser,
+} from "../common/index.js";
 import {
     getUsers,
     deleteUser,
     toggleUserCapability,
     createAllowedUserStubAccounts,
-} from "../lib/user";
-import { createSession } from "../lib/session";
-const log = getLogger();
+} from "../lib/user.js";
+import { createSession } from "../lib/session.js";
 
-export function setupRoutes({ server }) {
+export function setupRoutes(fastify, options, done) {
+    fastify.addHook("preHandler", demandAuthenticatedUser);
     // user routes
-    server.put("/users/:userId/upload", route(putUsersUploadCapabilityRouteHandler));
+    fastify.put(
+        "/users/:userId/upload",
+        { preHandler: demandAuthenticatedUser },
+        putUsersUploadCapabilityRouteHandler
+    );
 
     // admin user routes
-    server.get("/admin/users", routeAdmin(getUsersRouteHandler));
-    server.post("/admin/users", routeAdmin(postInviteUsersRouteHandler));
-    server.put("/admin/users/:userId/:capability", routeAdmin(putUserToggleCapabilityRouteHandler));
-    server.del("/admin/users/:userId", routeAdmin(deleteUserRouteHandler));
+    fastify.get(
+        "/admin/users",
+        { preHandler: [demandAuthenticatedUser, demandAdministrator] },
+        getUsersRouteHandler
+    );
+    fastify.post(
+        "/admin/users",
+        { preHandler: [demandAuthenticatedUser, demandAdministrator] },
+        postInviteUsersRouteHandler
+    );
+    fastify.put(
+        "/admin/users/:userId/:capability",
+        { preHandler: [demandAuthenticatedUser, demandAdministrator] },
+        putUserToggleCapabilityRouteHandler
+    );
+    fastify.delete(
+        "/admin/users/:userId",
+        { preHandler: [demandAuthenticatedUser, demandAdministrator] },
+        deleteUserRouteHandler
+    );
+
     // server.get("/user/:userId", 'return data for userId', { properties = [] });
     // server.post('/user', 'create new user known to this application', { identifier, username, authenticationService })
     // server.del('/user/:userId', 'delete user known to this application', { identifier, authenticationService })
+    done();
 }
-async function putUsersUploadCapabilityRouteHandler(req, res, next) {
+async function putUsersUploadCapabilityRouteHandler(req, res) {
     let userId = req.session.user.id;
     let user;
     try {
@@ -36,25 +63,28 @@ async function putUsersUploadCapabilityRouteHandler(req, res, next) {
             text: `User accepted terms and conditions of use. Enabling upload capability.`,
         });
     } catch (error) {
-        return next(new InternalServerError(error.message));
+        logEvent({
+            level: "error",
+            owner: req.session.user.email,
+            text: error.message,
+        });
+        return res.internalServerError();
     }
 
     let session = await createSession({ user });
-    res.send({ token: session.token });
-    next();
+    return { token: session.token };
 }
 
-async function getUsersRouteHandler(req, res, next) {
+async function getUsersRouteHandler(req) {
     let users = await getUsers({
         offset: req.query.offset,
         limit: req.query.limit,
         orderBy: req.query.orderBy,
     });
-    res.send(users);
-    next();
+    return users;
 }
 
-async function postInviteUsersRouteHandler(req, res, next) {
+async function postInviteUsersRouteHandler(req, res) {
     try {
         await createAllowedUserStubAccounts({ emails: req.body.emails });
         logEvent({
@@ -63,14 +93,18 @@ async function postInviteUsersRouteHandler(req, res, next) {
             text: `Admin invited users to the workspace.`,
             data: { emails: req.body.emails },
         });
+        return {};
     } catch (error) {
-        return next(new InternalServerError(error.message));
+        logEvent({
+            level: "error",
+            owner: req.session.user.email,
+            text: error.message,
+        });
+        return res.internalServerError();
     }
-    res.send({});
-    next();
 }
 
-async function putUserToggleCapabilityRouteHandler(req, res, next) {
+async function putUserToggleCapabilityRouteHandler(req, res) {
     try {
         await toggleUserCapability({
             userId: req.params.userId,
@@ -81,11 +115,16 @@ async function putUserToggleCapabilityRouteHandler(req, res, next) {
             owner: req.session.user.email,
             text: `Admin toggled capability '${req.params.capability}' for user '${req.params.userId}'.`,
         });
+        return {};
     } catch (error) {
-        return next(new InternalServerError(error.message));
+        console.log(error.message);
+        logEvent({
+            level: "error",
+            owner: req.session.user.email,
+            text: error.message,
+        });
+        return res.InternalServerError(error.message);
     }
-    res.send({});
-    next();
 }
 
 async function deleteUserRouteHandler(req, res, next) {
@@ -96,9 +135,13 @@ async function deleteUserRouteHandler(req, res, next) {
             owner: req.session.user.email,
             text: `Admin deleted user '${req.params.userId}'.`,
         });
+        return {};
     } catch (error) {
-        return next(new InternalServerError(error.message));
+        logEvent({
+            level: "error",
+            owner: req.session.user.email,
+            text: error.message,
+        });
+        return res.InternalServerError();
     }
-    res.send({});
-    next();
 }

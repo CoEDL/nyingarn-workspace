@@ -3,18 +3,20 @@
 import {
     S3Client,
     HeadBucketCommand,
+    CreateBucketCommand,
     HeadObjectCommand,
     ListBucketsCommand,
     GetObjectCommand,
-    PutObjectCommand,
     CopyObjectCommand,
     ListObjectsV2Command,
     DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { createReadStream, createWriteStream, readdir, ensureDir, stat } from "fs-extra";
-import { isEmpty } from "lodash";
+import fsExtraPkg from "fs-extra";
+const { createReadStream, createWriteStream, readdir, ensureDir, stat } = fsExtraPkg;
+import lodashPkg from "lodash";
+const { isEmpty } = lodashPkg;
 // const AWS = require("aws-sdk");
 import path from "path";
 const MB = 1024 * 1024;
@@ -47,6 +49,11 @@ export class S3 {
     async bucketExists({ bucket }) {
         bucket = bucket ? bucket : this.bucket;
         const command = new HeadBucketCommand({ Bucket: bucket });
+        return (await this.client.send(command)).$metadata.httpStatusCode === 200;
+    }
+
+    async createBucket({ bucket }) {
+        const command = new CreateBucketCommand({ Bucket: bucket });
         return (await this.client.send(command)).$metadata.httpStatusCode === 200;
     }
 }

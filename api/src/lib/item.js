@@ -1,9 +1,11 @@
-import models from "../models";
+import models from "../models/index.js";
 import { Op } from "sequelize";
-import { loadConfiguration, getS3Handle, getStoreHandle } from "../common";
+import { loadConfiguration, getS3Handle, getStoreHandle } from "../common/index.js";
 import path from "path";
-import { writeJson, remove } from "fs-extra";
-import { compact, groupBy, uniq, isNumber } from "lodash";
+import fsExtraPkg from "fs-extra";
+const { writeJson, remove } = fsExtraPkg;
+import lodashPkg from "lodash";
+const { compact, groupBy, uniq, isNumber } = lodashPkg;
 import { sub } from "date-fns";
 const completedResources = ".completed-resources.json";
 const specialFiles = [
@@ -46,12 +48,12 @@ export async function getItems({ userId, offset = 0, limit = 10 }) {
 
 export async function createItem({ identifier, userId }) {
     let item = await models.item.findOne({ where: { identifier } });
-    let collection = await models.collection.findOne({ where: { identifier } });
     if (item) {
         throw new Error("An item with that identifier already exists.");
     }
+    let collection = await models.collection.findOne({ where: { identifier } });
     if (collection) {
-        throw new Error("A collection with that identifier already exists.");
+        throw new Error("The item identifier clashes with a collection identifier.");
     }
 
     item = await models.item.create({ identifier });
@@ -251,12 +253,12 @@ export function groupFilesByResource({ identifier, files, naming }) {
     return { files: groupBy(resources, "resourceId") };
 }
 
-export async function getResourceProcessingStatus({ identifier, resources, dateFrom }) {
+export async function getResourceProcessingStatus({ itemId, resources, dateFrom }) {
     let dateTo = new Date();
     return await models.task.findAll({
         where: {
             [Op.and]: {
-                itemId: identifier,
+                itemId,
                 updatedAt: {
                     [Op.between]: [dateFrom, dateTo],
                 },

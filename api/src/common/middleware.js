@@ -1,6 +1,6 @@
-import { UnauthorizedError, ForbiddenError } from "restify-errors";
-import { getLogger, loadConfiguration, verifyToken } from "./";
-import { lookupItemByIdentifier } from "../lib/item";
+import { getLogger } from "./logger.js";
+import { verifyToken } from "./jwt.js";
+import { lookupItemByIdentifier } from "../lib/item.js";
 const log = getLogger();
 
 export function route(handler) {
@@ -11,35 +11,30 @@ export function routeAdmin(handler) {
     return [demandAuthenticatedUser, demandAdministrator, handler];
 }
 
-export async function demandAuthenticatedUser(req, res, next) {
+export async function demandAuthenticatedUser(req, res) {
     if (!req.headers.authorization) {
-        return next(new UnauthorizedError());
+        return res.unauthorized();
     }
-    const configuration = await loadConfiguration();
     try {
         let user = await verifyToken({
             token: req.headers.authorization.split("Bearer ")[1],
-            configuration,
+            configuration: req.session.configuration,
         });
-        req.session = {
-            user,
-        };
+        req.session.user = user;
     } catch (error) {
-        return next(new UnauthorizedError());
+        return res.unauthorized();
     }
-    next();
 }
 
-export async function demandAdministrator(req, res, next) {
+export async function demandAdministrator(req, res) {
     if (!req.session.user.administrator) {
-        return next(new ForbiddenError());
+        return res.forbidden();
     }
-    next();
 }
 
-export async function requireIdentifierAccess(req, res, next) {
+export async function requireIdentifierAccess(req, res) {
     if (!req.body?.identifier && !req.params?.identifier) {
-        return next(new ForbiddenError(`No identifier defined in body or params`));
+        return res.badRequest(`No identifier defined in body or params`);
     }
     const identifier = req.body?.identifier ? req.body?.identifier : req.params?.identifier;
     let item = await lookupItemByIdentifier({
@@ -47,8 +42,7 @@ export async function requireIdentifierAccess(req, res, next) {
         identifier: identifier,
     });
     if (!item) {
-        return next(new ForbiddenError(`You don't have access to that item`));
+        return res.forbidden(`You don't have access to that item`);
     }
-    req.item = item;
-    next();
+    req.session.item = item;
 }

@@ -5,23 +5,32 @@ import { loadConfiguration } from "../common";
 const chance = require("chance").Chance();
 import MockDate from "mockdate";
 import { copy, move, readJSON, writeJSON, readdir } from "fs-extra";
-import { setupBeforeAll, setupBeforeEach, teardownAfterAll, teardownAfterEach } from "./";
+import { getStoreHandle, TestSetup, setupTestItem } from "../common";
 
 describe("JWT tests", () => {
-    let users, configuration;
-    const userEmail = chance.email();
-    const adminEmail = chance.email();
+    let configuration, users, userEmail, adminEmail, bucket;
+    let identifier, store;
+    const tester = new TestSetup();
+
     beforeAll(async () => {
-        configuration = await setupBeforeAll({ adminEmails: [adminEmail] });
+        ({ userEmail, adminEmail, configuration, bucket } = await tester.setupBeforeAll());
+        users = await tester.setupUsers({ emails: [userEmail], adminEmails: [adminEmail] });
     });
     beforeEach(async () => {
-        users = await setupBeforeEach({ emails: [userEmail] });
+        identifier = chance.word();
+        store = await getStoreHandle({
+            id: identifier,
+            className: "item",
+        });
     });
     afterEach(async () => {
-        await teardownAfterEach({ users });
+        try {
+            await store.deleteItem();
+        } catch (error) {}
     });
     afterAll(async () => {
-        await teardownAfterAll(configuration);
+        await tester.purgeUsers({ users });
+        await tester.teardownAfterAll(configuration);
     });
     it("should be able to create a jwt", async () => {
         let user = users[0];

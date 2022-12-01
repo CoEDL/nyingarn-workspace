@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function (sequelize, DataTypes) {
+export default function (sequelize, DataTypes) {
     let Log = sequelize.define(
         "log",
         {
@@ -43,4 +43,4 @@ module.exports = function (sequelize, DataTypes) {
     Log.associate = function (models) {};
 
     return Log;
-};
+}

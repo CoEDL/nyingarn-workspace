@@ -1,4 +1,5 @@
-import { readJSON } from "fs-extra";
+import fsExtraPkg from "fs-extra";
+const { readJSON } = fsExtraPkg;
 
 const privateFields = ["clientSecret"];
 

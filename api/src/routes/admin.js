@@ -1,25 +1,29 @@
-import path from "path";
-import { routeAdmin, loadFiles, listObjects, getLogger, loadConfiguration } from "../common";
-import { groupBy } from "lodash";
-import { createItem, lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item";
+import {
+    listObjects,
+    loadConfiguration,
+    demandAdministrator,
+    demandAuthenticatedUser,
+} from "../common/index.js";
+import { createItem, lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
 import {
     createCollection,
     lookupCollectionByIdentifier,
     linkCollectionToUser,
     getCollections,
-} from "../lib/collection";
-const log = getLogger();
+} from "../lib/collection.js";
 
-export function setupRoutes({ server }) {
-    server.get("/admin/entries", routeAdmin(getAdminEntriesHandler));
-    server.put("/admin/items/:identifier/connect-user", routeAdmin(putAdminItemUserHandler));
-    server.put(
-        "/admin/collections/:identifier/connect-user",
-        routeAdmin(putAdminCollectionUserHandler)
-    );
+export function setupRoutes(fastify, options, done) {
+    fastify.addHook("preHandler", demandAuthenticatedUser);
+    fastify.addHook("preHandler", demandAdministrator);
+
+    fastify.get("/admin", async (req, res) => {});
+    fastify.get("/admin/entries", getAdminEntriesHandler);
+    fastify.put("/admin/items/:identifier/connect-user", putAdminItemUserHandler);
+    fastify.put("/admin/collections/:identifier/connect-user", putAdminCollectionUserHandler);
+    done();
 }
 
-async function getAdminEntriesHandler(req, res, next) {
+async function getAdminEntriesHandler(req) {
     const configuration = await loadConfiguration();
 
     const myItems = (await getItems({ userId: req.session.user.id, limit: undefined })).rows.map(
@@ -35,22 +39,22 @@ async function getAdminEntriesHandler(req, res, next) {
         (await listObjects({ prefix: `/${configuration.api.domain}/collection` })) || [];
     collections = collections.map((c) => ({ name: c, connected: myCollections.includes(c) }));
 
-    res.send({ items, collections });
-    next();
+    return { items, collections };
 }
 
-async function putAdminItemUserHandler(req, res, next) {
+// TODO: this code does not have tests
+async function putAdminItemUserHandler(req) {
     let item = await lookupItemByIdentifier({ identifier: req.params.identifier });
     if (item) {
         await linkItemToUser({ itemId: item.id, userId: req.session.user.id });
     } else {
         item = await createItem({ identifier: req.params.identifier, userId: req.session.user.id });
     }
-    res.send({});
-    next();
+    return {};
 }
 
-async function putAdminCollectionUserHandler(req, res, next) {
+// TODO: this code does not have tests
+async function putAdminCollectionUserHandler(req) {
     let collection = await lookupCollectionByIdentifier({ identifier: req.params.identifier });
     if (collection) {
         await linkCollectionToUser({ collectionId: collection.id, userId: req.session.user.id });
@@ -60,6 +64,5 @@ async function putAdminCollectionUserHandler(req, res, next) {
             userId: req.session.user.id,
         });
     }
-    res.send({});
-    next();
+    return {};
 }

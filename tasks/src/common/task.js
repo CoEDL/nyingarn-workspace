@@ -1,18 +1,4 @@
-import { createLogger, format, transports } from "winston";
-const { combine, timestamp, printf } = format;
-import models from "/srv/api/src/models";
-
-export function getLogger() {
-    const myFormat = printf(({ level, message, timestamp }) => {
-        return `${timestamp} ${level.toUpperCase()}: ${message}`;
-    });
-    const logger = createLogger({
-        level: process.env?.LOG_LEVEL ? process.env.LOG_LEVEL : "debug",
-        format: combine(timestamp(), myFormat),
-        transports: [new transports.Console()],
-    });
-    return logger;
-}
+import models from "/srv/api/src/models/index.js";
 
 export async function updateTask({ taskId, status, text, data }) {
     const statuses = ["in progress", "done", "failed"];

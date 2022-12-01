@@ -2,7 +2,6 @@
     <div class="my-2 flex flex-col space-y-2">
         <div class="flex flex-row">
             <uploader-component
-                :identifier="data.identifier"
                 @upload-started="data.failedTasks = []"
                 @file-uploaded="fileUploaded"
                 @file-removed="fileRemoved"

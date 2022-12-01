@@ -111,7 +111,7 @@ services:
     #     command: ["npm", "run", "develop"]
 
     api:
-        image: node:14-buster
+        image: node:18-bullseye
         hostname: api
         tty: true
         environment:
@@ -144,7 +144,7 @@ services:
             - 8080:8080
 
     ui:
-        image: node:14-buster
+        image: node:18-bullseye
         hostname: ui
         tty: true
         environment:

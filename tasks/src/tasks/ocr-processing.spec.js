@@ -2,7 +2,8 @@ import path from "path";
 import { readdir, remove, readJSON } from "fs-extra";
 import { prepare, cleanup } from "./index.js";
 import { runTextractOCR } from "./ocr-processing";
-import { getStoreHandle, getS3Handle, Textract } from "../common";
+import { getStoreHandle, getS3Handle } from "/srv/api/src/common/index.js";
+import { Textract } from "../common/textract.js";
 import Chance from "chance";
 const chance = new Chance();
 

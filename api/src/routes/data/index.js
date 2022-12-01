@@ -1,50 +1,61 @@
 import {
-    route,
     getLogger,
     requireIdentifierAccess,
     demandAuthenticatedUser,
     getStoreHandle,
     submitTask,
-} from "../../common";
-export const log = getLogger();
+} from "../../common/index.js";
+const log = getLogger();
 
-import { authenticateTusRequest, triggerProcessing, getItemPath } from "./upload";
+import { authenticateTusRequest, triggerProcessing, getItemPath } from "./upload.js";
 
-function routeProcessing(handler) {
-    return [demandAuthenticatedUser, requireIdentifierAccess, handler];
-}
+export function setupRoutes(fastify, options, done) {
+    fastify.addHook("preHandler", demandAuthenticatedUser);
 
-export function setupRoutes({ server }) {
-    server.get("/upload/pre-create", route(authenticateTusRequest));
-    server.get("/upload/pre-create/:itemType/:identifier", route(getItemPath));
-    server.get("/upload/post-finish/:identifier/:resource", routeProcessing(triggerProcessing));
-    server.post("/process/post-finish/:identifier/:resource", routeProcessing(triggerProcessing));
-    server.post(
-        "/process/extract-table/:identifier/:resource",
-        routeProcessing(extractTableHandler)
+    fastify.get("/upload/pre-create", authenticateTusRequest);
+    fastify.get(
+        "/upload/pre-create/:itemType/:identifier",
+        { preHandler: requireIdentifierAccess },
+        getItemPath
     );
+    fastify.get(
+        "/upload/post-finish/:identifier/:resource",
+        { preHandler: requireIdentifierAccess },
+        triggerProcessing
+    );
+    fastify.post(
+        "/process/post-finish/:identifier/:resource",
+        { preHandler: requireIdentifierAccess },
+        triggerProcessing
+    );
+    fastify.post(
+        "/process/extract-table/:identifier/:resource",
+        { preHandler: requireIdentifierAccess },
+        extractTableHandler
+    );
+    done();
 }
 
-async function extractTableHandler(req, res, next) {
-    let teiFile = `${req.params.resource}.tei.xml`;
-    let textractFile = `${req.params.resource}.textract_ocr-ADMIN.json`;
-    req.params.resource = `${req.params.resource}.jpg`;
+async function extractTableHandler(req) {
+    const { identifier, resource } = req.params;
 
-    let store = await getStoreHandle({ id: req.params.identifier, className: "item" });
+    const teiFile = `${resource}.tei.xml`;
+    const textractFile = `${resource}.textract_ocr-ADMIN.json`;
+    const imageFile = `${resource}.jpg`;
+
+    let store = await getStoreHandle({ id: identifier, className: "item" });
     await store.delete({ target: teiFile });
     await store.delete({ target: textractFile });
-
-    const identifier = req.params.identifier;
-    const resource = req.params.resource;
     const name = "extract-table";
 
     log.info(`Process: ${identifier}/${resource}`);
     let task = await submitTask({
+        rabbit: this.rabbit,
+        configuration: req.session.configuration,
+        item: req.session.item,
         name,
-        item: req.item,
-        body: { resource },
+        body: { resource: imageFile },
     });
 
-    res.send({ taskId: task.id });
-    next();
+    return { taskId: task.id };
 }

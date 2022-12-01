@@ -1,16 +1,19 @@
-import { route, getStoreHandle, getLogger, loadProfile } from "../common";
-import { uniqBy, isArray, compact, has, flattenDeep } from "lodash";
-import models from "../models";
+import { demandAuthenticatedUser, getStoreHandle, loadProfile } from "../common/index.js";
+import lodashPkg from "lodash";
+const { uniqBy, compact, flattenDeep } = lodashPkg;
+import models from "../models/index.js";
 import { registerAllFiles } from "../lib/crate-tools.js";
-const log = getLogger();
 
-export function setupRoutes({ server }) {
-    server.post("/describo/link", route(postLinkItemsHandler));
-    server.post("/describo/unlink", route(postUnlinkItemsHandler));
-    server.post("/describo/copy", route(postCopyCrateHandler));
-    server.get("/describo/rocrate/:type/:identifier", route(getDescriboROCrate));
-    server.put("/describo/rocrate/:type/:identifier", route(putDescriboROCrate));
-    server.get("/describo/profile/:type", route(getDescriboProfile));
+export function setupRoutes(fastify, options, done) {
+    fastify.addHook("preHandler", demandAuthenticatedUser);
+
+    fastify.post("/describo/link", postLinkItemsHandler);
+    fastify.post("/describo/unlink", postUnlinkItemsHandler);
+    fastify.post("/describo/copy", postCopyCrateHandler);
+    fastify.get("/describo/rocrate/:type/:identifier", getDescriboROCrate);
+    fastify.put("/describo/rocrate/:type/:identifier", putDescriboROCrate);
+    fastify.get("/describo/profile/:type", getDescriboProfile);
+    done();
 }
 
 function assembleUrl({ targetType, identifier }) {
@@ -21,7 +24,7 @@ function assembleUrl({ targetType, identifier }) {
     }
 }
 // TODO: this code does not have tests
-async function postLinkItemsHandler(req, res, next) {
+async function postLinkItemsHandler(req) {
     const updates = req.body.updates;
 
     // add the database link between source and target
@@ -74,12 +77,11 @@ async function postLinkItemsHandler(req, res, next) {
         });
         await store.put({ json: crate, target: "ro-crate-metadata.json" });
     }
-    res.send();
-    next();
+    return;
 }
 
 // TODO: this code does not have tests
-async function postUnlinkItemsHandler(req, res, next) {
+async function postUnlinkItemsHandler(req) {
     const updates = req.body.updates;
 
     let source = await models[updates[0].sourceType].findOne({
@@ -125,23 +127,21 @@ async function postUnlinkItemsHandler(req, res, next) {
         crate["@graph"] = crate["@graph"].filter((e) => e["@id"] !== id);
         await store.put({ json: crate, target: "ro-crate-metadata.json" });
     }
-    res.send();
-    next();
+    return;
 }
 
 // TODO: this code does not have tests
-async function postCopyCrateHandler(req, res, next) {
+async function postCopyCrateHandler(req) {
     const copy = req.body.copy;
     let store = await getStoreHandle({ id: copy.source, className: copy.sourceType });
     let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
     store = await getStoreHandle({ id: copy.target, className: copy.sourceType });
     await store.put({ json: crate, target: "ro-crate-metadata.json" });
-    res.send();
-    next();
+    return;
 }
 
 // TODO: this code does not have tests
-async function getDescriboROCrate(req, res, next) {
+async function getDescriboROCrate(req) {
     let store = await getStoreHandle({ id: req.params.identifier, className: req.params.type });
 
     let crate, filesAdded;
@@ -170,23 +170,20 @@ async function getDescriboROCrate(req, res, next) {
     if (filesAdded.length) {
         await store.put({ target: "ro-crate-metadata.json", json: crate });
     }
-    res.send({ crate });
-    next();
+    return { crate };
 }
 
 // TODO: this code does not have tests
-async function putDescriboROCrate(req, res, next) {
+async function putDescriboROCrate(req) {
     let store = await getStoreHandle({ id: req.params.identifier, className: req.params.type });
     await store.put({ target: "ro-crate-metadata.json", json: req.body.data.crate });
-    res.send();
-    next();
+    return {};
 }
 
 // TODO: this code does not have tests
 async function getDescriboProfile(req, res, next) {
     let profile = await loadProfile({ profile: `nyingarn-${req.params.type}-profile.json` });
-    res.send({ profile });
-    next();
+    return { profile };
 }
 
 function createDefaultROCrateFile({ name }) {

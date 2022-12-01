@@ -15,16 +15,12 @@ import "@uppy/dashboard/dist/style.css";
 import Uppy from "@uppy/core";
 import { ref, reactive, onMounted, inject, onBeforeUnmount } from "vue";
 import { useStore } from "vuex";
+import { useRoute } from "vue-router";
 const store = useStore();
 const $http = inject("$http");
+const $route = useRoute();
 const dashboard = ref(null);
 
-const props = defineProps({
-    identifier: {
-        type: String,
-        required: true,
-    },
-});
 const emit = defineEmits(["upload-started", "file-uploaded", "file-removed"]);
 const data = reactive({
     specialFileNameChecks: ["-digivol.csv", "-tei.xml"],
@@ -38,12 +34,12 @@ onMounted(() => {
     init();
 });
 onBeforeUnmount(() => {
-    data.uppy.close();
+    // data.uppy.close();
 });
 async function init() {
     await getItemPath();
     if (!data.path) return;
-    const identifier = props.identifier;
+    const identifier = $route.params.identifier;
     const configuration = store.state.configuration;
     let uppy = new Uppy({
         debug: false,
@@ -51,7 +47,7 @@ async function init() {
 
         onBeforeFileAdded: (currentFile, files) => {
             // does the first part of the file match the identifier
-            let regex = new RegExp(`^${props.identifier}-.*`);
+            let regex = new RegExp(`^${identifier}-.*`);
             if (!currentFile.name.match(regex) && configuration.ui.filename?.matchItemName) {
                 uppy.info(
                     `Skipping file '${currentFile.name}' because the name doesn't match the item name.`,
@@ -104,12 +100,12 @@ async function init() {
         // retryDelays: null,
     });
     const token = $http.getToken();
-    uppy.setMeta({ identifier: props.identifier, path: data.path, token });
+    uppy.setMeta({ identifier: $route.params.identifier, path: data.path, token });
     uppy.on("upload", () => {
         emit("upload-started");
     });
     uppy.on("upload-success", (data) => {
-        emit("file-uploaded", { itemId: props.identifier, resource: data.name });
+        emit("file-uploaded", { itemId: $route.params.identifier, resource: data.name });
     });
     uppy.on("file-removed", ({ data }) => {
         emit("file-removed", { resource: data.name });
@@ -118,7 +114,9 @@ async function init() {
 }
 
 async function getItemPath() {
-    let response = await $http.get({ route: `/upload/pre-create/item/${props.identifier}` });
+    let response = await $http.get({
+        route: `/upload/pre-create/item/${$route.params.identifier}`,
+    });
     if (response.status === 200) {
         data.path = (await response.json()).path;
     } else {

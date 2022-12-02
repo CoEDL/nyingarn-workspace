@@ -29,8 +29,8 @@
                     <el-button
                         @click="
                             data.markupControl === 'add'
-                                ? data.editorControls.add(control.markup)
-                                : data.editorControls.remove(control.markup)
+                                ? editorControls.add(control.markup)
+                                : editorControls.remove(control.markup)
                         "
                         size="large"
                         :type="data.markupControl === 'add' ? 'primary' : 'danger'"
@@ -47,11 +47,7 @@
                     raw-content
                     placement="left"
                 >
-                    <el-button
-                        @click="data.editorControls.removeAllMarkup()"
-                        size="large"
-                        type="danger"
-                    >
+                    <el-button @click="editorControls.removeAllMarkup()" size="large" type="danger">
                         <i class="fa-solid fa-code"></i>
                     </el-button>
                 </el-tooltip>
@@ -182,6 +178,10 @@ let data = reactive({
     controls: $store.state.configuration.ui.teiEditorControls,
 });
 
+const codemirror = ref(null);
+let view;
+let editorControls;
+
 onBeforeMount(async () => {
     await checkIfResourceIsComplete();
 });
@@ -196,9 +196,6 @@ onBeforeUnmount(async () => {
     await save();
 });
 
-const codemirror = ref(null);
-let view;
-
 function setupCodeMirror() {
     const initialState = EditorState.create({
         doc: data.transcription,
@@ -209,7 +206,7 @@ function setupCodeMirror() {
         state: initialState,
         parent: codemirror.value,
     });
-    data.editorControls = new CodemirrorEditorControls({ view });
+    editorControls = new CodemirrorEditorControls({ view });
     return { view };
 }
 async function loadTranscription() {
@@ -229,10 +226,10 @@ async function loadTranscription() {
     }
 }
 function undo() {
-    new CodemirrorEditorControls({ view }).undo();
+    editorControls.undo();
 }
 function redo() {
-    new CodemirrorEditorControls({ view }).redo();
+    editorControls.redo();
 }
 async function markComplete(status) {
     let response = await $http.put({
@@ -253,16 +250,16 @@ async function checkIfResourceIsComplete() {
     }
 }
 function deleteTranscription() {
-    new CodemirrorEditorControls({ view }).delete();
+    editorControls.delete();
 }
 function convertToTei() {
-    new CodemirrorEditorControls({ view }).convertToTei({ $route });
+    editorControls.convertToTei({ $route });
     nextTick(() => {
-        new CodemirrorEditorControls({ view }).formatDocument({});
+        editorControls.formatDocument({});
     });
 }
 function format() {
-    new CodemirrorEditorControls({ view }).formatDocument({});
+    editorControls.formatDocument({});
 }
 async function save() {
     let document = view.state.doc.toString();
@@ -271,7 +268,7 @@ async function save() {
         body: { datafiles: props.data, document },
     });
     data.saved = true;
-    new CodemirrorEditorControls({ view }).formatDocument({});
+    editorControls.formatDocument({});
 
     setTimeout(() => {
         data.saved = false;
@@ -301,7 +298,7 @@ async function reprocessPageAsTable() {
     });
 
     let document = await loadTranscription();
-    new CodemirrorEditorControls({ view }).formatDocument({ document });
+    editorControls.formatDocument({ document });
     data.extractTableProcessing = false;
 
     async function checkProcessingStatus({ $http, identifier, resources, taskId, dateFrom }) {

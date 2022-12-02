@@ -20,10 +20,15 @@ export class CodemirrorEditorControls {
         });
     }
     delete() {
+        let document = this.view.state.doc.toString();
+        let lines = document.split("\n").map((line) => {
+            if (line.match(/surface/)) return line;
+        });
+        lines = compact(lines);
         let changes = {
             from: 0,
             to: this.view.state.doc.length,
-            insert: "",
+            insert: lines.join("\n"),
         };
         this.dispatch({ changes });
     }
@@ -132,12 +137,13 @@ export class CodemirrorEditorControls {
                 let line = this.view.state
                     .sliceDoc(r.from, r.to)
                     .split("\n")
-                    .map((l) => {
-                        l = l
+                    .map((line) => {
+                        if (line.match(/surface/)) return line;
+                        line = line
                             .replace(/<.*?>/g, "")
                             .replace(/<\/.*?>/g, "")
                             .trim();
-                        if (l) return l;
+                        if (line) return line;
                     });
                 line = compact(line).join("\n");
                 if (line.length) {

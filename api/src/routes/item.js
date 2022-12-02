@@ -358,7 +358,8 @@ async function getItemResourceFileLinkHandler(req, res) {
 }
 
 async function saveItemTranscriptionHandler(req, res) {
-    const { identifier, resource, datafiles, document } = req.params;
+    const { identifier, resource } = req.params;
+    let { datafiles, document } = req.body;
     let file = `${resource}.tei.xml`;
     try {
         if (!isEmpty(document)) {

@@ -54,7 +54,7 @@
                 :max-height="tableHeight"
             >
                 <template #empty
-                    >You have no collection. Get started by creating a collection.</template
+                    >You have no collections. Get started by creating a collection.</template
                 >
                 <el-table-column prop="name" label="Name"> </el-table-column>
                 <el-table-column prop="type" label="Type" width="150"> </el-table-column>

@@ -45,10 +45,12 @@ async function getCollectionsHandler(req) {
     const userId = req.session.user.id;
     const offset = req.query.offset;
     const limit = req.query.limit;
+    const match = req.query.match;
     let { count, rows } = await getCollections({
         userId,
         offset,
         limit,
+        match,
     });
     let collections = rows.map((c) => {
         return {

@@ -31,7 +31,7 @@ export async function lookupItemByIdentifier({ identifier, userId }) {
     return await models.item.findOne(clause);
 }
 
-export async function getItems({ userId, offset = 0, limit = 10 }) {
+export async function getItems({ userId, offset = 0, limit = 10, match }) {
     const query = {
         order: [["identifier", "ASC"]],
     };
@@ -40,6 +40,13 @@ export async function getItems({ userId, offset = 0, limit = 10 }) {
     if (limit) {
         query.offset = offset;
         query.limit = limit;
+    }
+    if (match) {
+        query.where = {
+            identifier: {
+                [Op.startsWith]: match,
+            },
+        };
     }
     query.include = include;
 

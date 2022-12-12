@@ -14,7 +14,7 @@ export async function lookupCollectionByIdentifier({ identifier, userId }) {
     return await models.collection.findOne(clause);
 }
 
-export async function getCollections({ userId, offset = 0, limit = 10 }) {
+export async function getCollections({ userId, offset = 0, limit = 10, match }) {
     const query = {
         order: [["identifier", "ASC"]],
     };
@@ -23,6 +23,13 @@ export async function getCollections({ userId, offset = 0, limit = 10 }) {
     if (limit) {
         query.offset = offset;
         query.limit = limit;
+    }
+    if (match) {
+        query.where = {
+            identifier: {
+                [Op.startsWith]: match,
+            },
+        };
     }
     query.include = include;
 

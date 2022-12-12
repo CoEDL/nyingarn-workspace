@@ -84,7 +84,8 @@ async function getItemsHandler(req) {
     const userId = req.session.user.id;
     const offset = req.query.offset;
     const limit = req.query.limit;
-    let { count, rows } = await getItems({ userId, offset, limit });
+    const match = req.query.match;
+    let { count, rows } = await getItems({ userId, offset, limit, match });
     let items = rows.map((i) => ({
         name: i.identifier,
         type: "item",

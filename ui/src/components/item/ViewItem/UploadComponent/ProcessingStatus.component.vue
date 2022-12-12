@@ -25,10 +25,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    identifier: { stype: String, required: true },
 });
 const emit = defineEmits(["failed-tasks"]);
 const data = reactive({
-    identifier: $route.params.identifier,
     interval: undefined,
     tasks: [],
     failedTasks: [],
@@ -42,7 +42,7 @@ onBeforeUnmount(() => {
 });
 async function updateProcessingStatus() {
     let response = await $http.post({
-        route: `/items/${data.identifier}/resources/processing-status`,
+        route: `/items/${props.identifier}/resources/processing-status`,
         body: { resources: props.uploads, dateFrom: data.dateFrom },
     });
     let { tasks } = await response.json();

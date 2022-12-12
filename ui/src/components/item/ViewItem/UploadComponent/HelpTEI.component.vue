@@ -21,7 +21,7 @@
                 <i class="fa-solid fa-lightbulb"></i>
             </div>
             <div class="text-base py-2">
-                Ensure you are uploading a TEI XML file named '{{ identifier }}-tei.xml'
+                Ensure you are uploading a TEI XML file named '{{ props.identifier }}-tei.xml'
             </div>
         </div>
         <div class="bg-indigo-100 p-2 rounded flex flex-row">
@@ -29,7 +29,7 @@
                 <i class="fa-solid fa-lightbulb"></i>
             </div>
             <div class="text-base py-2">
-                File names must match the form {{ this.identifier }}-{sequence number} where
+                File names must match the form {{ props.identifier }}-{sequence number} where
                 sequence number can be any sequence of digits followed by letters (a-z,A-Z) or _.
                 <div>Accepted images types: tiff and jpg.</div>
             </div>
@@ -37,15 +37,9 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        type: { type: String, default: "ftp" },
-    },
-    data() {
-        return {
-            identifier: this.$route.params.identifier,
-        };
-    },
-};
+<script setup>
+const props = defineProps({
+    type: { type: String, default: "ftp" },
+    identifier: { stype: String, required: true },
+});
 </script>

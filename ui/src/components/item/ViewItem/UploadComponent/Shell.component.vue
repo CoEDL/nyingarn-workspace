@@ -1,5 +1,6 @@
 <template>
     <div class="my-2 flex flex-col space-y-2">
+        {{ identifier }}
         <div class="flex flex-row">
             <uploader-component
                 @upload-started="data.failedTasks = []"
@@ -9,16 +10,29 @@
             <processing-status-component
                 class="px-2 flex-grow"
                 v-if="data.uploads.length"
+                :identifier="identifier"
                 :uploads="data.uploads"
                 @failed-tasks="storeFailedTasks"
             />
 
             <div class="px-2" v-if="!data.uploads.length">
-                <digi-vol-help-component v-if="data.help === 'digivol'" />
-                <tei-help-component v-if="data.help === 'ftp'" type="ftp" />
-                <tei-help-component v-if="data.help === 'tei'" type="tei" />
-                <tei-help-component v-if="data.help === 'word'" type="word" />
-                <image-help-component v-if="data.help === 'images'" />
+                <digi-vol-help-component v-if="data.help === 'digivol'" :identifier="identifier" />
+                <tei-help-component
+                    v-if="data.help === 'ftp'"
+                    type="ftp"
+                    :identifier="identifier"
+                />
+                <tei-help-component
+                    v-if="data.help === 'tei'"
+                    type="tei"
+                    :identifier="identifier"
+                />
+                <tei-help-component
+                    v-if="data.help === 'word'"
+                    type="word"
+                    :identifier="identifier"
+                />
+                <image-help-component v-if="data.help === 'images'" :identifier="identifier" />
                 <div class="bg-yellow-100 p-2 rounded flex flex-row">
                     <div class="text-3xl p-4 text-red-600">
                         <i class="fa-solid fa-exclamation-circle"></i>
@@ -29,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <upload-wizard-component @show-help="showHelp" />
+        <upload-wizard-component @show-help="showHelp" :identifier="identifier" />
         <div
             class="border-t border-solid p-4 mt-4 panel-height overflow-scroll"
             v-if="data.failedTasks.length"
@@ -38,7 +52,11 @@
             <div v-for="error of data.failedTasks" :key="error.id">
                 <div class="flex flex-row">
                     <div><i class="fa-solid fa-chevron-right"></i></div>
-                    <error-reporter-component :error="error" class="ml-2" />
+                    <error-reporter-component
+                        :error="error"
+                        :identifier="identifier"
+                        class="ml-2"
+                    />
                 </div>
             </div>
         </div>
@@ -54,7 +72,7 @@ import TeiHelpComponent from "./HelpTEI.component.vue";
 import ImageHelpComponent from "./HelpImages.component.vue";
 import ProcessingStatusComponent from "./ProcessingStatus.component.vue";
 import { uniqBy } from "lodash";
-import { reactive } from "vue";
+import { reactive, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 const $store = useStore();
@@ -67,6 +85,7 @@ const data = reactive({
     uploads: [],
     failedTasks: [],
 });
+const identifier = computed(() => $route.params.identifier);
 function showHelp({ type }) {
     data.help = type;
 }

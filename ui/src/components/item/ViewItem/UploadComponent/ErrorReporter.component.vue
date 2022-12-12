@@ -21,7 +21,7 @@
 
     When reporting this problem to us please include the following information in the message (and send us the file that caused the error):
 
-    item: {{ $route.params.identifier }}
+    item: {{ props.identifier }}
     file: {{ props.error.resource }}
     error: {{ data.error.message }}
             </pre>
@@ -45,6 +45,10 @@ import { cloneDeep } from "lodash";
 const props = defineProps({
     error: {
         type: Object,
+        required: true,
+    },
+    identifier: {
+        type: String,
         required: true,
     },
 });

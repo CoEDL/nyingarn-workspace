@@ -13,7 +13,7 @@ import Tus from "@uppy/tus";
 import "@uppy/core/dist/style.css";
 import "@uppy/dashboard/dist/style.css";
 import Uppy from "@uppy/core";
-import { ref, reactive, onMounted, inject, onBeforeUnmount } from "vue";
+import { ref, reactive, onMounted, inject, onBeforeUnmount, watch } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 const store = useStore();
@@ -30,12 +30,26 @@ const data = reactive({
     error: false,
 });
 
+watch(
+    () => $route.params.identifier,
+    () => {
+        if (data.uppy) {
+            data.uppy.close();
+            data.uppy = undefined;
+        }
+        if ($route.params.identifier) init();
+    }
+);
 onMounted(() => {
     init();
 });
 onBeforeUnmount(() => {
-    // data.uppy.close();
+    if (data.uppy) {
+        data.uppy.close();
+        data.uppy = undefined;
+    }
 });
+
 async function init() {
     await getItemPath();
     if (!data.path) return;

@@ -33,21 +33,21 @@ const data = reactive({
     value: undefined,
     items: [],
 });
-onMounted(async () => {
-    await init();
-});
-async function init() {
+
+async function querySearch(queryString, cb) {
+    let items;
     if (props.type === "items") {
-        let items = await getMyItems();
-        data.items = [...items];
+        items = await getMyItems({ match: queryString });
     } else if (props.type === "collections") {
-        let collections = await getMyCollections();
-        data.items = [...collections];
+        items = await getMyCollections({ match: queryString });
     }
+    const results = items.map((r) => ({ name: r.name, value: r.name }));
+    cb(results);
 }
-async function getMyItems() {
+async function getMyItems({ match }) {
     let response = await $http.get({
         route: `/items`,
+        params: { match },
     });
     if (response.status === 200) {
         response = await response.json();
@@ -58,21 +58,13 @@ async function getMyItems() {
 async function getMyCollections() {
     let response = await $http.get({
         route: `/collections`,
+        params: { match },
     });
     if (response.status === 200) {
         response = await response.json();
         let collections = response.collections.filter((c) => c.name !== $route.params.identifier);
         return collections;
     }
-}
-function querySearch(queryString, cb) {
-    const re = new RegExp(queryString, "ig");
-    const results = data.items
-        .filter((i) => {
-            return i.name.match(re);
-        })
-        .map((r) => ({ name: r.name, value: r.name }));
-    cb(results);
 }
 async function copyCrate() {
     data.loading = true;
@@ -88,12 +80,12 @@ async function copyCrate() {
     });
     if (response.status === 200) {
         ElMessage({
-            message: "The crate was copied",
+            message: "The metadata was copied",
             type: "success",
         });
     } else {
         ElMessage({
-            message: "There was an error copying the crate",
+            message: "There was an error copying the metadata",
             type: "error",
         });
     }

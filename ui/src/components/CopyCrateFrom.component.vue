@@ -5,6 +5,7 @@
             class="w-full"
             v-model="data.value"
             :fetch-suggestions="querySearch"
+            :trigger-on-focus="false"
             clearable
             placeholder="Start typing to get a list of items"
             @select="copyCrate"
@@ -54,8 +55,9 @@ async function getMyItems({ match }) {
         let items = response.items.filter((c) => c.name !== $route.params.identifier);
         return items;
     }
+    return [];
 }
-async function getMyCollections() {
+async function getMyCollections({ match }) {
     let response = await $http.get({
         route: `/collections`,
         params: { match },
@@ -65,6 +67,7 @@ async function getMyCollections() {
         let collections = response.collections.filter((c) => c.name !== $route.params.identifier);
         return collections;
     }
+    return [];
 }
 async function copyCrate() {
     data.loading = true;

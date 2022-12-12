@@ -1,4 +1,5 @@
 import models from "../models/index.js";
+import { Op } from "sequelize";
 import { getStoreHandle } from "../common/index.js";
 
 export async function lookupCollectionByIdentifier({ identifier, userId }) {

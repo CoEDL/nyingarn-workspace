@@ -20,13 +20,14 @@ import fastifyCompress from "@fastify/compress";
 import cors from "@fastify/cors";
 import fastifySensible from "@fastify/sensible";
 const envToLogger = {
-    // development: {
-    // transport: {
-    //     target: "pino-pretty",
-    //     options: { ignore: "reqId,req.hostname,req.remoteAddress,req.remotePort" },
-    // },
-    // },
-    development: true,
+    development: {
+        transport: {
+            target: "@fastify/one-line-logger",
+            // target: "pino-pretty",
+            // options: { ignore: "reqId,req.hostname,req.remoteAddress,req.remotePort" },
+        },
+    },
+    // development: true,
     production: true,
     test: false,
 };

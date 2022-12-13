@@ -1,72 +1,116 @@
 <template>
-    <div
-        class="flex flex-col space-y-2 xl:flex-row xl:space-x-2 xl:space-y-0"
-        v-loading="data.loading"
-    >
-        <el-card class="box-card xl:w-1/2">
-            <template #header>
-                <div class="card-header flex flex-row">
-                    <div>Items</div>
-                </div>
-            </template>
-            <el-table :data="data.items" :height="tableHeight">
-                <template #empty> No items have been found. </template>
-                <el-table-column prop="name" label="Name">
-                    <template #default="scope">
-                        <div
-                            :class="{ 'cursor-pointer': scope.row.connected }"
-                            @click="loadItem(scope.row)"
-                        >
-                            {{ scope.row.name }}
+    <div class="flex flex-col space-y-2" v-loading="data.loading">
+        <div class="p-8 bg-blue-200">
+            <div>
+                If this is a new system, then you first need to import the items and collections on
+                the backend storage into the DB. You can do this with this control. You should only
+                really do this once though nothing will break if you run it again.
+            </div>
+            <div>
+                <el-button @click="importObjectsInTheStore">
+                    Import items and collections on the storage backend
+                </el-button>
+            </div>
+
+            <!-- <div><el-button @click="init">init</el-button></div> -->
+        </div>
+        <div
+            class="flex flex-col space-y-2 xl:flex-row xl:space-x-2 xl:space-y-0"
+            v-loading="data.loading"
+        >
+            <el-card class="box-card xl:w-1/2">
+                <template #header>
+                    <div class="card-header flex flex-row space-x-2">
+                        <div class="pt-1">Items</div>
+                        <div class="flex-grow">
+                            <el-input
+                                v-model="data.items.prefix"
+                                placeholder="Filter items by prefix"
+                                @change="loadItems"
+                                clearable
+                            ></el-input>
                         </div>
-                    </template>
-                </el-table-column>
-                <el-table-column label="Actions" width="200">
-                    <template #default="scope">
-                        <div class="flex flex-row space-x-2">
-                            <div v-if="!scope.row.connected">
-                                <el-button type="primary" @click="connectItem(scope.row)">
-                                    connect
-                                </el-button>
+                        <el-pagination
+                            layout="prev, pager, next"
+                            :total="data.items.total"
+                            :page-size="10"
+                            @current-change="pageItems"
+                        />
+                    </div>
+                </template>
+                <el-table :data="data.items.rows" :height="tableHeight">
+                    <template #empty> No items have been found. </template>
+                    <el-table-column prop="identifier" label="Identifier">
+                        <template #default="scope">
+                            <div
+                                :class="{ 'cursor-pointer': scope.row.connected }"
+                                @click="loadItem(scope.row)"
+                            >
+                                {{ scope.row.identifier }}
                             </div>
-                            <div v-else>connected</div>
-                        </div>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-card>
-        <el-card class="box-card xl:w-1/2">
-            <template #header>
-                <div class="card-header flex flex-row">
-                    <div>Collections</div>
-                </div>
-            </template>
-            <el-table :data="data.collections" :height="tableHeight">
-                <template #empty> No collections have been found. </template>
-                <el-table-column prop="name" label="Name">
-                    <template #default="scope">
-                        <div
-                            :class="{ 'cursor-pointer': scope.row.connected }"
-                            @click="loadCollection(scope.row)"
-                        >
-                            {{ scope.row.name }}
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column label="Actions" width="100">
-                    <template #default="scope">
-                        <div class="flex flex-row">
-                            <div v-if="!scope.row.connected">
-                                <el-button type="primary" @click="connectCollection(scope.row)">
-                                    connect
-                                </el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Actions" width="200">
+                        <template #default="scope">
+                            <div class="flex flex-row space-x-2">
+                                <div v-if="!scope.row.connected">
+                                    <el-button type="primary" @click="connectItem(scope.row)">
+                                        connect
+                                    </el-button>
+                                </div>
+                                <div v-else>connected</div>
                             </div>
-                            <div v-else>connected</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-card>
+            <el-card class="box-card xl:w-1/2">
+                <template #header>
+                    <div class="card-header flex flex-row space-x-2">
+                        <div class="pt-1">Collections</div>
+                        <div class="flex-grow">
+                            <el-input
+                                v-model="data.collections.prefix"
+                                placeholder="Filter collections by prefix"
+                                @change="loadCollections"
+                                clearable
+                            ></el-input>
                         </div>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-card>
+                        <el-pagination
+                            layout="prev, pager, next"
+                            :total="data.collections.total"
+                            :page-size="10"
+                            @current-change="pageCollections"
+                        />
+                    </div>
+                </template>
+                <el-table :data="data.collections.rows" :height="tableHeight">
+                    <template #empty> No collections have been found. </template>
+                    <el-table-column prop="identifier" label="Identifier">
+                        <template #default="scope">
+                            <div
+                                :class="{ 'cursor-pointer': scope.row.connected }"
+                                @click="loadCollection(scope.row)"
+                            >
+                                {{ scope.row.identifier }}
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Actions" width="100">
+                        <template #default="scope">
+                            <div class="flex flex-row">
+                                <div v-if="!scope.row.connected">
+                                    <el-button type="primary" @click="connectCollection(scope.row)">
+                                        connect
+                                    </el-button>
+                                </div>
+                                <div v-else>connected</div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-card>
+        </div>
     </div>
 </template>
 
@@ -78,52 +122,105 @@ const $http = inject("$http");
 
 let data = reactive({
     loading: false,
-    items: [],
-    collections: [],
+    defaultProps: {
+        label: "identifier",
+    },
+    items: {
+        prefix: undefined,
+        total: 0,
+        currentPage: 1,
+        rows: [],
+    },
+    collections: {
+        prefix: undefined,
+        total: 0,
+        currentPage: 1,
+        rows: [],
+    },
 });
 let tableHeight = computed(() => {
     if (window.innerWidth > 1280) {
-        return window.innerHeight - 250;
+        return window.innerHeight - 450;
     } else {
         return 300;
     }
 });
 onMounted(() => {
-    init();
+    loadItems();
+    loadCollections();
 });
 
-async function init() {
+async function loadItems() {
     data.loading = true;
-    let response = await $http.get({ route: "/admin/entries" });
+    const params = { offset: (data.items.currentPage - 1) * 10 };
+    if (data.items.prefix) params.prefix = data.items.prefix;
+    let response = await $http.get({
+        route: "/admin/entries/items",
+        params,
+    });
     if (response.status !== 200) {
         // report error
         data.loading = false;
         return;
     }
-    let { items, collections } = await response.json();
-    data.items = [...items];
-    data.collections = [...collections];
+    let { items, itemsTotal } = await response.json();
+    data.items.rows = [...items];
+    data.items.total = itemsTotal;
 
     data.loading = false;
 }
+function pageItems(page) {
+    data.items.currentPage = page;
+    loadItems();
+}
+
+async function loadCollections() {
+    data.loading = true;
+    const params = { offset: (data.collections.currentPage - 1) * 10 };
+    if (data.collections.prefix) params.prefix = data.collections.prefix;
+    let response = await $http.get({
+        route: "/admin/entries/collections",
+        params,
+    });
+    if (response.status !== 200) {
+        // report error
+        data.loading = false;
+        return;
+    }
+    let { collections, collectionsTotal } = await response.json();
+    data.collections.rows = [...collections];
+    data.collections.total = collectionsTotal;
+
+    data.loading = false;
+}
+function pageCollections(page) {
+    data.collections.currentPage = page;
+    loadCollections();
+}
 async function connectItem(item) {
-    await $http.put({ route: `/admin/items/${item.name}/connect-user` });
+    await $http.put({ route: `/admin/items/${item.identifier}/connect-user` });
     data.items = data.items.map((i) => {
-        if (i.name === item.name) i.connected = true;
+        if (i.identifier === item.identifier) i.connected = true;
         return i;
     });
 }
 function loadItem(item) {
-    if (item.connected) router.push(`/items/${item.name}/view`);
+    if (item.connected) router.push(`/items/${item.identifier}/view`);
 }
 async function connectCollection(collection) {
-    await $http.put({ route: `/admin/collections/${collection.name}/connect-user` });
+    await $http.put({ route: `/admin/collections/${collection.identifier}/connect-user` });
     data.collections = data.collections.map((c) => {
-        if (c.name === collection.name) c.connected = true;
+        if (c.identifier === collection.identifier) c.connected = true;
         return c;
     });
 }
 function loadCollection(collection) {
-    if (collection.connected) router.push(`/collections/${collection.name}/metadata`);
+    if (collection.connected) router.push(`/collections/${collection.identifier}/metadata`);
+}
+async function importObjectsInTheStore() {
+    data.loading = true;
+    await $http.get({ route: `/admin/items/import` });
+    await $http.get({ route: `/admin/collections/import` });
+    data.loading = false;
 }
 </script>

@@ -1,7 +1,7 @@
-export async function getMyItems({ $http, offset, limit }) {
+export async function getMyItems({ $http, offset, limit, prefix }) {
     return await $http.get({
         route: `/items`,
-        params: { offset, limit },
+        params: { offset, limit, match: prefix },
     });
 }
 

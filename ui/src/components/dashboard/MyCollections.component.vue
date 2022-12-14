@@ -1,14 +1,21 @@
 <template>
     <el-card class="box-card flex flex-col">
         <template #header>
-            <div class="card-header flex flex-row">
-                <div>Collections</div>
-                <div class="flex-grow"></div>
+            <div class="card-header flex flex-row space-x-2">
+                <div class="pt-1">Collections</div>
+                <div class="flex-grow">
+                    <el-input
+                        v-model="data.prefix"
+                        placeholder="Filter collections by prefix"
+                        @change="loadCollections"
+                        clearable
+                    ></el-input>
+                </div>
                 <el-pagination
                     layout="prev, pager, next"
                     :page-size="data.limit"
                     :total="data.total"
-                    @current-change="loadCollections"
+                    @current-change="pageCollections"
                 >
                 </el-pagination>
             </div>
@@ -91,6 +98,7 @@ const data = reactive({
     limit: 10,
     total: 0,
     collections: [],
+    prefix: undefined,
     isAdmin: store.state.user.administrator,
 });
 let tableHeight = computed(() => {
@@ -103,26 +111,30 @@ let tableHeight = computed(() => {
 onMounted(() => {
     loadCollections();
 });
-async function loadCollections(p) {
-    data.page = p ? p : 1;
+async function loadCollections() {
     let offset = (data.page - 1) * data.limit;
     let response = await collectionServices.getMyCollections({
         $http: $http,
         offset,
         limit: data.limit,
+        prefix: data.prefix,
     });
     if (response.status !== 200) {
         return;
     }
-    response = await response.json();
-    data.total = response.total;
-    let collections = response.collections.map((c) => ({
+    let { total, collections } = await response.json();
+    data.total = total;
+    collections = collections.map((c) => ({
         ...c,
         link: `/collections/${c.name}/metadata`,
     }));
     collections = orderBy(collections, "name");
 
     data.collections = [...collections];
+}
+function pageCollections(page) {
+    data.page = page;
+    loadCollections();
 }
 async function deleteCollection(collection) {
     try {

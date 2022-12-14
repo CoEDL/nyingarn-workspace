@@ -31,7 +31,7 @@
                             ></el-input>
                         </div>
                         <el-pagination
-                            layout="prev, pager, next"
+                            layout="prev, pager, next, total"
                             :total="data.items.total"
                             :page-size="10"
                             @current-change="pageItems"
@@ -77,7 +77,7 @@
                             ></el-input>
                         </div>
                         <el-pagination
-                            layout="prev, pager, next"
+                            layout="prev, pager, next, total"
                             :total="data.collections.total"
                             :page-size="10"
                             @current-change="pageCollections"

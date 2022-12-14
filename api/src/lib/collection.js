@@ -69,7 +69,8 @@ export async function deleteCollection({ id }) {
 
 export async function toggleCollectionVisibility({ collectionId }) {
     let collection = await models.collection.findOne({ where: { id: collectionId } });
-    collection.data.private = !collection.data.private;
+    if (!collection.data) collection.data = {};
+    collection.data.private = collection.data.private ? !collection.data?.private : true;
     collection.changed("data", true);
     collection = await collection.save();
 }

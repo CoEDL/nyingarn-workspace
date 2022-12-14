@@ -1,14 +1,21 @@
 <template>
     <el-card class="box-card flex flex-col">
         <template #header>
-            <div class="card-header flex flex-row">
-                <div>Items</div>
-                <div class="flex-grow"></div>
+            <div class="card-header flex flex-row space-x-2">
+                <div class="pt-1">Items</div>
+                <div class="flex-grow">
+                    <el-input
+                        v-model="data.prefix"
+                        placeholder="Filter items by prefix"
+                        @change="loadItems"
+                        clearable
+                    ></el-input>
+                </div>
                 <el-pagination
-                    layout="prev, pager, next"
+                    layout="prev, pager, next, total"
                     :page-size="data.limit"
                     :total="data.total"
-                    @current-change="loadItems"
+                    @current-change="pageItems"
                 >
                 </el-pagination></div
         ></template>
@@ -68,6 +75,7 @@ const data = reactive({
     limit: 10,
     total: 0,
     items: [],
+    prefix: undefined,
     isAdmin: store.state.user.administrator,
 });
 let tableHeight = computed(() => {
@@ -80,16 +88,20 @@ let tableHeight = computed(() => {
 onMounted(() => {
     loadItems();
 });
-async function loadItems(p) {
-    if (p) data.page = p;
+async function loadItems() {
     let offset = (data.page - 1) * data.limit;
-    let response = await itemServices.getMyItems({ $http, offset, limit: data.limit });
+    let response = await itemServices.getMyItems({
+        $http,
+        offset,
+        limit: data.limit,
+        prefix: data.prefix,
+    });
     if (response.status !== 200) {
         return;
     }
-    response = await response.json();
-    data.total = response.total;
-    let items = response.items.map((i) => ({
+    let { total, items } = await response.json();
+    data.total = total;
+    items = items.map((i) => ({
         ...i,
         link: `/items/${i.name}/view`,
         statistics: {},
@@ -111,6 +123,10 @@ async function loadItems(p) {
             await new Promise((resolve) => setTimeout(resolve, 10));
         }
     }
+}
+function pageItems(page) {
+    data.page = page;
+    loadItems();
 }
 async function deleteItem(item) {
     try {

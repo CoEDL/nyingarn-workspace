@@ -55,7 +55,7 @@ async function getCollectionsHandler(req) {
     let collections = rows.map((c) => {
         return {
             name: c.identifier,
-            private: c.data.private,
+            private: c.data?.private,
             type: "collection",
             items: groupBy(
                 c.items.map((i) => ({ type: "item", identifier: i.identifier })),

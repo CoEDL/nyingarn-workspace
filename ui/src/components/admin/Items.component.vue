@@ -173,7 +173,6 @@ function pageItems(page) {
     data.items.currentPage = page;
     loadItems();
 }
-
 async function loadCollections() {
     data.loading = true;
     const params = { offset: (data.collections.currentPage - 1) * 10 };
@@ -199,7 +198,7 @@ function pageCollections(page) {
 }
 async function connectItem(item) {
     await $http.put({ route: `/admin/items/${item.identifier}/connect-user` });
-    data.items = data.items.map((i) => {
+    data.items.rows = data.items.rows.map((i) => {
         if (i.identifier === item.identifier) i.connected = true;
         return i;
     });
@@ -209,7 +208,7 @@ function loadItem(item) {
 }
 async function connectCollection(collection) {
     await $http.put({ route: `/admin/collections/${collection.identifier}/connect-user` });
-    data.collections = data.collections.map((c) => {
+    data.collections.rows = data.collections.rows.map((c) => {
         if (c.identifier === collection.identifier) c.connected = true;
         return c;
     });

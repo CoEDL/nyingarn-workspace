@@ -45,6 +45,10 @@ export default function (sequelize, DataTypes) {
                 allowNull: false,
                 default: false,
             },
+            data: {
+                type: DataTypes.JSON,
+                allowNull: true,
+            },
         },
         {
             timestamps: true,

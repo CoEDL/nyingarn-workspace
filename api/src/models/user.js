@@ -26,6 +26,10 @@ export default function (sequelize, DataTypes) {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
+            identifier: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
             provider: {
                 type: DataTypes.STRING,
                 allowNull: false,

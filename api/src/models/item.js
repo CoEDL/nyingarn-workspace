@@ -19,6 +19,14 @@ export default function (sequelize, DataTypes) {
                 type: DataTypes.JSON,
                 allowNull: true,
             },
+            publicationStatus: {
+                type: DataTypes.ENUM("awaitingReview", "published"),
+                allowNull: true,
+            },
+            publicationStatusLogs: {
+                type: DataTypes.JSON,
+                allowNull: true,
+            },
         },
         {
             timestamps: true,

@@ -1,11 +1,6 @@
+import { logEvent, demandAdministrator, demandAuthenticatedUser } from "../common/index.js";
 import {
-    routeAdmin,
-    route,
-    logEvent,
-    demandAdministrator,
-    demandAuthenticatedUser,
-} from "../common/index.js";
-import {
+    getUser,
     getUsers,
     deleteUser,
     toggleUserCapability,
@@ -16,11 +11,8 @@ import { createSession } from "../lib/session.js";
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
     // user routes
-    fastify.put(
-        "/users/:userId/upload",
-        { preHandler: demandAuthenticatedUser },
-        putUsersUploadCapabilityRouteHandler
-    );
+    fastify.get("/users/self", getUserSelfInformationHandler);
+    fastify.put("/users/:userId/upload", putUsersUploadCapabilityRouteHandler);
 
     // admin user routes
     fastify.get(
@@ -49,6 +41,13 @@ export function setupRoutes(fastify, options, done) {
     // server.del('/user/:userId', 'delete user known to this application', { identifier, authenticationService })
     done();
 }
+
+// TODO: this code does not have tests
+async function getUserSelfInformationHandler(req) {
+    let user = await getUser({ userId: req.session.user.id });
+    return { user };
+}
+
 async function putUsersUploadCapabilityRouteHandler(req, res) {
     let userId = req.session.user.id;
     let user;

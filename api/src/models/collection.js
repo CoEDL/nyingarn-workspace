@@ -27,6 +27,14 @@ export default function (sequelize, DataTypes) {
                 type: DataTypes.JSON,
                 allowNull: true,
             },
+            accessType: {
+                type: DataTypes.ENUM("open", "restricted"),
+                allowNull: true,
+            },
+            accessControlList: {
+                type: DataTypes.JSON,
+                allowNull: true,
+            },
         },
         {
             timestamps: true,

@@ -31,41 +31,54 @@ const log = getLogger();
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
-    fastify.addHook("preHandler", requireItemAccess);
 
+    // user routes
     fastify.get("/items", getItemsHandler);
-    fastify.get("/items/:identifier", getItemHandler);
     fastify.post("/items", postItemHandler);
-    fastify.put("/items/:identifier/attach-user", putItemInviteUserHandler);
-    fastify.put("/items/:identifier/detach-user", putItemDetachUserHandler);
-    fastify.get("/items/:identifier/users", getItemUsers);
-    fastify.delete("/items/:identifier", deleteItemHandler);
-    fastify.get("/items/:identifier/status", getItemStatisticsHandler);
-    fastify.get("/items/:identifier/resources", getItemResourcesHandler);
-    fastify.put("/items/:identifier/reprocess-imports", putReprocessImports);
-    fastify.get("/items/:identifier/resources/:resource/files", getResourceFilesListHandler);
-    fastify.get(
-        "/items/:identifier/resources/:resource/status",
-        getResourceProcessingStatusHandler
-    );
-    fastify.put("/items/:identifier/resources/:resource/status", putResourceCompleteHandler);
-    fastify.get(
-        "/items/:identifier/resources/:resource/transcription",
-        getItemTranscriptionHandler
-    );
-    fastify.get("/items/:identifier/resources/:resource/transform", getTransformTeiDocumentHandler);
-    fastify.get("/items/:identifier/resources/:resource", getItemResourceFileHandler);
-    fastify.get("/items/:identifier/resources/:file/link", getItemResourceFileLinkHandler);
-    fastify.delete("/items/:identifier/resources/:resource", deleteItemResourceHandler);
-    // fastify.delete(
-    //     "/items/:identifier/resources/:resource/:file",
-    //     deleteItemResourceFileHandler
-    // );
-    fastify.put(
-        "/items/:identifier/resources/:resource/saveTranscription",
-        saveItemTranscriptionHandler
-    );
-    fastify.post("/items/:identifier/resources/processing-status", postResourceProcessingStatus);
+
+    // user routes - access specific item
+    fastify.register((fastify, options, done) => {
+        fastify.addHook("preHandler", requireItemAccess);
+
+        fastify.get("/items/:identifier", getItemHandler);
+        fastify.put("/items/:identifier/attach-user", putItemInviteUserHandler);
+        fastify.put("/items/:identifier/detach-user", putItemDetachUserHandler);
+        fastify.get("/items/:identifier/users", getItemUsers);
+        fastify.delete("/items/:identifier", deleteItemHandler);
+        fastify.get("/items/:identifier/status", getItemStatisticsHandler);
+        fastify.get("/items/:identifier/resources", getItemResourcesHandler);
+        fastify.put("/items/:identifier/reprocess-imports", putReprocessImports);
+        fastify.get("/items/:identifier/resources/:resource/files", getResourceFilesListHandler);
+        fastify.get(
+            "/items/:identifier/resources/:resource/status",
+            getResourceProcessingStatusHandler
+        );
+        fastify.put("/items/:identifier/resources/:resource/status", putResourceCompleteHandler);
+        fastify.get(
+            "/items/:identifier/resources/:resource/transcription",
+            getItemTranscriptionHandler
+        );
+        fastify.get(
+            "/items/:identifier/resources/:resource/transform",
+            getTransformTeiDocumentHandler
+        );
+        fastify.get("/items/:identifier/resources/:resource", getItemResourceFileHandler);
+        fastify.get("/items/:identifier/resources/:file/link", getItemResourceFileLinkHandler);
+        fastify.delete("/items/:identifier/resources/:resource", deleteItemResourceHandler);
+        // fastify.delete(
+        //     "/items/:identifier/resources/:resource/:file",
+        //     deleteItemResourceFileHandler
+        // );
+        fastify.put(
+            "/items/:identifier/resources/:resource/saveTranscription",
+            saveItemTranscriptionHandler
+        );
+        fastify.post(
+            "/items/:identifier/resources/processing-status",
+            postResourceProcessingStatus
+        );
+        done();
+    });
     done();
 }
 

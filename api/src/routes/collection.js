@@ -20,17 +20,22 @@ const log = getLogger();
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
-    fastify.addHook("preHandler", requireCollectionAccess);
 
     // user routes
     fastify.get("/collections", getCollectionsHandler);
-    fastify.get("/collections/:identifier", getCollectionHandler);
     fastify.post("/collections", postCollectionHandler);
-    fastify.put("/collections/:identifier/attach-user", putCollectionInviteUserHandler);
-    fastify.put("/collections/:identifier/detach-user", putCollectionDetachUserHandler);
-    fastify.put("/collections/:identifier/toggle-visibility", putCollectionToggleVisibility);
-    fastify.get("/collections/:identifier/users", getCollectionUsers);
-    fastify.delete("/collections/:identifier", deleteCollectionHandler);
+
+    // user routes - access specific collection
+    fastify.register((fastify, options, done) => {
+        fastify.addHook("preHandler", requireCollectionAccess);
+        fastify.get("/collections/:identifier", getCollectionHandler);
+        fastify.put("/collections/:identifier/attach-user", putCollectionInviteUserHandler);
+        fastify.put("/collections/:identifier/detach-user", putCollectionDetachUserHandler);
+        fastify.put("/collections/:identifier/toggle-visibility", putCollectionToggleVisibility);
+        fastify.get("/collections/:identifier/users", getCollectionUsers);
+        fastify.delete("/collections/:identifier", deleteCollectionHandler);
+        done();
+    });
     done();
 }
 

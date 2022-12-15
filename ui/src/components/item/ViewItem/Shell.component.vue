@@ -27,14 +27,14 @@
                     >
                     </describo-crate-builder>
                 </el-tab-pane>
-                <!-- <el-tab-pane label="Associate to Collection" name="associate">
-                    <item-members-component v-if="data.activeTab === 'associate'" />
-                </el-tab-pane> -->
                 <el-tab-pane label="Upload Data" name="upload">
                     <upload-component v-if="data.activeTab === 'upload'" />
                 </el-tab-pane>
                 <el-tab-pane label="Administration" name="administration">
                     <administration-component v-if="data.activeTab === 'administration'" />
+                </el-tab-pane>
+                <el-tab-pane label="Publish" name="publish">
+                    <publish-component v-if="data.activeTab === 'publish'" type="item" />
                 </el-tab-pane>
             </el-tabs>
         </div>
@@ -46,7 +46,7 @@ import { getItem } from "../item-services";
 import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
 import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
-import ItemMembersComponent from "./ItemMembers.component.vue";
+import PublishComponent from "../../Publish.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
@@ -66,7 +66,7 @@ let props = defineProps({
 let data = reactive({
     userIsPermitted: false,
     routeWatcher: undefined,
-    tabs: ["view", "metadata", "associate", "upload", "administration"],
+    tabs: ["view", "metadata", "associate", "upload", "administration", "publish"],
     activeTab: "view",
     metadataComponent: {
         display: false,

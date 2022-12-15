@@ -53,6 +53,11 @@ const routes = [
                         name: "items/:identifier/administration",
                         component: ViewItemComponent,
                     },
+                    {
+                        path: "publish",
+                        name: "items/:identifier/publish",
+                        component: ViewItemComponent,
+                    },
                 ],
             },
             {
@@ -82,6 +87,11 @@ const routes = [
                     {
                         path: "administration",
                         name: "collections/:identifier/administration",
+                        component: ViewCollectionComponent,
+                    },
+                    {
+                        path: "publish",
+                        name: "collections/:identifier/publish",
                         component: ViewCollectionComponent,
                     },
                 ],

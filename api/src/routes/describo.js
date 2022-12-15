@@ -2,7 +2,7 @@ import { demandAuthenticatedUser, getStoreHandle, loadProfile } from "../common/
 import lodashPkg from "lodash";
 const { uniqBy, compact, flattenDeep } = lodashPkg;
 import models from "../models/index.js";
-import { registerAllFiles } from "../lib/crate-tools.js";
+import { createDefaultROCrateFile } from "../lib/crate-tools.js";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -150,26 +150,6 @@ async function getDescriboROCrate(req) {
     } catch (error) {
         crate = createDefaultROCrateFile({ name: req.params.identifier });
     }
-    try {
-        ({ crate, filesAdded } = await registerAllFiles({
-            id: req.params.identifier,
-            className: req.params.type,
-            crate,
-        }));
-    } catch (error) {
-        // the crate is broken! mint a brand new one and do this setup again
-        crate = createDefaultROCrateFile({ name: req.params.identifier });
-        await store.put({ target: "ro-crate-metadata.json", json: crate });
-
-        ({ crate, filesAdded } = await registerAllFiles({
-            id: req.params.identifier,
-            className: req.params.type,
-            crate,
-        }));
-    }
-    if (filesAdded.length) {
-        await store.put({ target: "ro-crate-metadata.json", json: crate });
-    }
     return { crate };
 }
 
@@ -184,40 +164,4 @@ async function putDescriboROCrate(req) {
 async function getDescriboProfile(req, res, next) {
     let profile = await loadProfile({ profile: `nyingarn-${req.params.type}-profile.json` });
     return { profile };
-}
-
-function createDefaultROCrateFile({ name }) {
-    return {
-        "@context": [
-            "https://w3id.org/ro/crate/1.1/context",
-            {
-                "@vocab": "http://schema.org/",
-            },
-            {
-                txc: {
-                    "@id": "http://purl.archive.org/textcommons/terms#",
-                },
-            },
-            {
-                "@base": null,
-            },
-        ],
-        "@graph": [
-            {
-                "@id": "ro-crate-metadata.json",
-                "@type": "CreativeWork",
-                conformsTo: {
-                    "@id": "https://w3id.org/ro/crate/1.1/context",
-                },
-                about: {
-                    "@id": "./",
-                },
-            },
-            {
-                "@id": "./",
-                "@type": "Dataset",
-                name: name,
-            },
-        ],
-    };
 }

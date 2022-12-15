@@ -2,10 +2,12 @@
     "metadata": {
         "name": "NYINGARN Collection Profile",
         "description": "A collection profile for the NYINGARN project",
-        "version": 0.1
+        "version": 0.1,
+        "warnMissingProperty": true,
+        "keywords": ["languages", "Australian Languages", "Collection Metadata"]
     },
     "hide": {
-        "Dataset": ""
+        "Dataset": []
     },
     "layouts": {
         "Dataset": [

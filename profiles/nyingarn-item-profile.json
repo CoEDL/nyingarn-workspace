@@ -3,10 +3,11 @@
         "name": "NYINGARN Profile",
         "description": "Am item profile for the NYINGARN project",
         "version": 0.1,
-        "warnMissingProperty": true
+        "warnMissingProperty": true,
+        "keywords": ["languages", "Australian Languages", "Item Metadata"]
     },
     "hide": {
-        "Dataset": [""]
+        "Dataset": []
     },
     "layouts": {
         "Dataset": [

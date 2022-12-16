@@ -12,7 +12,7 @@
                     ></el-input>
                 </div>
                 <el-pagination
-                    layout="prev, pager, next"
+                    layout="prev, pager, next, total"
                     :page-size="data.limit"
                     :total="data.total"
                     @current-change="pageCollections"

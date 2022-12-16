@@ -15,29 +15,99 @@ const authorisedUsersFile = ".authorised-users.json";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
-    fastify.post(
-        "/publish/collection/:identifier",
-        { preHandler: requireCollectionAccess },
-        postPublishCollectionHandler
-    );
 
-    fastify.post(
-        "/publish/item/:identifier",
-        { preHandler: requireItemAccess },
-        postPublishItemHandler
-    );
-    fastify.get(
-        "/publish/item/:identifier/status",
-        { preHandler: requireItemAccess },
-        getItemPublicationStatus
-    );
+    fastify.register((fastify, options, done) => {
+        fastify.addHook("preHandler", requireCollectionAccess);
+        fastify.post("/publish/collection/:identifier", postPublishCollectionHandler);
+        fastify.get("/publish/collection/:identifier/status", getCollectionPublicationStatus);
+        done();
+    });
+
+    fastify.register((fastify, options, done) => {
+        fastify.addHook("preHandler", requireItemAccess);
+        fastify.post("/publish/item/:identifier", postPublishItemHandler);
+        fastify.get("/publish/item/:identifier/status", getItemPublicationStatus);
+        done();
+    });
     done();
 }
 
 // TODO: this code does not have tests
 async function postPublishCollectionHandler(req, res) {
-    console.log(req.session);
-    console.log(req.body);
+    if (isURL(req.body.data.user["@id"], { protocols: ["http", "https"] })) {
+        req.session.user.identifier = req.body.data.user["@id"];
+        await req.session.user.save();
+    }
+
+    // check that permission forms are loaded
+    //  TODO: not yet implemented
+
+    // set the properties for this collection
+    req.session.collection.publicationStatus = "awaitingReview";
+    req.session.collection.accessType = "open";
+
+    // save the collection
+    await req.session.collection.save();
+
+    let store = await getStoreHandle({
+        id: req.session.collection.identifier,
+        className: "collection",
+    });
+
+    // remove .collection file if it exists
+    if (await store.pathExists({ path: ".collection" })) {
+        await store.delete({ target: ".collection" });
+    }
+
+    // write the metadata into the crate
+    let crate;
+    try {
+        crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        crate = new ROCrate(crate, { array: true });
+        let licence = {
+            "@id": "LICENCE",
+            "@type": ["File", "DataReuselicence"],
+            name: "Open (subject to agreeing to PDSC access conditions)",
+            access: {
+                "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
+            },
+            authorizationWorkflow: [
+                { "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms" },
+            ],
+        };
+
+        if (crate.getEntity(licence["@id"])) crate.deleteEntity(licence["@id"]);
+        crate.addEntity(licence);
+        crate.rootDataset.licence = licence;
+
+        crate.addEntity(req.body.data.user);
+        let depositor = crate.rootDataset.depositor;
+        if (!depositor) {
+            depositor = [req.body.data.user];
+        } else {
+            depositor.push(req.body.data.user);
+            depositor = uniqBy(depositor, "@id");
+        }
+        crate.rootDataset.depositor = depositor;
+        crate = crate.toJSON();
+        crate["@context"] = getContext();
+
+        await store.put({ target: "ro-crate-metadata.json", json: crate });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// TODO: this code does not have tests
+async function getCollectionPublicationStatus(req) {
+    if (["awaitingReview", "published"].includes(req.session.collection.publicationStatus)) {
+        return {
+            status: req.session.collection.publicationStatus,
+            visibility: req.session.collection.accessType,
+            emails: req.session.collection.accessControlList,
+        };
+    }
+    return {};
 }
 
 // TODO: this code does not have tests
@@ -131,6 +201,7 @@ async function postPublishItemHandler(req, res) {
     }
 }
 
+// TODO: this code does not have tests
 async function getItemPublicationStatus(req) {
     if (["awaitingReview", "published"].includes(req.session.item.publicationStatus)) {
         return {

@@ -1,8 +1,16 @@
 <template>
     <div class="flex flex-col space-y-4">
         <div class="flex flex-col border border-solid p-2">
-            <div class="flex flex-row">
+            <div class="flex flex-row space-x-2">
                 <div class="pt-1">Associate items</div>
+                <div class="flex-grow">
+                    <el-input
+                        v-model="data.items.prefix"
+                        placeholder="Filter items by prefix"
+                        @change="getMyItems"
+                        clearable
+                    ></el-input>
+                </div>
                 <el-pagination
                     layout="prev, pager, next"
                     :total="data.items.total"
@@ -39,8 +47,16 @@
             </el-table>
         </div>
         <div class="flex flex-col border border-solid p-2">
-            <div class="flex flex-row">
+            <div class="flex flex-row space-x-2">
                 <div class="pt-1">Associate collections</div>
+                <div class="flex-grow">
+                    <el-input
+                        v-model="data.collections.prefix"
+                        placeholder="Filter collections by prefix"
+                        @change="getMyCollections"
+                        clearable
+                    ></el-input>
+                </div>
                 <el-pagination
                     layout="prev, pager, next"
                     :total="data.collections.total"
@@ -100,11 +116,13 @@ const data = reactive({
         page: 1,
         total: 0,
         results: [],
+        prefix: "",
     },
     collections: {
         page: 1,
         total: 0,
         results: [],
+        prefix: "",
     },
 });
 let tableHeight = computed(() => {
@@ -123,12 +141,13 @@ async function init() {
         getMyCollections({ page: data.collections.page });
     }
 }
-async function getMyItems({ page }) {
+async function getMyItems() {
     let response = await $http.get({
         route: `/items`,
         params: {
-            offset: (page - 1) * data.pageSize,
+            offset: (data.items.page - 1) * data.pageSize,
             limit: data.pageSize,
+            match: data.items.prefix,
         },
     });
     if (response.status === 200) {
@@ -137,12 +156,13 @@ async function getMyItems({ page }) {
         data.items.total = response.total;
     }
 }
-async function getMyCollections({ page }) {
+async function getMyCollections() {
     let response = await $http.get({
         route: `/collections`,
         params: {
-            offset: (page - 1) * data.pageSize,
+            offset: (data.collections.page - 1) * data.pageSize,
             limit: data.pageSize,
+            match: data.collections.prefix,
         },
     });
     if (response.status === 200) {
@@ -205,10 +225,10 @@ async function toggleLink({ item, url, successMsg, ErrorMsg }) {
 }
 async function handleItemPageChange(page) {
     data.items.page = page;
-    await getMyItems({ page });
+    await getMyItems();
 }
 async function handleCollectionPageChange(page) {
     data.collections.page = page;
-    await getMyCollections({ page });
+    await getMyCollections();
 }
 </script>

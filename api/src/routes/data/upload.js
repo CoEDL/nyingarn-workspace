@@ -19,7 +19,6 @@ export async function getItemPath(req, res) {
 
 export async function triggerProcessing(req) {
     // await new Promise((resolve) => setTimeout(resolve, 15000));
-
     const { identifier, resource } = req.params;
 
     log.info(`Process: ${identifier}/${resource}`);
@@ -34,13 +33,14 @@ export async function triggerProcessing(req) {
         // process uploaded image
         name = "process-image";
     }
-    await submitTask({
+    const task = {
         rabbit: this.rabbit,
         configuration: req.session.configuration,
-        item: req.session.item,
+        item: req.session.item.get(),
         name,
         body: { resource },
-    });
+    };
+    await submitTask(task);
 
     return {};
 }

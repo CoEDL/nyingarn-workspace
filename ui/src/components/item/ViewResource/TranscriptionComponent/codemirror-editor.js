@@ -49,15 +49,13 @@ export class CodemirrorEditorControls {
     }
     formatDocument({ document }) {
         document = document ? document : this.view.state.doc.toString();
+        let documentLength = this.view.state.doc.length;
         try {
-            let formattedDocument = format(document, {
-                indentation: "  ",
-                collapseContent: true,
-            });
+            document = format(document, { indentation: "  ", collapseContent: true });
             let changes = {
                 from: 0,
-                to: this.view.state.doc.length,
-                insert: formattedDocument,
+                to: documentLength,
+                insert: document,
             };
             this.dispatch({ changes });
         } catch (error) {

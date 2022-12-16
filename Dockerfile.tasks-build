@@ -10,6 +10,7 @@ WORKDIR /srv
 RUN apt-get update && apt-get install -y ca-certificates
 COPY --from=tasks-builder /srv/tasks/package.json /srv/package.json
 COPY --from=tasks-builder /srv/tasks/package-lock.json /srv/package-lock.json
+COPY tasks/unstick-queues.js /srv/unstick-queues.js
 RUN npm install
 COPY --from=tasks-builder /srv/tasks/dist/ /srv/
 COPY tasks/src/xslt /srv/tasks/src/xslt

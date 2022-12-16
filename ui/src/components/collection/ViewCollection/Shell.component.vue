@@ -28,10 +28,7 @@
                     </describo-crate-builder>
                 </el-tab-pane>
                 <el-tab-pane label="Collection Members" name="members">
-                    <view-collection-members-component
-                        :collection="data.collection"
-                        v-if="data.activeTab === 'members'"
-                    />
+                    <view-collection-members-component v-if="data.activeTab === 'members'" />
                 </el-tab-pane>
                 <el-tab-pane label="Associate Collections and Items" name="associate">
                     <collection-members-component v-if="data.activeTab === 'associate'" />

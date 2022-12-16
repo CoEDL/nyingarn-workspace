@@ -1,6 +1,5 @@
 <template>
     <div class="my-2 flex flex-col space-y-2">
-        {{ identifier }}
         <div class="flex flex-row">
             <uploader-component
                 @upload-started="data.failedTasks = []"

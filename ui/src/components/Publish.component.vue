@@ -3,8 +3,8 @@
         <div class="bg-blue-200 p-8 rounded text-center my-6">
             <div v-if="props.type === 'item'">
                 When you publish, the item and all of its pages will be marked complete.
-                <br />The item will then be flagged for review by an administrator prior to
-                ingestion into the repository.
+                <br />The item will then be flagged for review by an administrator prior to deposit
+                into the repository.
             </div>
             <div v-if="props.type === 'collection'">
                 When you publish, the collection will be flagged for review by an administrator
@@ -31,19 +31,19 @@
                 true-label="agreed"
             />
         </div>
-        <div class="" v-else>
+        <div class="" v-else v-loading="data.loading">
             <el-form :model="data.form" label-width="150px" @submit.prevent>
                 <el-form-item label="Your Identifier">
-                    <el-input v-model="data.form.orcid" />
+                    <el-input v-model="data.user.identifier" />
                     <div class="text-gray-700">
-                        Ideally, this is *your* ORCID or other similarly unique, URL identifier.
+                        Ideally, this is *your* ORCID or other similarly unique URL identifier.
                         However, if you don't have one, just leave this field blank.
                     </div>
                 </el-form-item>
                 <el-form-item label="Your Name">
                     <div>{{ data.user.givenName }} {{ data.user.familyName }}</div>
                 </el-form-item>
-                <el-form-item label="Visibility">
+                <el-form-item label="Visibility" v-if="props.type === 'item'">
                     <div class="flex flex-col">
                         <el-switch
                             v-model="data.form.visibility"
@@ -79,9 +79,9 @@
 <script setup>
 import { reactive, watch, inject, onMounted } from "vue";
 import { uniq, flattenDeep } from "lodash";
-import { useStore } from "vuex";
+import { useRoute } from "vue-router";
 import { isEmail } from "validator";
-const $store = useStore();
+const $route = useRoute();
 const $http = inject("$http");
 
 const props = defineProps({
@@ -92,6 +92,7 @@ const props = defineProps({
     },
 });
 const data = reactive({
+    loading: false,
     user: {},
     form: {
         orcid: "",
@@ -109,11 +110,30 @@ watch(
 );
 onMounted(() => {
     getUserData();
+    getPublicationStatus();
 });
 async function getUserData() {
     let response = await $http.get({ route: "/users/self" });
     response = await response.json();
     data.user = { ...response.user };
+}
+async function getPublicationStatus() {
+    let response = await $http.get({
+        route: `/publish/${$route.meta.type}/${$route.params.identifier}/status`,
+    });
+    if (response.status === 200) {
+        response = await response.json();
+        if (response?.status) {
+            if (props.type === "item") {
+                data.checked = ["agreed", "agreed", "agreed"];
+                data.form.visibility = response.visibility;
+                data.form.emails = response?.emails.join("\n");
+            } else {
+                data.checked = ["agreed", "agreed"];
+                data.form.visibility = "open";
+            }
+        }
+    }
 }
 function validate() {
     const checkLength = props.type === "item" ? 3 : 2;
@@ -137,8 +157,8 @@ async function publish() {
 
     const formData = {
         user: {
-            "@id": data.form.orcid
-                ? data.form.orcid
+            "@id": data.user.identifier
+                ? data.user.identifier
                 : `#${data.user.givenName} ${data.user.familyName}`.replace(/ /g, "_"),
             "@type": "Person",
             name: `${data.user.givenName} ${data.user.familyName}`,
@@ -146,6 +166,12 @@ async function publish() {
         ...data.form,
         emails,
     };
-    console.log(JSON.stringify(formData, null, 2));
+
+    data.loading = true;
+    await $http.post({
+        route: `/publish/${$route.meta.type}/${$route.params.identifier}`,
+        body: { data: formData },
+    });
+    data.loading = false;
 }
 </script>

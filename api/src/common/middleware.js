@@ -1,3 +1,4 @@
+import { getUser } from "../lib/user.js";
 import { getLogger } from "./logger.js";
 import { verifyToken } from "./jwt.js";
 import { lookupItemByIdentifier } from "../lib/item.js";

@@ -10,7 +10,12 @@ module.exports = {
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
         await queryInterface.addColumn("items", "publicationStatus", {
-            type: Sequelize.DataTypes.ENUM("awaitingReview", "published"),
+            type: Sequelize.DataTypes.ENUM(
+                "inProgress",
+                "awaitingReview",
+                "published",
+                "needsWork"
+            ),
             allowNull: true,
         });
         await queryInterface.addColumn("items", "publicationStatusLogs", {
@@ -26,7 +31,12 @@ module.exports = {
             allowNull: true,
         });
         await queryInterface.addColumn("collections", "publicationStatus", {
-            type: Sequelize.DataTypes.ENUM("awaitingReview", "published"),
+            type: Sequelize.DataTypes.ENUM(
+                "inProgress",
+                "awaitingReview",
+                "published",
+                "needsWork"
+            ),
             allowNull: true,
         });
         await queryInterface.addColumn("collections", "publicationStatusLogs", {

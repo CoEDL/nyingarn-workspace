@@ -20,8 +20,9 @@ export default function (sequelize, DataTypes) {
                 allowNull: true,
             },
             publicationStatus: {
-                type: DataTypes.ENUM("awaitingReview", "published"),
+                type: DataTypes.ENUM("inProgress", "awaitingReview", "published", "needsWork"),
                 allowNull: true,
+                defaultValue: "inProgress",
             },
             publicationStatusLogs: {
                 type: DataTypes.JSON,

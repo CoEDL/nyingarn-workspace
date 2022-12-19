@@ -87,7 +87,8 @@ async function getItemsHandler(req) {
     const offset = req.query.offset;
     const limit = req.query.limit;
     const match = req.query.match;
-    let { count, rows } = await getItems({ userId, offset, limit, match });
+    const publicationStatus = req.query.publicationStatus;
+    let { count, rows } = await getItems({ userId, offset, limit, match, publicationStatus });
     let items = rows.map((i) => ({
         name: i.identifier,
         type: "item",

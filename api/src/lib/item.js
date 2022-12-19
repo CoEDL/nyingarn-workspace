@@ -31,7 +31,7 @@ export async function lookupItemByIdentifier({ identifier, userId }) {
     return await models.item.findOne(clause);
 }
 
-export async function getItems({ userId, offset = 0, limit = 10, match }) {
+export async function getItems({ userId, offset = 0, limit = 10, match, publicationStatus }) {
     const query = {
         order: [[seqFn("lower", seqCol("item.identifier")), "ASC"]],
     };
@@ -41,12 +41,14 @@ export async function getItems({ userId, offset = 0, limit = 10, match }) {
         query.offset = offset;
         query.limit = limit;
     }
+    query.where = {};
     if (match) {
-        query.where = {
-            identifier: {
-                [Op.startsWith]: match,
-            },
+        query.where.identifier = {
+            [Op.startsWith]: match,
         };
+    }
+    if (publicationStatus) {
+        query.where.publicationStatus = publicationStatus;
     }
     query.include = include;
 

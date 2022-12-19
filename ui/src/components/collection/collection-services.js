@@ -1,7 +1,7 @@
-export async function getMyCollections({ $http, offset, limit, prefix }) {
+export async function getMyCollections({ $http, offset, limit, prefix, publicationStatus }) {
     return await $http.get({
         route: `/collections`,
-        params: { offset, limit, match: prefix },
+        params: { offset, limit, match: prefix, publicationStatus },
     });
 }
 

@@ -44,11 +44,13 @@ async function getCollectionsHandler(req) {
     const offset = req.query.offset;
     const limit = req.query.limit;
     const match = req.query.match;
+    const publicationStatus = req.query.publicationStatus;
     let { count, rows } = await getCollections({
         userId,
         offset,
         limit,
         match,
+        publicationStatus,
     });
     let collections = rows.map((c) => {
         return {

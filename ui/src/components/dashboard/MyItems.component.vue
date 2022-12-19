@@ -11,6 +11,17 @@
                         clearable
                     ></el-input>
                 </div>
+                <el-select
+                    v-model="data.filterByStatus"
+                    placeholder="Show"
+                    @change="loadItems"
+                    clearable
+                >
+                    <el-option label="In Progress" value="inProgress" />
+                    <el-option label="Awaiting Review" value="awaitingReview" />
+                    <el-option label="Published" value="published" />
+                    <el-option label="Needs Work" value="needsWork" />
+                </el-select>
                 <el-pagination
                     layout="prev, pager, next, total"
                     :page-size="data.limit"
@@ -82,6 +93,7 @@ const data = reactive({
     total: 0,
     items: [],
     prefix: undefined,
+    filterByStatus: undefined,
     isAdmin: store.state.user.administrator,
 });
 let tableHeight = computed(() => {
@@ -101,6 +113,7 @@ async function loadItems() {
         offset,
         limit: data.limit,
         prefix: data.prefix,
+        publicationStatus: data.filterByStatus,
     });
     if (response.status !== 200) {
         return;

@@ -100,14 +100,11 @@ async function postPublishCollectionHandler(req, res) {
 
 // TODO: this code does not have tests
 async function getCollectionPublicationStatus(req) {
-    if (["awaitingReview", "published"].includes(req.session.collection.publicationStatus)) {
-        return {
-            status: req.session.collection.publicationStatus,
-            visibility: req.session.collection.accessType,
-            emails: req.session.collection.accessControlList,
-        };
-    }
-    return {};
+    return {
+        status: req.session.collection.publicationStatus,
+        visibility: req.session.collection.accessType,
+        emails: req.session.collection.accessControlList,
+    };
 }
 
 // TODO: this code does not have tests
@@ -203,12 +200,9 @@ async function postPublishItemHandler(req, res) {
 
 // TODO: this code does not have tests
 async function getItemPublicationStatus(req) {
-    if (["awaitingReview", "published"].includes(req.session.item.publicationStatus)) {
-        return {
-            status: req.session.item.publicationStatus,
-            visibility: req.session.item.accessType,
-            emails: req.session.item.accessControlList,
-        };
-    }
-    return {};
+    return {
+        status: req.session.item.publicationStatus,
+        visibility: req.session.item.accessType,
+        emails: req.session.item.accessControlList,
+    };
 }

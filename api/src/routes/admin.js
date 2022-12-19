@@ -104,11 +104,19 @@ async function importItemsFromStorageIntoTheDb(req) {
     const configuration = req.session.configuration;
     let items = (await listObjects({ prefix: `/${configuration.api.domain}/item` })) || [];
     items = items.map((i) => ({ identifier: i }));
+
+    // insert any items found on the backend storage not already in the DB
     for (let item of items) {
         await models.item.findOrCreate({
             where: { identifier: item.identifier },
         });
     }
+
+    // ensure all existing items and collections have a publicationStatus
+    await models.item.update(
+        { publicationStatus: "inProgress" },
+        { where: { publicationStatus: null } }
+    );
     return {};
 }
 
@@ -118,11 +126,19 @@ async function importCollectionsFromStorageIntoTheDb(req) {
     let collections =
         (await listObjects({ prefix: `/${configuration.api.domain}/collection` })) || [];
     collections = collections.map((i) => ({ identifier: i }));
+
+    // insert any collections found on the backend storage not already in the DB
     for (let collection of collections) {
         await models.collection.findOrCreate({
             where: { identifier: collection.identifier },
         });
     }
+
+    // ensure all existing items and collections have a publicationStatus
+    await models.collection.update(
+        { publicationStatus: "inProgress" },
+        { where: { publicationStatus: null } }
+    );
     return {};
 }
 

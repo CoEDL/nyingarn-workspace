@@ -49,7 +49,7 @@ export async function requireCollectionAccess(req, res) {
 
 export async function requireItemAccess(req, res) {
     if (!req.body?.identifier && !req.params?.identifier) {
-        return res.badRequest(`No identifier defined in body or params`);
+        return res.badRequest(`Identifier not defined`);
     }
     const identifier = req.body?.identifier ? req.body?.identifier : req.params?.identifier;
     let item;

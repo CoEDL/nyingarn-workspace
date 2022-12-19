@@ -1,5 +1,11 @@
 import models from "../models/index.js";
-import { logEvent, getLogger, getStoreHandle, demandAuthenticatedUser } from "../common/index.js";
+import {
+    logEvent,
+    getLogger,
+    getStoreHandle,
+    demandAuthenticatedUser,
+    requireCollectionAccess,
+} from "../common/index.js";
 import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
 import {
@@ -14,7 +20,7 @@ const log = getLogger();
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
-    fastify.addHook("preHandler", verifyCollectionAccess);
+    fastify.addHook("preHandler", requireCollectionAccess);
 
     // user routes
     fastify.get("/collections", getCollectionsHandler);
@@ -26,19 +32,6 @@ export function setupRoutes(fastify, options, done) {
     fastify.get("/collections/:identifier/users", getCollectionUsers);
     fastify.delete("/collections/:identifier", deleteCollectionHandler);
     done();
-}
-
-async function verifyCollectionAccess(req, res) {
-    if (!req.params.identifier) return;
-
-    let collection = await lookupCollectionByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!collection) {
-        return res.forbidden(`You don't have permission to access this endpoint`);
-    }
-    req.session.collection = collection;
 }
 
 async function getCollectionsHandler(req) {

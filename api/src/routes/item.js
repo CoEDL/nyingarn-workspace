@@ -1,5 +1,11 @@
 import models from "../models/index.js";
-import { logEvent, getLogger, getStoreHandle, demandAuthenticatedUser } from "../common/index.js";
+import {
+    logEvent,
+    getLogger,
+    getStoreHandle,
+    demandAuthenticatedUser,
+    requireItemAccess,
+} from "../common/index.js";
 import lodashPkg from "lodash";
 const { groupBy, isEmpty } = lodashPkg;
 import {
@@ -23,13 +29,9 @@ import {
 import { transformDocument } from "../lib/transform.js";
 const log = getLogger();
 
-// function routeItem(handler) {
-//     return compact(flattenDeep([...route(), verifyItemAccess, handler]));
-// }
-
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
-    fastify.addHook("preHandler", verifyItemAccess);
+    fastify.addHook("preHandler", requireItemAccess);
 
     fastify.get("/items", getItemsHandler);
     fastify.get("/items/:identifier", getItemHandler);
@@ -65,19 +67,6 @@ export function setupRoutes(fastify, options, done) {
     );
     fastify.post("/items/:identifier/resources/processing-status", postResourceProcessingStatus);
     done();
-}
-
-async function verifyItemAccess(req, res) {
-    if (!req.params.identifier) return;
-
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return res.forbidden(`You don't have permission to access this endpoint`);
-    }
-    req.session.item = item;
 }
 
 async function getItemsHandler(req) {
@@ -384,6 +373,7 @@ async function postResourceProcessingStatus(req) {
     tasks = Object.keys(tasks).map((r) => tasks[r].shift());
     return { tasks };
 }
+
 // TODO: this method does not have tests
 async function getTransformTeiDocumentHandler(req) {
     const { identifier, resource } = req.params;

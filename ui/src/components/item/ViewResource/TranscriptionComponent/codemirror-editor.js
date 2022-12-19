@@ -59,6 +59,7 @@ export class CodemirrorEditorControls {
             };
             this.dispatch({ changes });
         } catch (error) {
+            return { error };
             // couldn't format - likely not an XML document
         }
     }

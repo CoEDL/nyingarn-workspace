@@ -158,6 +158,7 @@ import { CodemirrorEditorControls } from "./codemirror-editor.js";
 import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
+import { ElMessage } from "element-plus";
 
 const $http = inject("$http");
 const $route = useRoute();
@@ -189,7 +190,8 @@ onMounted(async () => {
     data.transcription = await loadTranscription();
     ({ view } = setupCodeMirror());
     nextTick(() => {
-        new CodemirrorEditorControls({ view }).formatDocument({});
+        new CodemirrorEditorControls({ view });
+        format();
     });
 });
 onBeforeUnmount(async () => {
@@ -255,11 +257,14 @@ function deleteTranscription() {
 function convertToTei() {
     editorControls.convertToTei({ $route });
     nextTick(() => {
-        editorControls.formatDocument({});
+        format();
     });
 }
 function format() {
-    editorControls.formatDocument({});
+    let { error } = editorControls.formatDocument({});
+    if (error) {
+        ElMessage.error("There is a problem with the XML.");
+    }
 }
 async function save() {
     let document = view.state.doc.toString();
@@ -268,13 +273,12 @@ async function save() {
         body: { datafiles: props.data, document },
     });
     data.saved = true;
-    editorControls.formatDocument({});
+    format();
 
     setTimeout(() => {
         data.saved = false;
     }, 1500);
 }
-
 async function reprocessPageAsTable() {
     const dateFrom = new Date();
     let response = await $http.post({

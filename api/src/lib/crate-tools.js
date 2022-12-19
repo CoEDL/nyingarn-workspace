@@ -15,7 +15,7 @@ export async function registerAllFiles({ store, crate }) {
         ].includes(file.Key);
     });
     files = files.filter((file) => !file.Key.match(/^\./));
-    if (!files.length) return { crate };
+    if (!files.length) return crate;
 
     // determine which files not already registered in the crate
     const filesInBucket = files.map((file) => file.Key);

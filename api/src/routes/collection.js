@@ -55,6 +55,7 @@ async function getCollectionsHandler(req) {
             name: c.identifier,
             private: c.data?.private,
             type: "collection",
+            publicationStatus: c.publicationStatus,
             items: groupBy(
                 c.items.map((i) => ({ type: "item", identifier: i.identifier })),
                 "identifier"

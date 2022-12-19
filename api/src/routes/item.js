@@ -91,6 +91,7 @@ async function getItemsHandler(req) {
     let items = rows.map((i) => ({
         name: i.identifier,
         type: "item",
+        publicationStatus: i.publicationStatus,
         collections: groupBy(
             i.collections.map((c) => ({
                 type: "collection",
@@ -99,7 +100,6 @@ async function getItemsHandler(req) {
             "identifier"
         ),
     }));
-
     return { total: count, items };
 }
 

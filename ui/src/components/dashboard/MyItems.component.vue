@@ -29,7 +29,7 @@
                         }}</router-link>
                     </template>
                 </el-table-column>
-                <el-table-column prop="status" label="Publication Status" width="150">
+                <el-table-column prop="status" label="Status" width="150">
                     <template #default="scope">
                         <status-badge-component :status="scope.row.publicationStatus" />
                     </template>

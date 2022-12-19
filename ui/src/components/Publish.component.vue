@@ -31,8 +31,20 @@
                 true-label="agreed"
             />
         </div>
-        <div class="" v-else v-loading="data.loading">
+        <div v-else v-loading="data.loading" class="flex flex-col">
             <el-form :model="data.form" label-width="150px" @submit.prevent>
+                <el-form-item label="Status">
+                    <div
+                        v-if="data.status"
+                        class="py-1 px-4 rounded"
+                        :class="{
+                            'bg-orange-500': data.status === 'Awaiting Review',
+                            'bg-green-500': data.status === 'Published',
+                        }"
+                    >
+                        {{ data.status }}
+                    </div>
+                </el-form-item>
                 <el-form-item label="Your Identifier">
                     <el-input v-model="data.user.identifier" />
                     <div class="text-gray-700">
@@ -78,7 +90,7 @@
 
 <script setup>
 import { reactive, watch, inject, onMounted } from "vue";
-import { uniq, flattenDeep } from "lodash";
+import { uniq, flattenDeep, startCase } from "lodash";
 import { useRoute } from "vue-router";
 import { isEmail } from "validator";
 const $route = useRoute();
@@ -125,6 +137,7 @@ async function getPublicationStatus() {
         response = await response.json();
         if (response?.status) {
             if (props.type === "item") {
+                data.status = startCase(response.status);
                 data.checked = ["agreed", "agreed", "agreed"];
                 data.form.visibility = response.visibility;
                 data.form.emails = response?.emails.join("\n");
@@ -172,6 +185,7 @@ async function publish() {
         route: `/publish/${$route.meta.type}/${$route.params.identifier}`,
         body: { data: formData },
     });
+    getPublicationStatus();
     data.loading = false;
 }
 </script>

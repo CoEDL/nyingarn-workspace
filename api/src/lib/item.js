@@ -1,5 +1,5 @@
 import models from "../models/index.js";
-import { Op } from "sequelize";
+import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import { loadConfiguration, getS3Handle, getStoreHandle } from "../common/index.js";
 import path from "path";
 import fsExtraPkg from "fs-extra";
@@ -33,7 +33,7 @@ export async function lookupItemByIdentifier({ identifier, userId }) {
 
 export async function getItems({ userId, offset = 0, limit = 10, match }) {
     const query = {
-        order: [["identifier", "ASC"]],
+        order: [[seqFn("lower", seqCol("item.identifier")), "ASC"]],
     };
     let include = [{ model: models.collection }];
     if (userId) include.push({ model: models.user, where: { id: userId } });

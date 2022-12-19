@@ -1,5 +1,5 @@
 import models from "../models/index.js";
-import { Op } from "sequelize";
+import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import { getStoreHandle } from "../common/index.js";
 
 export async function lookupCollectionByIdentifier({ identifier, userId }) {
@@ -17,7 +17,7 @@ export async function lookupCollectionByIdentifier({ identifier, userId }) {
 
 export async function getCollections({ userId, offset = 0, limit = 10, match }) {
     const query = {
-        order: [["identifier", "ASC"]],
+        order: [[seqFn("lower", seqCol("collection.identifier")), "ASC"]],
     };
     let include = [{ model: models.item }, { model: models.collection, as: "subCollection" }];
     if (userId) include.push({ model: models.user, where: { id: userId } });

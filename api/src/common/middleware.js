@@ -36,8 +36,9 @@ export async function requireCollectionAccess(req, res) {
         return res.badRequest(`Identifier not defined`);
     }
 
+    let collection;
     try {
-        let collection = await lookupCollectionByIdentifier({
+        collection = await lookupCollectionByIdentifier({
             identifier: req.params.identifier,
             userId: req.session.user.id,
         });

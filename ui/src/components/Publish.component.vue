@@ -34,16 +34,7 @@
         <div v-else v-loading="data.loading" class="flex flex-col">
             <el-form :model="data.form" label-width="150px" @submit.prevent>
                 <el-form-item label="Status">
-                    <div
-                        v-if="data.status"
-                        class="py-1 px-4 rounded"
-                        :class="{
-                            'bg-orange-500': data.status === 'Awaiting Review',
-                            'bg-green-500': data.status === 'Published',
-                        }"
-                    >
-                        {{ data.status }}
-                    </div>
+                    <status-badge-component :status="data.status" />
                 </el-form-item>
                 <el-form-item label="Your Identifier">
                     <el-input v-model="data.user.identifier" />
@@ -89,6 +80,7 @@
 </template>
 
 <script setup>
+import StatusBadgeComponent from "./StatusBadge.component.vue";
 import { reactive, watch, inject, onMounted } from "vue";
 import { uniq, flattenDeep, startCase } from "lodash";
 import { useRoute } from "vue-router";
@@ -106,6 +98,7 @@ const props = defineProps({
 const data = reactive({
     loading: false,
     user: {},
+    status: undefined,
     form: {
         orcid: "",
         visibility: "open",
@@ -137,13 +130,18 @@ async function getPublicationStatus() {
         response = await response.json();
         if (response?.status) {
             if (props.type === "item") {
-                data.status = startCase(response.status);
-                data.checked = ["agreed", "agreed", "agreed"];
+                data.status = response.status;
                 data.form.visibility = response.visibility;
-                data.form.emails = response?.emails.join("\n");
-            } else {
-                data.checked = ["agreed", "agreed"];
+                data.form.emails = response?.emails?.join("\n");
+                if (data.status !== "inProgress") {
+                    data.checked = ["agreed", "agreed", "agreed"];
+                }
+            } else if (props.type === "collection") {
+                data.status = response.status;
                 data.form.visibility = "open";
+                if (data.status !== "inProgress") {
+                    data.checked = ["agreed", "agreed"];
+                }
             }
         }
     }

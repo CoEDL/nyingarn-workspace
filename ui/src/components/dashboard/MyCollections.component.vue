@@ -33,6 +33,11 @@
                         }}</router-link>
                     </template>
                 </el-table-column>
+                <el-table-column prop="status" label="Publication Status" width="150">
+                    <template #default="scope">
+                        <status-badge-component :status="scope.row.publicationStatus" />
+                    </template>
+                </el-table-column>
                 <el-table-column label="Actions" width="150" align="center">
                     <template #default="scope">
                         <div class="flex flex-row space-x-1">
@@ -85,6 +90,7 @@
 </template>
 
 <script setup>
+import StatusBadgeComponent from "../StatusBadge.component.vue";
 import { ElMessage } from "element-plus";
 import { orderBy } from "lodash";
 import * as collectionServices from "../collection/collection-services";
@@ -128,8 +134,6 @@ async function loadCollections() {
         ...c,
         link: `/collections/${c.name}/metadata`,
     }));
-    collections = orderBy(collections, "name");
-
     data.collections = [...collections];
 }
 function pageCollections(page) {

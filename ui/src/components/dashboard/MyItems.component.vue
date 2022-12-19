@@ -29,6 +29,11 @@
                         }}</router-link>
                     </template>
                 </el-table-column>
+                <el-table-column prop="status" label="Publication Status" width="150">
+                    <template #default="scope">
+                        <status-badge-component :status="scope.row.publicationStatus" />
+                    </template>
+                </el-table-column>
                 <el-table-column prop="total" label="Pages" width="100"> </el-table-column>
                 <el-table-column label="Actions" width="100" align="center">
                     <template #default="scope">
@@ -62,6 +67,7 @@
 </template>
 
 <script setup>
+import StatusBadgeComponent from "../StatusBadge.component.vue";
 import { ElMessage } from "element-plus";
 import { orderBy } from "lodash";
 import * as itemServices from "../item/item-services";
@@ -106,7 +112,6 @@ async function loadItems() {
         link: `/items/${i.name}/view`,
         statistics: {},
     }));
-    items = orderBy(items, "name");
     data.items = [...items];
 
     for (let item of data.items) {

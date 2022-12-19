@@ -1,9 +1,4 @@
-import {
-    listObjects,
-    loadConfiguration,
-    demandAdministrator,
-    demandAuthenticatedUser,
-} from "../common/index.js";
+import { listObjects, demandAdministrator, demandAuthenticatedUser } from "../common/index.js";
 import { createItem, lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
 import {
     createCollection,
@@ -12,7 +7,7 @@ import {
     getCollections,
 } from "../lib/collection.js";
 import models from "../models/index.js";
-import { Op } from "sequelize";
+import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
 
@@ -43,7 +38,6 @@ async function getAdminEntriesItemsHandler(req) {
             [Op.startsWith]: prefix,
         };
     }
-    console.log(where);
     let myItems = await models.item.findAll({
         where,
         include: [{ model: models.user, where: { id: req.session.user.id } }],
@@ -56,6 +50,7 @@ async function getAdminEntriesItemsHandler(req) {
         where,
         offset,
         limit,
+        order: [[seqFn("lower", seqCol("identifier")), "ASC"]],
         attributes: ["identifier"],
         raw: true,
     });
@@ -81,13 +76,13 @@ async function getAdminEntriesCollectionsHandler(req) {
         attributes: ["identifier"],
         raw: true,
     });
-    console.log(where);
     myCollections = groupBy(myCollections, "identifier");
 
     let { count: collectionsTotal, rows: collections } = await models.collection.findAndCountAll({
         where,
         offset,
         limit,
+        order: [[seqFn("lower", seqCol("identifier")), "ASC"]],
         attributes: ["identifier"],
         raw: true,
     });

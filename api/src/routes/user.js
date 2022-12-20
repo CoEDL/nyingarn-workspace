@@ -1,5 +1,9 @@
 import { logEvent, demandAdministrator, demandAuthenticatedUser } from "../common/index.js";
 import {
+<<<<<<< HEAD
+=======
+    getUser,
+>>>>>>> c15dea7 (add handler for user to get self information)
     getUsers,
     deleteUser,
     toggleUserCapability,

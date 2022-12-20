@@ -1,48 +1,65 @@
 <template>
     <div class="flex flex-col space-y-10">
-        <el-table :data="data.items" style="width: 100%">
-            <el-table-column prop="identifier" label="Identifier" width="300">
-                <template #default="scope">
-                    <div class="cursor-pointer" @click="loadItem(scope.row.identifier)">
-                        {{ scope.row.identifier }}
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column prop="publicationStatusLogs" label="Logs" />
-            <el-table-column prop="actions" label="Actions" width="300">
-                <template #default="scope">
-                    <el-button @click="deposit('items', scope.row.identifier)" type="primary">
-                        Deposit
-                    </el-button>
-                    <el-button @click="needsWork('items', scope.row.identifier)" type="danger">
-                        Needs Work
-                    </el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <el-table :data="data.collections" style="width: 100%">
-            <el-table-column prop="identifier" label="Identifier" width="300">
-                <template #default="scope">
-                    <div class="cursor-pointer" @click="loadCollection(scope.row.identifier)">
-                        {{ scope.row.identifier }}
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column prop="publicationStatusLogs" label="Logs" />
-            <el-table-column prop="actions" label="Actions" width="300">
-                <template #default="scope">
-                    <el-button @click="deposit('collections', scope.row.identifier)" type="primary">
-                        Deposit
-                    </el-button>
-                    <el-button
-                        @click="needsWork('collections', scope.row.identifier)"
-                        type="danger"
-                    >
-                        Needs Work
-                    </el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+        <el-card class="box-card">
+            <template #header>
+                <div class="card-header">
+                    <div class="pt-1">Items</div>
+                </div>
+            </template>
+            <el-table :data="data.items" style="width: 100%">
+                <el-table-column prop="identifier" label="Identifier" width="300">
+                    <template #default="scope">
+                        <div class="cursor-pointer" @click="loadItem(scope.row.identifier)">
+                            {{ scope.row.identifier }}
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="publicationStatusLogs" label="Logs" />
+                <el-table-column prop="actions" label="Actions" width="300">
+                    <template #default="scope">
+                        <el-button @click="deposit('items', scope.row.identifier)" type="primary">
+                            Deposit
+                        </el-button>
+                        <el-button @click="needsWork('items', scope.row.identifier)" type="danger">
+                            Needs Work
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-card>
+        <el-card class="box-card">
+            <template #header>
+                <div class="card-header">
+                    <div class="pt-1">Collections</div>
+                </div>
+            </template>
+            <el-table :data="data.collections" style="width: 100%">
+                <el-table-column prop="identifier" label="Identifier" width="300">
+                    <template #default="scope">
+                        <div class="cursor-pointer" @click="loadCollection(scope.row.identifier)">
+                            {{ scope.row.identifier }}
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="publicationStatusLogs" label="Logs" />
+                <el-table-column prop="actions" label="Actions" width="300">
+                    <template #default="scope">
+                        <el-button
+                            @click="deposit('collections', scope.row.identifier)"
+                            type="primary"
+                        >
+                            Deposit
+                        </el-button>
+                        <el-button
+                            @click="needsWork('collections', scope.row.identifier)"
+                            type="danger"
+                        >
+                            Needs Work
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-card>
     </div>
 </template>
 

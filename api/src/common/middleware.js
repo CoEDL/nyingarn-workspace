@@ -1,4 +1,5 @@
 import { getLogger } from "./logger.js";
+import { getUser } from "../lib/user.js";
 import { verifyToken } from "./jwt.js";
 import { lookupItemByIdentifier } from "../lib/item.js";
 const log = getLogger();

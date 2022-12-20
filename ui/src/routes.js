@@ -9,6 +9,7 @@ import AdminComponent from "@/components/admin/Shell.component.vue";
 import AdminManageUsersComponent from "@/components/admin/users/ManageUsers.component.vue";
 import AdminWhitelistUsersComponent from "@/components/admin/users/WhitelistUsers.component.vue";
 import AdminLogsComponent from "@/components/admin/Logs.component.vue";
+import AdminAwaitingReviewComponent from "@/components/admin/AwaitingReview.component.vue";
 import AdminItemsComponent from "@/components/admin/Items.component.vue";
 import HTTPService from "./http.service";
 import { createRouter, createWebHistory } from "vue-router";
@@ -123,6 +124,12 @@ const routes = [
                         path: "logs",
                         component: AdminLogsComponent,
                         meta: { name: "view system logs" },
+                    },
+                    {
+                        name: "admin.review",
+                        path: "awaiting-review",
+                        component: AdminAwaitingReviewComponent,
+                        meta: { name: "Items and Collections Awaiting Review" },
                     },
                     {
                         name: "admin.items",

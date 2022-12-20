@@ -59,6 +59,11 @@ export default {
                 },
                 { name: "Manage Users", path: "/admin/users", icon: "fa-solid fa-users" },
                 { name: "System Logs", path: "/admin/logs", icon: "fa-solid fa-clipboard-list" },
+                {
+                    name: "Awaiting Review",
+                    path: "/admin/awaiting-review",
+                    icon: "fa-solid fa-magnifying-glass",
+                },
                 { name: "Workspace Items", path: "/admin/items", icon: "fa-solid fa-file-image" },
             ],
         };

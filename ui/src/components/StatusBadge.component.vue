@@ -13,10 +13,10 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed } from "vue";
 import { startCase } from "lodash";
 const props = defineProps({
     status: { type: [String, undefined], required: true },
 });
-const status = ref(startCase(props.status));
+const status = computed(() => startCase(props.status));
 </script>

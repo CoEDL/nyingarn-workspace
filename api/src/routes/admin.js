@@ -1,4 +1,9 @@
-import { listObjects, demandAdministrator, demandAuthenticatedUser } from "../common/index.js";
+import {
+    listObjects,
+    demandAdministrator,
+    demandAuthenticatedUser,
+    getStoreHandle,
+} from "../common/index.js";
 import { createItem, lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
 import {
     createCollection,
@@ -10,6 +15,9 @@ import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
+import { ROCrate } from "ro-crate";
+import { authorisedUsersFile } from "./publish.js";
+import { getContext } from "../lib/crate-tools.js";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -199,11 +207,90 @@ async function getCollectionsAwaitingReviewHandler(req) {
 
 // TODO: this code does not have tests
 async function getDepositHandler(req) {
-    console.log(req.params);
+    const { type, identifier } = req.params;
+    const className = type === "items" ? "item" : "collection";
+
+    let store = await getStoreHandle({
+        id: identifier,
+        className,
+    });
+
+    let crate;
+    try {
+        crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        crate = new ROCrate(crate, { array: true });
+    } catch (error) {
+        console.log(error);
+        return res.internalServerError();
+    }
+
+    let licence;
+    if (className === "collection") {
+        const collection = await lookupCollectionByIdentifier({ identifier });
+        collection.publicationStatus = "published";
+        await collection.save();
+
+        // write the metadata into the crate
+        licence = {
+            "@id": "LICENCE",
+            "@type": ["File", "DataReuselicence"],
+            name: "Open (subject to agreeing to PDSC access conditions)",
+            access: {
+                "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
+            },
+            authorizationWorkflow: [
+                { "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms" },
+            ],
+        };
+    } else if (className === "item") {
+        const item = await lookupItemByIdentifier({ identifier });
+        item.publicationStatus = "published";
+        await item.save();
+
+        licence = {
+            "@id": "LICENCE",
+            "@type": ["File", "DataReuselicence"],
+            name: "Open (subject to agreeing to PDSC access conditions)",
+            access: {
+                "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
+            },
+            authorizationWorkflow: [
+                { "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms" },
+            ],
+        };
+        if (item.accessType === "restricted") {
+            licence.access = {
+                "@id": "http://purl.archive.org/language-data-commons/terms#AuthorizedAccess",
+            };
+            licence.authorizationWorkflow.push({
+                "@id": "http://purl.archive.org/language-data-commons/terms#AccessControlList",
+            });
+            licence.accessControlList = `file://${authorisedUsersFile}`;
+        }
+    }
+
+    if (crate.getEntity(licence["@id"])) crate.deleteEntity(licence["@id"]);
+    crate.addEntity(licence);
+    crate.rootDataset.licence = licence;
+    crate = crate.toJSON();
+    crate["@context"] = getContext();
+    await store.put({ target: "ro-crate-metadata.json", json: crate });
+
     return {};
 }
 
 // TODO: this code does not have tests
 async function putNeedsWorkHandler(req) {
-    console.log(req.params);
+    const { type, identifier } = req.params;
+    const className = type === "items" ? "item" : "collection";
+
+    if (className === "collection") {
+        const collection = await lookupCollectionByIdentifier({ identifier });
+        collection.publicationStatus = "needsWork";
+        await collection.save();
+    } else if (className === "item") {
+        const item = await lookupItemByIdentifier({ identifier });
+        item.publicationStatus = "needsWork";
+        await item.save();
+    }
 }

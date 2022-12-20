@@ -11,7 +11,7 @@ import validatorPkg from "validator";
 const { isURL } = validatorPkg;
 import { ROCrate } from "ro-crate";
 import { registerAllFiles, getContext } from "../lib/crate-tools.js";
-const authorisedUsersFile = ".authorised-users.json";
+export const authorisedUsersFile = ".authorised-users.json";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -64,21 +64,6 @@ async function postPublishCollectionHandler(req, res) {
     try {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         crate = new ROCrate(crate, { array: true });
-        let licence = {
-            "@id": "LICENCE",
-            "@type": ["File", "DataReuselicence"],
-            name: "Open (subject to agreeing to PDSC access conditions)",
-            access: {
-                "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
-            },
-            authorizationWorkflow: [
-                { "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms" },
-            ],
-        };
-
-        if (crate.getEntity(licence["@id"])) crate.deleteEntity(licence["@id"]);
-        crate.addEntity(licence);
-        crate.rootDataset.licence = licence;
 
         crate.addEntity(req.body.data.user);
         let depositor = crate.rootDataset.depositor;
@@ -130,8 +115,8 @@ async function postPublishItemHandler(req, res) {
     req.session.item.accessControlList =
         req.body.data.visibility === "open" ? [] : req.body.data?.emails;
     req.session.item.publicationStatusLogs = [
-        "All pages marked complete",
-        "Permission forms not loaded",
+        "all pages marked complete",
+        "permission forms not loaded",
     ];
 
     // save the item
@@ -153,31 +138,6 @@ async function postPublishItemHandler(req, res) {
     try {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         crate = new ROCrate(crate, { array: true });
-        let licence = {
-            "@id": "LICENCE",
-            "@type": ["File", "DataReuselicence"],
-            name: "Open (subject to agreeing to PDSC access conditions)",
-            access: {
-                "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
-            },
-            authorizationWorkflow: [
-                { "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms" },
-            ],
-        };
-        if (req.body.data.visibility === "restricted") {
-            licence.access = {
-                "@id": "http://purl.archive.org/language-data-commons/terms#AuthorizedAccess",
-            };
-            licence.authorizationWorkflow.push({
-                "@id": "http://purl.archive.org/language-data-commons/terms#AccessControlList",
-            });
-            licence.accessControlList = `file://${authorisedUsersFile}`;
-            await store.put({ target: authorisedUsersFile, json: req.body.data.emails });
-        }
-
-        if (crate.getEntity(licence["@id"])) crate.deleteEntity(licence["@id"]);
-        crate.addEntity(licence);
-        crate.rootDataset.licence = licence;
 
         crate.addEntity(req.body.data.user);
         let depositor = crate.rootDataset.depositor;
@@ -191,6 +151,10 @@ async function postPublishItemHandler(req, res) {
         crate = await registerAllFiles({ store, crate });
         crate = crate.toJSON();
         crate["@context"] = getContext();
+
+        if (req.session.item.accessType === "restricted") {
+            await store.put({ target: authorisedUsersFile, json: req.body.data.emails });
+        }
 
         await store.put({ target: "ro-crate-metadata.json", json: crate });
     } catch (error) {

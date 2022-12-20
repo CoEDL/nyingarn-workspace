@@ -1,4 +1,3 @@
-import { getUser } from "../lib/user.js";
 import { getLogger } from "./logger.js";
 import { getUser } from "../lib/user.js";
 import { verifyToken } from "./jwt.js";

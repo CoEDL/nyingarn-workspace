@@ -1,10 +1,4 @@
-import {
-    routeAdmin,
-    route,
-    logEvent,
-    demandAdministrator,
-    demandAuthenticatedUser,
-} from "../common/index.js";
+import { logEvent, demandAdministrator, demandAuthenticatedUser } from "../common/index.js";
 import {
     getUsers,
     deleteUser,

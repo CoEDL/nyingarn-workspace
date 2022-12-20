@@ -3,11 +3,10 @@ export { getLogger, logEvent, log } from "./logger.js";
 export { submitTask, registerTask } from "./task.js";
 export { getS3Handle, getStoreHandle } from "./getS3Handle.js";
 export {
-    route,
-    routeAdmin,
     demandAuthenticatedUser,
     demandAdministrator,
-    requireIdentifierAccess,
+    requireCollectionAccess,
+    requireItemAccess,
 } from "./middleware.js";
 export { generateToken, verifyToken } from "./jwt.js";
 export { host, headers, TestSetup, generateLogs, setupTestItem } from "./test-utils.js";

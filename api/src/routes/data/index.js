@@ -1,6 +1,6 @@
 import {
     getLogger,
-    requireIdentifierAccess,
+    requireItemAccess,
     demandAuthenticatedUser,
     getStoreHandle,
     submitTask,
@@ -15,22 +15,22 @@ export function setupRoutes(fastify, options, done) {
     fastify.get("/upload/pre-create", authenticateTusRequest);
     fastify.get(
         "/upload/pre-create/:itemType/:identifier",
-        { preHandler: requireIdentifierAccess },
+        { preHandler: requireItemAccess },
         getItemPath
     );
     fastify.get(
         "/upload/post-finish/:identifier/:resource",
-        { preHandler: requireIdentifierAccess },
+        { preHandler: requireItemAccess },
         triggerProcessing
     );
     fastify.post(
         "/process/post-finish/:identifier/:resource",
-        { preHandler: requireIdentifierAccess },
+        { preHandler: requireItemAccess },
         triggerProcessing
     );
     fastify.post(
         "/process/extract-table/:identifier/:resource",
-        { preHandler: requireIdentifierAccess },
+        { preHandler: requireItemAccess },
         extractTableHandler
     );
     done();

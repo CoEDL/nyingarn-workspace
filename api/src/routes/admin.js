@@ -20,13 +20,19 @@ export function setupRoutes(fastify, options, done) {
     fastify.get("/admin/entries/collections", getAdminEntriesCollectionsHandler);
 
     fastify.get("/admin/items/import", importItemsFromStorageIntoTheDb);
+    fastify.get("/admin/items/awaiting-review", getItemsAwaitingReviewHandler);
     fastify.put("/admin/items/:identifier/connect-user", putAdminItemUserHandler);
 
     fastify.get("/admin/collections/import", importCollectionsFromStorageIntoTheDb);
+    fastify.get("/admin/collections/awaiting-review", getCollectionsAwaitingReviewHandler);
     fastify.put("/admin/collections/:identifier/connect-user", putAdminCollectionUserHandler);
+
+    fastify.get("/admin/:type/:identifier/deposit", getDepositHandler);
+    fastify.put("/admin/:type/:identifier/needsWork", putNeedsWorkHandler);
     done();
 }
 
+// TODO: this code does not have tests
 async function getAdminEntriesItemsHandler(req) {
     let { prefix, offset } = req.query;
     if (!offset) offset = 0;
@@ -59,6 +65,7 @@ async function getAdminEntriesItemsHandler(req) {
     return { items, itemsTotal };
 }
 
+// TODO: this code does not have tests
 async function getAdminEntriesCollectionsHandler(req) {
     let { prefix, offset } = req.query;
     if (!offset) offset = 0;
@@ -160,4 +167,43 @@ async function putAdminCollectionUserHandler(req) {
         });
     }
     return {};
+}
+
+// TODO: this code does not have tests
+async function getItemsAwaitingReviewHandler(req) {
+    let items = await models.item.findAll({
+        where: { publicationStatus: "awaitingReview" },
+        attributes: ["identifier", "publicationStatus", "publicationStatusLogs"],
+    });
+    if (items) {
+        items = items.map((item) => item.get());
+        return { items };
+    } else {
+        return [];
+    }
+}
+
+// TODO: this code does not have tests
+async function getCollectionsAwaitingReviewHandler(req) {
+    let collections = await models.collection.findAll({
+        where: { publicationStatus: "awaitingReview" },
+        attributes: ["identifier", "publicationStatus", "publicationStatusLogs"],
+    });
+    if (collections) {
+        collections = collections.map((collection) => collection.get());
+        return { collections };
+    } else {
+        return [];
+    }
+}
+
+// TODO: this code does not have tests
+async function getDepositHandler(req) {
+    console.log(req.params);
+    return {};
+}
+
+// TODO: this code does not have tests
+async function putNeedsWorkHandler(req) {
+    console.log(req.params);
 }

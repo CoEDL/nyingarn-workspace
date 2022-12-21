@@ -42,7 +42,6 @@ export function setupRoutes(fastify, options, done) {
     done();
 }
 
-// TODO: this code does not have tests
 async function getUserSelfInformationHandler(req) {
     let user = await getUser({ userId: req.session.user.id });
     return { user };

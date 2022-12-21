@@ -13,6 +13,7 @@ import {
     listItemResourceFiles,
     itemResourceExists,
     markResourceComplete,
+    markAllResourcesComplete,
     isResourceComplete,
 } from "./item";
 const chance = require("chance").Chance();
@@ -219,6 +220,21 @@ describe("Item management tests", () => {
         await markResourceComplete({ identifier, resource: `${identifier}-01`, complete: false });
         status = await isResourceComplete({ identifier, resource: `${identifier}-01` });
         expect(status).toBeFalse;
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to mark all resources as complete", async () => {
+        let user = users.filter((u) => !u.administrator)[0];
+        let { item } = await setupTestItem({ identifier, store, user });
+
+        await markAllResourcesComplete({
+            identifier,
+            resources: [`${identifier}-01`],
+            complete: true,
+        });
+        let status = await isResourceComplete({ identifier, resource: `${identifier}-01` });
+        expect(status).toBeTrue;
 
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });

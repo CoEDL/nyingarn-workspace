@@ -301,7 +301,6 @@ export async function markResourceComplete({ identifier, resource, complete = fa
     await store.put({ json: status, target: completedResources, registerFile: false });
 }
 
-// TODO does not have tests yet
 export async function markAllResourcesComplete({ identifier, resources, complete = true }) {
     let store = await getStoreHandle({ id: identifier, className: "item" });
     if (!(await store.itemExists())) {

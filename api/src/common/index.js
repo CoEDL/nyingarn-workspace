@@ -9,7 +9,14 @@ export {
     requireItemAccess,
 } from "./middleware.js";
 export { generateToken, verifyToken } from "./jwt.js";
-export { host, headers, TestSetup, generateLogs, setupTestItem } from "./test-utils.js";
+export {
+    host,
+    headers,
+    TestSetup,
+    generateLogs,
+    setupTestItem,
+    setupTestCollection,
+} from "./test-utils.js";
 
 import path from "path";
 import { getS3Handle } from "./getS3Handle.js";

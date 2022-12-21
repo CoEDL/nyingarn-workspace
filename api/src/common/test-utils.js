@@ -7,6 +7,7 @@ const chance = Chance();
 import lodashPkg from "lodash";
 const { range, cloneDeep } = lodashPkg;
 import { createItem } from "../lib/item.js";
+import { createCollection } from "../lib/collection.js";
 import { getS3Handle } from "./getS3Handle.js";
 
 const bucketName = "testing";
@@ -103,8 +104,6 @@ export async function generateLogs(info, warn, error) {
 
 export async function setupTestItem({ identifier, store, user }) {
     let item = await createItem({ identifier, userId: user.id });
-    expect(item.identifier).toEqual(identifier);
-
     await store.put({
         batch: [
             {
@@ -126,4 +125,9 @@ export async function setupTestItem({ identifier, store, user }) {
         ],
     });
     return { item };
+}
+
+export async function setupTestCollection({ identifier, user }) {
+    let collection = await createCollection({ identifier, userId: user.id });
+    return { collection };
 }

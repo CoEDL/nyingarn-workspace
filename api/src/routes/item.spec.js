@@ -433,44 +433,4 @@ describe("Item management route tests", () => {
 
         await deleteItem({ id: item.id });
     });
-    it("an admin should be able to get a list of all items in the space", async () => {
-        //  setup as a normal user
-        let user = users.filter((u) => !u.administrator)[0];
-        let session = await createSession({ user });
-        let { item } = await setupTestItem({ identifier, store, user });
-
-        // setup and connect as an admin
-        let adminUser = users.filter((u) => u.administrator)[0];
-        session = await createSession({ user: adminUser });
-
-        let response = await fetch(`${host}/admin/entries`, {
-            method: "GET",
-            headers: headers(session),
-        });
-        response = await response.json();
-        expect(response.items.length).toBeGreaterThanOrEqual(1);
-
-        await models.item.destroy({ where: {} });
-    });
-    it("should be able to attach an item to the admin user", async () => {
-        let identifiers = [];
-        let items = [];
-        //  setup as a normal user
-        let user = users.filter((u) => !u.administrator)[0];
-        let session = await createSession({ user });
-        let { item } = await setupTestItem({ identifier, store, user });
-
-        // connect as an admin
-        let adminUser = users.filter((u) => u.administrator)[0];
-        session = await createSession({ user: adminUser });
-
-        let response = await fetch(`${host}/admin/items/${identifier}/connect-user`, {
-            method: "PUT",
-            headers: headers(session),
-            body: JSON.stringify({}),
-        });
-        expect(response.status).toEqual(200);
-
-        await models.item.destroy({ where: {} });
-    });
 });

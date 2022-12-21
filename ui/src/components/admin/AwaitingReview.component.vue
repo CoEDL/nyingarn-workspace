@@ -111,7 +111,7 @@ async function deposit(type, identifier) {
     }
 }
 async function needsWork(type, identifier) {
-    let response = await $http.put({ route: `/admin/${type}/${identifier}/needsWork` });
+    let response = await $http.put({ route: `/admin/${type}/${identifier}/needs-work` });
     if (response.status === 200) {
         getItemsAwaitingReview();
         getCollectionsAwaitingReview();

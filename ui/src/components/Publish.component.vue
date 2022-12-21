@@ -123,8 +123,10 @@ async function getUserData() {
     data.user = { ...response.user };
 }
 async function getPublicationStatus() {
+    let routePath = $route.meta.type === "item" ? "items" : "collections";
+
     let response = await $http.get({
-        route: `/publish/${$route.meta.type}/${$route.params.identifier}/status`,
+        route: `/publish/${routePath}/${$route.params.identifier}/status`,
     });
     if (response.status === 200) {
         response = await response.json();
@@ -159,6 +161,7 @@ function validate() {
     }
 }
 async function publish() {
+    let routePath = $route.meta.type === "item" ? "items" : "collections";
     let emails;
     if (data.form.emails) {
         emails = data.form.emails.split("\n").map((line) => line.split(",").map((e) => e.trim()));
@@ -180,7 +183,7 @@ async function publish() {
 
     data.loading = true;
     await $http.post({
-        route: `/publish/${$route.meta.type}/${$route.params.identifier}`,
+        route: `/publish/${routePath}/${$route.params.identifier}`,
         body: { data: formData },
     });
     getPublicationStatus();

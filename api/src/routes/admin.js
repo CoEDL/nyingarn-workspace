@@ -4,12 +4,11 @@ import {
     demandAuthenticatedUser,
     getStoreHandle,
 } from "../common/index.js";
-import { createItem, lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
+import { createItem, lookupItemByIdentifier, linkItemToUser } from "../lib/item.js";
 import {
     createCollection,
     lookupCollectionByIdentifier,
     linkCollectionToUser,
-    getCollections,
 } from "../lib/collection.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
@@ -36,11 +35,10 @@ export function setupRoutes(fastify, options, done) {
     fastify.put("/admin/collections/:identifier/connect-user", putAdminCollectionUserHandler);
 
     fastify.get("/admin/:type/:identifier/deposit", getDepositHandler);
-    fastify.put("/admin/:type/:identifier/needsWork", putNeedsWorkHandler);
+    fastify.put("/admin/:type/:identifier/needs-work", putNeedsWorkHandler);
     done();
 }
 
-// TODO: this code does not have tests
 async function getAdminEntriesItemsHandler(req) {
     let { prefix, offset } = req.query;
     if (!offset) offset = 0;
@@ -73,7 +71,6 @@ async function getAdminEntriesItemsHandler(req) {
     return { items, itemsTotal };
 }
 
-// TODO: this code does not have tests
 async function getAdminEntriesCollectionsHandler(req) {
     let { prefix, offset } = req.query;
     if (!offset) offset = 0;
@@ -109,7 +106,6 @@ async function getAdminEntriesCollectionsHandler(req) {
     return { collections, collectionsTotal };
 }
 
-// TODO: this code does not have tests
 async function importItemsFromStorageIntoTheDb(req) {
     const configuration = req.session.configuration;
     let items = (await listObjects({ prefix: `/${configuration.api.domain}/item` })) || [];
@@ -130,7 +126,6 @@ async function importItemsFromStorageIntoTheDb(req) {
     return {};
 }
 
-// TODO: this code does not have tests
 async function importCollectionsFromStorageIntoTheDb(req) {
     const configuration = req.session.configuration;
     let collections =
@@ -152,33 +147,25 @@ async function importCollectionsFromStorageIntoTheDb(req) {
     return {};
 }
 
-// TODO: this code does not have tests
 async function putAdminItemUserHandler(req) {
     let item = await lookupItemByIdentifier({ identifier: req.params.identifier });
-    if (item) {
-        await linkItemToUser({ itemId: item.id, userId: req.session.user.id });
-    } else {
-        item = await createItem({ identifier: req.params.identifier, userId: req.session.user.id });
+    if (!item) {
+        return res.internalServerError();
     }
+    await linkItemToUser({ itemId: item.id, userId: req.session.user.id });
     return {};
 }
 
-// TODO: this code does not have tests
 async function putAdminCollectionUserHandler(req) {
     let collection = await lookupCollectionByIdentifier({ identifier: req.params.identifier });
-    if (collection) {
-        await linkCollectionToUser({ collectionId: collection.id, userId: req.session.user.id });
-    } else {
-        collection = await createCollection({
-            identifier: req.params.identifier,
-            userId: req.session.user.id,
-        });
+    if (!collection) {
+        return res.internalServerError();
     }
+    await linkCollectionToUser({ collectionId: collection.id, userId: req.session.user.id });
     return {};
 }
 
-// TODO: this code does not have tests
-async function getItemsAwaitingReviewHandler(req) {
+async function getItemsAwaitingReviewHandler() {
     let items = await models.item.findAll({
         where: { publicationStatus: "awaitingReview" },
         attributes: ["identifier", "publicationStatus", "publicationStatusLogs"],
@@ -191,8 +178,7 @@ async function getItemsAwaitingReviewHandler(req) {
     }
 }
 
-// TODO: this code does not have tests
-async function getCollectionsAwaitingReviewHandler(req) {
+async function getCollectionsAwaitingReviewHandler() {
     let collections = await models.collection.findAll({
         where: { publicationStatus: "awaitingReview" },
         attributes: ["identifier", "publicationStatus", "publicationStatusLogs"],
@@ -205,11 +191,9 @@ async function getCollectionsAwaitingReviewHandler(req) {
     }
 }
 
-// TODO: this code does not have tests
 async function getDepositHandler(req) {
     const { type, identifier } = req.params;
     const className = type === "items" ? "item" : "collection";
-
     let store = await getStoreHandle({
         id: identifier,
         className,
@@ -279,8 +263,7 @@ async function getDepositHandler(req) {
     return {};
 }
 
-// TODO: this code does not have tests
-async function putNeedsWorkHandler(req) {
+async function putNeedsWorkHandler(req, res) {
     const { type, identifier } = req.params;
     const className = type === "items" ? "item" : "collection";
 

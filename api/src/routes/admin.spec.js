@@ -11,8 +11,6 @@ import {
     setupTestItem,
     setupTestCollection,
 } from "../common/index.js";
-import { deleteItem } from "../lib/item.js";
-import { deleteCollection } from "../lib/collection.js";
 import models from "../models/index.js";
 
 describe("Admin route tests", () => {
@@ -270,7 +268,7 @@ describe("Admin route tests", () => {
         await storeItem.deleteItem();
         await storeCollection.deleteItem();
     });
-    it("should be able to publish an item", async () => {
+    it("should be able to deposit an item (mark it as published)", async () => {
         let storeItem = await getStoreHandle({
             id: identifier,
             className: "item",

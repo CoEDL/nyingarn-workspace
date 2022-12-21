@@ -1,6 +1,5 @@
 import { logEvent, demandAdministrator, demandAuthenticatedUser } from "../common/index.js";
 import {
-    getUser,
     getUsers,
     deleteUser,
     toggleUserCapability,

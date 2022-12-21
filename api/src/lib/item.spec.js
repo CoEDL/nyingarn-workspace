@@ -193,7 +193,7 @@ describe("Item management tests", () => {
         let { item } = await setupTestItem({ identifier, store, user });
 
         let data = await getItemResourceLink({ identifier, resource: `${identifier}-01.json` });
-        expect(data).toMatch("https://s3.nyingarn.net");
+        expect(data).toMatch("http://s3:9000");
 
         await item.destroy();
     });

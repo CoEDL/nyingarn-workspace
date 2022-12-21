@@ -7,4 +7,6 @@ module.exports = {
     transform: {
         "\\.[jt]sx?$": ["babel-jest", { rootMode: "upward" }],
     },
+    globalSetup: "<rootDir>/common/test-global-setup.cjs",
+    globalTeardown: "<rootDir>/common/test-global-teardown.cjs",
 };

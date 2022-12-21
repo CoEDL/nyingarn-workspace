@@ -30,20 +30,8 @@ export class TestSetup {
         const userEmail = chance.email();
         const adminEmail = chance.email();
         let configuration = await loadConfiguration();
-        this.originalConfiguration = configuration;
-
-        let devConfiguration = cloneDeep(configuration);
-        devConfiguration.api.administrators = [adminEmail];
-        devConfiguration.api.services.s3.bucket = bucketName;
 
         let { s3, bucket } = await getS3Handle({ configuration });
-        if (!(await s3.bucketExists({ bucket: bucketName }))) {
-            await s3.createBucket({ bucket: bucketName });
-        }
-
-        await writeJSON("/srv/configuration/development-configuration.json", devConfiguration, {
-            spaces: 4,
-        });
         return { userEmail, adminEmail, configuration, bucket };
     }
 
@@ -79,13 +67,10 @@ export class TestSetup {
     }
 
     async teardownAfterAll(configuration) {
-        await writeJSON(
-            "/srv/configuration/development-configuration.json",
-            this.originalConfiguration,
-            {
-                spaces: 4,
-            }
-        );
+        await models.log.truncate();
+        await models.collection.destroy({ where: {} });
+        await models.item.destroy({ where: {} });
+        await models.user.destroy({ where: {} });
         models.sequelize.close();
     }
 }

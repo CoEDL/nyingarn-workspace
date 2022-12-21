@@ -4,12 +4,8 @@ import {
     demandAuthenticatedUser,
     getStoreHandle,
 } from "../common/index.js";
-import { createItem, lookupItemByIdentifier, linkItemToUser } from "../lib/item.js";
-import {
-    createCollection,
-    lookupCollectionByIdentifier,
-    linkCollectionToUser,
-} from "../lib/collection.js";
+import { lookupItemByIdentifier, linkItemToUser } from "../lib/item.js";
+import { lookupCollectionByIdentifier, linkCollectionToUser } from "../lib/collection.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import lodashPkg from "lodash";
@@ -17,6 +13,7 @@ const { groupBy } = lodashPkg;
 import { ROCrate } from "ro-crate";
 import { authorisedUsersFile } from "./publish.js";
 import { getContext } from "../lib/crate-tools.js";
+import path from "path";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -216,7 +213,7 @@ async function getDepositHandler(req) {
 
         // write the metadata into the crate
         licence = {
-            "@id": "LICENCE",
+            "@id": req.session.configuration.api.licence,
             "@type": ["File", "DataReuselicence"],
             name: "Open (subject to agreeing to PDSC access conditions)",
             access: {
@@ -232,7 +229,7 @@ async function getDepositHandler(req) {
         await item.save();
 
         licence = {
-            "@id": "LICENCE",
+            "@id": req.session.configuration.api.licence,
             "@type": ["File", "DataReuselicence"],
             name: "Open (subject to agreeing to PDSC access conditions)",
             access: {
@@ -259,6 +256,11 @@ async function getDepositHandler(req) {
     crate = crate.toJSON();
     crate["@context"] = getContext();
     await store.put({ target: "ro-crate-metadata.json", json: crate });
+    await store.put({
+        target: req.session.configuration.api.licence,
+        localPath: path.join(`/srv/configuration/${req.session.configuration.api.licence}`),
+        registerFile: false,
+    });
 
     return {};
 }

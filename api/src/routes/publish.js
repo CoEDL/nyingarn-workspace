@@ -18,21 +18,20 @@ export function setupRoutes(fastify, options, done) {
 
     fastify.register((fastify, options, done) => {
         fastify.addHook("preHandler", requireCollectionAccess);
-        fastify.post("/publish/collection/:identifier", postPublishCollectionHandler);
-        fastify.get("/publish/collection/:identifier/status", getCollectionPublicationStatus);
+        fastify.post("/publish/collections/:identifier", postPublishCollectionHandler);
+        fastify.get("/publish/collections/:identifier/status", getCollectionPublicationStatus);
         done();
     });
 
     fastify.register((fastify, options, done) => {
         fastify.addHook("preHandler", requireItemAccess);
-        fastify.post("/publish/item/:identifier", postPublishItemHandler);
-        fastify.get("/publish/item/:identifier/status", getItemPublicationStatus);
+        fastify.post("/publish/items/:identifier", postPublishItemHandler);
+        fastify.get("/publish/items/:identifier/status", getItemPublicationStatus);
         done();
     });
     done();
 }
 
-// TODO: this code does not have tests
 async function postPublishCollectionHandler(req, res) {
     if (isURL(req.body.data.user["@id"], { protocols: ["http", "https"] })) {
         req.session.user.identifier = req.body.data.user["@id"];
@@ -83,7 +82,6 @@ async function postPublishCollectionHandler(req, res) {
     }
 }
 
-// TODO: this code does not have tests
 async function getCollectionPublicationStatus(req) {
     return {
         status: req.session.collection.publicationStatus,
@@ -92,7 +90,6 @@ async function getCollectionPublicationStatus(req) {
     };
 }
 
-// TODO: this code does not have tests
 async function postPublishItemHandler(req, res) {
     if (isURL(req.body.data.user["@id"], { protocols: ["http", "https"] })) {
         req.session.user.identifier = req.body.data.user["@id"];
@@ -162,7 +159,6 @@ async function postPublishItemHandler(req, res) {
     }
 }
 
-// TODO: this code does not have tests
 async function getItemPublicationStatus(req) {
     return {
         status: req.session.item.publicationStatus,

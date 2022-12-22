@@ -29,7 +29,7 @@ if [ "$resp" == "y" ] ; then
     npm version --no-git-tag-version ${VERSION}
     cd ..
     git tag v${VERSION}
-    git commit -a -m "tag and bump version"
+    git commit -a -m "tag and bump version: ${VERSION}"
 fi
 
 

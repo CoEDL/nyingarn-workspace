@@ -173,7 +173,7 @@ async function getItemPublicationStatus(req) {
         status: req.session.item.publicationStatus,
         visibility: req.session.item.accessType,
         emails: req.session.item.accessControlList,
-        narrative: req.session.item.accessNarrative.text,
-        restrictedUntil: req.session.item.accessNarrative.restrictedUntil,
+        narrative: req.session.item.accessNarrative?.text,
+        restrictedUntil: req.session.item.accessNarrative?.restrictedUntil,
     };
 }

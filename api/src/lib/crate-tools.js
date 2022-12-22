@@ -1,18 +1,14 @@
-import { getStoreHandle } from "../common/index.js";
+import { specialFiles } from "../common/index.js";
 import path from "path";
 import mime from "mime-types";
 import lodashPkg from "lodash";
-const { difference, isArray } = lodashPkg;
+const { difference } = lodashPkg;
 
 // TODO: this code does not have tests
 export async function registerAllFiles({ store, crate }) {
     // get list of files in the bucket
     let files = (await store.listResources()).filter((file) => {
-        return ![
-            "ro-crate-metadata.json",
-            "nocfl.inventory.json",
-            "nocfl.identifier.json",
-        ].includes(file.Key);
+        return !specialFiles.includes(file.Key);
     });
     files = files.filter((file) => !file.Key.match(/^\./));
     if (!files.length) return crate;

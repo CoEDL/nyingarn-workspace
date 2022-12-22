@@ -61,38 +61,48 @@
                         </div>
                     </div>
                 </el-form-item>
-                <el-form-item label="Access Narrative" v-if="data.form.visibility === 'restricted'">
-                    <el-input v-model="data.form.narrative" :rows="8" type="textarea" />
-                    <div class="text-gray-700">
-                        Detail the reasoning for restricting access to this item.
-                    </div>
-                    <div class="text-red-700 text-lg" v-if="data.showNarrativeRequirement">
-                        Restricted items can't be published without a narrative explaining WHY they
-                        are restricted.
-                    </div>
-                </el-form-item>
-                <el-form-item label="Restricted Until" v-if="data.form.visibility === 'restricted'">
-                    <el-date-picker
-                        v-model="data.form.restrictedUntil"
-                        type="date"
-                        placeholder="Pick a day"
-                    />
-                    <div class="text-gray-700 ml-4">
-                        After this date the item will become open access.
-                    </div>
-                </el-form-item>
-                <el-form-item label="Authorised Users" v-if="data.form.visibility === 'restricted'">
-                    <el-input v-model="data.form.emails" :rows="8" type="textarea" />
-                    <div class="text-gray-700">
-                        List the email addresses of the people who are allowed to have access to
-                        this item. One per line and/or separated by comma.
-                    </div>
-                </el-form-item>
+                <span v-if="data.form.visibility === 'restricted'">
+                    <el-form-item label="Access Narrative">
+                        <el-input v-model="data.form.narrative" :rows="8" type="textarea" />
+                        <div class="text-gray-700">
+                            Detail the reasoning for restricting access to this item.
+                        </div>
+                        <div class="text-red-700 text-lg" v-if="data.showNarrativeRequirement">
+                            Restricted items can't be published without a narrative explaining WHY
+                            they are restricted.
+                        </div>
+                    </el-form-item>
+                    <el-form-item label="Restricted Until">
+                        <el-date-picker
+                            v-model="data.form.restrictedUntil"
+                            type="date"
+                            placeholder="Pick a day"
+                        />
+                        <div class="text-gray-700 ml-4">
+                            After this date the item will become open access.
+                        </div>
+                    </el-form-item>
+                    <el-form-item label="Authorised Users">
+                        <el-input v-model="data.form.emails" :rows="8" type="textarea" />
+                        <div class="text-gray-700">
+                            List the email addresses of the people who are allowed to have access to
+                            this item. One per line and/or separated by comma.
+                        </div>
+                    </el-form-item>
+                </span>
                 <el-form-item>
-                    <el-button type="primary" @click="publish"
-                        >Publish this {{ props.type }}</el-button
+                    <el-button type="primary" @click="publish">
+                        Publish this {{ props.type }}
+                    </el-button>
+                    <el-button
+                        @click="
+                            data.confirmed = false;
+                            data.checked = [];
+                        "
+                        v-if="data.status === 'inProgress'"
                     >
-                    <el-button @click="data.confirmed = false">Cancel</el-button>
+                        Cancel
+                    </el-button>
                 </el-form-item>
             </el-form>
         </div>

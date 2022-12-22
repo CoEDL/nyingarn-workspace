@@ -1,23 +1,15 @@
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
-import { loadConfiguration, getS3Handle, getStoreHandle } from "../common/index.js";
+import {
+    loadConfiguration,
+    getS3Handle,
+    getStoreHandle,
+    completedResources,
+    specialFiles,
+} from "../common/index.js";
 import path from "path";
-import fsExtraPkg from "fs-extra";
-const { writeJson, remove } = fsExtraPkg;
 import lodashPkg from "lodash";
 const { compact, groupBy, uniq, isNumber } = lodashPkg;
-import { sub } from "date-fns";
-const completedResources = ".completed-resources.json";
-const specialFiles = [
-    "ro-crate-metadata.json",
-    "-digivol.csv",
-    "-tei.xml",
-    "nocfl.identifier.json",
-    "nocfl.inventory.json",
-    completedResources,
-];
-export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
-export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
 
 export async function lookupItemByIdentifier({ identifier, userId }) {
     let clause = {

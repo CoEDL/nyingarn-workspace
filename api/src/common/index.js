@@ -18,6 +18,21 @@ export {
     setupTestCollection,
 } from "./test-utils.js";
 
+export const completedResources = ".completed-resources.json";
+export const specialFiles = [
+    "LICENCE.md",
+    "LICENCE.txt",
+    "LICENCE",
+    "ro-crate-metadata.json",
+    "-digivol.csv",
+    "-tei.xml",
+    "nocfl.identifier.json",
+    "nocfl.inventory.json",
+    completedResources,
+];
+export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
+export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
+
 import path from "path";
 import { getS3Handle } from "./getS3Handle.js";
 import { ensureDir } from "fs-extra";

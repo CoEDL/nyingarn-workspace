@@ -32,6 +32,10 @@ export default function (sequelize, DataTypes) {
                 type: DataTypes.ENUM("open", "restricted"),
                 allowNull: true,
             },
+            accessNarrative: {
+                type: DataTypes.JSON,
+                allowNull: true,
+            },
             accessControlList: {
                 type: DataTypes.JSON,
                 allowNull: true,

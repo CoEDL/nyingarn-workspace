@@ -240,6 +240,8 @@ async function getDepositHandler(req) {
             ],
         };
         if (item.accessType === "restricted") {
+            licence.description = item.accessNarrative.text;
+            licence.restrictedUntil = item.accessNarrative?.restrictedUntil;
             licence.access = {
                 "@id": "http://purl.archive.org/language-data-commons/terms#AuthorizedAccess",
             };

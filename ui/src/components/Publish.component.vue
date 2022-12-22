@@ -61,6 +61,26 @@
                         </div>
                     </div>
                 </el-form-item>
+                <el-form-item label="Access Narrative" v-if="data.form.visibility === 'restricted'">
+                    <el-input v-model="data.form.narrative" :rows="8" type="textarea" />
+                    <div class="text-gray-700">
+                        Detail the reasoning for restricting access to this item.
+                    </div>
+                    <div class="text-red-700 text-lg" v-if="data.showNarrativeRequirement">
+                        Restricted items can't be published without a narrative explaining WHY they
+                        are restricted.
+                    </div>
+                </el-form-item>
+                <el-form-item label="Restricted Until" v-if="data.form.visibility === 'restricted'">
+                    <el-date-picker
+                        v-model="data.form.restrictedUntil"
+                        type="date"
+                        placeholder="Pick a day"
+                    />
+                    <div class="text-gray-700 ml-4">
+                        After this date the item will become open access.
+                    </div>
+                </el-form-item>
                 <el-form-item label="Authorised Users" v-if="data.form.visibility === 'restricted'">
                     <el-input v-model="data.form.emails" :rows="8" type="textarea" />
                     <div class="text-gray-700">
@@ -82,9 +102,10 @@
 <script setup>
 import StatusBadgeComponent from "./StatusBadge.component.vue";
 import { reactive, watch, inject, onMounted } from "vue";
-import { uniq, flattenDeep, startCase } from "lodash";
+import { uniq, flattenDeep } from "lodash";
 import { useRoute } from "vue-router";
 import { isEmail } from "validator";
+import { parseISO } from "date-fns";
 const $route = useRoute();
 const $http = inject("$http");
 
@@ -99,10 +120,13 @@ const data = reactive({
     loading: false,
     user: {},
     status: undefined,
+    showNarrativeRequirement: false,
     form: {
         orcid: "",
         visibility: "open",
         emails: "",
+        narrative: undefined,
+        restrictedUntil: undefined,
     },
     checked: [],
     confirmed: false,
@@ -138,6 +162,10 @@ async function getPublicationStatus() {
                 if (data.status !== "inProgress") {
                     data.checked = ["agreed", "agreed", "agreed"];
                 }
+                data.form.narrative = response.narrative;
+                if (response.restrictedUntil) {
+                    data.form.restrictedUntil = parseISO(response.restrictedUntil);
+                }
             } else if (props.type === "collection") {
                 data.status = response.status;
                 data.form.visibility = "open";
@@ -161,6 +189,14 @@ function validate() {
     }
 }
 async function publish() {
+    data.showNarrativeRequirement = false;
+    if (
+        data.form.visibility === "restricted" &&
+        (!data.form.narrative || data.form.narrative.length === 0)
+    ) {
+        data.showNarrativeRequirement = true;
+        return;
+    }
     let routePath = $route.meta.type === "item" ? "items" : "collections";
     let emails;
     if (data.form.emails) {
@@ -177,14 +213,23 @@ async function publish() {
             "@type": "Person",
             name: `${data.user.givenName} ${data.user.familyName}`,
         },
-        ...data.form,
-        emails,
+        access: {
+            visibility: data.form.visibility,
+        },
     };
+    if (data.form.visibility === "restricted") {
+        formData.access.narrative = data.form.narrative;
+        formData.access.acl = emails;
+
+        if (data.form.restrictedUntil) {
+            formData.access.restrictedUntil = data.form.restrictedUntil?.toISOString();
+        }
+    }
 
     data.loading = true;
     await $http.post({
         route: `/publish/${routePath}/${$route.params.identifier}`,
-        body: { data: formData },
+        body: { ...formData },
     });
     getPublicationStatus();
     data.loading = false;

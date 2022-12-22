@@ -91,8 +91,8 @@ async function getCollectionPublicationStatus(req) {
 }
 
 async function postPublishItemHandler(req, res) {
-    if (isURL(req.body.data.user["@id"], { protocols: ["http", "https"] })) {
-        req.session.user.identifier = req.body.data.user["@id"];
+    if (isURL(req.body.user["@id"], { protocols: ["http", "https"] })) {
+        req.session.user.identifier = req.body.user["@id"];
         await req.session.user.save();
     }
 
@@ -106,15 +106,24 @@ async function postPublishItemHandler(req, res) {
     // check that permission forms are loaded
     //  TODO: not yet implemented
 
+    // reset the properties first
+    req.session.item.accessControlList = null;
+    req.session.item.accessNarrative = null;
+    await req.session.item.save();
+
     // set the properties for this item
     req.session.item.publicationStatus = "awaitingReview";
-    req.session.item.accessType = req.body.data.visibility;
+    req.session.item.accessType = req.body.access.visibility;
     req.session.item.accessControlList =
-        req.body.data.visibility === "open" ? [] : req.body.data?.emails;
+        req.body.access.visibility === "open" ? [] : req.body.access?.acl;
     req.session.item.publicationStatusLogs = [
         "all pages marked complete",
         "permission forms not loaded",
     ];
+    req.session.item.accessNarrative = {
+        text: req.body.access.narrative,
+        restrictedUntil: req.body.access?.restrictedUntil,
+    };
 
     // save the item
     await req.session.item.save();
@@ -136,12 +145,12 @@ async function postPublishItemHandler(req, res) {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         crate = new ROCrate(crate, { array: true });
 
-        crate.addEntity(req.body.data.user);
+        crate.addEntity(req.body.user);
         let depositor = crate.rootDataset.depositor;
         if (!depositor) {
-            depositor = [req.body.data.user];
+            depositor = [req.body.user];
         } else {
-            depositor.push(req.body.data.user);
+            depositor.push(req.body.user);
             depositor = uniqBy(depositor, "@id");
         }
         crate.rootDataset.depositor = depositor;
@@ -150,7 +159,7 @@ async function postPublishItemHandler(req, res) {
         crate["@context"] = getContext();
 
         if (req.session.item.accessType === "restricted") {
-            await store.put({ target: authorisedUsersFile, json: req.body.data.emails });
+            await store.put({ target: authorisedUsersFile, json: req.body.access.acl ?? [] });
         }
 
         await store.put({ target: "ro-crate-metadata.json", json: crate });
@@ -164,5 +173,7 @@ async function getItemPublicationStatus(req) {
         status: req.session.item.publicationStatus,
         visibility: req.session.item.accessType,
         emails: req.session.item.accessControlList,
+        narrative: req.session.item.accessNarrative.text,
+        restrictedUntil: req.session.item.accessNarrative.restrictedUntil,
     };
 }

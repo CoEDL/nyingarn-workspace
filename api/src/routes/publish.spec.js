@@ -54,8 +54,8 @@ describe("Publish route tests", () => {
             method: "POST",
             headers: headers(session),
             body: JSON.stringify({
-                data: {
-                    user: { "@id": "https://some.id.com/person", name: "A user" },
+                user: { "@id": "https://some.id.com/person", name: "A user" },
+                access: {
                     visibility: "open",
                 },
             }),

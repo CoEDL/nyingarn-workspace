@@ -1,6 +1,10 @@
 {
     "name": "api",
+<<<<<<< HEAD
     "version": "0.41.0",
+=======
+    "version": "0.40.0",
+>>>>>>> implement-publish-flow
     "description": "",
     "author": "Marco La Rosa",
     "main": "index.js",
@@ -54,9 +58,18 @@
         "pg-hstore": "^2.3.4",
         "pino-pretty": "^9.1.1",
         "regenerator-runtime": "^0.13.11",
+<<<<<<< HEAD
         "saxon-js": "^2.5.0",
         "sequelize": "^6.27.0",
         "uuid": "^9.0.0",
+=======
+        "ro-crate": "^3.2.0",
+        "saxon-js": "^2.5.0",
+        "sequelize": "^6.26.0",
+        "sequelize-cli": "^6.5.2",
+        "uuid": "^9.0.0",
+        "validator": "^13.7.0",
+>>>>>>> implement-publish-flow
         "winston": "^3.8.2"
     }
 }

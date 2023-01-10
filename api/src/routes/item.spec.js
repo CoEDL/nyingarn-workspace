@@ -433,6 +433,7 @@ describe("Item management route tests", () => {
 
         await deleteItem({ id: item.id });
     });
+<<<<<<< HEAD
     it("an admin should be able to get a list of all items in the space", async () => {
         //  setup as a normal user
         let user = users.filter((u) => !u.administrator)[0];
@@ -473,4 +474,6 @@ describe("Item management route tests", () => {
 
         await models.item.destroy({ where: {} });
     });
+=======
+>>>>>>> implement-publish-flow
 });

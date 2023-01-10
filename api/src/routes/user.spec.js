@@ -16,6 +16,20 @@ describe("User management route tests as admin", () => {
     });
     afterAll(async () => {
         await tester.purgeUsers({ users });
+<<<<<<< HEAD
+=======
+    });
+    it("a user should be able to get own information ", async () => {
+        let user = users.filter((u) => !u.administrator)[0];
+        let session = await createSession({ user });
+
+        let response = await fetch(`${host}/users/self`, {
+            headers: headers(session),
+        });
+        expect(response.status).toEqual(200);
+        response = await response.json();
+        expect(response.user.email).toEqual(user.email);
+>>>>>>> implement-publish-flow
     });
     it("should be able to get a list of users", async () => {
         // expect to find two users

@@ -9,7 +9,33 @@ export {
     requireItemAccess,
 } from "./middleware.js";
 export { generateToken, verifyToken } from "./jwt.js";
+<<<<<<< HEAD
 export { host, headers, TestSetup, generateLogs, setupTestItem } from "./test-utils.js";
+=======
+export {
+    host,
+    headers,
+    TestSetup,
+    generateLogs,
+    setupTestItem,
+    setupTestCollection,
+} from "./test-utils.js";
+
+export const completedResources = ".completed-resources.json";
+export const specialFiles = [
+    "LICENCE.md",
+    "LICENCE.txt",
+    "LICENCE",
+    "ro-crate-metadata.json",
+    "-digivol.csv",
+    "-tei.xml",
+    "nocfl.identifier.json",
+    "nocfl.inventory.json",
+    completedResources,
+];
+export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
+export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
+>>>>>>> implement-publish-flow
 
 import path from "path";
 import { getS3Handle } from "./getS3Handle.js";

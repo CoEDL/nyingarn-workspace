@@ -19,6 +19,30 @@ export default function (sequelize, DataTypes) {
                 type: DataTypes.JSON,
                 allowNull: true,
             },
+<<<<<<< HEAD
+=======
+            publicationStatus: {
+                type: DataTypes.ENUM("inProgress", "awaitingReview", "published", "needsWork"),
+                allowNull: true,
+                defaultValue: "inProgress",
+            },
+            publicationStatusLogs: {
+                type: DataTypes.JSON,
+                allowNull: true,
+            },
+            accessType: {
+                type: DataTypes.ENUM("open", "restricted"),
+                allowNull: true,
+            },
+            accessNarrative: {
+                type: DataTypes.JSON,
+                allowNull: true,
+            },
+            accessControlList: {
+                type: DataTypes.JSON,
+                allowNull: true,
+            },
+>>>>>>> implement-publish-flow
         },
         {
             timestamps: true,

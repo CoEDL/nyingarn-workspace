@@ -2,7 +2,11 @@ import { demandAuthenticatedUser, getStoreHandle, loadProfile } from "../common/
 import lodashPkg from "lodash";
 const { uniqBy, compact, flattenDeep } = lodashPkg;
 import models from "../models/index.js";
+<<<<<<< HEAD
 import { registerAllFiles } from "../lib/crate-tools.js";
+=======
+import { createDefaultROCrateFile } from "../lib/crate-tools.js";
+>>>>>>> implement-publish-flow
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -150,6 +154,7 @@ async function getDescriboROCrate(req) {
     } catch (error) {
         crate = createDefaultROCrateFile({ name: req.params.identifier });
     }
+<<<<<<< HEAD
     try {
         ({ crate, filesAdded } = await registerAllFiles({
             id: req.params.identifier,
@@ -170,6 +175,8 @@ async function getDescriboROCrate(req) {
     if (filesAdded.length) {
         await store.put({ target: "ro-crate-metadata.json", json: crate });
     }
+=======
+>>>>>>> implement-publish-flow
     return { crate };
 }
 
@@ -185,6 +192,7 @@ async function getDescriboProfile(req, res, next) {
     let profile = await loadProfile({ profile: `nyingarn-${req.params.type}-profile.json` });
     return { profile };
 }
+<<<<<<< HEAD
 
 function createDefaultROCrateFile({ name }) {
     return {
@@ -221,3 +229,5 @@ function createDefaultROCrateFile({ name }) {
         ],
     };
 }
+=======
+>>>>>>> implement-publish-flow

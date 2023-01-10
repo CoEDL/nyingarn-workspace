@@ -1,5 +1,9 @@
 import models from "../models/index.js";
+<<<<<<< HEAD
 import { Op } from "sequelize";
+=======
+import { Op, fn as seqFn, col as seqCol } from "sequelize";
+>>>>>>> implement-publish-flow
 import { getStoreHandle } from "../common/index.js";
 
 export async function lookupCollectionByIdentifier({ identifier, userId }) {
@@ -15,9 +19,15 @@ export async function lookupCollectionByIdentifier({ identifier, userId }) {
     return await models.collection.findOne(clause);
 }
 
+<<<<<<< HEAD
 export async function getCollections({ userId, offset = 0, limit = 10, match }) {
     const query = {
         order: [["identifier", "ASC"]],
+=======
+export async function getCollections({ userId, offset = 0, limit = 10, match, publicationStatus }) {
+    const query = {
+        order: [[seqFn("lower", seqCol("collection.identifier")), "ASC"]],
+>>>>>>> implement-publish-flow
     };
     let include = [{ model: models.item }, { model: models.collection, as: "subCollection" }];
     if (userId) include.push({ model: models.user, where: { id: userId } });
@@ -25,6 +35,7 @@ export async function getCollections({ userId, offset = 0, limit = 10, match }) 
         query.offset = offset;
         query.limit = limit;
     }
+<<<<<<< HEAD
     if (match) {
         query.where = {
             identifier: {
@@ -32,6 +43,17 @@ export async function getCollections({ userId, offset = 0, limit = 10, match }) 
             },
         };
     }
+=======
+    query.where = {};
+    if (match) {
+        query.where.identifier = {
+            [Op.startsWith]: match,
+        };
+    }
+    if (publicationStatus) {
+        query.where.publicationStatus = publicationStatus;
+    }
+>>>>>>> implement-publish-flow
     query.include = include;
 
     let collections = await models.collection.findAndCountAll(query);

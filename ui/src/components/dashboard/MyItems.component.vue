@@ -11,6 +11,20 @@
                         clearable
                     ></el-input>
                 </div>
+<<<<<<< HEAD
+=======
+                <el-select
+                    v-model="data.filterByStatus"
+                    placeholder="Show"
+                    @change="loadItems"
+                    clearable
+                >
+                    <el-option label="In Progress" value="inProgress" />
+                    <el-option label="Awaiting Review" value="awaitingReview" />
+                    <el-option label="Published" value="published" />
+                    <el-option label="Needs Work" value="needsWork" />
+                </el-select>
+>>>>>>> implement-publish-flow
                 <el-pagination
                     layout="prev, pager, next, total"
                     :page-size="data.limit"
@@ -29,6 +43,14 @@
                         }}</router-link>
                     </template>
                 </el-table-column>
+<<<<<<< HEAD
+=======
+                <el-table-column prop="status" label="Status" width="150">
+                    <template #default="scope">
+                        <status-badge-component :status="scope.row.publicationStatus" />
+                    </template>
+                </el-table-column>
+>>>>>>> implement-publish-flow
                 <el-table-column prop="total" label="Pages" width="100"> </el-table-column>
                 <el-table-column label="Actions" width="100" align="center">
                     <template #default="scope">
@@ -62,6 +84,10 @@
 </template>
 
 <script setup>
+<<<<<<< HEAD
+=======
+import StatusBadgeComponent from "../StatusBadge.component.vue";
+>>>>>>> implement-publish-flow
 import { ElMessage } from "element-plus";
 import { orderBy } from "lodash";
 import * as itemServices from "../item/item-services";
@@ -76,6 +102,10 @@ const data = reactive({
     total: 0,
     items: [],
     prefix: undefined,
+<<<<<<< HEAD
+=======
+    filterByStatus: undefined,
+>>>>>>> implement-publish-flow
     isAdmin: store.state.user.administrator,
 });
 let tableHeight = computed(() => {
@@ -95,6 +125,10 @@ async function loadItems() {
         offset,
         limit: data.limit,
         prefix: data.prefix,
+<<<<<<< HEAD
+=======
+        publicationStatus: data.filterByStatus,
+>>>>>>> implement-publish-flow
     });
     if (response.status !== 200) {
         return;
@@ -106,7 +140,10 @@ async function loadItems() {
         link: `/items/${i.name}/view`,
         statistics: {},
     }));
+<<<<<<< HEAD
     items = orderBy(items, "name");
+=======
+>>>>>>> implement-publish-flow
     data.items = [...items];
 
     for (let item of data.items) {

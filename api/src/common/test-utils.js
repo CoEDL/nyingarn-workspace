@@ -7,6 +7,10 @@ const chance = Chance();
 import lodashPkg from "lodash";
 const { range, cloneDeep } = lodashPkg;
 import { createItem } from "../lib/item.js";
+<<<<<<< HEAD
+=======
+import { createCollection } from "../lib/collection.js";
+>>>>>>> implement-publish-flow
 import { getS3Handle } from "./getS3Handle.js";
 
 const bucketName = "testing";
@@ -29,6 +33,7 @@ export class TestSetup {
         const userEmail = chance.email();
         const adminEmail = chance.email();
         let configuration = await loadConfiguration();
+<<<<<<< HEAD
         this.originalConfiguration = configuration;
 
         let devConfiguration = cloneDeep(configuration);
@@ -43,6 +48,10 @@ export class TestSetup {
         await writeJSON("/srv/configuration/development-configuration.json", devConfiguration, {
             spaces: 4,
         });
+=======
+
+        let { s3, bucket } = await getS3Handle({ configuration });
+>>>>>>> implement-publish-flow
         return { userEmail, adminEmail, configuration, bucket };
     }
 
@@ -78,6 +87,7 @@ export class TestSetup {
     }
 
     async teardownAfterAll(configuration) {
+<<<<<<< HEAD
         await writeJSON(
             "/srv/configuration/development-configuration.json",
             this.originalConfiguration,
@@ -85,6 +95,12 @@ export class TestSetup {
                 spaces: 4,
             }
         );
+=======
+        await models.log.truncate();
+        await models.collection.destroy({ where: {} });
+        await models.item.destroy({ where: {} });
+        await models.user.destroy({ where: {} });
+>>>>>>> implement-publish-flow
         models.sequelize.close();
     }
 }
@@ -103,8 +119,11 @@ export async function generateLogs(info, warn, error) {
 
 export async function setupTestItem({ identifier, store, user }) {
     let item = await createItem({ identifier, userId: user.id });
+<<<<<<< HEAD
     expect(item.identifier).toEqual(identifier);
 
+=======
+>>>>>>> implement-publish-flow
     await store.put({
         batch: [
             {
@@ -127,3 +146,11 @@ export async function setupTestItem({ identifier, store, user }) {
     });
     return { item };
 }
+<<<<<<< HEAD
+=======
+
+export async function setupTestCollection({ identifier, user }) {
+    let collection = await createCollection({ identifier, userId: user.id });
+    return { collection };
+}
+>>>>>>> implement-publish-flow

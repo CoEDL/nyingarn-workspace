@@ -1,5 +1,15 @@
 import models from "../models/index.js";
+<<<<<<< HEAD
 import { logEvent, getLogger, getStoreHandle, demandAuthenticatedUser } from "../common/index.js";
+=======
+import {
+    logEvent,
+    getLogger,
+    getStoreHandle,
+    demandAuthenticatedUser,
+    requireCollectionAccess,
+} from "../common/index.js";
+>>>>>>> implement-publish-flow
 import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
 import {
@@ -14,6 +24,7 @@ const log = getLogger();
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
+<<<<<<< HEAD
     fastify.addHook("preHandler", verifyCollectionAccess);
 
     // user routes
@@ -39,6 +50,25 @@ async function verifyCollectionAccess(req, res) {
         return res.forbidden(`You don't have permission to access this endpoint`);
     }
     req.session.collection = collection;
+=======
+
+    // user routes
+    fastify.get("/collections", getCollectionsHandler);
+    fastify.post("/collections", postCollectionHandler);
+
+    // user routes - access specific collection
+    fastify.register((fastify, options, done) => {
+        fastify.addHook("preHandler", requireCollectionAccess);
+        fastify.get("/collections/:identifier", getCollectionHandler);
+        fastify.put("/collections/:identifier/attach-user", putCollectionInviteUserHandler);
+        fastify.put("/collections/:identifier/detach-user", putCollectionDetachUserHandler);
+        fastify.put("/collections/:identifier/toggle-visibility", putCollectionToggleVisibility);
+        fastify.get("/collections/:identifier/users", getCollectionUsers);
+        fastify.delete("/collections/:identifier", deleteCollectionHandler);
+        done();
+    });
+    done();
+>>>>>>> implement-publish-flow
 }
 
 async function getCollectionsHandler(req) {
@@ -46,17 +76,29 @@ async function getCollectionsHandler(req) {
     const offset = req.query.offset;
     const limit = req.query.limit;
     const match = req.query.match;
+<<<<<<< HEAD
+=======
+    const publicationStatus = req.query.publicationStatus;
+>>>>>>> implement-publish-flow
     let { count, rows } = await getCollections({
         userId,
         offset,
         limit,
         match,
+<<<<<<< HEAD
+=======
+        publicationStatus,
+>>>>>>> implement-publish-flow
     });
     let collections = rows.map((c) => {
         return {
             name: c.identifier,
             private: c.data?.private,
             type: "collection",
+<<<<<<< HEAD
+=======
+            publicationStatus: c.publicationStatus,
+>>>>>>> implement-publish-flow
             items: groupBy(
                 c.items.map((i) => ({ type: "item", identifier: i.identifier })),
                 "identifier"

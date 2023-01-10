@@ -2,6 +2,10 @@ import { getLogger } from "./logger.js";
 import { getUser } from "../lib/user.js";
 import { verifyToken } from "./jwt.js";
 import { lookupItemByIdentifier } from "../lib/item.js";
+<<<<<<< HEAD
+=======
+import { lookupCollectionByIdentifier } from "../lib/collection.js";
+>>>>>>> implement-publish-flow
 const log = getLogger();
 
 export async function demandAuthenticatedUser(req, res) {
@@ -34,8 +38,14 @@ export async function requireCollectionAccess(req, res) {
         return res.badRequest(`Identifier not defined`);
     }
 
+<<<<<<< HEAD
     try {
         let collection = await lookupCollectionByIdentifier({
+=======
+    let collection;
+    try {
+        collection = await lookupCollectionByIdentifier({
+>>>>>>> implement-publish-flow
             identifier: req.params.identifier,
             userId: req.session.user.id,
         });
@@ -50,7 +60,11 @@ export async function requireCollectionAccess(req, res) {
 
 export async function requireItemAccess(req, res) {
     if (!req.body?.identifier && !req.params?.identifier) {
+<<<<<<< HEAD
         return res.badRequest(`No identifier defined in body or params`);
+=======
+        return res.badRequest(`Identifier not defined`);
+>>>>>>> implement-publish-flow
     }
     const identifier = req.body?.identifier ? req.body?.identifier : req.params?.identifier;
     let item;

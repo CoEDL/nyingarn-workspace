@@ -1,29 +1,10 @@
-<<<<<<< HEAD
-import { getStoreHandle } from "../common/index.js";
-=======
 import { specialFiles } from "../common/index.js";
->>>>>>> implement-publish-flow
 import path from "path";
 import mime from "mime-types";
 import lodashPkg from "lodash";
 const { difference } = lodashPkg;
 
 // TODO: this code does not have tests
-<<<<<<< HEAD
-export async function registerAllFiles({ id, className, crate }) {
-    let store = await getStoreHandle({ id, className });
-
-    // get list of files in the bucket
-    let files = (await store.listResources()).filter((file) => {
-        return ![
-            "ro-crate-metadata.json",
-            "nocfl.inventory.json",
-            "nocfl.identifier.json",
-        ].includes(file.Key);
-    });
-    files = files.filter((file) => !file.Key.match(/^\./));
-    if (!files.length) return { crate, filesAdded: [] };
-=======
 export async function registerAllFiles({ store, crate }) {
     // get list of files in the bucket
     let files = (await store.listResources()).filter((file) => {
@@ -31,7 +12,6 @@ export async function registerAllFiles({ store, crate }) {
     });
     files = files.filter((file) => !file.Key.match(/^\./));
     if (!files.length) return crate;
->>>>>>> implement-publish-flow
 
     // determine which files not already registered in the crate
     const filesInBucket = files.map((file) => file.Key);
@@ -53,29 +33,6 @@ export async function registerAllFiles({ store, crate }) {
                 hasPart: [{ "@id": "./" }],
             },
         };
-<<<<<<< HEAD
-        crate["@graph"].push(entity);
-    }
-
-    // link the missing files into the hasPart prop of the rootDataset
-    let rootDescriptor = crate["@graph"].filter(
-        (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
-    )[0];
-    crate["@graph"] = crate["@graph"].map((e) => {
-        if (e["@id"] === rootDescriptor.about["@id"]) {
-            e.hasPart = [...e.hasPart, ...filesToAdd.map((file) => ({ "@id": file }))];
-        }
-        return e;
-    });
-
-    // set the mimetype on all files in the crate
-    crate["@graph"] = crate["@graph"].map((entity) => {
-        return { encodingFormat: getMimeType(entity["@id"]), ...entity };
-    });
-
-    // upload the new crate file
-    return { crate, filesAdded: filesToAdd };
-=======
         crate.addEntity(entity);
         let parts = crate.rootDataset.hasPart;
         parts.push({ "@id": entity["@id"] });
@@ -93,7 +50,6 @@ export async function registerAllFiles({ store, crate }) {
 
     // upload the new crate file
     return crate;
->>>>>>> implement-publish-flow
 
     function getMimeType(filename) {
         let mimetype = mime.lookup(filename);
@@ -109,8 +65,6 @@ export async function registerAllFiles({ store, crate }) {
         return mimetype;
     }
 }
-<<<<<<< HEAD
-=======
 
 export function getContext() {
     return [
@@ -147,4 +101,3 @@ export function createDefaultROCrateFile({ name }) {
         ],
     };
 }
->>>>>>> implement-publish-flow

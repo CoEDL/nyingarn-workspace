@@ -1,25 +1,4 @@
 import models from "../models/index.js";
-<<<<<<< HEAD
-import { Op } from "sequelize";
-import { loadConfiguration, getS3Handle, getStoreHandle } from "../common/index.js";
-import path from "path";
-import fsExtraPkg from "fs-extra";
-const { writeJson, remove } = fsExtraPkg;
-import lodashPkg from "lodash";
-const { compact, groupBy, uniq, isNumber } = lodashPkg;
-import { sub } from "date-fns";
-const completedResources = ".completed-resources.json";
-const specialFiles = [
-    "ro-crate-metadata.json",
-    "-digivol.csv",
-    "-tei.xml",
-    "nocfl.identifier.json",
-    "nocfl.inventory.json",
-    completedResources,
-];
-export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
-export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
-=======
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import {
     loadConfiguration,
@@ -31,7 +10,6 @@ import {
 import path from "path";
 import lodashPkg from "lodash";
 const { compact, groupBy, uniq, isNumber } = lodashPkg;
->>>>>>> implement-publish-flow
 
 export async function lookupItemByIdentifier({ identifier, userId }) {
     let clause = {
@@ -45,15 +23,9 @@ export async function lookupItemByIdentifier({ identifier, userId }) {
     return await models.item.findOne(clause);
 }
 
-<<<<<<< HEAD
-export async function getItems({ userId, offset = 0, limit = 10, match }) {
-    const query = {
-        order: [["identifier", "ASC"]],
-=======
 export async function getItems({ userId, offset = 0, limit = 10, match, publicationStatus }) {
     const query = {
         order: [[seqFn("lower", seqCol("item.identifier")), "ASC"]],
->>>>>>> implement-publish-flow
     };
     let include = [{ model: models.collection }];
     if (userId) include.push({ model: models.user, where: { id: userId } });
@@ -61,15 +33,6 @@ export async function getItems({ userId, offset = 0, limit = 10, match, publicat
         query.offset = offset;
         query.limit = limit;
     }
-<<<<<<< HEAD
-    if (match) {
-        query.where = {
-            identifier: {
-                [Op.startsWith]: match,
-            },
-        };
-    }
-=======
     query.where = {};
     if (match) {
         query.where.identifier = {
@@ -79,7 +42,6 @@ export async function getItems({ userId, offset = 0, limit = 10, match, publicat
     if (publicationStatus) {
         query.where.publicationStatus = publicationStatus;
     }
->>>>>>> implement-publish-flow
     query.include = include;
 
     return await models.item.findAndCountAll(query);
@@ -328,9 +290,6 @@ export async function markResourceComplete({ identifier, resource, complete = fa
     resource = path.join(identifier, resource);
     status[resource] = String(complete) === "true";
 
-<<<<<<< HEAD
-    await store.put({ json: status, target: completedResources });
-=======
     await store.put({ json: status, target: completedResources, registerFile: false });
 }
 
@@ -350,7 +309,6 @@ export async function markAllResourcesComplete({ identifier, resources, complete
     }
 
     await store.put({ json: status, target: completedResources, registerFile: false });
->>>>>>> implement-publish-flow
 }
 
 export async function isResourceComplete({ identifier, resource }) {

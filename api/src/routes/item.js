@@ -1,7 +1,4 @@
 import models from "../models/index.js";
-<<<<<<< HEAD
-import { logEvent, getLogger, getStoreHandle, demandAuthenticatedUser } from "../common/index.js";
-=======
 import {
     logEvent,
     getLogger,
@@ -9,7 +6,6 @@ import {
     demandAuthenticatedUser,
     requireItemAccess,
 } from "../common/index.js";
->>>>>>> implement-publish-flow
 import lodashPkg from "lodash";
 const { groupBy, isEmpty } = lodashPkg;
 import {
@@ -33,63 +29,6 @@ import {
 import { transformDocument } from "../lib/transform.js";
 const log = getLogger();
 
-<<<<<<< HEAD
-// function routeItem(handler) {
-//     return compact(flattenDeep([...route(), verifyItemAccess, handler]));
-// }
-
-export function setupRoutes(fastify, options, done) {
-    fastify.addHook("preHandler", demandAuthenticatedUser);
-    fastify.addHook("preHandler", verifyItemAccess);
-
-    fastify.get("/items", getItemsHandler);
-    fastify.get("/items/:identifier", getItemHandler);
-    fastify.post("/items", postItemHandler);
-    fastify.put("/items/:identifier/attach-user", putItemInviteUserHandler);
-    fastify.put("/items/:identifier/detach-user", putItemDetachUserHandler);
-    fastify.get("/items/:identifier/users", getItemUsers);
-    fastify.delete("/items/:identifier", deleteItemHandler);
-    fastify.get("/items/:identifier/status", getItemStatisticsHandler);
-    fastify.get("/items/:identifier/resources", getItemResourcesHandler);
-    fastify.put("/items/:identifier/reprocess-imports", putReprocessImports);
-    fastify.get("/items/:identifier/resources/:resource/files", getResourceFilesListHandler);
-    fastify.get(
-        "/items/:identifier/resources/:resource/status",
-        getResourceProcessingStatusHandler
-    );
-    fastify.put("/items/:identifier/resources/:resource/status", putResourceCompleteHandler);
-    fastify.get(
-        "/items/:identifier/resources/:resource/transcription",
-        getItemTranscriptionHandler
-    );
-    fastify.get("/items/:identifier/resources/:resource/transform", getTransformTeiDocumentHandler);
-    fastify.get("/items/:identifier/resources/:resource", getItemResourceFileHandler);
-    fastify.get("/items/:identifier/resources/:file/link", getItemResourceFileLinkHandler);
-    fastify.delete("/items/:identifier/resources/:resource", deleteItemResourceHandler);
-    // fastify.delete(
-    //     "/items/:identifier/resources/:resource/:file",
-    //     deleteItemResourceFileHandler
-    // );
-    fastify.put(
-        "/items/:identifier/resources/:resource/saveTranscription",
-        saveItemTranscriptionHandler
-    );
-    fastify.post("/items/:identifier/resources/processing-status", postResourceProcessingStatus);
-    done();
-}
-
-async function verifyItemAccess(req, res) {
-    if (!req.params.identifier) return;
-
-    let item = await lookupItemByIdentifier({
-        identifier: req.params.identifier,
-        userId: req.session.user.id,
-    });
-    if (!item) {
-        return res.forbidden(`You don't have permission to access this endpoint`);
-    }
-    req.session.item = item;
-=======
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
 
@@ -141,7 +80,6 @@ export function setupRoutes(fastify, options, done) {
         done();
     });
     done();
->>>>>>> implement-publish-flow
 }
 
 async function getItemsHandler(req) {
@@ -149,19 +87,12 @@ async function getItemsHandler(req) {
     const offset = req.query.offset;
     const limit = req.query.limit;
     const match = req.query.match;
-<<<<<<< HEAD
-    let { count, rows } = await getItems({ userId, offset, limit, match });
-    let items = rows.map((i) => ({
-        name: i.identifier,
-        type: "item",
-=======
     const publicationStatus = req.query.publicationStatus;
     let { count, rows } = await getItems({ userId, offset, limit, match, publicationStatus });
     let items = rows.map((i) => ({
         name: i.identifier,
         type: "item",
         publicationStatus: i.publicationStatus,
->>>>>>> implement-publish-flow
         collections: groupBy(
             i.collections.map((c) => ({
                 type: "collection",
@@ -170,10 +101,6 @@ async function getItemsHandler(req) {
             "identifier"
         ),
     }));
-<<<<<<< HEAD
-
-=======
->>>>>>> implement-publish-flow
     return { total: count, items };
 }
 
@@ -460,10 +387,6 @@ async function postResourceProcessingStatus(req) {
     tasks = Object.keys(tasks).map((r) => tasks[r].shift());
     return { tasks };
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> implement-publish-flow
 // TODO: this method does not have tests
 async function getTransformTeiDocumentHandler(req) {
     const { identifier, resource } = req.params;

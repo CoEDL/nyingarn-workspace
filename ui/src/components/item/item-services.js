@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-export async function getMyItems({ $http, offset, limit, prefix }) {
-    return await $http.get({
-        route: `/items`,
-        params: { offset, limit, match: prefix },
-=======
 export async function getMyItems({ $http, offset, limit, prefix, publicationStatus }) {
     return await $http.get({
         route: `/items`,
         params: { offset, limit, match: prefix, publicationStatus },
->>>>>>> implement-publish-flow
     });
 }
 

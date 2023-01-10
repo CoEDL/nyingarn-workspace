@@ -36,12 +36,9 @@
                 <el-tab-pane label="Administration" name="administration">
                     <administration-component v-if="data.activeTab === 'administration'" />
                 </el-tab-pane>
-<<<<<<< HEAD
-=======
                 <el-tab-pane label="Publish" name="publish">
                     <publish-component v-if="data.activeTab === 'publish'" type="collection" />
                 </el-tab-pane>
->>>>>>> implement-publish-flow
             </el-tabs>
         </div>
     </div>
@@ -52,10 +49,7 @@ import { getCollection } from "../collection-services";
 import AdministrationComponent from "./Administration/Shell.component.vue";
 import CollectionMembersComponent from "./CollectionMembers.component.vue";
 import ViewCollectionMembersComponent from "./ViewCollectionMembers.component.vue";
-<<<<<<< HEAD
-=======
 import PublishComponent from "../../Publish.component.vue";
->>>>>>> implement-publish-flow
 import { ref, reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
@@ -75,11 +69,7 @@ let props = defineProps({
 let data = reactive({
     userIsPermitted: false,
     routeWatcher: undefined,
-<<<<<<< HEAD
-    tabs: ["members", "metadata", "associate", "administration"],
-=======
     tabs: ["members", "metadata", "associate", "administration", "publish"],
->>>>>>> implement-publish-flow
     activeTab: "metadata",
     metadataComponent: {
         display: false,

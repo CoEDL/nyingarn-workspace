@@ -9,10 +9,7 @@ import AdminComponent from "@/components/admin/Shell.component.vue";
 import AdminManageUsersComponent from "@/components/admin/users/ManageUsers.component.vue";
 import AdminWhitelistUsersComponent from "@/components/admin/users/WhitelistUsers.component.vue";
 import AdminLogsComponent from "@/components/admin/Logs.component.vue";
-<<<<<<< HEAD
-=======
 import AdminAwaitingReviewComponent from "@/components/admin/AwaitingReview.component.vue";
->>>>>>> implement-publish-flow
 import AdminItemsComponent from "@/components/admin/Items.component.vue";
 import HTTPService from "./http.service";
 import { createRouter, createWebHistory } from "vue-router";
@@ -57,14 +54,11 @@ const routes = [
                         name: "items/:identifier/administration",
                         component: ViewItemComponent,
                     },
-<<<<<<< HEAD
-=======
                     {
                         path: "publish",
                         name: "items/:identifier/publish",
                         component: ViewItemComponent,
                     },
->>>>>>> implement-publish-flow
                 ],
             },
             {
@@ -96,14 +90,11 @@ const routes = [
                         name: "collections/:identifier/administration",
                         component: ViewCollectionComponent,
                     },
-<<<<<<< HEAD
-=======
                     {
                         path: "publish",
                         name: "collections/:identifier/publish",
                         component: ViewCollectionComponent,
                     },
->>>>>>> implement-publish-flow
                 ],
             },
             {
@@ -135,15 +126,12 @@ const routes = [
                         meta: { name: "view system logs" },
                     },
                     {
-<<<<<<< HEAD
-=======
                         name: "admin.review",
                         path: "awaiting-review",
                         component: AdminAwaitingReviewComponent,
                         meta: { name: "Items and Collections Awaiting Review" },
                     },
                     {
->>>>>>> implement-publish-flow
                         name: "admin.items",
                         path: "items",
                         component: AdminItemsComponent,

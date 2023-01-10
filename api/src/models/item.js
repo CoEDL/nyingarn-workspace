@@ -19,8 +19,6 @@ export default function (sequelize, DataTypes) {
                 type: DataTypes.JSON,
                 allowNull: true,
             },
-<<<<<<< HEAD
-=======
             publicationStatus: {
                 type: DataTypes.ENUM("inProgress", "awaitingReview", "published", "needsWork"),
                 allowNull: true,
@@ -42,7 +40,6 @@ export default function (sequelize, DataTypes) {
                 type: DataTypes.JSON,
                 allowNull: true,
             },
->>>>>>> implement-publish-flow
         },
         {
             timestamps: true,

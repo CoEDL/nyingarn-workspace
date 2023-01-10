@@ -116,14 +116,9 @@
 
 <script setup>
 import { reactive, computed, onMounted, inject, nextTick } from "vue";
-<<<<<<< HEAD
-import { useRouter } from "vue-router";
-const router = useRouter();
-=======
 import * as lib from "./lib.js";
 import { useRouter } from "vue-router";
 const $router = useRouter();
->>>>>>> implement-publish-flow
 const $http = inject("$http");
 
 let data = reactive({
@@ -203,39 +198,24 @@ function pageCollections(page) {
     loadCollections();
 }
 async function connectItem(item) {
-<<<<<<< HEAD
-    await $http.put({ route: `/admin/items/${item.identifier}/connect-user` });
-=======
     await lib.connectItem({ $http, identifier: item.identifier });
->>>>>>> implement-publish-flow
     data.items.rows = data.items.rows.map((i) => {
         if (i.identifier === item.identifier) i.connected = true;
         return i;
     });
 }
 function loadItem(item) {
-<<<<<<< HEAD
-    if (item.connected) router.push(`/items/${item.identifier}/view`);
-}
-async function connectCollection(collection) {
-    await $http.put({ route: `/admin/collections/${collection.identifier}/connect-user` });
-=======
     if (item.connected) lib.loadItem({ $router, identifier: item.identifier });
 }
 async function connectCollection(collection) {
     await lib.connectCollection({ $http, identifier: collection.identifier });
->>>>>>> implement-publish-flow
     data.collections.rows = data.collections.rows.map((c) => {
         if (c.identifier === collection.identifier) c.connected = true;
         return c;
     });
 }
 function loadCollection(collection) {
-<<<<<<< HEAD
-    if (collection.connected) router.push(`/collections/${collection.identifier}/metadata`);
-=======
     if (collection.connected) lib.loadCollection({ $router, identifier: collection.identifier });
->>>>>>> implement-publish-flow
 }
 async function importObjectsInTheStore() {
     data.loading = true;

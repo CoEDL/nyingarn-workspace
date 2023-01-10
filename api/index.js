@@ -13,10 +13,7 @@ import { setupRoutes as setupLogRoutes } from "./src/routes/logs.js";
 import { setupRoutes as setupSearchRoutes } from "./src/routes/search.js";
 import { setupRoutes as setupUserRoutes } from "./src/routes/user.js";
 import { setupRoutes as setupDataRoutes } from "./src/routes/data/index.js";
-<<<<<<< HEAD
-=======
 import { setupRoutes as setupPublishRoutes } from "./src/routes/publish.js";
->>>>>>> implement-publish-flow
 import rabbit from "foo-foo-mq";
 
 import Fastify from "fastify";

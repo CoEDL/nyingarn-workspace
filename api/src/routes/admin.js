@@ -1,22 +1,5 @@
 import {
     listObjects,
-<<<<<<< HEAD
-    loadConfiguration,
-    demandAdministrator,
-    demandAuthenticatedUser,
-} from "../common/index.js";
-import { createItem, lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
-import {
-    createCollection,
-    lookupCollectionByIdentifier,
-    linkCollectionToUser,
-    getCollections,
-} from "../lib/collection.js";
-import models from "../models/index.js";
-import { Op } from "sequelize";
-import lodashPkg from "lodash";
-const { groupBy } = lodashPkg;
-=======
     demandAdministrator,
     demandAuthenticatedUser,
     getStoreHandle,
@@ -31,7 +14,6 @@ import { ROCrate } from "ro-crate";
 import { authorisedUsersFile } from "./publish.js";
 import { getContext } from "../lib/crate-tools.js";
 import path from "path";
->>>>>>> implement-publish-flow
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -42,12 +24,6 @@ export function setupRoutes(fastify, options, done) {
     fastify.get("/admin/entries/collections", getAdminEntriesCollectionsHandler);
 
     fastify.get("/admin/items/import", importItemsFromStorageIntoTheDb);
-<<<<<<< HEAD
-    fastify.put("/admin/items/:identifier/connect-user", putAdminItemUserHandler);
-
-    fastify.get("/admin/collections/import", importCollectionsFromStorageIntoTheDb);
-    fastify.put("/admin/collections/:identifier/connect-user", putAdminCollectionUserHandler);
-=======
     fastify.get("/admin/items/awaiting-review", getItemsAwaitingReviewHandler);
     fastify.put("/admin/items/:identifier/connect-user", putAdminItemUserHandler);
 
@@ -57,7 +33,6 @@ export function setupRoutes(fastify, options, done) {
 
     fastify.get("/admin/:type/:identifier/deposit", getDepositHandler);
     fastify.put("/admin/:type/:identifier/needs-work", putNeedsWorkHandler);
->>>>>>> implement-publish-flow
     done();
 }
 
@@ -72,10 +47,6 @@ async function getAdminEntriesItemsHandler(req) {
             [Op.startsWith]: prefix,
         };
     }
-<<<<<<< HEAD
-    console.log(where);
-=======
->>>>>>> implement-publish-flow
     let myItems = await models.item.findAll({
         where,
         include: [{ model: models.user, where: { id: req.session.user.id } }],
@@ -88,10 +59,7 @@ async function getAdminEntriesItemsHandler(req) {
         where,
         offset,
         limit,
-<<<<<<< HEAD
-=======
         order: [[seqFn("lower", seqCol("identifier")), "ASC"]],
->>>>>>> implement-publish-flow
         attributes: ["identifier"],
         raw: true,
     });
@@ -117,20 +85,13 @@ async function getAdminEntriesCollectionsHandler(req) {
         attributes: ["identifier"],
         raw: true,
     });
-<<<<<<< HEAD
-    console.log(where);
-=======
->>>>>>> implement-publish-flow
     myCollections = groupBy(myCollections, "identifier");
 
     let { count: collectionsTotal, rows: collections } = await models.collection.findAndCountAll({
         where,
         offset,
         limit,
-<<<<<<< HEAD
-=======
         order: [[seqFn("lower", seqCol("identifier")), "ASC"]],
->>>>>>> implement-publish-flow
         attributes: ["identifier"],
         raw: true,
     });
@@ -142,30 +103,17 @@ async function getAdminEntriesCollectionsHandler(req) {
     return { collections, collectionsTotal };
 }
 
-<<<<<<< HEAD
-// TODO: this code does not have tests
-=======
->>>>>>> implement-publish-flow
 async function importItemsFromStorageIntoTheDb(req) {
     const configuration = req.session.configuration;
     let items = (await listObjects({ prefix: `/${configuration.api.domain}/item` })) || [];
     items = items.map((i) => ({ identifier: i }));
-<<<<<<< HEAD
-=======
 
     // insert any items found on the backend storage not already in the DB
->>>>>>> implement-publish-flow
     for (let item of items) {
         await models.item.findOrCreate({
             where: { identifier: item.identifier },
         });
     }
-<<<<<<< HEAD
-    return {};
-}
-
-// TODO: this code does not have tests
-=======
 
     // ensure all existing items and collections have a publicationStatus
     await models.item.update(
@@ -175,51 +123,18 @@ async function importItemsFromStorageIntoTheDb(req) {
     return {};
 }
 
->>>>>>> implement-publish-flow
 async function importCollectionsFromStorageIntoTheDb(req) {
     const configuration = req.session.configuration;
     let collections =
         (await listObjects({ prefix: `/${configuration.api.domain}/collection` })) || [];
     collections = collections.map((i) => ({ identifier: i }));
-<<<<<<< HEAD
-=======
 
     // insert any collections found on the backend storage not already in the DB
->>>>>>> implement-publish-flow
     for (let collection of collections) {
         await models.collection.findOrCreate({
             where: { identifier: collection.identifier },
         });
     }
-<<<<<<< HEAD
-    return {};
-}
-
-// TODO: this code does not have tests
-async function putAdminItemUserHandler(req) {
-    let item = await lookupItemByIdentifier({ identifier: req.params.identifier });
-    if (item) {
-        await linkItemToUser({ itemId: item.id, userId: req.session.user.id });
-    } else {
-        item = await createItem({ identifier: req.params.identifier, userId: req.session.user.id });
-    }
-    return {};
-}
-
-// TODO: this code does not have tests
-async function putAdminCollectionUserHandler(req) {
-    let collection = await lookupCollectionByIdentifier({ identifier: req.params.identifier });
-    if (collection) {
-        await linkCollectionToUser({ collectionId: collection.id, userId: req.session.user.id });
-    } else {
-        collection = await createCollection({
-            identifier: req.params.identifier,
-            userId: req.session.user.id,
-        });
-    }
-    return {};
-}
-=======
 
     // ensure all existing items and collections have a publicationStatus
     await models.collection.update(
@@ -366,4 +281,3 @@ async function putNeedsWorkHandler(req, res) {
         await item.save();
     }
 }
->>>>>>> implement-publish-flow

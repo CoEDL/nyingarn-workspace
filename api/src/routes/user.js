@@ -1,9 +1,6 @@
 import { logEvent, demandAdministrator, demandAuthenticatedUser } from "../common/index.js";
 import {
-<<<<<<< HEAD
-=======
     getUser,
->>>>>>> implement-publish-flow
     getUsers,
     deleteUser,
     toggleUserCapability,
@@ -14,16 +11,8 @@ import { createSession } from "../lib/session.js";
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
     // user routes
-<<<<<<< HEAD
-    fastify.put(
-        "/users/:userId/upload",
-        { preHandler: demandAuthenticatedUser },
-        putUsersUploadCapabilityRouteHandler
-    );
-=======
     fastify.get("/users/self", getUserSelfInformationHandler);
     fastify.put("/users/:userId/upload", putUsersUploadCapabilityRouteHandler);
->>>>>>> implement-publish-flow
 
     // admin user routes
     fastify.get(
@@ -51,35 +40,6 @@ export function setupRoutes(fastify, options, done) {
     // server.post('/user', 'create new user known to this application', { identifier, username, authenticationService })
     // server.del('/user/:userId', 'delete user known to this application', { identifier, authenticationService })
     done();
-<<<<<<< HEAD
-}
-async function putUsersUploadCapabilityRouteHandler(req, res) {
-    let userId = req.session.user.id;
-    let user;
-    try {
-        user = await toggleUserCapability({
-            userId,
-            capability: "upload",
-        });
-        logEvent({
-            level: "info",
-            owner: req.session.user.email,
-            text: `User accepted terms and conditions of use. Enabling upload capability.`,
-        });
-    } catch (error) {
-        logEvent({
-            level: "error",
-            owner: req.session.user.email,
-            text: error.message,
-        });
-        return res.internalServerError();
-    }
-
-    let session = await createSession({ user });
-    return { token: session.token };
-}
-
-=======
 }
 
 async function getUserSelfInformationHandler(req) {
@@ -113,7 +73,6 @@ async function putUsersUploadCapabilityRouteHandler(req, res) {
     return { token: session.token };
 }
 
->>>>>>> implement-publish-flow
 async function getUsersRouteHandler(req) {
     let users = await getUsers({
         offset: req.query.offset,

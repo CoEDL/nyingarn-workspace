@@ -1,10 +1,6 @@
 {
     "name": "tasks",
-<<<<<<< HEAD
-    "version": "0.41.0",
-=======
     "version": "0.40.0",
->>>>>>> implement-publish-flow
     "description": "",
     "author": "Marco La Rosa",
     "main": "index.js",

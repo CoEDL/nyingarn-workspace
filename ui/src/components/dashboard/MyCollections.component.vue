@@ -11,8 +11,6 @@
                         clearable
                     ></el-input>
                 </div>
-<<<<<<< HEAD
-=======
                 <el-select
                     v-model="data.filterByStatus"
                     placeholder="Show"
@@ -24,7 +22,6 @@
                     <el-option label="Published" value="published" />
                     <el-option label="Needs Work" value="needsWork" />
                 </el-select>
->>>>>>> implement-publish-flow
                 <el-pagination
                     layout="prev, pager, next, total"
                     :page-size="data.limit"
@@ -47,14 +44,11 @@
                         }}</router-link>
                     </template>
                 </el-table-column>
-<<<<<<< HEAD
-=======
                 <el-table-column prop="status" label="Status" width="150">
                     <template #default="scope">
                         <status-badge-component :status="scope.row.publicationStatus" />
                     </template>
                 </el-table-column>
->>>>>>> implement-publish-flow
                 <el-table-column label="Actions" width="150" align="center">
                     <template #default="scope">
                         <div class="flex flex-row space-x-1">
@@ -107,10 +101,7 @@
 </template>
 
 <script setup>
-<<<<<<< HEAD
-=======
 import StatusBadgeComponent from "../StatusBadge.component.vue";
->>>>>>> implement-publish-flow
 import { ElMessage } from "element-plus";
 import { orderBy } from "lodash";
 import * as collectionServices from "../collection/collection-services";
@@ -125,10 +116,7 @@ const data = reactive({
     total: 0,
     collections: [],
     prefix: undefined,
-<<<<<<< HEAD
-=======
     filterByStatus: undefined,
->>>>>>> implement-publish-flow
     isAdmin: store.state.user.administrator,
 });
 let tableHeight = computed(() => {
@@ -148,10 +136,7 @@ async function loadCollections() {
         offset,
         limit: data.limit,
         prefix: data.prefix,
-<<<<<<< HEAD
-=======
         publicationStatus: data.filterByStatus,
->>>>>>> implement-publish-flow
     });
     if (response.status !== 200) {
         return;
@@ -162,11 +147,6 @@ async function loadCollections() {
         ...c,
         link: `/collections/${c.name}/metadata`,
     }));
-<<<<<<< HEAD
-    collections = orderBy(collections, "name");
-
-=======
->>>>>>> implement-publish-flow
     data.collections = [...collections];
 }
 function pageCollections(page) {

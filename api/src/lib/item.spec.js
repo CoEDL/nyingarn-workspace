@@ -13,10 +13,7 @@ import {
     listItemResourceFiles,
     itemResourceExists,
     markResourceComplete,
-<<<<<<< HEAD
-=======
     markAllResourcesComplete,
->>>>>>> implement-publish-flow
     isResourceComplete,
 } from "./item";
 const chance = require("chance").Chance();
@@ -196,11 +193,7 @@ describe("Item management tests", () => {
         let { item } = await setupTestItem({ identifier, store, user });
 
         let data = await getItemResourceLink({ identifier, resource: `${identifier}-01.json` });
-<<<<<<< HEAD
-        expect(data).toMatch("https://s3.nyingarn.net");
-=======
         expect(data).toMatch("http://s3:9000");
->>>>>>> implement-publish-flow
 
         await item.destroy();
     });
@@ -231,8 +224,6 @@ describe("Item management tests", () => {
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
-<<<<<<< HEAD
-=======
     it("should be able to mark all resources as complete", async () => {
         let user = users.filter((u) => !u.administrator)[0];
         let { item } = await setupTestItem({ identifier, store, user });
@@ -248,5 +239,4 @@ describe("Item management tests", () => {
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
->>>>>>> implement-publish-flow
 });

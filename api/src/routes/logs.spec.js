@@ -37,11 +37,7 @@ describe("Log management tests", () => {
             headers: headers(session),
         });
         let { logs } = await response.json();
-<<<<<<< HEAD
-        expect(logs.count).toEqual(1);
-=======
         expect(logs.count).toBeGreaterThanOrEqual(1);
->>>>>>> implement-publish-flow
     });
     test("it should be able to page through logs", async () => {
         await generateLogs(1, 0, 0);

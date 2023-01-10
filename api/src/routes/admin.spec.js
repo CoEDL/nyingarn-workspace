@@ -3,12 +3,6 @@ import { createSession } from "../lib/session.js";
 import Chance from "chance";
 const chance = Chance();
 import fetch from "cross-fetch";
-<<<<<<< HEAD
-import { getStoreHandle, TestSetup, headers, host } from "../common";
-
-import lodashPkg from "lodash";
-const { isArray } = lodashPkg;
-=======
 import {
     getStoreHandle,
     TestSetup,
@@ -18,7 +12,6 @@ import {
     setupTestCollection,
 } from "../common/index.js";
 import models from "../models/index.js";
->>>>>>> implement-publish-flow
 
 describe("Admin route tests", () => {
     let configuration, users, userEmail, adminEmail, bucket;
@@ -31,13 +24,6 @@ describe("Admin route tests", () => {
     });
     beforeEach(async () => {
         identifier = chance.word();
-<<<<<<< HEAD
-        store = await getStoreHandle({
-            id: identifier,
-            className: "collection",
-        });
-=======
->>>>>>> implement-publish-flow
     });
     afterEach(async () => {
         try {
@@ -67,12 +53,6 @@ describe("Admin route tests", () => {
         });
         expect(response.status).toEqual(403);
     });
-<<<<<<< HEAD
-    it("should be able to get a list of all items and collections", async () => {
-        let user = users.filter((u) => u.administrator)[0];
-        let session = await createSession({ user });
-        let response = await fetch(`${host}/admin/entries`, {
-=======
     it("an admin should be able to get a list of all items in the space", async () => {
         store = await getStoreHandle({
             id: identifier,
@@ -265,16 +245,11 @@ describe("Admin route tests", () => {
 
         // get items awaiting review
         let response = await fetch(`${host}/admin/items/awaiting-review`, {
->>>>>>> implement-publish-flow
             method: "GET",
             headers: headers(session),
         });
         expect(response.status).toEqual(200);
         response = await response.json();
-<<<<<<< HEAD
-        expect(isArray(response.items)).toBeTrue;
-        expect(isArray(response.collections)).toBeTrue;
-=======
         expect(response.items.length).toEqual(1);
         expect(response.items[0].identifier).toEqual(identifier);
 
@@ -361,6 +336,5 @@ describe("Admin route tests", () => {
 
         await models.item.destroy({ where: { identifier } });
         await storeItem.deleteItem();
->>>>>>> implement-publish-flow
     });
 });

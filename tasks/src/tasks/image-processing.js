@@ -21,14 +21,14 @@ export async function createImageThumbnail({ directory, identifier, resource }) 
 export async function createWebFormats({ directory, identifier, resource }) {
     const resourceBasename = path.basename(resource, path.extname(resource));
     const source = path.join(directory, identifier, resource);
-    if (path.extname(resource).match(/tif{1,2}/)) {
+    if (path.extname(resource).match(/tif{1,2}/i)) {
         // resource is a tif image - create jpeg and webp webformats
         let target = path.join(directory, identifier, `${resourceBasename}.jpg`);
         await createImage({ source, target });
 
         target = path.join(directory, identifier, `${resourceBasename}.webp`);
         await createImage({ source, target });
-    } else if (path.extname(resource).match(/jpe?g/)) {
+    } else if (path.extname(resource).match(/jpe?g/i)) {
         // resource is a jpg - create webp format
         let target = path.join(directory, identifier, `${resourceBasename}.webp`);
         await createImage({ source, target });

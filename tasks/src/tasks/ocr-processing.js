@@ -41,7 +41,7 @@ export async function runTextractOCR({
 
     let localFiles = await readdir(path.join(directory, identifier));
     const sourceImage = localFiles
-        .filter((f) => f.match(/\.jpe?g/))
+        .filter((f) => f.match(/\.jpe?g/i))
         .filter((f) => !f.match(/thumbnail/))
         .pop();
     const sourceBasename = path.basename(sourceImage, path.extname(sourceImage));

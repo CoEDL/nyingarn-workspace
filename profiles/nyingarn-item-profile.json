@@ -14,14 +14,7 @@
             {
                 "name": "About",
                 "description": "",
-                "inputs": [
-                    "identifier",
-                    "description",
-                    "contentLanguage",
-                    "subjectLanguage",
-                    "languageName",
-                    "subject"
-                ]
+                "inputs": ["description", "subjectLanguage", "languageName", "contentLanguage"]
             },
 
             {
@@ -29,25 +22,22 @@
                 "description": "",
                 "inputs": [
                     "source",
+                    "holdingInstitution",
+                    "catalogLinkAtRelevantInstitution",
                     "extent",
                     "publisher",
-                    "publicationYear",
-                    "yearCreated",
+                    "publicationDate",
+                    "dateCreated",
                     "dateFreeText",
-                    "originalForm"
+                    "originalForm",
+                    "recordedAt"
                 ]
             },
 
             {
                 "name": "Permissions",
                 "description": "",
-                "inputs": [
-                    "descendantsPermissions",
-                    "holdingInstitution",
-                    "rightsHolder",
-                    "copyrightStatus",
-                    "descendantsPermission"
-                ]
+                "inputs": ["languageAuthorityPermissions", "rightsHolder", "copyrightStatus"]
             },
             {
                 "name": "Who",
@@ -98,15 +88,6 @@
                     "name": "name",
                     "label": "Title",
                     "help": "The name of this dataset",
-                    "required": true,
-                    "multiple": false,
-                    "type": ["Text"]
-                },
-                {
-                    "id": "https://schema.org/identifier",
-                    "name": "identifier",
-                    "label": "Identifier",
-                    "help": "DocumentID",
                     "required": true,
                     "multiple": false,
                     "type": ["Text"]
@@ -293,7 +274,6 @@
                     "name": "source",
                     "label": "Publication Title",
                     "help": "Publication Title (if published) of work from which the document is derived",
-                    "required": true,
                     "multiple": false,
                     "type": ["Text"]
                 },
@@ -301,7 +281,7 @@
                     "id": "http://schema.org/contentLanguage",
                     "name": "contentLanguage",
                     "label": "Content Language",
-                    "help": "The Indigenous language(s) that are the subject of the document. Use the AIATSIS language definition.",
+                    "help": "The language(s) that are in the document. If unknown - select unknown.",
                     "multiple": true,
                     "type": ["Language"]
                 },
@@ -309,21 +289,29 @@
                     "id": "http://schema.org/subjectLanguage",
                     "name": "subjectLanguage",
                     "label": "Subject Language",
-                    "help": "The other language(s) used in the document (e.g. English).",
+                    "help": "The language(s) that the document is about. If unknown - select unknown.",
                     "multiple": true,
                     "type": ["Language"]
                 },
                 {
                     "id": "http://schema.org/languageName",
                     "name": "languageName",
-                    "help": "Language name in non-standard form",
-                    "type": ["Text"]
+                    "help": "Language name as written in the document; also known as.",
+                    "type": ["Text"],
+                    "multiple": true
                 },
                 {
                     "id": "http://schema.org/holdingInstitution",
                     "name": "holdingInstitution",
                     "help": "Holding Institution",
                     "type": ["Organization"]
+                },
+                {
+                    "id": "http://schema.org/catalogLinkAtRelevantInstitution",
+                    "name": "catalogLinkAtRelevantInstitution",
+                    "help": "Provide a link (URL) to the item in the relevant institution",
+                    "type": ["URL"],
+                    "multiple": true
                 },
                 {
                     "id": "https://www.dublincore.org/specifications/dublin-core/dcmi-terms/terms/rightsHolder",
@@ -345,9 +333,9 @@
                     ]
                 },
                 {
-                    "id": "http://schema.org/descendantsPermission",
-                    "name": "descendantsPermissions",
-                    "help": "Permissions required from descendants of named individuals or from speech community",
+                    "id": "http://schema.org/languageAuthorityPermissions",
+                    "name": "languageAuthorityPermissions",
+                    "help": "Permissions required from the relevant language authority",
                     "type": ["Select"],
                     "values": ["Yes", "No"]
                 },
@@ -361,20 +349,20 @@
                 {
                     "id": "http://schema.org/publisher",
                     "name": "publisher",
-                    "help": "Publisher",
+                    "help": "Publisher. Can be people and / or organisations",
                     "type": ["Person", "Organization"]
                 },
                 {
-                    "id": "http://schema.org/publicationYear",
-                    "name": "publicationYear",
-                    "help": "Year of publication",
+                    "id": "http://schema.org/publicationDate",
+                    "name": "publicationDate",
+                    "help": "Date of publication.  If you don't know the full date then set the first of January of the year.",
                     "type": ["Date"],
                     "multiple": false
                 },
                 {
-                    "id": "http://schema.org/yearCreated",
-                    "name": "yearCreated",
-                    "help": "Year created",
+                    "id": "http://schema.org/dateCreated",
+                    "name": "dateCreated",
+                    "help": "Date created. If you don't know the full date then set the first of January of the year.",
                     "type": ["Date"],
                     "multiple": false
                 },
@@ -382,8 +370,7 @@
                     "id": "http://nyingarn.net/metadata/dateFreetext",
                     "name": "dateFreeText",
                     "label": "Date (free text)",
-                    "help": "used for unknown or estimated dates or for date ranges",
-                    "label": "Put your free text date data in here",
+                    "help": "Used for unknown or estimated dates or for date ranges",
                     "type": ["Text"],
                     "multiple": false
                 },
@@ -393,13 +380,6 @@
                     "help": "Original in typed of handwritten form",
                     "type": ["Select"],
                     "values": ["Hand", "Type", "Both"],
-                    "multiple": true
-                },
-                {
-                    "id": "http://schema.org/about",
-                    "name": "subject",
-                    "help": "Subject Pathways thesaurus subject",
-                    "type": ["Text"],
                     "multiple": true
                 },
                 {
@@ -413,7 +393,15 @@
                     "id": "http://schema.org/contentLocation",
                     "name": "location",
                     "help": "Location [min/max lat/long]. Given by bounding box on map.",
-                    "type": ["Geo"]
+                    "type": ["Geo"],
+                    "multiple": true
+                },
+                {
+                    "id": "http://schema.org/recordedAt",
+                    "name": "recordedAt",
+                    "help": "The location at which this item was recorded",
+                    "type": ["Geo"],
+                    "multiple": true
                 }
             ]
         },

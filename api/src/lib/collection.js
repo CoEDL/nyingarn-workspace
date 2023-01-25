@@ -9,7 +9,7 @@ export async function lookupCollectionByIdentifier({ identifier, userId }) {
     };
     if (userId) {
         clause.include = [
-            { model: models.user, where: { id: userId }, attributes: ["id"], raw: true },
+            { model: models.user, where: { id: userId }, attributes: ["id", "email"], raw: true },
         ];
     }
     return await models.collection.findOne(clause);
@@ -58,7 +58,7 @@ export async function linkCollectionToUser({ collectionId, userId }) {
 }
 
 export async function createCollectionLocationInObjectStore({ identifier }) {
-    let store = await getStoreHandle({ id: identifier, className: "collection" });
+    let store = await getStoreHandle({ id: identifier, type: "collection" });
     let exists = await store.itemExists();
     if (!exists) {
         await store.createItem();

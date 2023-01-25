@@ -21,7 +21,10 @@ export async function getS3Handle() {
     return { s3, bucket };
 }
 
-export async function getStoreHandle({ id, className }) {
+export async function getStoreHandle({ id, identifier, type, location = "workspace" }) {
+    if (!id && !identifier) {
+        throw new Error(`'id' or 'identifier' must be defined`);
+    }
     const configuration = await loadConfiguration();
     let s3 = configuration.api.services.s3;
     let credentials = {
@@ -34,10 +37,11 @@ export async function getStoreHandle({ id, className }) {
         credentials.endpoint = s3.endpointUrl;
         credentials.forcePathStyle = s3.forcePathStyle;
     }
+    id = id ? id : identifier;
     return new Store({
         id,
-        className,
-        domain: configuration.api.domain,
+        type,
+        prefix: `${configuration.api.domain}/${location}`,
         credentials,
     });
 }

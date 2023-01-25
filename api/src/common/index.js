@@ -32,6 +32,7 @@ export const specialFiles = [
 ];
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
+export const authorisedUsersFile = ".authorised-users.json";
 
 import path from "path";
 import { getS3Handle } from "./getS3Handle.js";

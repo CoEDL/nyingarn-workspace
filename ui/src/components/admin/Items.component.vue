@@ -14,6 +14,9 @@
 
             <!-- <div><el-button @click="init">init</el-button></div> -->
         </div>
+        <!-- <div>
+            <el-button @click="migrate">migrate backend</el-button>
+        </div> -->
         <div
             class="flex flex-col space-y-2 xl:flex-row xl:space-x-2 xl:space-y-0"
             v-loading="data.loading"
@@ -26,7 +29,7 @@
                             <el-input
                                 v-model="data.items.prefix"
                                 placeholder="Filter items by prefix"
-                                @change="loadItems"
+                                @current-change="loadItems"
                                 clearable
                             ></el-input>
                         </div>
@@ -164,9 +167,9 @@ async function loadItems() {
         data.loading = false;
         return;
     }
-    let { items, itemsTotal } = await response.json();
+    let { items, total } = await response.json();
     data.items.rows = [...items];
-    data.items.total = itemsTotal;
+    data.items.total = total;
 
     data.loading = false;
 }
@@ -187,9 +190,9 @@ async function loadCollections() {
         data.loading = false;
         return;
     }
-    let { collections, collectionsTotal } = await response.json();
+    let { collections, total } = await response.json();
     data.collections.rows = [...collections];
-    data.collections.total = collectionsTotal;
+    data.collections.total = total;
 
     data.loading = false;
 }
@@ -224,5 +227,8 @@ async function importObjectsInTheStore() {
     await loadItems();
     await loadCollections();
     data.loading = false;
+}
+async function migrate() {
+    await $http.get({ route: `/admin/migrate` });
 }
 </script>

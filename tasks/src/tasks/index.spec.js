@@ -22,7 +22,7 @@ describe(`Test `, () => {
         const directory = path.join("/tmp", chance.word());
         const resource = `${identifier}-01.tiff`;
 
-        let store = await getStoreHandle({ id: identifier, className: "test" });
+        let store = await getStoreHandle({ id: identifier, type: "test" });
         await store.createItem();
 
         await ensureDir(directory);
@@ -36,7 +36,7 @@ describe(`Test `, () => {
             path.join("src", "tasks", "index.spec.js"),
             path.join(directory, identifier, "index.spec.js")
         );
-        await removeOverlappingNewContent({ directory, identifier, className: "test" });
+        await removeOverlappingNewContent({ directory, identifier, type: "test" });
 
         let contents = await readdir(path.join(directory, identifier));
         expect(contents).toEqual(["index.spec.js"]);
@@ -51,14 +51,14 @@ describe(`Test `, () => {
         };
         const resource = "test-image-text.jpg";
 
-        let store = await getStoreHandle({ id: identifier, className: "test" });
+        let store = await getStoreHandle({ id: identifier, type: "test" });
         await store.createItem();
         await store.put({
             localPath: path.join("src", "test-data", "image-processing", resource),
             target: resource,
         });
 
-        let directory = await prepare({ identifier, task, resource, className: "test" });
+        let directory = await prepare({ identifier, task, resource, type: "test" });
 
         let contents = await readdir(path.join(directory, identifier));
         expect(contents).toEqual([resource]);
@@ -73,17 +73,17 @@ describe(`Test `, () => {
         };
         const resource = "test-image-text.jpg";
 
-        let store = await getStoreHandle({ id: identifier, className: "test" });
-        await store.createItem();
+        let store = await getStoreHandle({ id: identifier, type: "test" });
+        await store.createObject();
         await store.put({
             localPath: path.join("src", "test-data", "image-processing", resource),
             target: resource,
         });
 
-        let directory = await prepare({ identifier, task, resource, className: "test" });
+        let directory = await prepare({ identifier, task, resource, type: "test" });
 
-        await cleanup({ directory, identifier, className: "test" });
-        expect(await pathExists(directory)).toBe(false);
+        await cleanup({ directory, identifier, type: "test" });
+        expect(await pathExists(directory)).toBeFalse;
 
         let resources = await store.listResources();
         expect(resources.length).toEqual(4);
@@ -102,14 +102,14 @@ describe(`Test `, () => {
         };
         const resource = "test-image-text.jpg";
 
-        let store = await getStoreHandle({ id: identifier, className: "test" });
+        let store = await getStoreHandle({ id: identifier, type: "test" });
         await store.createItem();
         await store.put({
             localPath: path.join("src", "test-data", "image-processing", resource),
             target: resource,
         });
 
-        let directory = await prepare({ identifier, task, resource, className: "test" });
+        let directory = await prepare({ identifier, task, resource, type: "test" });
         // console.log(directory);
         await copy(
             path.join("src", "tasks", "index.js"),
@@ -120,7 +120,7 @@ describe(`Test `, () => {
             path.join(directory, identifier, "index.spec.js")
         );
 
-        await syncToBucket({ directory, identifier, className: "test" });
+        await syncToBucket({ directory, identifier, type: "test" });
         let resources = await store.listResources();
         expect(resources.length).toEqual(6);
         expect(resources.map((r) => r.Key).sort()).toEqual([

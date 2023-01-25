@@ -3,6 +3,7 @@ import lodashPkg from "lodash";
 const { uniqBy, compact, flattenDeep } = lodashPkg;
 import models from "../models/index.js";
 import { createDefaultROCrateFile } from "../lib/crate-tools.js";
+import { ROCrate } from "ro-crate";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -46,7 +47,7 @@ async function postLinkItemsHandler(req) {
     for (let update of req.body.updates) {
         const id = assembleUrl({ targetType: update.targetType, identifier: update.target });
 
-        let store = await getStoreHandle({ id: update.source, className: update.sourceType });
+        let store = await getStoreHandle({ id: update.source, type: update.sourceType });
         let crate;
         try {
             crate = await store.getJSON({ target: "ro-crate-metadata.json" });
@@ -101,7 +102,7 @@ async function postUnlinkItemsHandler(req) {
     for (let update of req.body.updates) {
         const id = assembleUrl({ targetType: update.targetType, identifier: update.target });
 
-        let store = await getStoreHandle({ id: update.source, className: update.sourceType });
+        let store = await getStoreHandle({ id: update.source, type: update.sourceType });
         let crate;
         try {
             crate = await store.getJSON({ target: "ro-crate-metadata.json" });
@@ -133,29 +134,33 @@ async function postUnlinkItemsHandler(req) {
 // TODO: this code does not have tests
 async function postCopyCrateHandler(req) {
     const copy = req.body.copy;
-    let store = await getStoreHandle({ id: copy.source, className: copy.sourceType });
+    let store = await getStoreHandle({ id: copy.source, type: copy.sourceType });
     let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
-    store = await getStoreHandle({ id: copy.target, className: copy.sourceType });
+    store = await getStoreHandle({ id: copy.target, type: copy.sourceType });
     await store.put({ json: crate, target: "ro-crate-metadata.json" });
     return;
 }
 
 // TODO: this code does not have tests
 async function getDescriboROCrate(req) {
-    let store = await getStoreHandle({ id: req.params.identifier, className: req.params.type });
+    const { type, identifier } = req.params;
+    let store = await getStoreHandle({ id: identifier, type });
 
     let crate, filesAdded;
     try {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
     } catch (error) {
-        crate = createDefaultROCrateFile({ name: req.params.identifier });
+        crate = createDefaultROCrateFile({ name: identifier });
     }
-    return { crate };
+
+    crate = new ROCrate(crate);
+    crate.rootDataset.identifier = identifier;
+    return { crate: crate.toJSON() };
 }
 
 // TODO: this code does not have tests
 async function putDescriboROCrate(req) {
-    let store = await getStoreHandle({ id: req.params.identifier, className: req.params.type });
+    let store = await getStoreHandle({ id: req.params.identifier, type: req.params.type });
     await store.put({ target: "ro-crate-metadata.json", json: req.body.data.crate });
     return {};
 }

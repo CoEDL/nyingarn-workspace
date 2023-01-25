@@ -13,7 +13,7 @@ export async function getItemPath(req, res) {
     if (!req.session.user.upload) {
         return res.unauthorized();
     }
-    let store = await getStoreHandle({ id: req.params.identifier, className: req.params.itemType });
+    let store = await getStoreHandle({ id: req.params.identifier, type: req.params.itemType });
     return { path: store.getItemPath() };
 }
 

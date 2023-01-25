@@ -22,7 +22,7 @@
 
             <el-table :data="data.items.results" v-loading="data.loading" :max-height="tableHeight">
                 <template #empty>You have no items. Get started by creating an item.</template>
-                <el-table-column prop="name" label="Name"> </el-table-column>
+                <el-table-column prop="identifier" label="Identifier"> </el-table-column>
                 <el-table-column prop="type" label="Type" width="150"> </el-table-column>
                 <el-table-column label="Actions" width="100">
                     <template #default="scope">
@@ -72,7 +72,7 @@
                 <template #empty
                     >You have no collections. Get started by creating a collection.</template
                 >
-                <el-table-column prop="name" label="Name"> </el-table-column>
+                <el-table-column prop="identifier" label="Identifier"> </el-table-column>
                 <el-table-column prop="type" label="Type" width="150"> </el-table-column>
                 <el-table-column label="Actions" width="100">
                     <template #default="scope">

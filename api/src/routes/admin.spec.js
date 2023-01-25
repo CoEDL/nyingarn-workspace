@@ -1,5 +1,6 @@
 require("regenerator-runtime");
 import { createSession } from "../lib/session.js";
+import { deleteItem } from "../lib/item.js";
 import Chance from "chance";
 const chance = Chance();
 import fetch from "cross-fetch";
@@ -24,11 +25,6 @@ describe("Admin route tests", () => {
     });
     beforeEach(async () => {
         identifier = chance.word();
-    });
-    afterEach(async () => {
-        try {
-            await store.deleteItem();
-        } catch (error) {}
     });
     afterAll(async () => {
         await tester.purgeUsers({ users });
@@ -56,7 +52,7 @@ describe("Admin route tests", () => {
     it("an admin should be able to get a list of all items in the space", async () => {
         store = await getStoreHandle({
             id: identifier,
-            className: "item",
+            type: "item",
         });
 
         //  setup as a normal user
@@ -77,12 +73,12 @@ describe("Admin route tests", () => {
         expect(item.connected).toBeFalse;
 
         await models.item.destroy({ where: { identifier } });
-        await store.deleteItem();
+        await store.removeObject();
     });
     it("an admin should be able to get a list of all collections in the space", async () => {
         store = await getStoreHandle({
             id: identifier,
-            className: "collection",
+            type: "collection",
         });
 
         //  setup as a normal user
@@ -103,12 +99,12 @@ describe("Admin route tests", () => {
         expect(collection.connected).toBeFalse;
 
         await models.collection.destroy({ where: { identifier } });
-        await store.deleteItem();
+        await store.removeObject();
     });
     it("should be able to attach an item and a collection to the admin user", async () => {
         store = await getStoreHandle({
             id: identifier,
-            className: "item",
+            type: "item",
         });
 
         //  setup as a normal user
@@ -155,25 +151,25 @@ describe("Admin route tests", () => {
         expect(collection.connected).toBeTrue;
 
         await models.item.destroy({ where: { identifier } });
-        await store.deleteItem();
+        await store.removeObject();
 
         await models.collection.destroy({ where: { identifier } });
         store = await getStoreHandle({
             id: identifier,
-            className: "collection",
+            type: "collection",
         });
-        await store.deleteItem();
+        await store.removeObject();
     });
     it("should be able to import items and collections from the storage into the DB", async () => {
         let storeItem = await getStoreHandle({
             id: identifier,
-            className: "item",
+            type: "item",
         });
         await storeItem.createItem();
 
         let storeCollection = await getStoreHandle({
             id: identifier,
-            className: "collection",
+            type: "collection",
         });
         await storeCollection.createItem();
 
@@ -213,17 +209,17 @@ describe("Admin route tests", () => {
 
         await models.item.destroy({ where: { identifier } });
         await models.collection.destroy({ where: { identifier } });
-        await storeItem.deleteItem();
-        await storeCollection.deleteItem();
+        await storeItem.removeObject();
+        await storeCollection.removeObject();
     });
     it("should be able to get items and collections awaiting review", async () => {
         let storeItem = await getStoreHandle({
             id: identifier,
-            className: "item",
+            type: "item",
         });
         let storeCollection = await getStoreHandle({
             id: identifier,
-            className: "collection",
+            type: "collection",
         });
 
         //  setup as a normal user
@@ -265,18 +261,23 @@ describe("Admin route tests", () => {
 
         await models.item.destroy({ where: { identifier } });
         await models.collection.destroy({ where: { identifier } });
-        await storeItem.deleteItem();
-        await storeCollection.deleteItem();
+        await storeItem.removeObject();
+        await storeCollection.removeObject();
     });
-    it("should be able to deposit an item (mark it as published)", async () => {
-        let storeItem = await getStoreHandle({
+    it("should be able to publish an item and deposit it into the repository", async () => {
+        let workspaceObject = await getStoreHandle({
             id: identifier,
-            className: "item",
+            type: "item",
+        });
+        let repositoryObject = await getStoreHandle({
+            id: identifier,
+            type: "item",
+            location: "repository",
         });
 
         //  setup as a normal user
         let user = users.filter((u) => !u.administrator)[0];
-        await setupTestItem({ identifier, store: storeItem, user });
+        await setupTestItem({ identifier, store: workspaceObject, user });
 
         // connect as an admin
         let adminUser = users.filter((u) => u.administrator)[0];
@@ -284,35 +285,75 @@ describe("Admin route tests", () => {
 
         // deposit the item
         let response = await fetch(`${host}/admin/items/${identifier}/deposit`, {
-            method: "GET",
+            method: "PUT",
             headers: headers(session),
+            body: JSON.stringify({}),
         });
         expect(response.status).toEqual(200);
 
         let item = await models.item.findOne({ where: { identifier } });
         expect(item.publicationStatus).toEqual("published");
 
-        let crate = await storeItem.getJSON({ target: "ro-crate-metadata.json" });
-        let licence = crate["@graph"].filter((e) => e["@id"] === "LICENCE")[0];
-        expect(licence).toEqual({
-            "@id": "LICENCE",
-            "@type": ["File", "DataReuselicence"],
-            name: "Open (subject to agreeing to PDSC access conditions)",
-            access: {
-                "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
-            },
-            authorizationWorkflow: {
-                "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms",
-            },
-        });
+        expect(await workspaceObject.exists()).toBeFalse;
+        expect(await repositoryObject.exists()).toBeTrue;
+        let resources = await repositoryObject.listResources();
+        resources = resources.map((r) => r.Key);
+        expect(resources.length).toEqual(8);
 
         await models.item.destroy({ where: { identifier } });
-        await storeItem.deleteItem();
+        await workspaceObject.removeObject();
+        await repositoryObject.removeObject();
+    });
+    it("should be able to restore an item to the workspace for further work", async () => {
+        let workspaceObject = await getStoreHandle({
+            id: identifier,
+            type: "item",
+        });
+        let repositoryObject = await getStoreHandle({
+            id: identifier,
+            type: "item",
+            location: "repository",
+        });
+
+        //  setup as a normal user
+        let user = users.filter((u) => !u.administrator)[0];
+        await setupTestItem({ identifier, store: workspaceObject, user });
+
+        // connect as an admin
+        let adminUser = users.filter((u) => u.administrator)[0];
+        let session = await createSession({ user: adminUser });
+
+        // deposit the item
+        let response = await fetch(`${host}/admin/items/${identifier}/deposit`, {
+            method: "PUT",
+            headers: headers(session),
+            body: JSON.stringify({}),
+        });
+        expect(response.status).toEqual(200);
+
+        let item = await models.item.findOne({ where: { identifier } });
+        expect(item.publicationStatus).toEqual("published");
+
+        response = await fetch(`${host}/admin/items/${identifier}/restore`, {
+            method: "PUT",
+            headers: headers(session),
+            body: JSON.stringify({}),
+        });
+        expect(response.status).toEqual(200);
+
+        item = await models.item.findOne({ where: { identifier } });
+        expect(item.publicationStatus).toEqual("inProgress");
+
+        expect(await await workspaceObject.exists()).toBeTrue;
+
+        await models.item.destroy({ where: { identifier } });
+        await workspaceObject.removeObject();
+        await repositoryObject.removeObject();
     });
     it("should be able to mark an item as needing work", async () => {
         let storeItem = await getStoreHandle({
             id: identifier,
-            className: "item",
+            type: "item",
         });
 
         //  setup as a normal user
@@ -335,6 +376,6 @@ describe("Admin route tests", () => {
         expect(item.publicationStatus).toEqual("needsWork");
 
         await models.item.destroy({ where: { identifier } });
-        await storeItem.deleteItem();
+        await storeItem.removeObject();
     });
 });

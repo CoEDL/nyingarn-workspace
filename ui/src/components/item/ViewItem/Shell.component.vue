@@ -30,11 +30,11 @@
                 <el-tab-pane label="Upload Data" name="upload">
                     <upload-component v-if="data.activeTab === 'upload'" />
                 </el-tab-pane>
+                <el-tab-pane label="Publish" name="publish" v-if="data.isAdmin">
+                    <publish-component v-if="data.activeTab === 'publish'" type="item" />
+                </el-tab-pane>
                 <el-tab-pane label="Administration" name="administration">
                     <administration-component v-if="data.activeTab === 'administration'" />
-                </el-tab-pane>
-                <el-tab-pane label="Publish" name="publish">
-                    <publish-component v-if="data.activeTab === 'publish'" type="item" />
                 </el-tab-pane>
             </el-tabs>
         </div>
@@ -49,9 +49,11 @@ import AdministrationComponent from "./Administration/Shell.component.vue";
 import PublishComponent from "../../Publish.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { Lookup } from "../../lookup.js";
 import { debounce } from "lodash";
+const $store = useStore();
 const $route = useRoute();
 const $router = useRouter();
 const $http = inject("$http");
@@ -75,6 +77,7 @@ let data = reactive({
     crate: {},
     profile: {},
     debouncedLoad: debounce(load, 300),
+    isAdmin: $store.state.user.administrator,
 });
 onBeforeMount(async () => {
     await checkUserAccess();

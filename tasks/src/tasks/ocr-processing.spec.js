@@ -20,16 +20,16 @@ describe(`Test Textract OCR processing`, () => {
         };
         const resource = "test-image-text.jpg";
 
-        let store = await getStoreHandle({ id: identifier, className: "test" });
+        let store = await getStoreHandle({ id: identifier, type: "test" });
         await store.createItem();
         await store.put({
             localPath: path.join("src", "test-data", "image-processing", resource),
             target: resource,
         });
 
-        let directory = await prepare({ identifier, task, resource, className: "test" });
+        let directory = await prepare({ identifier, task, resource, type: "test" });
 
-        await runTextractOCR({ directory, identifier, resource, className: "test" });
+        await runTextractOCR({ directory, identifier, resource, type: "test" });
         let contents = await readdir(path.join(directory, identifier));
 
         expect(contents.sort()).toEqual([
@@ -38,7 +38,7 @@ describe(`Test Textract OCR processing`, () => {
             "test-image-text.textract_ocr-ADMIN.json",
         ]);
 
-        await cleanup({ directory, identifier, className: "test" });
+        await cleanup({ directory, identifier, type: "test" });
 
         await remove(directory);
         await bucket.removeObjects({ prefix: store.getItemPath() });
@@ -50,21 +50,21 @@ describe(`Test Textract OCR processing`, () => {
         };
         const resource = "test-image-table-1.jpg";
 
-        let store = await getStoreHandle({ id: identifier, className: "test" });
+        let store = await getStoreHandle({ id: identifier, type: "test" });
         await store.createItem();
         await store.put({
             localPath: path.join("src", "test-data", "image-processing", resource),
             target: resource,
         });
 
-        let directory = await prepare({ identifier, task, resource, className: "test" });
+        let directory = await prepare({ identifier, task, resource, type: "test" });
 
         await runTextractOCR({
             task: "table",
             directory,
             identifier,
             resource,
-            className: "test",
+            type: "test",
         });
         let contents = await readdir(path.join(directory, identifier));
 
@@ -74,7 +74,7 @@ describe(`Test Textract OCR processing`, () => {
             "test-image-table-1.textract_ocr-ADMIN.json",
         ]);
 
-        await cleanup({ directory, identifier, className: "test" });
+        await cleanup({ directory, identifier, type: "test" });
 
         await remove(directory);
         await bucket.removeObjects({ prefix: store.getItemPath() });

@@ -90,7 +90,7 @@ async function getItemsHandler(req) {
     const publicationStatus = req.query.publicationStatus;
     let { count, rows } = await getItems({ userId, offset, limit, match, publicationStatus });
     let items = rows.map((i) => ({
-        name: i.identifier,
+        identifier: i.identifier,
         type: "item",
         publicationStatus: i.publicationStatus,
         collections: groupBy(
@@ -189,8 +189,8 @@ async function getItemUsers(req) {
 async function deleteItemHandler(req, res) {
     try {
         await deleteItem({ id: req.session.item.id });
-        let store = await getStoreHandle({ id: req.params.identifier, className: "item" });
-        await store.deleteItem();
+        let store = await getStoreHandle({ id: req.params.identifier, type: "item" });
+        await store.removeObject();
         await logEvent({
             level: "info",
             owner: req.session.user.email,
@@ -390,7 +390,7 @@ async function postResourceProcessingStatus(req) {
 // TODO: this method does not have tests
 async function getTransformTeiDocumentHandler(req) {
     const { identifier, resource } = req.params;
-    let store = await getStoreHandle({ id: identifier, className: "item" });
+    let store = await getStoreHandle({ id: identifier, type: "item" });
     let document = await store.get({ target: `${resource}.tei.xml` });
     document = await transformDocument({ document });
     return { document };

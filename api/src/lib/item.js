@@ -6,6 +6,7 @@ import {
     getStoreHandle,
     completedResources,
     specialFiles,
+    imageExtensions,
 } from "../common/index.js";
 import path from "path";
 import lodashPkg from "lodash";
@@ -17,7 +18,7 @@ export async function lookupItemByIdentifier({ identifier, userId }) {
     };
     if (userId) {
         clause.include = [
-            { model: models.user, where: { id: userId }, attributes: ["id"], raw: true },
+            { model: models.user, where: { id: userId }, attributes: ["id", "email"], raw: true },
         ];
     }
     return await models.item.findOne(clause);
@@ -74,16 +75,16 @@ export async function linkItemToUser({ itemId, userId }) {
 }
 
 export async function createItemLocationInObjectStore({ identifier }) {
-    let store = await getStoreHandle({ id: identifier, className: "item" });
-    let exists = await store.itemExists();
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    let exists = await store.exists();
     if (!exists) {
-        await store.createItem();
+        await store.createObject();
     }
 }
 
 export async function itemResourceExists({ identifier, resource }) {
-    let store = await getStoreHandle({ id: identifier, className: "item" });
-    if (!(await store.itemExists())) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
     let stat = await store.stat({ path: resource });
@@ -92,11 +93,11 @@ export async function itemResourceExists({ identifier, resource }) {
 }
 
 export async function getItemResource({ identifier, resource }) {
-    let store = await getStoreHandle({ id: identifier, className: "item" });
-    if (!(await store.itemExists())) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
-    if (!(await store.pathExists({ path: resource }))) {
+    if (!(await store.fileExists({ path: resource }))) {
         throw new Error(`Not found`);
     } else {
         return await store.get({ target: resource });
@@ -104,8 +105,8 @@ export async function getItemResource({ identifier, resource }) {
 }
 
 export async function deleteItemResource({ identifier, resource }) {
-    let store = await getStoreHandle({ id: identifier, className: "item" });
-    if (!(await store.itemExists())) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
     await store.delete({ prefix: resource });
@@ -119,20 +120,20 @@ export async function putItemResource({
     content = undefined,
     json,
 }) {
-    let store = await getStoreHandle({ id: identifier, className: "item" });
-    if (!(await store.itemExists())) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
     await store.put({ target: resource, localPath, content, json });
 }
 
 export async function getItemResourceLink({ identifier, resource, download }) {
-    let store = await getStoreHandle({ id: identifier, className: "item" });
-    if (!(await store.itemExists())) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
 
-    if (!(await store.pathExists({ path: resource }))) {
+    if (!(await store.fileExists({ path: resource }))) {
         throw new Error("Not found");
     } else {
         return await store.getPresignedUrl({ target: resource, download });
@@ -141,8 +142,8 @@ export async function getItemResourceLink({ identifier, resource, download }) {
 
 export async function listItemResources({ identifier, offset = 0, limit }) {
     const configuration = await loadConfiguration();
-    let store = await getStoreHandle({ id: identifier, className: "item" });
-    if (!(await store.itemExists())) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
 
@@ -169,8 +170,8 @@ export async function listItemResources({ identifier, offset = 0, limit }) {
 }
 
 export async function listItemResourceFiles({ identifier, resource }) {
-    let store = await getStoreHandle({ id: identifier, className: "item" });
-    if (!(await store.itemExists())) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
     // let { bucket } = await getS3Handle();
@@ -278,7 +279,7 @@ export async function statItemFile({ identifier, file }) {
 }
 
 export async function markResourceComplete({ identifier, resource, complete = false }) {
-    let store = await getStoreHandle({ id: identifier, className: "item" });
+    let store = await getStoreHandle({ id: identifier, type: "item" });
     if (!(await store.itemExists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
@@ -294,7 +295,7 @@ export async function markResourceComplete({ identifier, resource, complete = fa
 }
 
 export async function markAllResourcesComplete({ identifier, resources, complete = true }) {
-    let store = await getStoreHandle({ id: identifier, className: "item" });
+    let store = await getStoreHandle({ id: identifier, type: "item" });
     if (!(await store.itemExists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }

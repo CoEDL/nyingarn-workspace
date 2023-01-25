@@ -23,7 +23,7 @@ describe("Collection management tests", () => {
         identifier = chance.word();
         store = await getStoreHandle({
             id: identifier,
-            className: "collection",
+            type: "collection",
         });
     });
     afterEach(async () => {

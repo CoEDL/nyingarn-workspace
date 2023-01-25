@@ -33,7 +33,7 @@ describe("Item management tests", () => {
         identifier = chance.word();
         store = await getStoreHandle({
             id: identifier,
-            className: "item",
+            type: "item",
         });
     });
     afterEach(async () => {

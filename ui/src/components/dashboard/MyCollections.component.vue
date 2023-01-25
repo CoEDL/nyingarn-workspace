@@ -33,15 +33,24 @@
         </template>
 
         <div class="w-full">
-            <el-table :data="data.collections" :height="tableHeight" size="small">
+            <el-table
+                :data="data.collections"
+                :height="tableHeight"
+                size="small"
+                v-loading="data.loading"
+            >
                 <template #empty
                     >You have no collections. Get started by creating a collection.</template
                 >
-                <el-table-column prop="name" label="">
+                <el-table-column prop="identifier" label="">
                     <template #default="scope">
-                        <router-link :to="scope.row.link" class="text-base">{{
-                            scope.row.name
-                        }}</router-link>
+                        <router-link
+                            :to="scope.row.link"
+                            class="text-base"
+                            v-if="scope.row.publicationStatus !== 'published'"
+                            >{{ scope.row.identifier }}</router-link
+                        >
+                        <div v-else class="text-base">{{ scope.row.identifier }}</div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="status" label="Status" width="150">
@@ -49,9 +58,18 @@
                         <status-badge-component :status="scope.row.publicationStatus" />
                     </template>
                 </el-table-column>
-                <el-table-column label="Actions" width="150" align="center">
+                <el-table-column label="Actions" width="250" align="center">
                     <template #default="scope">
                         <div class="flex flex-row space-x-1">
+                            <div v-if="data.isAdmin && scope.row.publicationStatus === 'published'">
+                                <el-button
+                                    type="primary"
+                                    size="small"
+                                    @click="restoreCollection(scope.row)"
+                                >
+                                    <i class="fa-solid fa-rotate-left"></i>&nbsp; restore
+                                </el-button>
+                            </div>
                             <div>
                                 <el-button
                                     type="primary"
@@ -107,17 +125,18 @@ import { orderBy } from "lodash";
 import * as collectionServices from "../collection/collection-services";
 import { reactive, computed, onMounted, inject } from "vue";
 import { useStore } from "vuex";
-const store = useStore();
+const $store = useStore();
 const $http = inject("$http");
 
 const data = reactive({
+    loading: false,
     page: 1,
     limit: 10,
     total: 0,
     collections: [],
     prefix: undefined,
     filterByStatus: undefined,
-    isAdmin: store.state.user.administrator,
+    isAdmin: $store.state.user.administrator,
 });
 let tableHeight = computed(() => {
     if (window.innerWidth > 1280) {
@@ -145,7 +164,7 @@ async function loadCollections() {
     data.total = total;
     collections = collections.map((c) => ({
         ...c,
-        link: `/collections/${c.name}/metadata`,
+        link: `/collections/${c.identifier}/metadata`,
     }));
     data.collections = [...collections];
 }
@@ -155,7 +174,7 @@ function pageCollections(page) {
 }
 async function deleteCollection(collection) {
     try {
-        await collectionServices.deleteCollection({ $http, identifier: collection.name });
+        await collectionServices.deleteCollection({ $http, identifier: collection.identifier });
         loadCollections();
     } catch (error) {
         ElMessage.error(`Something went wrong deleting this collection`);
@@ -164,7 +183,7 @@ async function deleteCollection(collection) {
 async function toggleCollectionVisibility(collection) {
     await collectionServices.toggleCollectionVisibility({
         $http,
-        identifier: collection.name,
+        identifier: collection.identifier,
     });
     await loadCollections();
 }
@@ -172,12 +191,18 @@ async function unlinkMe(collection) {
     try {
         await collectionServices.detachUserFromCollection({
             $http,
-            identifier: collection.name,
+            identifier: collection.identifier,
             userId: store.state.user.id,
         });
         loadCollections();
     } catch (error) {
         ElMessage.error(`Something went wrong detaching you from this collection`);
     }
+}
+async function restoreCollection(item) {
+    data.loading = true;
+    await $http.put({ route: `/admin/collections/${item.identifier}/restore`, body: {} });
+    loadCollections();
+    data.loading = false;
 }
 </script>

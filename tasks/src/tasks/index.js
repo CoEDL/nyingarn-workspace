@@ -9,8 +9,8 @@ export const thumbnailHeight = 300;
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];
 export const specialFiles = ["ro-crate-metadata.json", "nocfl.", "-digivol.csv", "-tei.xml"];
 
-export async function removeOverlappingNewContent({ directory, identifier, className = "item" }) {
-    let store = await getStoreHandle({ id: identifier, className });
+export async function removeOverlappingNewContent({ directory, identifier, type = "item" }) {
+    let store = await getStoreHandle({ id: identifier, type });
     let storeResources = (await store.listResources()).map((r) => r.Key);
 
     directory = path.join(directory, identifier);
@@ -23,8 +23,8 @@ export async function removeOverlappingNewContent({ directory, identifier, class
     });
 }
 
-export async function prepare({ task, identifier, resource, className = "item" }) {
-    let store = await getStoreHandle({ id: identifier, className });
+export async function prepare({ task, identifier, resource, type = "item" }) {
+    let store = await getStoreHandle({ id: identifier, type });
     const directory = await ensureDir(path.join("/tmp", task.id, identifier));
     log.debug(`Setting up task to run in directory: ${directory}.`);
 
@@ -32,9 +32,9 @@ export async function prepare({ task, identifier, resource, className = "item" }
     return directory;
 }
 
-export async function cleanup({ directory, identifier, className = "item" }) {
+export async function cleanup({ directory, identifier, type = "item" }) {
     log.debug(`Task in ${directory} completed successfully.`);
-    await syncToBucket({ directory, identifier, className });
+    await syncToBucket({ directory, identifier, type });
 
     if (await pathExists(directory)) {
         await remove(directory);
@@ -51,9 +51,9 @@ export async function cleanupAfterFailure({ directory }) {
     }
 }
 
-export async function syncToBucket({ directory, identifier, className = "item" }) {
+export async function syncToBucket({ directory, identifier, type = "item" }) {
     log.debug(`Sync'ing back to bucket.`);
-    let store = await getStoreHandle({ id: identifier, className });
+    let store = await getStoreHandle({ id: identifier, type });
     directory = path.join(directory, identifier);
 
     let batch = [];

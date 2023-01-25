@@ -14,9 +14,9 @@ export async function runTextractOCR({
     directory,
     identifier,
     resource,
-    className = "item",
+    type = "item",
 }) {
-    let store = await getStoreHandle({ id: identifier, className });
+    let store = await getStoreHandle({ id: identifier, type });
     let storeResources = (await store.listResources()).map((r) => r.Key);
 
     // have we already run OCR or do we have a TEI xml from somewhere else

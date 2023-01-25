@@ -43,7 +43,7 @@ async function extractTableHandler(req) {
     const textractFile = `${resource}.textract_ocr-ADMIN.json`;
     const imageFile = `${resource}.jpg`;
 
-    let store = await getStoreHandle({ id: identifier, className: "item" });
+    let store = await getStoreHandle({ id: identifier, type: "item" });
     await store.delete({ target: teiFile });
     await store.delete({ target: textractFile });
     const name = "extract-table";

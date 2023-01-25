@@ -36,18 +36,10 @@ onMounted(() => {
 
 let sidebarWidth = computed(() => {
     if (data.expanded) {
-        // if (window.innerWidth < 1280) {
-        //     return { "min-width": `${round(window.innerWidth * 0.3)}px` };
-        // } else if (window.innerWidth < 1536) {
-        //     return { "min-width": `${round(window.innerWidth * 0.25)}px` };
-        // } else if (window.innerWidth < 2000) {
-        //     return { "min-width": `${round(window.innerWidth * 0.2)}px` };
-        // } else {
-        //     return { "min-width": `${round(window.innerWidth * 0.15)}px` };
-        // }
-        return { "min-width": `200px` };
+        return { "min-width": `250px` };
+    } else {
+        return { width: `10px` };
     }
-    return { width: `10px` };
 });
 async function init() {
     let response = await $http.get({ route: "/authenticated" });

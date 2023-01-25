@@ -6,26 +6,28 @@
                     <div class="pt-1">Items</div>
                 </div>
             </template>
-            <el-table :data="data.items" style="width: 100%">
-                <el-table-column prop="identifier" label="Identifier" width="300">
-                    <template #default="scope">
-                        <div class="cursor-pointer" @click="loadItem(scope.row.identifier)">
-                            {{ scope.row.identifier }}
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="publicationStatusLogs" label="Logs" />
-                <el-table-column prop="actions" label="Actions" width="300">
-                    <template #default="scope">
-                        <el-button @click="deposit('items', scope.row.identifier)" type="primary">
+            <div v-for="(item, idx) in data.items" :key="idx" v-loading="data.loading">
+                <div class="flex flex-row space-x-6">
+                    <div class="flex flex-grow cursor-pointer" @click="loadItem(item.identifier)">
+                        {{ item.identifier }}
+                    </div>
+                    <div class="flex flex-row space-x-2">
+                        <div class="pt-1">version:</div>
+                        <el-checkbox v-model="item.version.metadata" label="metadata" />
+                        <el-checkbox v-model="item.version.documents" label="documents" />
+                        <el-checkbox v-model="item.version.images" label="images" />
+                        <el-button @click="deposit('items', item)" type="primary">
                             Deposit
                         </el-button>
-                        <el-button @click="needsWork('items', scope.row.identifier)" type="danger">
+                    </div>
+                    <div class="flex-grow"></div>
+                    <div>
+                        <el-button @click="needsWork('items', item)" type="danger">
                             Needs Work
                         </el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
+                    </div>
+                </div>
+            </div>
         </el-card>
         <el-card class="box-card">
             <template #header>
@@ -33,52 +35,55 @@
                     <div class="pt-1">Collections</div>
                 </div>
             </template>
-            <el-table :data="data.collections" style="width: 100%">
-                <el-table-column prop="identifier" label="Identifier" width="300">
-                    <template #default="scope">
-                        <div class="cursor-pointer" @click="loadCollection(scope.row.identifier)">
-                            {{ scope.row.identifier }}
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="publicationStatusLogs" label="Logs" />
-                <el-table-column prop="actions" label="Actions" width="300">
-                    <template #default="scope">
-                        <el-button
-                            @click="deposit('collections', scope.row.identifier)"
-                            type="primary"
-                        >
+            <div v-for="(collection, idx) in data.collections" :key="idx" v-loading="data.loading">
+                <div class="flex flex-row space-x-6">
+                    <div
+                        class="flex flex-grow cursor-pointer"
+                        @click="loadCollection(collection.identifier)"
+                    >
+                        {{ collection.identifier }}
+                    </div>
+                    <div class="flex flex-row space-x-2">
+                        <div class="pt-1">version:</div>
+                        <el-checkbox v-model="collection.version.metadata" label="metadata" />
+                        <el-button @click="deposit('collections', collection)" type="primary">
                             Deposit
                         </el-button>
-                        <el-button
-                            @click="needsWork('collections', scope.row.identifier)"
-                            type="danger"
-                        >
+                    </div>
+                    <div class="flex-grow"></div>
+                    <div>
+                        <el-button @click="needsWork('collections', collection)" type="danger">
                             Needs Work
                         </el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
+                    </div>
+                </div>
+            </div>
         </el-card>
     </div>
 </template>
 
 <script setup>
 import { reactive, inject, onMounted } from "vue";
+import { getAwaitingReview } from "./admin-services.js";
 import * as lib from "./lib.js";
 import { useRouter } from "vue-router";
 const $http = inject("$http");
 const $router = useRouter();
 
 const data = reactive({
+    loading: false,
     items: [],
     colllections: [],
 });
 
 onMounted(() => {
-    getItemsAwaitingReview();
-    getCollectionsAwaitingReview();
+    init();
 });
+async function init() {
+    let [items, collections] = await getAwaitingReview();
+    data.items = [...items];
+    data.collections = [...collections];
+}
 async function loadItem(identifier) {
     await lib.connectItem({ $http, identifier });
     lib.loadItem({ $router, identifier });
@@ -87,34 +92,23 @@ async function loadCollection(identifier) {
     await lib.connectCollection({ $http, identifier });
     lib.loadCollection({ $router, identifier });
 }
-async function getItemsAwaitingReview() {
-    let response = await $http.get({ route: "/admin/items/awaiting-review" });
+async function deposit(type, item) {
+    data.loading = true;
+    let { identifier, version } = item;
+    let response = await $http.put({
+        route: `/admin/${type}/${identifier}/deposit`,
+        body: { version },
+    });
     if (response.status === 200) {
-        response = await response.json();
-        let items = response.items;
-        data.items = items;
+        init();
     }
+    data.loading = false;
 }
-async function getCollectionsAwaitingReview() {
-    let response = await $http.get({ route: "/admin/collections/awaiting-review" });
-    if (response.status === 200) {
-        response = await response.json();
-        let collections = response.collections;
-        data.collections = collections;
-    }
-}
-async function deposit(type, identifier) {
-    let response = await $http.get({ route: `/admin/${type}/${identifier}/deposit` });
-    if (response.status === 200) {
-        getItemsAwaitingReview();
-        getCollectionsAwaitingReview();
-    }
-}
-async function needsWork(type, identifier) {
+async function needsWork(type, item) {
+    let { identifier } = item;
     let response = await $http.put({ route: `/admin/${type}/${identifier}/needs-work` });
     if (response.status === 200) {
-        getItemsAwaitingReview();
-        getCollectionsAwaitingReview();
+        init();
     }
 }
 </script>

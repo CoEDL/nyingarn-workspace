@@ -27,12 +27,12 @@ describe("Test the /authenticated endpoint", () => {
         identifier = chance.word();
         store = await getStoreHandle({
             id: identifier,
-            className: "collection",
+            type: "collection",
         });
     });
     afterEach(async () => {
         try {
-            await store.deleteItem();
+            await store.removeObject();
         } catch (error) {}
     });
     afterAll(async () => {

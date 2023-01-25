@@ -16,15 +16,6 @@ describe("Crate tools tests", () => {
     });
     beforeEach(async () => {
         identifier = chance.word();
-        store = await getStoreHandle({
-            id: identifier,
-            className: "item",
-        });
-    });
-    afterEach(async () => {
-        try {
-            await store.deleteItem();
-        } catch (error) {}
     });
     afterAll(async () => {
         await tester.purgeUsers({ users });
@@ -33,7 +24,7 @@ describe("Crate tools tests", () => {
     it("should be able to register all item files in the crate", async () => {
         let store = await getStoreHandle({
             id: identifier,
-            className: "item",
+            type: "item",
         });
         //  setup as a normal user
         let user = users.filter((u) => !u.administrator)[0];
@@ -45,6 +36,6 @@ describe("Crate tools tests", () => {
         expect(crate.rootDataset.hasPart.length).toBe(4);
 
         await models.item.destroy({ where: { identifier } });
-        await store.deleteItem();
+        await store.removeObject();
     });
 });

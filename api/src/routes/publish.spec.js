@@ -26,11 +26,6 @@ describe("Publish route tests", () => {
     beforeEach(async () => {
         identifier = chance.word();
     });
-    afterEach(async () => {
-        try {
-            await store.deleteItem();
-        } catch (error) {}
-    });
     afterAll(async () => {
         await tester.purgeUsers({ users });
         await tester.teardownAfterAll(configuration);
@@ -39,7 +34,7 @@ describe("Publish route tests", () => {
     it("should be able to publish an item and get its publication status", async () => {
         let store = await getStoreHandle({
             id: identifier,
-            className: "item",
+            type: "item",
         });
 
         //  setup as a normal user
@@ -78,12 +73,12 @@ describe("Publish route tests", () => {
         expect(response).toEqual({ status: "awaitingReview", visibility: "open", emails: [] });
 
         await models.item.destroy({ where: { identifier } });
-        await store.deleteItem();
+        await store.removeObject();
     });
     it("should be able to publish a collection and get its publication status", async () => {
         let store = await getStoreHandle({
             id: identifier,
-            className: "collection",
+            type: "collection",
         });
 
         //  setup as a normal user
@@ -122,6 +117,6 @@ describe("Publish route tests", () => {
         expect(response).toEqual({ status: "awaitingReview", visibility: "open", emails: null });
 
         await models.collection.destroy({ where: { identifier } });
-        await store.deleteItem();
+        await store.removeObject();
     });
 });

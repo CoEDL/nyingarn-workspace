@@ -31,13 +31,22 @@
                 </el-pagination></div
         ></template>
         <div class="w-full">
-            <el-table :data="data.items" :height="tableHeight" size="small">
+            <el-table
+                :data="data.items"
+                :height="tableHeight"
+                size="small"
+                v-loading="data.loading"
+            >
                 <template #empty>You have no items. Get started by creating an item.</template>
-                <el-table-column prop="name" label="">
+                <el-table-column prop="identifier" label="">
                     <template #default="scope">
-                        <router-link :to="scope.row.link" class="text-base">{{
-                            scope.row.name
-                        }}</router-link>
+                        <router-link
+                            :to="scope.row.link"
+                            class="text-base"
+                            v-if="scope.row.publicationStatus !== 'published'"
+                            >{{ scope.row.identifier }}</router-link
+                        >
+                        <div v-else class="text-base">{{ scope.row.identifier }}</div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="status" label="Status" width="150">
@@ -46,9 +55,18 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="total" label="Pages" width="100"> </el-table-column>
-                <el-table-column label="Actions" width="100" align="center">
+                <el-table-column label="Actions" width="200" align="center">
                     <template #default="scope">
                         <div class="flex flex-row space-x-1">
+                            <div v-if="data.isAdmin && scope.row.publicationStatus === 'published'">
+                                <el-button
+                                    type="primary"
+                                    size="small"
+                                    @click="restoreItem(scope.row)"
+                                >
+                                    <i class="fa-solid fa-rotate-left"></i>&nbsp; restore
+                                </el-button>
+                            </div>
                             <div v-if="data.isAdmin">
                                 <el-button type="primary" size="small" @click="unlinkMe(scope.row)">
                                     <i class="fa-solid fa-unlink"></i>
@@ -84,17 +102,18 @@ import { orderBy } from "lodash";
 import * as itemServices from "../item/item-services";
 import { reactive, computed, onMounted, inject } from "vue";
 import { useStore } from "vuex";
-const store = useStore();
+const $store = useStore();
 const $http = inject("$http");
 
 const data = reactive({
+    loading: false,
     page: 1,
     limit: 10,
     total: 0,
     items: [],
     prefix: undefined,
     filterByStatus: undefined,
-    isAdmin: store.state.user.administrator,
+    isAdmin: $store.state.user.administrator,
 });
 let tableHeight = computed(() => {
     if (window.innerWidth > 1280) {
@@ -122,13 +141,14 @@ async function loadItems() {
     data.total = total;
     items = items.map((i) => ({
         ...i,
-        link: `/items/${i.name}/view`,
+        link: `/items/${i.identifier}/view`,
         statistics: {},
     }));
     data.items = [...items];
 
     for (let item of data.items) {
-        response = await itemServices.getStatus({ $http, identifier: item.name });
+        if (item.publicationStatus === "published") continue;
+        response = await itemServices.getStatus({ $http, identifier: item.identifier });
         if (response.status == 200) {
             let { statistics } = await response.json();
             item = {
@@ -136,7 +156,7 @@ async function loadItems() {
                 ...statistics,
             };
             data.items = data.items.map((i) => {
-                return i.name === item.name ? item : i;
+                return i.identifier === item.identifier ? item : i;
             });
             await new Promise((resolve) => setTimeout(resolve, 10));
         }
@@ -148,7 +168,7 @@ function pageItems(page) {
 }
 async function deleteItem(item) {
     try {
-        await itemServices.deleteItem({ $http, identifier: item.name });
+        await itemServices.deleteItem({ $http, identifier: item.identifier });
         loadItems();
     } catch (error) {
         ElMessage.error(`Something went wrong deleting this item`);
@@ -158,12 +178,18 @@ async function unlinkMe(item) {
     try {
         await itemServices.detachUserFromItem({
             $http,
-            identifier: item.name,
+            identifier: item.identifier,
             userId: store.state.user.id,
         });
         loadItems();
     } catch (error) {
         ElMessage.error(`Something went wrong detaching you from this item`);
     }
+}
+async function restoreItem(item) {
+    data.loading = true;
+    await $http.put({ route: `/admin/items/${item.identifier}/restore`, body: {} });
+    loadItems();
+    data.loading = false;
 }
 </script>

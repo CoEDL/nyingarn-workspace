@@ -40,28 +40,7 @@ export class CodemirrorEditorControls {
             ...document.map((l) => `<line>${l}</line>`),
             "</surface>",
         ];
-        let changes = {
-            from: 0,
-            to: this.view.state.doc.length,
-            insert: tei.join("\n"),
-        };
-        this.dispatch({ changes });
-    }
-    formatDocument({ document }) {
-        document = document ? document : this.view.state.doc.toString();
-        let documentLength = this.view.state.doc.length;
-        try {
-            document = format(document, { indentation: "  ", collapseContent: true });
-            let changes = {
-                from: 0,
-                to: documentLength,
-                insert: document,
-            };
-            this.dispatch({ changes });
-        } catch (error) {
-            return { error };
-            // couldn't format - likely not an XML document
-        }
+        formatDocument({ view: this.view, document: tei.join("\n") });
     }
     add({ element, pre, post }) {
         this.applyMarkup({ element, pre, post });
@@ -159,5 +138,23 @@ export class CodemirrorEditorControls {
     }
     dispatch({ changes }) {
         this.view.dispatch({ changes });
+    }
+}
+
+export function formatDocument({ view, document = undefined }) {
+    try {
+        document = document ? document : view.state.doc.toString();
+        let documentLength = view.state.doc.length;
+        document = format(document, { indentation: "  ", collapseContent: true });
+        let changes = {
+            from: 0,
+            to: documentLength,
+            insert: document,
+        };
+        view.dispatch({ changes });
+        return {};
+    } catch (error) {
+        // couldn't format - likely not an XML document
+        return { error };
     }
 }

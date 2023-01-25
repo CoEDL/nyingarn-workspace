@@ -1,11 +1,9 @@
 require("regenerator-runtime");
-import { createUser } from "../lib/user";
 import { generateToken, verifyToken } from "./jwt";
 import { loadConfiguration } from "../common";
 const chance = require("chance").Chance();
 import MockDate from "mockdate";
-import { copy, move, readJSON, writeJSON, readdir } from "fs-extra";
-import { getStoreHandle, TestSetup, setupTestItem } from "../common";
+import { TestSetup } from "../common";
 
 describe("JWT tests", () => {
     let configuration, users, userEmail, adminEmail, bucket;
@@ -18,15 +16,6 @@ describe("JWT tests", () => {
     });
     beforeEach(async () => {
         identifier = chance.word();
-        store = await getStoreHandle({
-            id: identifier,
-            className: "item",
-        });
-    });
-    afterEach(async () => {
-        try {
-            await store.deleteItem();
-        } catch (error) {}
     });
     afterAll(async () => {
         await tester.purgeUsers({ users });

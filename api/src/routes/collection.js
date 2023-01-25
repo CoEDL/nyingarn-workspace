@@ -54,7 +54,7 @@ async function getCollectionsHandler(req) {
     });
     let collections = rows.map((c) => {
         return {
-            name: c.identifier,
+            identifier: c.identifier,
             private: c.data?.private,
             type: "collection",
             publicationStatus: c.publicationStatus,
@@ -178,8 +178,8 @@ async function getCollectionUsers(req) {
 async function deleteCollectionHandler(req, res) {
     try {
         await deleteCollection({ id: req.session.collection.id });
-        let store = await getStoreHandle({ id: req.params.identifier, className: "collection" });
-        await store.deleteItem();
+        let store = await getStoreHandle({ id: req.params.identifier, type: "collection" });
+        await store.removeObject();
         await logEvent({
             level: "info",
             owner: req.session.user.email,

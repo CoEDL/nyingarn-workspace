@@ -3,6 +3,7 @@ import {
     requireCollectionAccess,
     requireItemAccess,
     getStoreHandle,
+    authorisedUsersFile,
 } from "../common/index.js";
 import { listItemResources, markAllResourcesComplete } from "../lib/item.js";
 import lodashPkg from "lodash";
@@ -11,7 +12,6 @@ import validatorPkg from "validator";
 const { isURL } = validatorPkg;
 import { ROCrate } from "ro-crate";
 import { registerAllFiles, getContext } from "../lib/crate-tools.js";
-export const authorisedUsersFile = ".authorised-users.json";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -33,8 +33,8 @@ export function setupRoutes(fastify, options, done) {
 }
 
 async function postPublishCollectionHandler(req, res) {
-    if (isURL(req.body.data.user["@id"], { protocols: ["http", "https"] })) {
-        req.session.user.identifier = req.body.data.user["@id"];
+    if (isURL(req.body.user["@id"], { protocols: ["http", "https"] })) {
+        req.session.user.identifier = req.body.user["@id"];
         await req.session.user.save();
     }
 
@@ -50,11 +50,11 @@ async function postPublishCollectionHandler(req, res) {
 
     let store = await getStoreHandle({
         id: req.session.collection.identifier,
-        className: "collection",
+        type: "collection",
     });
 
     // remove .collection file if it exists
-    if (await store.pathExists({ path: ".collection" })) {
+    if (await store.fileExists({ path: ".collection" })) {
         await store.delete({ target: ".collection" });
     }
 
@@ -64,12 +64,12 @@ async function postPublishCollectionHandler(req, res) {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         crate = new ROCrate(crate, { array: true });
 
-        crate.addEntity(req.body.data.user);
+        crate.addEntity(req.body.user);
         let depositor = crate.rootDataset.depositor;
         if (!depositor) {
-            depositor = [req.body.data.user];
+            depositor = [req.body.user];
         } else {
-            depositor.push(req.body.data.user);
+            depositor.push(req.body.user);
             depositor = uniqBy(depositor, "@id");
         }
         crate.rootDataset.depositor = depositor;
@@ -122,20 +122,20 @@ async function postPublishItemHandler(req, res) {
     ];
     req.session.item.accessNarrative = {
         text: req.body.access.narrative,
-        restrictedUntil: req.body.access?.restrictedUntil,
+        reviewDate: req.body.access?.reviewDate,
     };
 
     // save the item
     await req.session.item.save();
 
-    let store = await getStoreHandle({ id: req.session.item.identifier, className: "item" });
+    let store = await getStoreHandle({ id: req.session.item.identifier, type: "item" });
 
     // remove authorised users file if exists and item open
-    if (await store.pathExists({ path: authorisedUsersFile })) {
+    if (await store.fileExists({ path: authorisedUsersFile })) {
         await store.delete({ target: authorisedUsersFile });
     }
     // remove .item file if it exists
-    if (await store.pathExists({ path: ".item" })) {
+    if (await store.fileExists({ path: ".item" })) {
         await store.delete({ target: ".item" });
     }
 
@@ -169,11 +169,13 @@ async function postPublishItemHandler(req, res) {
 }
 
 async function getItemPublicationStatus(req) {
+    const emails = [...req.session.item.users.map((u) => u.email)];
+    if (req.session.accessControlList) emails = [emails, ...req.session.item.accessControlList];
     return {
         status: req.session.item.publicationStatus,
         visibility: req.session.item.accessType,
-        emails: req.session.item.accessControlList,
+        emails,
         narrative: req.session.item.accessNarrative?.text,
-        restrictedUntil: req.session.item.accessNarrative?.restrictedUntil,
+        reviewDate: req.session.item.accessNarrative?.reviewDate,
     };
 }

@@ -154,7 +154,7 @@ import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { xml, xmlLanguage } from "@codemirror/lang-xml";
-import { CodemirrorEditorControls } from "./codemirror-editor.js";
+import { CodemirrorEditorControls, formatDocument } from "./codemirror-editor.js";
 import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
@@ -189,10 +189,8 @@ onBeforeMount(async () => {
 onMounted(async () => {
     data.transcription = await loadTranscription();
     ({ view } = setupCodeMirror());
-    nextTick(() => {
-        new CodemirrorEditorControls({ view });
-        format();
-    });
+    editorControls = new CodemirrorEditorControls({ view });
+    format();
 });
 onBeforeUnmount(async () => {
     await save();
@@ -208,7 +206,7 @@ function setupCodeMirror() {
         state: initialState,
         parent: codemirror.value,
     });
-    editorControls = new CodemirrorEditorControls({ view });
+
     return { view };
 }
 async function loadTranscription() {
@@ -256,15 +254,9 @@ function deleteTranscription() {
 }
 function convertToTei() {
     editorControls.convertToTei({ $route });
-    nextTick(() => {
-        format();
-    });
 }
 function format() {
-    let { error } = editorControls.formatDocument({});
-    if (error) {
-        ElMessage.error("There is a problem with the XML.");
-    }
+    let { error } = formatDocument({ view });
 }
 async function save() {
     let document = view.state.doc.toString();
@@ -302,7 +294,7 @@ async function reprocessPageAsTable() {
     });
 
     let document = await loadTranscription();
-    editorControls.formatDocument({ document });
+    formatDocument({ view, document });
     data.extractTableProcessing = false;
 
     async function checkProcessingStatus({ $http, identifier, resources, taskId, dateFrom }) {

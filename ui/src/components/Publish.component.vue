@@ -64,17 +64,19 @@
                 <span v-if="data.form.visibility === 'restricted'">
                     <el-form-item label="Access Narrative">
                         <el-input v-model="data.form.narrative" :rows="8" type="textarea" />
-                        <div class="text-gray-700">
-                            Detail the reasoning for restricting access to this item.
-                        </div>
-                        <div class="text-red-700 text-lg" v-if="data.showNarrativeRequirement">
-                            Restricted items can't be published without a narrative explaining WHY
-                            they are restricted.
+                        <div class="flex flex-col">
+                            <div class="text-gray-700">
+                                Detail the reasoning for restricting access to this item.
+                            </div>
+                            <div class="text-red-600 text-lg" v-if="data.showNarrativeRequirement">
+                                Restricted items can't be published without a narrative explaining
+                                WHY they are restricted.
+                            </div>
                         </div>
                     </el-form-item>
-                    <el-form-item label="Restricted Until">
+                    <el-form-item label="Review Date">
                         <el-date-picker
-                            v-model="data.form.restrictedUntil"
+                            v-model="data.form.reviewDate"
                             type="date"
                             placeholder="Pick a day"
                         />
@@ -136,7 +138,7 @@ const data = reactive({
         visibility: "open",
         emails: "",
         narrative: undefined,
-        restrictedUntil: undefined,
+        reviewDate: undefined,
     },
     checked: [],
     confirmed: false,
@@ -173,8 +175,8 @@ async function getPublicationStatus() {
                     data.checked = ["agreed", "agreed", "agreed"];
                 }
                 data.form.narrative = response.narrative;
-                if (response.restrictedUntil) {
-                    data.form.restrictedUntil = parseISO(response.restrictedUntil);
+                if (response.reviewDate) {
+                    data.form.reviewDate = parseISO(response.reviewDate);
                 }
             } else if (props.type === "collection") {
                 data.status = response.status;
@@ -231,8 +233,8 @@ async function publish() {
         formData.access.narrative = data.form.narrative;
         formData.access.acl = emails;
 
-        if (data.form.restrictedUntil) {
-            formData.access.restrictedUntil = data.form.restrictedUntil?.toISOString();
+        if (data.form.reviewDate) {
+            formData.access.reviewDate = data.form.reviewDate?.toISOString();
         }
     }
 

@@ -33,11 +33,11 @@
                 <el-tab-pane label="Associate Collections and Items" name="associate">
                     <collection-members-component v-if="data.activeTab === 'associate'" />
                 </el-tab-pane>
+                <el-tab-pane label="Publish" name="publish" v-if="data.isAdmin">
+                    <publish-component v-if="data.activeTab === 'publish'" type="collection" />
+                </el-tab-pane>
                 <el-tab-pane label="Administration" name="administration">
                     <administration-component v-if="data.activeTab === 'administration'" />
-                </el-tab-pane>
-                <el-tab-pane label="Publish" name="publish">
-                    <publish-component v-if="data.activeTab === 'publish'" type="collection" />
                 </el-tab-pane>
             </el-tabs>
         </div>
@@ -52,9 +52,11 @@ import ViewCollectionMembersComponent from "./ViewCollectionMembers.component.vu
 import PublishComponent from "../../Publish.component.vue";
 import { ref, reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { Lookup } from "../../lookup.js";
 import { debounce } from "lodash";
+const $store = useStore();
 const $route = useRoute();
 const $router = useRouter();
 const $http = inject("$http");
@@ -79,6 +81,7 @@ let data = reactive({
     crate: {},
     profile: {},
     debouncedLoad: debounce(load, 300),
+    isAdmin: $store.state.user.administrator,
 });
 onBeforeMount(async () => {
     await checkUserAccess();

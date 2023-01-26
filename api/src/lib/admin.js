@@ -7,8 +7,12 @@ import {
     authorisedUsersFile,
     imageExtensions,
 } from "../common/index.js";
-import { lookupItemByIdentifier, linkItemToUser } from "../lib/item.js";
-import { lookupCollectionByIdentifier, linkCollectionToUser } from "../lib/collection.js";
+import { lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
+import {
+    lookupCollectionByIdentifier,
+    linkCollectionToUser,
+    getCollections,
+} from "../lib/collection.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import lodashPkg from "lodash";
@@ -17,75 +21,53 @@ import { ROCrate } from "ro-crate";
 import { getContext } from "../lib/crate-tools.js";
 import path from "path";
 
-export async function getAdminItems({ user, prefix, offset }) {
+export async function getAdminItems({ user, prefix, offset = 0 }) {
     if (!user.administrator) {
         throw new Error(`User must be an admin`);
     }
-    if (!offset) offset = 0;
     const limit = 10;
 
-    let where = {};
-    if (prefix) {
-        where.identifier = {
-            [Op.startsWith]: prefix,
-        };
-    }
     let myItems = await models.item.findAll({
-        where,
+        where: {},
         include: [{ model: models.user, where: { id: user.id } }],
         attributes: ["identifier"],
-        raw: true,
     });
     myItems = groupBy(myItems, "identifier");
 
-    let { count, rows: items } = await models.item.findAndCountAll({
-        where,
-        offset,
-        limit,
-        order: [[seqFn("lower", seqCol("identifier")), "ASC"]],
-        attributes: ["identifier"],
-        raw: true,
-    });
+    let { count: total, rows: items } = await getItems({ offset, limit, match: prefix });
 
-    items = items.map((i) => ({ ...i, connected: myItems[i.identifier]?.length ? true : false }));
-    return { items, total: count };
+    items = items.map((i) => ({
+        ...i.get(),
+        connected: myItems[i.identifier]?.length ? true : false,
+    }));
+    return { items, total };
 }
 
-export async function getAdminCollections({ user, prefix, offset }) {
+export async function getAdminCollections({ user, prefix, offset = 0 }) {
     if (!user.administrator) {
         throw new Error(`User must be an admin`);
     }
-    if (!offset) offset = 0;
     const limit = 10;
 
-    let where = {};
-    if (prefix) {
-        where.identifier = {
-            [Op.startsWith]: prefix,
-        };
-    }
     let myCollections = await models.collection.findAll({
-        where,
+        where: {},
         include: [{ model: models.user, where: { id: user.id } }],
         attributes: ["identifier"],
-        raw: true,
     });
     myCollections = groupBy(myCollections, "identifier");
 
-    let { count, rows: collections } = await models.collection.findAndCountAll({
-        where,
+    let { count: total, rows: collections } = await getCollections({
         offset,
         limit,
-        order: [[seqFn("lower", seqCol("identifier")), "ASC"]],
-        attributes: ["identifier"],
-        raw: true,
+        match: prefix,
     });
 
-    collections = collections.map((i) => ({
-        ...i,
-        connected: myCollections[i.identifier]?.length ? true : false,
+    collections = collections.map((c) => ({
+        ...c.get(),
+        connected: myCollections[c.identifier]?.length ? true : false,
     }));
-    return { collections, total: count };
+
+    return { collections, total };
 }
 
 export async function importItemsFromStorageIntoTheDb({ user, configuration }) {

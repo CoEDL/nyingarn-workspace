@@ -228,7 +228,7 @@ async function importObjectsInTheStore() {
     await loadCollections();
     data.loading = false;
 }
-async function migrate() {
-    await $http.get({ route: `/admin/migrate` });
-}
+// async function migrate() {
+//     await $http.get({ route: `/admin/migrate` });
+// }
 </script>

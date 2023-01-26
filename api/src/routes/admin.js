@@ -3,6 +3,7 @@ import {
     demandAuthenticatedUser,
     requireCollectionAccess,
     requireItemAccess,
+    getS3Handle,
 } from "../common/index.js";
 import { lookupItemByIdentifier, linkItemToUser } from "../lib/item.js";
 import { lookupCollectionByIdentifier, linkCollectionToUser } from "../lib/collection.js";
@@ -71,7 +72,7 @@ export function setupRoutes(fastify, options, done) {
             done();
         });
 
-        fastify.get("/admin/migrate", migrateBackend);
+        // fastify.get("/admin/migrate", migrateBackend);
 
         done();
     });
@@ -173,33 +174,46 @@ async function putObjectNeedsWorkHandler(req, res) {
     await objectRequiresMoreWork({ user: req.session.user, type, identifier });
 }
 
-async function migrateBackend(req) {
-    console.log("migrate backend not implemented");
-    // console.log("migrate backend storage");
-    // let { bucket } = await getS3Handle();
-    // await migrate({});
+// async function migrateBackend(req) {
+//     // console.log("migrate backend not implemented");
+//     console.log("migrate backend storage");
+//     let { bucket } = await getS3Handle();
+//     await migrate({});
 
-    // async function migrate({ continuationToken }) {
-    //     let resources = await bucket.listObjects({
-    //         continuationToken,
-    //     });
-    //     console.log(resources.Contents.length);
-    //     for (let resource of resources.Contents) {
-    //         const source = resource.Key;
-    //         const target = resource.Key.replace(/nyingarn.net/, "nyingarn.net/workspace");
-    //         if (source !== target) {
-    //             console.log(`Copying ${source} -> ${target}`);
-    //             await bucket.copy({ source, target });
-    //         }
-    //         // console.log({
-    //         //     source: resource.Key,
-    //         //     target: resource.Key.replace(/nyingarn.net/, "nyingarn.net/workspace"),
-    //         // });
-    //     }
-    //     if (resources.NextContinuationToken) {
-    //         await migrate({
-    //             continuationToken: resources.NextContinuationToken,
-    //         });
-    //     }
-    // }
-}
+//     async function migrate({ continuationToken }) {
+//         let resources = await bucket.listObjects({
+//             continuationToken,
+//         });
+//         // console.log(resources.Contents.length);
+//         for (let resource of resources.Contents) {
+//             if (resource.Key.match(/.*\/workspace\/.*\/nocfl.identifier.json/)) {
+//                 let content = await bucket.readJSON({ target: resource.Key });
+//                 console.log(content);
+//                 // let identifier = {
+//                 //     id: content.id,
+//                 //     type: content.className,
+//                 //     prefix: "nyingarn.net/workspace",
+//                 //     splay: content.splay ?? 1,
+//                 // };
+//                 // console.log("updating", resource.Key);
+//                 // await bucket.upload({ target: resource.Key, json: identifier });
+//                 // console.log(content);
+//             }
+//             // const source = resource.Key;
+//             // const target = resource.Key.replace(/nyingarn.net/, "nyingarn.net/workspace");
+//             // if (source !== target) {
+//             //     console.log(`Copying ${source} -> ${target}`);
+//             //     await bucket.copy({ source, target });
+//             // }
+//             // console.log({
+//             //     source: resource.Key,
+//             //     target: resource.Key.replace(/nyingarn.net/, "nyingarn.net/workspace"),
+//             // });
+//         }
+//         if (resources.NextContinuationToken) {
+//             await migrate({
+//                 continuationToken: resources.NextContinuationToken,
+//             });
+//         }
+//     }
+// }

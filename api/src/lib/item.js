@@ -20,6 +20,8 @@ export async function lookupItemByIdentifier({ identifier, userId }) {
         clause.include = [
             { model: models.user, where: { id: userId }, attributes: ["id", "email"], raw: true },
         ];
+    } else {
+        clause.include = [{ model: models.user, attributes: ["id", "email"], raw: true }];
     }
     return await models.item.findOne(clause);
 }

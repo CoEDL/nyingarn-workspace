@@ -170,7 +170,7 @@ async function getItemPublicationStatus(req) {
     return {
         status: req.session.item.publicationStatus,
         visibility: req.session.item.publicationMetadata?.accessType,
-        emails: req.session.item.publicationMetadata?.accessType === "restricted" ? emails : [],
+        emails,
         narrative: req.session.item.publicationMetadata?.accessNarrative?.text,
         reviewDate: req.session.item.publicationMetadata?.accessNarrative?.reviewDate,
     };

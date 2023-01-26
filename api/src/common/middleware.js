@@ -37,10 +37,11 @@ export async function requireCollectionAccess(req, res) {
 
     let collection;
     try {
-        collection = await lookupCollectionByIdentifier({
+        let where = {
             identifier: req.params.identifier,
-            userId: req.session.user.id,
-        });
+        };
+        if (!req.session.user.administrator) where.userId = req.session.user.id;
+        collection = await lookupCollectionByIdentifier(where);
         if (!collection) {
             return res.forbidden(`You don't have permission to access this endpoint`);
         }
@@ -54,13 +55,15 @@ export async function requireItemAccess(req, res) {
     if (!req.body?.identifier && !req.params?.identifier) {
         return res.badRequest(`Identifier not defined`);
     }
-    const identifier = req.body?.identifier ? req.body?.identifier : req.params?.identifier;
+
     let item;
     try {
-        item = await lookupItemByIdentifier({
+        const identifier = req.body?.identifier ? req.body?.identifier : req.params?.identifier;
+        let where = {
             identifier,
-            userId: req.session.user.id,
-        });
+        };
+        if (!req.session.user.administrator) where.userId = req.session.user.id;
+        item = await lookupItemByIdentifier(where);
         if (!item) {
             return res.forbidden(`You don't have permission to access this endpoint`);
         }

@@ -163,13 +163,14 @@ async function postPublishItemHandler(req, res) {
 }
 
 async function getItemPublicationStatus(req) {
-    const emails = [...req.session.item.users.map((u) => u.email)];
-    if (req.session.accessControlList)
-        emails = [emails, ...req.session.item.publicationMetadata?.accessControlList];
+    let emails = [...req.session.item.users.map((u) => u.email)];
+    if (req.session.item.publicationMetadata?.accessControlList?.length) {
+        emails = [...emails, ...req.session.item.publicationMetadata?.accessControlList];
+    }
     return {
         status: req.session.item.publicationStatus,
         visibility: req.session.item.publicationMetadata?.accessType,
-        emails,
+        emails: req.session.item.publicationMetadata?.accessType === "restricted" ? emails : [],
         narrative: req.session.item.publicationMetadata?.accessNarrative?.text,
         reviewDate: req.session.item.publicationMetadata?.accessNarrative?.reviewDate,
     };

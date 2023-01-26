@@ -179,10 +179,11 @@ async function unlinkMe(item) {
         await itemServices.detachUserFromItem({
             $http,
             identifier: item.identifier,
-            userId: store.state.user.id,
+            userId: $store.state.user.id,
         });
         loadItems();
     } catch (error) {
+        console.log(error);
         ElMessage.error(`Something went wrong detaching you from this item`);
     }
 }

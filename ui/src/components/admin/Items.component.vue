@@ -29,7 +29,7 @@
                             <el-input
                                 v-model="data.items.prefix"
                                 placeholder="Filter items by prefix"
-                                @current-change="loadItems"
+                                @change="loadItems"
                                 clearable
                             ></el-input>
                         </div>

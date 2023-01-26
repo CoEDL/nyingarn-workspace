@@ -24,20 +24,8 @@ export default function (sequelize, DataTypes) {
                 allowNull: true,
                 defaultValue: "inProgress",
             },
-            publicationStatusLogs: {
-                type: DataTypes.JSON,
-                allowNull: true,
-            },
-            accessType: {
-                type: DataTypes.ENUM("open", "restricted"),
-                allowNull: true,
-            },
-            accessNarrative: {
-                type: DataTypes.JSON,
-                allowNull: true,
-            },
-            accessControlList: {
-                type: DataTypes.JSON,
+            publicationMetadata: {
+                type: DataTypes.JSONB,
                 allowNull: true,
             },
         },

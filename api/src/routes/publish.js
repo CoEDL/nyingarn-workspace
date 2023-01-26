@@ -43,7 +43,9 @@ async function postPublishCollectionHandler(req, res) {
 
     // set the properties for this collection
     req.session.collection.publicationStatus = "awaitingReview";
-    req.session.collection.accessType = "open";
+    req.session.collection.publicationMetadata = {
+        accessType: "open",
+    };
 
     // save the collection
     await req.session.collection.save();
@@ -85,8 +87,7 @@ async function postPublishCollectionHandler(req, res) {
 async function getCollectionPublicationStatus(req) {
     return {
         status: req.session.collection.publicationStatus,
-        visibility: req.session.collection.accessType,
-        emails: req.session.collection.accessControlList,
+        visibility: req.session.collection.publicationMetadata?.accessType,
     };
 }
 
@@ -107,22 +108,15 @@ async function postPublishItemHandler(req, res) {
     //  TODO: not yet implemented
 
     // reset the properties first
-    req.session.item.accessControlList = null;
-    req.session.item.accessNarrative = null;
-    await req.session.item.save();
-
-    // set the properties for this item
     req.session.item.publicationStatus = "awaitingReview";
-    req.session.item.accessType = req.body.access.visibility;
-    req.session.item.accessControlList =
-        req.body.access.visibility === "open" ? [] : req.body.access?.acl;
-    req.session.item.publicationStatusLogs = [
-        "all pages marked complete",
-        "permission forms not loaded",
-    ];
-    req.session.item.accessNarrative = {
-        text: req.body.access.narrative,
-        reviewDate: req.body.access?.reviewDate,
+    req.session.item.publicationMetadata = {
+        accessType: req.body.access.visibility,
+        accessControlList: req.body.access.visibility === "open" ? [] : req.body.access?.acl,
+        publicationStatusLogs: ["all pages marked complete", "permission forms not loaded"],
+        accessNarrative: {
+            text: req.body.access.narrative,
+            reviewDate: req.body.access?.reviewDate,
+        },
     };
 
     // save the item
@@ -170,12 +164,13 @@ async function postPublishItemHandler(req, res) {
 
 async function getItemPublicationStatus(req) {
     const emails = [...req.session.item.users.map((u) => u.email)];
-    if (req.session.accessControlList) emails = [emails, ...req.session.item.accessControlList];
+    if (req.session.accessControlList)
+        emails = [emails, ...req.session.item.publicationMetadata?.accessControlList];
     return {
         status: req.session.item.publicationStatus,
-        visibility: req.session.item.accessType,
+        visibility: req.session.item.publicationMetadata?.accessType,
         emails,
-        narrative: req.session.item.accessNarrative?.text,
-        reviewDate: req.session.item.accessNarrative?.reviewDate,
+        narrative: req.session.item.publicationMetadata?.accessNarrative?.text,
+        reviewDate: req.session.item.publicationMetadata?.accessNarrative?.reviewDate,
     };
 }

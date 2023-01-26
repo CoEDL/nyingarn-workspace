@@ -158,7 +158,7 @@ export async function getItemsAwaitingReview({ user }) {
     }
     let items = await models.item.findAll({
         where: { publicationStatus: "awaitingReview" },
-        attributes: ["identifier", "publicationStatus", "publicationStatusLogs"],
+        attributes: ["identifier", "publicationStatus", "publicationMetadata"],
     });
     if (items) {
         items = items.map((item) => item.get());
@@ -174,7 +174,7 @@ export async function getCollectionsAwaitingReview({ user }) {
     }
     let collections = await models.collection.findAll({
         where: { publicationStatus: "awaitingReview" },
-        attributes: ["identifier", "publicationStatus", "publicationStatusLogs"],
+        attributes: ["identifier", "publicationStatus", "publicationMetadata"],
     });
     if (collections) {
         collections = collections.map((collection) => collection.get());

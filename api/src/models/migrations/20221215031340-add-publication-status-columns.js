@@ -18,20 +18,8 @@ module.exports = {
             ),
             allowNull: true,
         });
-        await queryInterface.addColumn("items", "publicationStatusLogs", {
-            type: Sequelize.DataTypes.JSON,
-            allowNull: true,
-        });
-        await queryInterface.addColumn("items", "accessType", {
-            type: Sequelize.DataTypes.ENUM("open", "restricted"),
-            allowNull: true,
-        });
-        await queryInterface.addColumn("items", "accessNarrative", {
-            type: Sequelize.DataTypes.JSON,
-            allowNull: true,
-        });
-        await queryInterface.addColumn("items", "accessControlList", {
-            type: Sequelize.DataTypes.JSON,
+        await queryInterface.addColumn("items", "publicationMetadata", {
+            type: Sequelize.DataTypes.JSONB,
             allowNull: true,
         });
         await queryInterface.addColumn("collections", "publicationStatus", {
@@ -43,20 +31,8 @@ module.exports = {
             ),
             allowNull: true,
         });
-        await queryInterface.addColumn("collections", "publicationStatusLogs", {
-            type: Sequelize.DataTypes.JSON,
-            allowNull: true,
-        });
-        await queryInterface.addColumn("collections", "accessType", {
-            type: Sequelize.DataTypes.ENUM("open", "restricted"),
-            allowNull: true,
-        });
-        await queryInterface.addColumn("collections", "accessNarrative", {
-            type: Sequelize.DataTypes.JSON,
-            allowNull: true,
-        });
-        await queryInterface.addColumn("collections", "accessControlList", {
-            type: Sequelize.DataTypes.JSON,
+        await queryInterface.addColumn("collections", "publicationMetadata", {
+            type: Sequelize.DataTypes.JSONB,
             allowNull: true,
         });
     },
@@ -69,17 +45,11 @@ module.exports = {
          * await queryInterface.dropTable('users');
          */
         await queryInterface.removeColumn("items", "publicationStatus");
-        await queryInterface.removeColumn("items", "publicationStatusLogs");
-        await queryInterface.removeColumn("items", "accessType");
-        await queryInterface.removeColumn("items", "accessNarrative");
-        await queryInterface.removeColumn("items", "accessControlList");
+        await queryInterface.removeColumn("items", "publicationMetadata");
         await queryInterface.sequelize.query('DROP TYPE "enum_items_publicationStatus";');
         await queryInterface.sequelize.query('DROP TYPE "enum_items_accessType";');
         await queryInterface.removeColumn("collections", "publicationStatus");
-        await queryInterface.removeColumn("collections", "publicationStatusLogs");
-        await queryInterface.removeColumn("collections", "accessType");
-        await queryInterface.removeColumn("collections", "accessNarrative");
-        await queryInterface.removeColumn("collections", "accessControlList");
+        await queryInterface.removeColumn("collections", "publicationMetadata");
         await queryInterface.sequelize.query('DROP TYPE "enum_collections_publicationStatus";');
         await queryInterface.sequelize.query('DROP TYPE "enum_collections_accessType";');
     },

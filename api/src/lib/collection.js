@@ -30,7 +30,7 @@ export async function getCollections({ userId, offset = 0, limit = 10, match, pu
     query.where = {};
     if (match) {
         query.where.identifier = {
-            [Op.startsWith]: match,
+            [Op.iLike]: `${match}%`,
         };
     }
     if (publicationStatus) {

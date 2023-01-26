@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { attachUser, getCollectionUsers } from "@/components/collection/collection-services";
+import { attachUser, getCollectionUsers } from "../../collection-services.js";
 import ViewCollectionUsersComponent from "./ViewCollectionUsers.component.vue";
 import { flattenDeep } from "lodash";
 import { reactive, onMounted, inject } from "vue";

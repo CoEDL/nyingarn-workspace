@@ -47,7 +47,7 @@
 <script>
 import TranscriptionComponent from "./TranscriptionComponent/Shell.component.vue";
 import FilesComponent from "./Files.component.vue";
-import { getItemResources } from "@/components/item/item-services";
+import { getItemResources } from "../item-services.js";
 
 export default {
     components: {

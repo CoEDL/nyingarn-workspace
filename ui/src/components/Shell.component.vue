@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { tokenSessionKey, getLocalStorage } from "@/components/storage";
+import { tokenSessionKey, getLocalStorage } from "./storage.js";
 import SidebarComponent from "./Sidebar.component.vue";
 import { reactive, onMounted, inject, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";

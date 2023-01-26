@@ -14,7 +14,7 @@
 
 <script>
 import { ElMessage } from "element-plus";
-import { reprocessImports } from "@/components/item/item-services";
+import { reprocessImports } from "../../item-services.js";
 export default {
     data() {
         return {

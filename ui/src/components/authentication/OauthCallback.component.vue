@@ -9,7 +9,7 @@ import {
     putLocalStorage,
     getLocalStorage,
     removeLocalStorage,
-} from "@/components/storage";
+} from "../storage.js";
 
 import { reactive, onMounted, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";

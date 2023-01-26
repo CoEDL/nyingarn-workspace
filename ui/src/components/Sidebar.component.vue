@@ -37,10 +37,10 @@
 </template>
 
 <script>
-import CreateItemComponent from "@/components/item/CreateItem.component.vue";
-import CreateCollectionComponent from "@/components/collection/CreateCollection.component.vue";
-import WhoAmIComponent from "@/components/WhoAmI.component.vue";
-import { tokenSessionKey, removeLocalStorage } from "@/components/storage";
+import CreateItemComponent from "./item/CreateItem.component.vue";
+import CreateCollectionComponent from "./collection/CreateCollection.component.vue";
+import WhoAmIComponent from "./WhoAmI.component.vue";
+import { tokenSessionKey, removeLocalStorage } from "./storage.js";
 
 export default {
     components: {

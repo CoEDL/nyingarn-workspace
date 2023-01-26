@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { getResourceFiles, deleteResourceFile, getFileUrl } from "@/components/item/item-services";
+import { getResourceFiles, deleteResourceFile, getFileUrl } from "../item-services.js";
 import { ElMessage } from "element-plus";
 import { reactive, onMounted, inject, nextTick } from "vue";
 import { useRoute } from "vue-router";

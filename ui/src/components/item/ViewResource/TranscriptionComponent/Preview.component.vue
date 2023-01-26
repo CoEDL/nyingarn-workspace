@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import "@/assets/tei.css";
+import "../../../../assets/tei.css";
 import { ref, onMounted, inject, computed } from "vue";
 import { useRoute } from "vue-router";
 const $route = useRoute();

@@ -34,7 +34,7 @@
 
 <script>
 import { ElMessage } from "element-plus";
-import { detachUserFromCollection } from "@/components/collection/collection-services";
+import { detachUserFromCollection } from "../../collection-services.js";
 export default {
     props: {
         users: {

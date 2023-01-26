@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import LinkRelatedResourceComponent from "@/components/LinkRelatedResource.component.vue";
+import LinkRelatedResourceComponent from "../../LinkRelatedResource.component.vue";
 </script>

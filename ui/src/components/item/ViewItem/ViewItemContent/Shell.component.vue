@@ -29,7 +29,7 @@
 
 <script setup>
 import ViewItemComponent from "./ViewItem.component.vue";
-import { getItemResources } from "@/components/item/item-services";
+import { getItemResources } from "../../item-services.js";
 import { reactive, onMounted, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";

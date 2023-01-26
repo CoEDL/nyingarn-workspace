@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import LinkRelatedResourceComponent from "@/components/LinkRelatedResource.component.vue";
+import LinkRelatedResourceComponent from "../../LinkRelatedResource.component.vue";
 export default {
     components: {
         LinkRelatedResourceComponent,

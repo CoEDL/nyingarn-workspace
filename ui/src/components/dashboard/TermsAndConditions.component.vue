@@ -17,7 +17,7 @@ import {
     putLocalStorage,
     getLocalStorage,
     removeLocalStorage,
-} from "@/components/storage";
+} from "../storage.js";
 
 export default {
     data() {

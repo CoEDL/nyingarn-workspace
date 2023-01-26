@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { attachUser, getItemUsers } from "@/components/item/item-services";
+import { attachUser, getItemUsers } from "../../item-services.js";
 import ViewItemUsersComponent from "./ViewItemUsers.component.vue";
 import { flattenDeep } from "lodash";
 import { reactive, onMounted, inject } from "vue";

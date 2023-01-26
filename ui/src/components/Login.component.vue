@@ -3,14 +3,7 @@
         <div class="w-full m-auto">
             <div class="flex flex-row">
                 <div
-                    class="
-                        w-1/2
-                        text-right
-                        pr-4
-                        text-gray-600 text-4xl
-                        flex flex-col
-                        justify-center
-                    "
+                    class="w-1/2 text-right pr-4 text-gray-600 text-4xl flex flex-col justify-center"
                 >
                     <div>
                         {{ siteName }}
@@ -23,13 +16,7 @@
                         :provider="provider.name"
                         :image="provider.icon"
                         :button-text="provider.text"
-                        class="
-                            border-l-4 border-solid
-                            p-4
-                            cursor-pointer
-                            hover:border-yellow-400 hover:bg-yellow-100
-                            focus:ring-2 focus:ring-yellow-100
-                        "
+                        class="border-l-4 border-solid p-4 cursor-pointer hover:border-yellow-400 hover:bg-yellow-100 focus:ring-2 focus:ring-yellow-100"
                     />
                 </div>
             </div>
@@ -43,7 +30,7 @@ import { defineAsyncComponent } from "vue";
 export default {
     components: {
         OauthLoginComponent: defineAsyncComponent(() =>
-            import("@/components/authentication/OauthLogin.component.vue")
+            import("./authentication/OauthLogin.component.vue")
         ),
     },
     data() {

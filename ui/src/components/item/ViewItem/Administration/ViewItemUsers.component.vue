@@ -34,7 +34,7 @@
 
 <script>
 import { ElMessage } from "element-plus";
-import { detachUserFromItem } from "@/components/item/item-services";
+import { detachUserFromItem } from "../../item-services.js";
 export default {
     props: {
         users: {

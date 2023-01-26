@@ -1,4 +1,4 @@
-import { tokenSessionKey, getLocalStorage } from "@/components/storage";
+import { tokenSessionKey, getLocalStorage } from "./components/storage.js";
 import { isNumber, isString, isBoolean } from "lodash";
 
 export default class HTTPService {

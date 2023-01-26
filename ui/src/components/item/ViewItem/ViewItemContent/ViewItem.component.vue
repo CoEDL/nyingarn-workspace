@@ -47,12 +47,7 @@
 import { ElMessage } from "element-plus";
 import DisplayImageThumbnailComponent from "./DisplayImageThumbnail.component.vue";
 import DisplayStatusPropertyComponent from "./DisplayStatusProperty.component.vue";
-import {
-    getResourceFiles,
-    getStatus,
-    getFileUrl,
-    deleteResource,
-} from "@/components/item/item-services";
+import { getResourceFiles, getStatus, getFileUrl, deleteResource } from "../../item-services.js";
 export default {
     components: {
         DisplayImageThumbnailComponent,

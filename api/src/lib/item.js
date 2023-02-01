@@ -181,7 +181,8 @@ export async function listItemResourceFiles({ identifier, resource }) {
     try {
         files = await store.listResources();
         ({ files } = filterSpecialFiles({ files }));
-        files = files.filter((f) => f.match(resource));
+        const re = new RegExp(`${resource}\\.`);
+        files = files.filter((f) => f.match(re));
     } catch (error) {
         files = [];
     }

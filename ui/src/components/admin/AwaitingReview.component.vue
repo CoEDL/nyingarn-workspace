@@ -121,12 +121,9 @@ async function deposit(type, item) {
         params: { clientId: $socket.id },
         body: { version },
     });
-    if (response.status === 200) {
-        init();
-    }
+    data.loading = false;
     await new Promise((resolve) => setTimeout(resolve, 5000));
     data.depositLogs = [];
-    data.loading = false;
     init();
 }
 async function needsWork(type, item) {

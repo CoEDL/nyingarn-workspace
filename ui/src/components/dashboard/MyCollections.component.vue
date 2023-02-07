@@ -33,12 +33,7 @@
         </template>
 
         <div class="w-full">
-            <el-table
-                :data="data.collections"
-                :height="tableHeight"
-                size="small"
-                v-loading="data.loading"
-            >
+            <el-table :data="data.collections" :height="550" size="small" v-loading="data.loading">
                 <template #empty
                     >You have no collections. Get started by creating a collection.</template
                 >
@@ -121,9 +116,8 @@
 <script setup>
 import StatusBadgeComponent from "../StatusBadge.component.vue";
 import { ElMessage } from "element-plus";
-import { orderBy } from "lodash";
 import * as collectionServices from "../collection/collection-services";
-import { reactive, computed, onMounted, inject } from "vue";
+import { reactive, onMounted, inject } from "vue";
 import { useStore } from "vuex";
 const $store = useStore();
 const $http = inject("$http");
@@ -137,13 +131,6 @@ const data = reactive({
     prefix: undefined,
     filterByStatus: undefined,
     isAdmin: $store.state.user.administrator,
-});
-let tableHeight = computed(() => {
-    if (window.innerWidth > 1280) {
-        return window.innerHeight - 250;
-    } else {
-        return 300;
-    }
 });
 onMounted(() => {
     loadCollections();

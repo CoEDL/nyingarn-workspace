@@ -31,7 +31,7 @@
                 </el-pagination></div
         ></template>
         <div class="w-full">
-            <el-table :data="data.items" size="small" v-loading="data.loading">
+            <el-table :data="data.items" :height="550" size="small" v-loading="data.loading">
                 <template #empty>You have no items. Get started by creating an item.</template>
                 <el-table-column prop="identifier" label="">
                     <template #default="scope">
@@ -99,9 +99,8 @@
 <script setup>
 import StatusBadgeComponent from "../StatusBadge.component.vue";
 import { ElMessage } from "element-plus";
-import { orderBy } from "lodash";
 import * as itemServices from "../item/item-services";
-import { reactive, computed, onMounted, inject } from "vue";
+import { reactive, onMounted, inject } from "vue";
 import { useStore } from "vuex";
 import { parseISO, format } from "date-fns";
 import { io } from "socket.io-client";
@@ -123,13 +122,6 @@ const data = reactive({
     filterByStatus: undefined,
     isAdmin: $store.state.user.administrator,
     restoreLogs: [],
-});
-let tableHeight = computed(() => {
-    if (window.innerWidth > 1280) {
-        return window.innerHeight - 250;
-    } else {
-        return 300;
-    }
 });
 onMounted(() => {
     loadItems();
@@ -204,9 +196,9 @@ async function restoreItem(item) {
         params: { clientId: $socket.id },
         body: {},
     });
-    loadItems();
     await new Promise((resolve) => setTimeout(resolve, 5000));
     data.restoreLogs = [];
     data.loading = false;
+    loadItems();
 }
 </script>

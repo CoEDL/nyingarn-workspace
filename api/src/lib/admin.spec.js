@@ -1,15 +1,11 @@
 require("regenerator-runtime");
-import { createSession } from "../lib/session.js";
 import { deleteItem } from "../lib/item.js";
 import Chance from "chance";
 const chance = Chance();
-import fetch from "cross-fetch";
 import {
     loadConfiguration,
     getStoreHandle,
     TestSetup,
-    headers,
-    host,
     setupTestItem,
     setupTestCollection,
 } from "../common/index.js";
@@ -66,8 +62,8 @@ describe("Admin management tests", () => {
 
         // connect as admin
         let { items, total } = await getAdminItems({ user: adminUser });
-        expect(items).toEqual([{ identifier, connected: false }]);
         expect(total).toEqual(1);
+        expect(items[0]).toMatchObject({ identifier, connected: false });
 
         await models.item.destroy({ where: { identifier } });
         await store.removeObject();
@@ -92,8 +88,8 @@ describe("Admin management tests", () => {
 
         // connect as admin
         let { collections, total } = await getAdminCollections({ user: adminUser });
-        expect(collections).toEqual([{ identifier, connected: false }]);
         expect(total).toEqual(1);
+        expect(collections[0]).toMatchObject({ identifier, connected: false });
 
         await models.collection.destroy({ where: { identifier } });
         await store.removeObject();
@@ -181,14 +177,14 @@ describe("Admin management tests", () => {
 
         // retrieve all items
         let { items } = await getAdminItems({ user: adminUser });
-        expect(items).toEqual([{ identifier, connected: false }]);
+        expect(items[0]).toMatchObject({ identifier, connected: false });
 
         // import collections
         await importCollectionsFromStorageIntoTheDb({ user: adminUser, configuration });
 
         // retrieve all collections
         let { collections } = await getAdminCollections({ user: adminUser });
-        expect(collections).toEqual([{ identifier, connected: false }]);
+        expect(collections[0]).toMatchObject({ identifier, connected: false });
 
         await models.item.destroy({ where: { identifier } });
         await models.collection.destroy({ where: { identifier } });

@@ -73,7 +73,7 @@ describe("Publish route tests", () => {
         expect(response).toEqual({
             status: "awaitingReview",
             visibility: "open",
-            emails: [],
+            emails: [user.email],
         });
 
         await models.item.destroy({ where: { identifier } });

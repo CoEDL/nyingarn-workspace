@@ -97,8 +97,15 @@ async function postPublishItemHandler(req, res) {
         await req.session.user.save();
     }
 
+    req.io
+        .to(req.query.clientId)
+        .emit("publish-item", { msg: `Getting item resources`, date: new Date() });
     let listResources = await listItemResources({ identifier: req.session.item.identifier });
     const resources = listResources.resources;
+
+    req.io
+        .to(req.query.clientId)
+        .emit("publish-item", { msg: `Marking all resources as complete`, date: new Date() });
     await markAllResourcesComplete({
         identifier: req.session.item.identifier,
         resources: resources.map((r) => r.name),
@@ -108,6 +115,12 @@ async function postPublishItemHandler(req, res) {
     //  TODO: not yet implemented
 
     // reset the properties first
+    req.io
+        .to(req.query.clientId)
+        .emit("publish-item", {
+            msg: `Setting the item status to 'Awaiting Review'`,
+            date: new Date(),
+        });
     req.session.item.publicationStatus = "awaitingReview";
     req.session.item.publicationMetadata = {
         accessType: req.body.access.visibility,
@@ -134,9 +147,16 @@ async function postPublishItemHandler(req, res) {
     }
 
     // write the metadata into the crate
-    let crate;
     try {
-        crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        req.io
+            .to(req.query.clientId)
+            .emit("publish-item", {
+                msg: `Registering all files in the metadata`,
+                date: new Date(),
+            });
+        let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        const resources = await store.listResources();
+
         crate = new ROCrate(crate, { array: true });
 
         crate.addEntity(req.body.user);
@@ -148,7 +168,9 @@ async function postPublishItemHandler(req, res) {
             depositor = uniqBy(depositor, "@id");
         }
         crate.rootDataset.depositor = depositor;
-        crate = await registerAllFiles({ store, crate });
+
+        crate = await registerAllFiles({ crate, resources });
+
         crate = crate.toJSON();
         crate["@context"] = getContext();
 
@@ -157,6 +179,7 @@ async function postPublishItemHandler(req, res) {
         }
 
         await store.put({ target: "ro-crate-metadata.json", json: crate });
+        req.io.to(req.query.clientId).emit("publish-item", { msg: `Done`, date: new Date() });
     } catch (error) {
         console.log(error);
     }

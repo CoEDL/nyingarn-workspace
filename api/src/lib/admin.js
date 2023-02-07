@@ -271,13 +271,16 @@ export async function depositObjectIntoRepository({
         location: "repository",
     });
     objectRepository.on("copy", (event) => {
-        io.emit("deposit-item", { msg: `Batch: ${event.msg}`, date: event.date });
+        io.emit(`deposit-${type}`, { msg: `Batch: ${event.msg}`, date: event.date });
     });
 
     const repositoryObjectExists = await objectRepository.exists();
     if (!repositoryObjectExists) {
         // create the object location in the repo
-        io.emit("deposit-item", { msg: `Creating the item in the repository`, date: new Date() });
+        io.emit(`deposit-${type}`, {
+            msg: `Creating the ${type} in the repository`,
+            date: new Date(),
+        });
         await objectRepository.createObject();
         let { bucket } = await getS3Handle();
 
@@ -290,7 +293,6 @@ export async function depositObjectIntoRepository({
 
     // copy over all of the files from the workspace entry
     let resources = await objectWorkspace.listResources();
-    io.emit("deposit-item", { msg: `Getting item resources`, date: new Date() });
     resources = resources
         .filter((resource) => !resource.Key.match(/nocfl.*/))
         .map((resource) => {
@@ -313,13 +315,18 @@ export async function depositObjectIntoRepository({
                 version: versionFile,
             };
         });
-    io.emit("deposit-item", { msg: `Copying item resources to the repository`, date: new Date() });
+    io.emit(`deposit-${type}`, {
+        msg: `Copying ${type} resources to the repository`,
+        date: new Date(),
+    });
     await objectRepository.copy({ batch: resources });
 
     // delete the files from the workspace entry
-    io.emit("deposit-item", { msg: `Removing the item from the workspace`, date: new Date() });
+    io.emit(`deposit-${type}`, {
+        msg: `Removing the ${type} from the workspace`,
+        date: new Date(),
+    });
     await objectWorkspace.removeObject();
-    io.emit("deposit-item", { msg: `Done`, date: new Date() });
 }
 
 export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit: () => {} } }) {
@@ -330,13 +337,16 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
         location: "repository",
     });
     objectWorkspace.on("copy", (event) => {
-        io.emit("restore-item", { msg: `Batch: ${event.msg}`, date: event.date });
+        io.emit(`restore-${type}`, { msg: `Batch: ${event.msg}`, date: event.date });
     });
 
     const workspaceObjectExists = await objectWorkspace.exists();
     if (!workspaceObjectExists) {
         // create the object location in the repo
-        io.emit("restore-item", { msg: `Creating the item in the workspace`, date: new Date() });
+        io.emit(`restore-${type}`, {
+            msg: `Creating the ${type} in the workspace`,
+            date: new Date(),
+        });
         await objectWorkspace.createObject();
         let { bucket } = await getS3Handle();
 
@@ -348,7 +358,6 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
     }
 
     // copy over all non versioned files from the repository entry
-    io.emit("restore-item", { msg: `Getting item resources`, date: new Date() });
     let resources = await objectRepository.listResources();
     resources = resources
         .filter((resource) => !resource.Key.match(/nocfl.*/))
@@ -364,8 +373,8 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
             };
         });
 
-    io.emit("restore-item", {
-        msg: `Copying item resources to the workspace`,
+    io.emit(`restore-${type}`, {
+        msg: `Copying ${type} resources to the workspace`,
         date: new Date(),
     });
     await objectWorkspace.copy({ batch: resources });

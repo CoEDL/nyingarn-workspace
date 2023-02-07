@@ -140,9 +140,10 @@ async function putDepositObjectHandler(req) {
     type = type === "items" ? "item" : "collection";
 
     // mark the object as published
-    req.io
-        .to(req.query.clientId)
-        .emit("deposit-item", { msg: `Setting the item status to 'Published'`, date: new Date() });
+    req.io.to(req.query.clientId).emit(`deposit-${type}`, {
+        msg: `Setting the ${type} status to 'Published'`,
+        date: new Date(),
+    });
     await publishObject({
         user: req.session.user,
         type,
@@ -151,6 +152,10 @@ async function putDepositObjectHandler(req) {
     });
 
     // deposit it into the repository
+    req.io.to(req.query.clientId).emit(`deposit-${type}`, {
+        msg: `Depositing the ${type} into the repository`,
+        date: new Date(),
+    });
     await depositObjectIntoRepository({
         type,
         identifier,
@@ -158,15 +163,15 @@ async function putDepositObjectHandler(req) {
         io: req.io.to(req.query.clientId),
     });
 
-    req.io.to(req.query.clientId).emit("publish-item", { msg: `Done`, date: new Date() });
+    req.io.to(req.query.clientId).emit(`deposit-${type}`, { msg: `Done`, date: new Date() });
 }
 
 async function putRestoreObjectHandler(req) {
     let { type, identifier } = req.params;
     type = type === "items" ? "item" : "collection";
 
-    req.io.to(req.query.clientId).emit("restore-item", {
-        msg: `Setting the item status to 'In Progress'`,
+    req.io.to(req.query.clientId).emit(`restore-${type}`, {
+        msg: `Setting the ${type} status to 'In Progress'`,
         date: new Date(),
     });
     // set the objects status back to inProgress
@@ -182,7 +187,7 @@ async function putRestoreObjectHandler(req) {
     // restore it back into the workspace
     await restoreObjectIntoWorkspace({ type, identifier, io: req.io.to(req.query.clientId) });
 
-    req.io.to(req.query.clientId).emit("restore-item", { msg: `Done`, date: new Date() });
+    req.io.to(req.query.clientId).emit(`restore-${type}`, { msg: `Done`, date: new Date() });
 }
 
 async function putObjectNeedsWorkHandler(req, res) {

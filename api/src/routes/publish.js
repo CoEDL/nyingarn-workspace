@@ -7,7 +7,7 @@ import {
 } from "../common/index.js";
 import { listItemResources, markAllResourcesComplete } from "../lib/item.js";
 import lodashPkg from "lodash";
-const { uniqBy } = lodashPkg;
+const { uniqBy, uniq } = lodashPkg;
 import validatorPkg from "validator";
 const { isURL } = validatorPkg;
 import { ROCrate } from "ro-crate";
@@ -37,11 +37,14 @@ async function postPublishCollectionHandler(req, res) {
         req.session.user.identifier = req.body.user["@id"];
         await req.session.user.save();
     }
-
     // check that permission forms are loaded
     //  TODO: not yet implemented
 
     // set the properties for this collection
+    req.io.to(req.query.clientId).emit("publish-item", {
+        msg: `Setting the collection status to 'Awaiting Review'`,
+        date: new Date(),
+    });
     req.session.collection.publicationStatus = "awaitingReview";
     req.session.collection.publicationMetadata = {
         accessType: "open",
@@ -61,9 +64,12 @@ async function postPublishCollectionHandler(req, res) {
     }
 
     // write the metadata into the crate
-    let crate;
     try {
-        crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        req.io.to(req.query.clientId).emit("publish-item", {
+            msg: `Updating the crate metadata`,
+            date: new Date(),
+        });
+        let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         crate = new ROCrate(crate, { array: true });
 
         crate.addEntity(req.body.user);
@@ -79,6 +85,7 @@ async function postPublishCollectionHandler(req, res) {
         crate["@context"] = getContext();
 
         await store.put({ target: "ro-crate-metadata.json", json: crate });
+        req.io.to(req.query.clientId).emit("publish-collection", { msg: `Done`, date: new Date() });
     } catch (error) {
         console.log(error);
     }
@@ -151,7 +158,7 @@ async function postPublishItemHandler(req, res) {
     // write the metadata into the crate
     try {
         req.io.to(req.query.clientId).emit("publish-item", {
-            msg: `Registering all files in the metadata`,
+            msg: `Updating the crate metadata and registering all files`,
             date: new Date(),
         });
         let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
@@ -190,6 +197,7 @@ async function getItemPublicationStatus(req) {
     if (req.session.item.publicationMetadata?.accessControlList?.length) {
         emails = [...emails, ...req.session.item.publicationMetadata?.accessControlList];
     }
+    emails = uniq(emails);
     return {
         status: req.session.item.publicationStatus,
         visibility: req.session.item.publicationMetadata?.accessType,

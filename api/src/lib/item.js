@@ -283,7 +283,7 @@ export async function statItemFile({ identifier, file }) {
 
 export async function markResourceComplete({ identifier, resource, complete = false }) {
     let store = await getStoreHandle({ id: identifier, type: "item" });
-    if (!(await store.itemExists())) {
+    if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
 
@@ -299,7 +299,7 @@ export async function markResourceComplete({ identifier, resource, complete = fa
 
 export async function markAllResourcesComplete({ identifier, resources, complete = true }) {
     let store = await getStoreHandle({ id: identifier, type: "item" });
-    if (!(await store.itemExists())) {
+    if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
 

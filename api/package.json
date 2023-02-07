@@ -34,7 +34,7 @@
         "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
-        "@coedl/nocfl-js": "^1.19.1",
+        "@coedl/nocfl-js": "^1.21.0",
         "@describo/data-packs": "^0.10.0",
         "@fastify/compress": "^6.2.0",
         "@fastify/cors": "^8.2.0",
@@ -50,17 +50,17 @@
         "lodash": "^4.17.20",
         "mime-types": "^2.1.35",
         "mockdate": "^3.0.5",
-        "openid-client": "^5.3.2",
+        "openid-client": "^5.4.0",
         "pg": "^8.9.0",
         "pg-hstore": "^2.3.4",
         "pino-pretty": "^9.1.1",
         "regenerator-runtime": "^0.13.11",
-        "ro-crate": "^3.2.0",
+        "ro-crate": "^3.2.1",
         "saxon-js": "^2.5.0",
         "sequelize": "^6.28.0",
         "sequelize-cli": "^6.6.0",
         "uuid": "^9.0.0",
-        "validator": "^13.7.0",
+        "validator": "^13.9.0",
         "winston": "^3.8.2"
     }
 }

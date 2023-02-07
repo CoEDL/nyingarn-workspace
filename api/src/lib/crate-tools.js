@@ -5,38 +5,29 @@ import lodashPkg from "lodash";
 const { difference } = lodashPkg;
 
 // TODO: this code does not have tests
-export async function registerAllFiles({ store, crate }) {
-    // get list of files in the bucket
-    let files = (await store.listResources()).filter((file) => {
-        return !specialFiles.includes(file.Key);
-    });
+export async function registerAllFiles({ crate, resources }) {
+    let files = resources.filter((file) => !specialFiles.includes(file.Key));
     files = files.filter((file) => !file.Key.match(/^\./));
     if (!files.length) return crate;
 
-    // determine which files not already registered in the crate
-    const filesInBucket = files.map((file) => file.Key);
-    const filesInCrate = crate["@graph"]
-        .filter((entity) => entity["@type"] === "File")
-        .map((entity) => entity["@id"]);
-    const filesToAdd = difference(filesInBucket, filesInCrate);
-
-    // add an entry for each missing file
-    for (let file of filesToAdd) {
-        file = files.filter((f) => f.Key === file)[0];
-        let entity = {
-            "@id": file.Key,
-            "@type": "File",
-            name: file.Key,
-            contentSize: file.Size,
-            dateModified: file.LastModified,
-            "@reverse": {
-                hasPart: [{ "@id": "./" }],
-            },
-        };
-        crate.addEntity(entity);
-        let parts = crate.rootDataset.hasPart;
-        parts.push({ "@id": entity["@id"] });
-        crate.rootDataset.hasPart = parts;
+    for (let file of files) {
+        let entity = crate.getEntity(file.Key);
+        if (!entity) {
+            entity = {
+                "@id": file.Key,
+                "@type": "File",
+                name: file.Key,
+                contentSize: file.Size,
+                dateModified: file.LastModified,
+                "@reverse": {
+                    hasPart: [{ "@id": "./" }],
+                },
+            };
+            crate.addEntity(entity);
+            let parts = crate.rootDataset.hasPart;
+            parts.push({ "@id": entity["@id"] });
+            crate.rootDataset.hasPart = parts;
+        }
     }
 
     // set the mimetype on all files in the crate

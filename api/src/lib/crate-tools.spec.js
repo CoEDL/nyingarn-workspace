@@ -32,8 +32,11 @@ describe("Crate tools tests", () => {
         let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         crate = new ROCrate(crate, { array: true });
 
-        await registerAllFiles({ store, crate });
+        let resources = await store.listResources();
+
+        await registerAllFiles({ crate, resources });
         expect(crate.rootDataset.hasPart.length).toBe(4);
+        console.log(crate.toJSON());
 
         await models.item.destroy({ where: { identifier } });
         await store.removeObject();

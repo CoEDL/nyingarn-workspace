@@ -30,8 +30,8 @@
                 >
                 </el-pagination></div
         ></template>
-        <div class="w-full">
-            <el-table :data="data.items" :height="550" size="small" v-loading="data.loading">
+        <div class="w-full" :class="{ 'h-40': data.loading }" v-loading="data.loading">
+            <el-table :data="data.items" :height="550" size="small" v-show="!data.loading">
                 <template #empty>You have no items. Get started by creating an item.</template>
                 <el-table-column prop="identifier" label="">
                     <template #default="scope">
@@ -87,9 +87,9 @@
                 </el-table-column>
             </el-table>
         </div>
-        <div v-if="data.restoreLogs.length">
+        <div v-if="data.loading && data.restoreLogs.length">
             <el-table :data="data.restoreLogs">
-                <el-table-column prop="msg" label="Message" />
+                <el-table-column prop="msg" label="" />
                 <el-table-column prop="date" label="Date" width="250" />
             </el-table>
         </div>
@@ -196,7 +196,7 @@ async function restoreItem(item) {
         params: { clientId: $socket.id },
         body: {},
     });
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     data.restoreLogs = [];
     data.loading = false;
     loadItems();

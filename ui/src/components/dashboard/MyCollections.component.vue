@@ -32,8 +32,8 @@
             </div>
         </template>
 
-        <div class="w-full">
-            <el-table :data="data.collections" :height="550" size="small" v-loading="data.loading">
+        <div class="w-full" :class="{ 'h-40': data.loading }" v-loading="data.loading">
+            <el-table :data="data.collections" :height="550" size="small" v-show="!data.loading">
                 <template #empty
                     >You have no collections. Get started by creating a collection.</template
                 >
@@ -110,6 +110,12 @@
                 </el-table-column>
             </el-table>
         </div>
+        <div v-if="data.loading && data.restoreLogs.length">
+            <el-table :data="data.restoreLogs">
+                <el-table-column prop="msg" label="" />
+                <el-table-column prop="date" label="Date" width="250" />
+            </el-table>
+        </div>
     </el-card>
 </template>
 
@@ -119,6 +125,13 @@ import { ElMessage } from "element-plus";
 import * as collectionServices from "../collection/collection-services";
 import { reactive, onMounted, inject } from "vue";
 import { useStore } from "vuex";
+import { parseISO, format } from "date-fns";
+import { io } from "socket.io-client";
+const $socket = io();
+$socket.on("restore-collection", ({ msg, date }) => {
+    if (msg.match(/Batch.*/)) data.restoreLogs = data.restoreLogs.slice(0, -1);
+    data.restoreLogs.push({ msg, date: format(parseISO(date), "PPpp") });
+});
 const $store = useStore();
 const $http = inject("$http");
 
@@ -131,6 +144,7 @@ const data = reactive({
     prefix: undefined,
     filterByStatus: undefined,
     isAdmin: $store.state.user.administrator,
+    restoreLogs: [],
 });
 onMounted(() => {
     loadCollections();
@@ -187,9 +201,16 @@ async function unlinkMe(collection) {
     }
 }
 async function restoreCollection(item) {
+    data.restoreLogs = [];
     data.loading = true;
-    await $http.put({ route: `/admin/collections/${item.identifier}/restore`, body: {} });
-    loadCollections();
+    await $http.put({
+        route: `/admin/collections/${item.identifier}/restore`,
+        params: { clientId: $socket.id },
+        body: {},
+    });
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    data.restoreLogs = [];
     data.loading = false;
+    loadCollections();
 }
 </script>

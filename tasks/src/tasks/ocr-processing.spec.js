@@ -21,7 +21,7 @@ describe(`Test Textract OCR processing`, () => {
         const resource = "test-image-text.jpg";
 
         let store = await getStoreHandle({ id: identifier, type: "test" });
-        await store.createItem();
+        await store.createObject();
         await store.put({
             localPath: path.join("src", "test-data", "image-processing", resource),
             target: resource,
@@ -41,7 +41,7 @@ describe(`Test Textract OCR processing`, () => {
         await cleanup({ directory, identifier, type: "test" });
 
         await remove(directory);
-        await bucket.removeObjects({ prefix: store.getItemPath() });
+        await bucket.removeObjects({ prefix: store.getObjectPath() });
     });
     it(`should be able send an image with a table to textract for OCR and get a result`, async () => {
         const identifier = chance.word();
@@ -51,7 +51,7 @@ describe(`Test Textract OCR processing`, () => {
         const resource = "test-image-table-1.jpg";
 
         let store = await getStoreHandle({ id: identifier, type: "test" });
-        await store.createItem();
+        await store.createObject();
         await store.put({
             localPath: path.join("src", "test-data", "image-processing", resource),
             target: resource,
@@ -77,7 +77,7 @@ describe(`Test Textract OCR processing`, () => {
         await cleanup({ directory, identifier, type: "test" });
 
         await remove(directory);
-        await bucket.removeObjects({ prefix: store.getItemPath() });
+        await bucket.removeObjects({ prefix: store.getObjectPath() });
     });
     it(`should be able process a textract document without tables`, async () => {
         const identifier = "Bates34";

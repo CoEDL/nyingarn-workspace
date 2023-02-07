@@ -14,7 +14,7 @@ export async function getItemPath(req, res) {
         return res.unauthorized();
     }
     let store = await getStoreHandle({ id: req.params.identifier, type: req.params.itemType });
-    return { path: store.getItemPath() };
+    return { path: store.getObjectPath() };
 }
 
 export async function triggerProcessing(req) {

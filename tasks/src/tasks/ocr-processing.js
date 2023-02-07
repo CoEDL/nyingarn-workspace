@@ -88,7 +88,7 @@ export async function runTextractOCR({
     } else if (task === "table") {
         document = textract.parseTables();
     }
-    if (!(await store.pathExists({ path: targetTei }))) {
+    if (!(await store.fileExists({ path: targetTei }))) {
         await writeFile(targetTei, document.join("\n"));
     }
 }

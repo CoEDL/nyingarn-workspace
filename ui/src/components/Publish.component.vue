@@ -108,6 +108,12 @@
                 </el-form-item>
             </el-form>
         </div>
+        <div v-if="data.publishLogs.length">
+            <el-table :data="data.publishLogs">
+                <el-table-column prop="msg" label="Message" />
+                <el-table-column prop="date" label="Date" width="250" />
+            </el-table>
+        </div>
     </div>
 </template>
 
@@ -115,11 +121,16 @@
 import StatusBadgeComponent from "./StatusBadge.component.vue";
 import { reactive, watch, inject, onMounted } from "vue";
 import { uniq, flattenDeep } from "lodash";
+import { io } from "socket.io-client";
 import { useRoute } from "vue-router";
 import { isEmail } from "validator";
-import { parseISO } from "date-fns";
+import { parseISO, format } from "date-fns";
 const $route = useRoute();
 const $http = inject("$http");
+const $socket = io();
+$socket.on("publish-item", ({ msg, date }) => {
+    data.publishLogs.push({ msg, date: format(parseISO(date), "PPpp") });
+});
 
 const props = defineProps({
     type: {
@@ -142,6 +153,7 @@ const data = reactive({
     },
     checked: [],
     confirmed: false,
+    publishLogs: [],
 });
 
 watch(
@@ -202,6 +214,7 @@ function validate() {
 }
 async function publish() {
     data.showNarrativeRequirement = false;
+    data.publishLogs = [];
     if (
         data.form.visibility === "restricted" &&
         (!data.form.narrative || data.form.narrative.length === 0)
@@ -241,6 +254,7 @@ async function publish() {
     data.loading = true;
     await $http.post({
         route: `/publish/${routePath}/${$route.params.identifier}`,
+        params: { clientId: $socket.id },
         body: { ...formData },
     });
     getPublicationStatus();

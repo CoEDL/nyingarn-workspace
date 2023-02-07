@@ -58,7 +58,7 @@
                         <status-badge-component :status="scope.row.publicationStatus" />
                     </template>
                 </el-table-column>
-                <el-table-column label="Actions" width="250" align="center">
+                <el-table-column label="Actions" width="200" align="center">
                     <template #default="scope">
                         <div class="flex flex-row space-x-1">
                             <div v-if="data.isAdmin && scope.row.publicationStatus === 'published'">

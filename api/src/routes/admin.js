@@ -140,6 +140,9 @@ async function putDepositObjectHandler(req) {
     type = type === "items" ? "item" : "collection";
 
     // mark the object as published
+    req.io
+        .to(req.query.clientId)
+        .emit("deposit-item", { msg: `Setting the item status to 'Published'`, date: new Date() });
     await publishObject({
         user: req.session.user,
         type,
@@ -148,12 +151,24 @@ async function putDepositObjectHandler(req) {
     });
 
     // deposit it into the repository
-    await depositObjectIntoRepository({ type, identifier, version });
+    await depositObjectIntoRepository({
+        type,
+        identifier,
+        version,
+        io: req.io.to(req.query.clientId),
+    });
+
+    req.io.to(req.query.clientId).emit("publish-item", { msg: `Done`, date: new Date() });
 }
 
 async function putRestoreObjectHandler(req) {
     let { type, identifier } = req.params;
     type = type === "items" ? "item" : "collection";
+
+    req.io.to(req.query.clientId).emit("restore-item", {
+        msg: `Setting the item status to 'In Progress'`,
+        date: new Date(),
+    });
     // set the objects status back to inProgress
     let model;
     if (type === "collection") {
@@ -163,8 +178,11 @@ async function putRestoreObjectHandler(req) {
     }
     model.publicationStatus = "inProgress";
     await model.save();
+
     // restore it back into the workspace
-    await restoreObjectIntoWorkspace({ type, identifier });
+    await restoreObjectIntoWorkspace({ type, identifier, io: req.io.to(req.query.clientId) });
+
+    req.io.to(req.query.clientId).emit("restore-item", { msg: `Done`, date: new Date() });
 }
 
 async function putObjectNeedsWorkHandler(req, res) {
@@ -173,47 +191,3 @@ async function putObjectNeedsWorkHandler(req, res) {
 
     await objectRequiresMoreWork({ user: req.session.user, type, identifier });
 }
-
-// async function migrateBackend(req) {
-//     // console.log("migrate backend not implemented");
-//     console.log("migrate backend storage");
-//     let { bucket } = await getS3Handle();
-//     await migrate({});
-
-//     async function migrate({ continuationToken }) {
-//         let resources = await bucket.listObjects({
-//             continuationToken,
-//         });
-//         // console.log(resources.Contents.length);
-//         for (let resource of resources.Contents) {
-//             if (resource.Key.match(/.*\/workspace\/.*\/nocfl.identifier.json/)) {
-//                 let content = await bucket.readJSON({ target: resource.Key });
-//                 console.log(content);
-//                 // let identifier = {
-//                 //     id: content.id,
-//                 //     type: content.className,
-//                 //     prefix: "nyingarn.net/workspace",
-//                 //     splay: content.splay ?? 1,
-//                 // };
-//                 // console.log("updating", resource.Key);
-//                 // await bucket.upload({ target: resource.Key, json: identifier });
-//                 // console.log(content);
-//             }
-//             // const source = resource.Key;
-//             // const target = resource.Key.replace(/nyingarn.net/, "nyingarn.net/workspace");
-//             // if (source !== target) {
-//             //     console.log(`Copying ${source} -> ${target}`);
-//             //     await bucket.copy({ source, target });
-//             // }
-//             // console.log({
-//             //     source: resource.Key,
-//             //     target: resource.Key.replace(/nyingarn.net/, "nyingarn.net/workspace"),
-//             // });
-//         }
-//         if (resources.NextContinuationToken) {
-//             await migrate({
-//                 continuationToken: resources.NextContinuationToken,
-//             });
-//         }
-//     }
-// }

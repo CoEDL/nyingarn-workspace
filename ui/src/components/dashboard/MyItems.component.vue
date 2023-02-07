@@ -31,12 +31,7 @@
                 </el-pagination></div
         ></template>
         <div class="w-full">
-            <el-table
-                :data="data.items"
-                :height="tableHeight"
-                size="small"
-                v-loading="data.loading"
-            >
+            <el-table :data="data.items" size="small" v-loading="data.loading">
                 <template #empty>You have no items. Get started by creating an item.</template>
                 <el-table-column prop="identifier" label="">
                     <template #default="scope">
@@ -92,6 +87,12 @@
                 </el-table-column>
             </el-table>
         </div>
+        <div v-if="data.restoreLogs.length">
+            <el-table :data="data.restoreLogs">
+                <el-table-column prop="msg" label="Message" />
+                <el-table-column prop="date" label="Date" width="250" />
+            </el-table>
+        </div>
     </el-card>
 </template>
 
@@ -102,6 +103,13 @@ import { orderBy } from "lodash";
 import * as itemServices from "../item/item-services";
 import { reactive, computed, onMounted, inject } from "vue";
 import { useStore } from "vuex";
+import { parseISO, format } from "date-fns";
+import { io } from "socket.io-client";
+const $socket = io();
+$socket.on("restore-item", ({ msg, date }) => {
+    if (msg.match(/Batch.*/)) data.restoreLogs = data.restoreLogs.slice(0, -1);
+    data.restoreLogs.push({ msg, date: format(parseISO(date), "PPpp") });
+});
 const $store = useStore();
 const $http = inject("$http");
 
@@ -114,6 +122,7 @@ const data = reactive({
     prefix: undefined,
     filterByStatus: undefined,
     isAdmin: $store.state.user.administrator,
+    restoreLogs: [],
 });
 let tableHeight = computed(() => {
     if (window.innerWidth > 1280) {
@@ -188,9 +197,16 @@ async function unlinkMe(item) {
     }
 }
 async function restoreItem(item) {
+    data.restoreLogs = [];
     data.loading = true;
-    await $http.put({ route: `/admin/items/${item.identifier}/restore`, body: {} });
+    await $http.put({
+        route: `/admin/items/${item.identifier}/restore`,
+        params: { clientId: $socket.id },
+        body: {},
+    });
     loadItems();
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    data.restoreLogs = [];
     data.loading = false;
 }
 </script>

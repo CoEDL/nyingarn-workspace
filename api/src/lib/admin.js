@@ -258,41 +258,11 @@ export async function objectRequiresMoreWork({ type, identifier }) {
     await model.save();
 }
 
-async function migrateBackend(req) {
-    console.log("migrate backend not implemented");
-    // console.log("migrate backend storage");
-    // let { bucket } = await getS3Handle();
-    // await migrate({});
-
-    // async function migrate({ continuationToken }) {
-    //     let resources = await bucket.listObjects({
-    //         continuationToken,
-    //     });
-    //     console.log(resources.Contents.length);
-    //     for (let resource of resources.Contents) {
-    //         const source = resource.Key;
-    //         const target = resource.Key.replace(/nyingarn.net/, "nyingarn.net/workspace");
-    //         if (source !== target) {
-    //             console.log(`Copying ${source} -> ${target}`);
-    //             await bucket.copy({ source, target });
-    //         }
-    //         // console.log({
-    //         //     source: resource.Key,
-    //         //     target: resource.Key.replace(/nyingarn.net/, "nyingarn.net/workspace"),
-    //         // });
-    //     }
-    //     if (resources.NextContinuationToken) {
-    //         await migrate({
-    //             continuationToken: resources.NextContinuationToken,
-    //         });
-    //     }
-    // }
-}
-
 export async function depositObjectIntoRepository({
     type,
     identifier,
     version = { metadata: false, images: false, documents: false },
+    io = { emit: () => {} },
 }) {
     const objectWorkspace = await getStoreHandle({ identifier, type });
     const objectRepository = await getStoreHandle({
@@ -300,14 +270,18 @@ export async function depositObjectIntoRepository({
         type,
         location: "repository",
     });
+    objectRepository.on("copy", (event) => {
+        io.emit("deposit-item", { msg: `Batch: ${event.msg}`, date: event.date });
+    });
 
     const repositoryObjectExists = await objectRepository.exists();
     if (!repositoryObjectExists) {
         // create the object location in the repo
-        await objectRepository.createItem();
+        io.emit("deposit-item", { msg: `Creating the item in the repository`, date: new Date() });
+        await objectRepository.createObject();
         let { bucket } = await getS3Handle();
 
-        // on first create - remove the metadata file so that not matter what,
+        // on first create - remove the metadata file so that no matter what,
         //  it won't get versioned
         await bucket.removeObjects({
             keys: [path.join(objectRepository.objectPath, "ro-crate-metadata.json")],
@@ -316,6 +290,7 @@ export async function depositObjectIntoRepository({
 
     // copy over all of the files from the workspace entry
     let resources = await objectWorkspace.listResources();
+    io.emit("deposit-item", { msg: `Getting item resources`, date: new Date() });
     resources = resources
         .filter((resource) => !resource.Key.match(/nocfl.*/))
         .map((resource) => {
@@ -338,24 +313,31 @@ export async function depositObjectIntoRepository({
                 version: versionFile,
             };
         });
+    io.emit("deposit-item", { msg: `Copying item resources to the repository`, date: new Date() });
     await objectRepository.copy({ batch: resources });
 
     // delete the files from the workspace entry
+    io.emit("deposit-item", { msg: `Removing the item from the workspace`, date: new Date() });
     await objectWorkspace.removeObject();
+    io.emit("deposit-item", { msg: `Done`, date: new Date() });
 }
 
-export async function restoreObjectIntoWorkspace({ type, identifier }) {
+export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit: () => {} } }) {
     const objectWorkspace = await getStoreHandle({ identifier, type });
     const objectRepository = await getStoreHandle({
         identifier,
         type,
         location: "repository",
     });
+    objectWorkspace.on("copy", (event) => {
+        io.emit("restore-item", { msg: `Batch: ${event.msg}`, date: event.date });
+    });
 
     const workspaceObjectExists = await objectWorkspace.exists();
     if (!workspaceObjectExists) {
         // create the object location in the repo
-        await objectWorkspace.createItem();
+        io.emit("restore-item", { msg: `Creating the item in the workspace`, date: new Date() });
+        await objectWorkspace.createObject();
         let { bucket } = await getS3Handle();
 
         // on first create - remove the metadata file so that not matter what,
@@ -366,6 +348,7 @@ export async function restoreObjectIntoWorkspace({ type, identifier }) {
     }
 
     // copy over all non versioned files from the repository entry
+    io.emit("restore-item", { msg: `Getting item resources`, date: new Date() });
     let resources = await objectRepository.listResources();
     resources = resources
         .filter((resource) => !resource.Key.match(/nocfl.*/))
@@ -380,5 +363,10 @@ export async function restoreObjectIntoWorkspace({ type, identifier }) {
                 source: objectRepository.resolvePath({ path: resource.Key }),
             };
         });
+
+    io.emit("restore-item", {
+        msg: `Copying item resources to the workspace`,
+        date: new Date(),
+    });
     await objectWorkspace.copy({ batch: resources });
 }

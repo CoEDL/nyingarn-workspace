@@ -106,21 +106,23 @@ async function postPublishItemHandler(req, res) {
     req.io
         .to(req.query.clientId)
         .emit("publish-item", { msg: `Marking all resources as complete`, date: new Date() });
-    await markAllResourcesComplete({
-        identifier: req.session.item.identifier,
-        resources: resources.map((r) => r.name),
-    });
+    try {
+        await markAllResourcesComplete({
+            identifier: req.session.item.identifier,
+            resources: resources.map((r) => r.name),
+        });
+    } catch (error) {
+        console.log(error);
+    }
 
     // check that permission forms are loaded
     //  TODO: not yet implemented
 
     // reset the properties first
-    req.io
-        .to(req.query.clientId)
-        .emit("publish-item", {
-            msg: `Setting the item status to 'Awaiting Review'`,
-            date: new Date(),
-        });
+    req.io.to(req.query.clientId).emit("publish-item", {
+        msg: `Setting the item status to 'Awaiting Review'`,
+        date: new Date(),
+    });
     req.session.item.publicationStatus = "awaitingReview";
     req.session.item.publicationMetadata = {
         accessType: req.body.access.visibility,
@@ -148,12 +150,10 @@ async function postPublishItemHandler(req, res) {
 
     // write the metadata into the crate
     try {
-        req.io
-            .to(req.query.clientId)
-            .emit("publish-item", {
-                msg: `Registering all files in the metadata`,
-                date: new Date(),
-            });
+        req.io.to(req.query.clientId).emit("publish-item", {
+            msg: `Registering all files in the metadata`,
+            date: new Date(),
+        });
         let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         const resources = await store.listResources();
 

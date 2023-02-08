@@ -8,7 +8,7 @@
             </template>
             <div v-loading="data.loading">
                 <div v-for="(item, idx) in data.items" :key="idx">
-                    <div class="flex flex-row space-x-6 my-1">
+                    <div class="flex flex-row space-x-20 my-1">
                         <div
                             class="flex flex-grow cursor-pointer"
                             @click="loadItem(item.identifier)"
@@ -24,7 +24,6 @@
                                 Deposit
                             </el-button>
                         </div>
-                        <div class="flex-grow"></div>
                         <div>
                             <el-button @click="needsWork('items', item)" type="danger">
                                 Needs Work

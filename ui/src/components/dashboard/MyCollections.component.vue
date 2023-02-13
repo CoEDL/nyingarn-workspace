@@ -53,9 +53,9 @@
                         <status-badge-component :status="scope.row.publicationStatus" />
                     </template>
                 </el-table-column>
-                <el-table-column label="Actions" width="200" align="center">
+                <el-table-column label="Actions" align="center" width="200">
                     <template #default="scope">
-                        <div class="flex flex-row space-x-1">
+                        <div class="flex flex-row justify-items-center space-x-1">
                             <div v-if="data.isAdmin && scope.row.publicationStatus === 'published'">
                                 <el-button
                                     type="primary"
@@ -63,20 +63,6 @@
                                     @click="restoreCollection(scope.row)"
                                 >
                                     <i class="fa-solid fa-rotate-left"></i>&nbsp; restore
-                                </el-button>
-                            </div>
-                            <div>
-                                <el-button
-                                    type="primary"
-                                    size="small"
-                                    @click="toggleCollectionVisibility(scope.row)"
-                                >
-                                    <span v-show="scope.row.private">
-                                        <i class="fa-solid fa-lock"></i>
-                                    </span>
-                                    <span v-show="!scope.row.private">
-                                        <i class="fa-solid fa-lock-open"></i>
-                                    </span>
                                 </el-button>
                             </div>
                             <div class="flex flex-row space-x-1">
@@ -180,13 +166,6 @@ async function deleteCollection(collection) {
     } catch (error) {
         ElMessage.error(`Something went wrong deleting this collection`);
     }
-}
-async function toggleCollectionVisibility(collection) {
-    await collectionServices.toggleCollectionVisibility({
-        $http,
-        identifier: collection.identifier,
-    });
-    await loadCollections();
 }
 async function unlinkMe(collection) {
     try {

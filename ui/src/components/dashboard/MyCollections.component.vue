@@ -53,9 +53,9 @@
                         <status-badge-component :status="scope.row.publicationStatus" />
                     </template>
                 </el-table-column>
-                <el-table-column label="Actions" align="center" width="200">
+                <el-table-column label="Actions" width="200">
                     <template #default="scope">
-                        <div class="flex flex-row justify-items-center space-x-1">
+                        <div class="flex flex-row space-x-1">
                             <div v-if="data.isAdmin && scope.row.publicationStatus === 'published'">
                                 <el-button
                                     type="primary"
@@ -65,31 +65,25 @@
                                     <i class="fa-solid fa-rotate-left"></i>&nbsp; restore
                                 </el-button>
                             </div>
-                            <div class="flex flex-row space-x-1">
-                                <div v-if="data.isAdmin">
-                                    <el-button
-                                        type="primary"
-                                        size="small"
-                                        @click="unlinkMe(scope.row)"
-                                    >
-                                        <i class="fa-solid fa-unlink"></i>
-                                    </el-button>
-                                </div>
-                                <div>
-                                    <el-popconfirm
-                                        title="Are you sure you want to delete this collection? All data will be removed and this can't be undone."
-                                        @confirm="deleteCollection(scope.row)"
-                                        confirmButtonType="danger"
-                                        cancelButtonType="primary"
-                                        width="300"
-                                    >
-                                        <template #reference>
-                                            <el-button type="danger" size="small">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </el-button>
-                                        </template>
-                                    </el-popconfirm>
-                                </div>
+                            <div v-if="data.isAdmin">
+                                <el-button type="primary" size="small" @click="unlinkMe(scope.row)">
+                                    <i class="fa-solid fa-unlink"></i>
+                                </el-button>
+                            </div>
+                            <div>
+                                <el-popconfirm
+                                    title="Are you sure you want to delete this collection? All data will be removed and this can't be undone."
+                                    @confirm="deleteCollection(scope.row)"
+                                    confirmButtonType="danger"
+                                    cancelButtonType="primary"
+                                    width="300"
+                                >
+                                    <template #reference>
+                                        <el-button type="danger" size="small">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </el-button>
+                                    </template>
+                                </el-popconfirm>
                             </div>
                         </div>
                     </template>

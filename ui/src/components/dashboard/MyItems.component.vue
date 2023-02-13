@@ -50,7 +50,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="total" label="Pages" width="100"> </el-table-column>
-                <el-table-column label="Actions" width="200" align="center">
+                <el-table-column label="Actions" width="200">
                     <template #default="scope">
                         <div class="flex flex-row space-x-1">
                             <div v-if="data.isAdmin && scope.row.publicationStatus === 'published'">

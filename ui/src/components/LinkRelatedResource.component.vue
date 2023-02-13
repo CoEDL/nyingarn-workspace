@@ -196,11 +196,11 @@ async function toggleLink({ item, url, successMsg, ErrorMsg }) {
             source: $route.params.identifier,
             sourceType: $route.meta.type,
             property: data.property,
-            target: item.name,
+            target: item.identifier,
             targetType: item.type,
         },
         {
-            source: item.name,
+            source: item.identifier,
             sourceType: item.type,
             property: data.reverseProperty,
             target: $route.params.identifier,

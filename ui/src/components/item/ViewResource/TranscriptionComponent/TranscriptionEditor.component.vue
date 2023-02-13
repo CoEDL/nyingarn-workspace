@@ -141,8 +141,24 @@
                         </el-button>
                     </template>
                 </el-popconfirm>
+                <div>
+                    <el-button @click="decreaseFontSize" type="primary" size="large">
+                        <span class="fa-stack">
+                            <i class="fa-solid fa-font" data-fa-transform="down-12 right-4"></i>
+                            <i class="fa-solid fa-minus" data-fa-transform="up-2 left-2"></i>
+                        </span>
+                    </el-button>
+                </div>
+                <div>
+                    <el-button @click="increaseFontSize" type="primary" size="large">
+                        <span class="fa-stack">
+                            <i class="fa-solid fa-font" data-fa-transform="down-12 right-4"></i>
+                            <i class="fa-solid fa-plus" data-fa-transform="up-2 left-2"></i>
+                        </span>
+                    </el-button>
+                </div>
             </div>
-            <div class="editor min-max-width overflow-scroll">
+            <div class="editor min-max-width overflow-scroll" :class="data.fontSize">
                 <div ref="codemirror"></div>
             </div>
         </div>
@@ -155,7 +171,7 @@ import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { xml, xmlLanguage } from "@codemirror/lang-xml";
 import { CodemirrorEditorControls, formatDocument } from "./codemirror-editor.js";
-import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount, nextTick } from "vue";
+import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
@@ -177,6 +193,19 @@ let data = reactive({
     markupControl: "add",
     editorContols: {},
     controls: $store.state.configuration.ui.teiEditorControls,
+    fontSize: "text-base",
+    sizes: [
+        "text-xs",
+        "text-sm",
+        "text-base",
+        "text-lg",
+        "text-xl",
+        "text-2xl",
+        "text-3xl",
+        "text-4xl",
+        "text-5xl",
+        "text-6xl",
+    ],
 });
 
 const codemirror = ref(null);
@@ -320,11 +349,20 @@ async function reprocessPageAsTable() {
         }
     }
 }
+function decreaseFontSize() {
+    let next = data.sizes.indexOf(data.fontSize) - 1;
+    next = next < 0 ? 0 : next;
+    data.fontSize = data.sizes[next];
+}
+function increaseFontSize() {
+    let next = data.sizes.indexOf(data.fontSize) + 1;
+    next = next > 9 ? 9 : next;
+    data.fontSize = data.sizes[next];
+}
 </script>
 
 <style scoped>
 .editor {
-    font-size: 16px;
     height: calc(100vh - 320px);
 }
 

@@ -39,7 +39,7 @@ export async function getItems({ userId, offset = 0, limit = 10, match, publicat
     query.where = {};
     if (match) {
         query.where.identifier = {
-            [Op.iLike]: `${match}%`,
+            [Op.iLike]: `%${match}%`,
         };
     }
     if (publicationStatus) {

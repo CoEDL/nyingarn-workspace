@@ -13,7 +13,6 @@ import AdminAwaitingReviewComponent from "./components/admin/AwaitingReview.comp
 import AdminItemsComponent from "./components/admin/Items.component.vue";
 import HTTPService from "./http.service.js";
 import { createRouter, createWebHistory } from "vue-router";
-
 const routes = [
     {
         path: "/",
@@ -163,11 +162,12 @@ const routes = [
     },
 ];
 
-const router = createRouter({
+export const router = createRouter({
     history: createWebHistory("/"),
     routes,
 });
 router.beforeEach(onAuthRequired);
+export const $http = new HTTPService({ router });
 
 async function onAuthRequired(to, from, next) {
     if (to.meta?.requiresAuth) {
@@ -188,8 +188,7 @@ async function onAuthRequired(to, from, next) {
 
 export async function isAuthenticated() {
     try {
-        const httpService = new HTTPService({ router });
-        let response = await httpService.get({ route: "/authenticated" });
+        let response = await $http.get({ route: "/authenticated" });
         if (response.status === 200) {
             return true;
         }
@@ -199,5 +198,3 @@ export async function isAuthenticated() {
         return false;
     }
 }
-
-export default router;

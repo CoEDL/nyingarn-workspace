@@ -7,7 +7,7 @@ config.autoReplaceSvg = "nest";
 
 import { createApp } from "vue";
 import App from "./App.vue";
-import router from "./routes";
+import { router, $http } from "./routes";
 import { store } from "./store";
 import ElementPlus from "element-plus";
 import DescriboCrateBuilder from "@describo/crate-builder-component";
@@ -35,7 +35,7 @@ import HTTPService from "./http.service";
         app.use(router);
         app.use(ElementPlus);
         app.use(DescriboCrateBuilder);
-        app.config.globalProperties.$http = new HTTPService({ router });
+        app.config.globalProperties.$http = $http;
         app.provide("$http", app.config.globalProperties.$http);
 
         // app.config.globalProperties.$log = log;

@@ -4,20 +4,6 @@ import { log, loadConfiguration } from "/srv/api/src/common/index.js";
 import { expandError } from "../common/errors.js";
 import { removeOverlappingNewContent } from "./index.js";
 
-export async function reconstituteTEIFile({ directory, identifier, resource }) {
-    let sourceURI = "file://" + path.join(directory, identifier, resource);
-    await SaxonJS.transform(
-        {
-            stylesheetFileName: "/srv/tasks/src/xslt/reconstitute.xsl.sef.json",
-            templateParams: {
-                "source-uri": sourceURI,
-            },
-            baseOutputURI: sourceURI, // output into the same folder as the source data file
-        },
-        "async"
-    );
-}
-
 export async function processTEIToPageFilesAsStrings({ directory, identifier, resource }) {
     //TODO ask SaxonJS to return the documents in memory, rather than write them directly to disk
     // so that the storage bucket can be checked for pre-existing files, to avoid overwriting them.

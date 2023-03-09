@@ -7,20 +7,6 @@ import { getS3Handle, getLogger, loadConfiguration, expandError } from "../commo
 import { removeOverlappingNewContent } from "./";
 const log = getLogger();
 
-export async function reconstituteTEIFile({ directory, identifier, resource }) {
-    let sourceURI = "file://" + path.join(directory, identifier, resource);
-    await SaxonJS.transform(
-        {
-            stylesheetFileName: "/srv/tasks/src/xslt/reconstitute.xsl.sef.json",
-            templateParams: {
-                "source-uri": sourceURI,
-            },
-            baseOutputURI: sourceURI, // output into the same folder as the source data file
-        },
-        "async"
-    );
-}
-
 export async function processTEIToPageFilesAsStrings({ directory, identifier, resource }) {
     //TODO ask SaxonJS to return the documents in memory, rather than write them directly to disk
     // so that the storage bucket can be checked for pre-existing files, to avoid overwriting them.

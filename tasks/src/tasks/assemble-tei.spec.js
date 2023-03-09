@@ -7,12 +7,13 @@ const chance = new Chance();
 
 describe(`Test assembling a TEI file from the stub files`, () => {
     it(`Should be able to assemble a TEI file from the stub files`, async () => {
-        const identifier = chance.word();
-        const directory = path.join("/tmp", chance.word());
+        const identifier = 'test'; //chance.word();
+        //const directory = path.join("/tmp", chance.word());
+        const directory = '/tmp/test';
         await ensureDir(directory);
         // let store = await getStoreHandle({ id: identifier, className: "item" });
         // await store.createItem();
-        for (let i of [1, 2, 3]) {
+        for (let i of ['01', '02', '03']) {
             // await store.put({
             //     target: `${identifier}-${i}.tei.xml`,
             //     content: sampleDocument(identifier, i),
@@ -34,6 +35,9 @@ function sampleDocument(identifier, page) {
     <surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${identifier}-${page}">
     <line>
         NATIVE <unclear>VOCABULARY.</unclear>
+    </line>
+    <line>
+        blah blah blah
     </line>
 </surface>`;
 }

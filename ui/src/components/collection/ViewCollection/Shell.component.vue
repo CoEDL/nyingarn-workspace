@@ -33,7 +33,7 @@
                 <el-tab-pane label="Associate Collections and Items" name="associate">
                     <collection-members-component v-if="data.activeTab === 'associate'" />
                 </el-tab-pane>
-                <el-tab-pane label="Publish" name="publish" v-if="data.isAdmin">
+                <el-tab-pane label="Publish" name="publish">
                     <publish-component v-if="data.activeTab === 'publish'" type="collection" />
                 </el-tab-pane>
                 <el-tab-pane label="Administration" name="administration">
@@ -49,7 +49,7 @@ import { getCollection } from "../collection-services";
 import AdministrationComponent from "./Administration/Shell.component.vue";
 import CollectionMembersComponent from "./CollectionMembers.component.vue";
 import ViewCollectionMembersComponent from "./ViewCollectionMembers.component.vue";
-import PublishComponent from "../../Publish.component.vue";
+import PublishComponent from "./PublishComponent/Shell.component.vue";
 import { ref, reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";

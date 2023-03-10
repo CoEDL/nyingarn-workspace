@@ -12,7 +12,7 @@
             <div class="flex flex-col space-y-2 text-gray-600" v-loading="data.loading">
                 <div class="flex flex-row">
                     <div class="flex-grow"></div>
-                    <div v-if="data.error?.code" class="text-red-800">
+                    <div v-if="data.error?.statusCode" class="text-red-800">
                         Error: {{ data.error.message }}
                     </div>
                 </div>

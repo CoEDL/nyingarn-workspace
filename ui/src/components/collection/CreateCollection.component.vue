@@ -19,7 +19,7 @@
                         Please define an identifier for this collection.
                     </div>
                     <div class="flex-grow"></div>
-                    <div v-if="data.error?.code" class="text-red-800">
+                    <div v-if="data.error?.statusCode" class="text-red-800">
                         Error: {{ data.error.message }}
                     </div>
                 </div>

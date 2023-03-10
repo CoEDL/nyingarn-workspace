@@ -166,10 +166,11 @@ async function unlinkMe(collection) {
         await collectionServices.detachUserFromCollection({
             $http,
             identifier: collection.identifier,
-            userId: store.state.user.id,
+            userId: $store.state.user.id,
         });
         loadCollections();
     } catch (error) {
+        console.log(error);
         ElMessage.error(`Something went wrong detaching you from this collection`);
     }
 }

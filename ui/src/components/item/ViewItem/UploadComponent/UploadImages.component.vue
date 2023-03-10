@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <ProcessingStatusComponent
-                    class="w-full"
+                    class="w-full overflow-scroll processing-panel-height"
                     v-if="data.showProcessingStatus"
                     :taskIds="data.taskIds"
                 />
@@ -71,3 +71,9 @@ async function handleUploadedTranscription(file) {
     data.taskIds = [...data.taskIds, response.taskId];
 }
 </script>
+
+<style scoped>
+.processing-panel-height {
+    height: 500px;
+}
+</style>

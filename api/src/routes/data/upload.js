@@ -7,40 +7,45 @@ export async function authenticateTusRequest(req, res) {
     return {};
 }
 
-export async function getItemPath(req, res) {
+export async function getUploadDetails(req, res) {
     if (!req.params.identifier) return;
 
     if (!req.session.user.upload) {
         return res.unauthorized();
     }
     let store = await getStoreHandle({ id: req.params.identifier, type: req.params.itemType });
-    return { path: store.getObjectPath() };
+    return {
+        path: store.getObjectPath(),
+        bucket: req.session.configuration.api.services.s3.bucket,
+    };
 }
 
 export async function triggerProcessing(req) {
     // await new Promise((resolve) => setTimeout(resolve, 15000));
     const { identifier, resource } = req.params;
+    const { action } = req.body;
 
     log.info(`Process: ${identifier}/${resource}`);
     let name;
-    if (resource.match(/digivol\.csv/)) {
+    if (resource === `${identifier}-digivol.csv`) {
         // process digivol file
         name = "process-digivol";
-    } else if (resource.match(/tei\.xml/)) {
+    } else if (resource === `${identifier}-tei.xml`) {
         // process tei xml file
         name = "process-tei";
     } else {
         // process uploaded image
-        name = "process-image";
+        name = action ? action : "process-image";
     }
-    const task = {
+
+    let task = {
         rabbit: this.rabbit,
         configuration: req.session.configuration,
         item: req.session.item.get(),
         name,
         body: { resource },
     };
-    await submitTask(task);
+    task = await submitTask(task);
 
-    return {};
+    return { taskId: task.id };
 }

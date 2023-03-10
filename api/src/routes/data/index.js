@@ -7,7 +7,7 @@ import {
 } from "../../common/index.js";
 const log = getLogger();
 
-import { authenticateTusRequest, triggerProcessing, getItemPath } from "./upload.js";
+import { authenticateTusRequest, triggerProcessing, getUploadDetails } from "./upload.js";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -16,7 +16,7 @@ export function setupRoutes(fastify, options, done) {
     fastify.get(
         "/upload/pre-create/:itemType/:identifier",
         { preHandler: requireItemAccess },
-        getItemPath
+        getUploadDetails
     );
     fastify.get(
         "/upload/post-finish/:identifier/:resource",

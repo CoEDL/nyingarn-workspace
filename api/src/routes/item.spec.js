@@ -232,7 +232,7 @@ describe("Item management route tests", () => {
         let items = await models.item.findAll();
         expect(items.length).toEqual(0);
 
-        let itemExists = await store.itemExists();
+        let itemExists = await store.exists();
         expect(itemExists).toBe(false);
     });
     it("should succeed if the new item exists and is already associated to this user", async () => {
@@ -417,6 +417,23 @@ describe("Item management route tests", () => {
             }
         );
         expect(response.status).toEqual(200);
+
+        await deleteItem({ id: item.id });
+    });
+    it("should be able to get permission forms", async () => {
+        let user = users.filter((u) => !u.administrator)[0];
+        let session = await createSession({ user });
+        let { item } = await setupTestItem({ identifier, store, user });
+        await store.put({ json: {}, target: `${identifier}-rights-holder-permission.pdf` });
+        await store.put({ json: {}, target: `${identifier}-language-authority-permission.pdf` });
+
+        let response = await fetch(`${host}/items/${identifier}/permission-forms`, {
+            method: "GET",
+            headers: headers(session),
+        });
+        expect(response.status).toEqual(200);
+        response = await response.json();
+        expect(response.files.length).toEqual(2);
 
         await deleteItem({ id: item.id });
     });

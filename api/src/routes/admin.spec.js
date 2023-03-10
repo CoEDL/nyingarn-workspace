@@ -165,13 +165,13 @@ describe("Admin route tests", () => {
             id: identifier,
             type: "item",
         });
-        await storeItem.createItem();
+        await storeItem.createObject();
 
         let storeCollection = await getStoreHandle({
             id: identifier,
             type: "collection",
         });
-        await storeCollection.createItem();
+        await storeCollection.createObject();
 
         // connect as an admin
         let adminUser = users.filter((u) => u.administrator)[0];

@@ -171,6 +171,19 @@ export async function listItemResources({ identifier, offset = 0, limit }) {
     return { resources, total };
 }
 
+export async function listItemPermissionForms({ identifier }) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+
+    let files = await store.listResources();
+    files = files
+        .filter((file) => file.Key.match(/permission\.pdf/))
+        .map((file) => ({ name: file.Key }));
+    return { files };
+}
+
 export async function listItemResourceFiles({ identifier, resource }) {
     let store = await getStoreHandle({ id: identifier, type: "item" });
     if (!(await store.exists())) {
@@ -258,20 +271,15 @@ export function groupFilesByResource({ identifier, files, naming }) {
     return { files: groupBy(resources, "resourceId") };
 }
 
-export async function getResourceProcessingStatus({ itemId, resources, dateFrom }) {
-    let dateTo = new Date();
-    return await models.task.findAll({
-        where: {
-            [Op.and]: {
-                itemId,
-                updatedAt: {
-                    [Op.between]: [dateFrom, dateTo],
-                },
-                [Op.or]: { resource: resources },
-            },
+// TODO this method does not have tests
+export async function getResourceProcessingStatus({ itemId, taskIds }) {
+    let where = {
+        [Op.and]: {
+            itemId,
+            [Op.or]: taskIds.map((id) => ({ id })),
         },
-        order: [["updatedAt", "DESC"]],
-    });
+    };
+    return models.task.findAll({ where, order: [["updatedAt", "DESC"]] });
 }
 
 export async function statItemFile({ identifier, file }) {

@@ -9,10 +9,7 @@ import { log } from "/srv/api/src/common/index.js";
 import { updateTask, deleteTask } from "./common/task.js";
 
 export function setupHandlers({ rabbit }) {
-    rabbit.handle("process-image", runTask);
-    rabbit.handle("process-digivol", runTask);
-    rabbit.handle("process-tei", runTask);
-    rabbit.handle("extract-table", runTask);
+    rabbit.handle("*", runTask);
 }
 
 export async function runTask(msg) {
@@ -30,7 +27,6 @@ export async function runTask(msg) {
                 break;
             case "process-tei":
                 log.info(`Running 'process-tei' task for '${identifier}' in ${directory}`);
-                //await processFtpTeiTranscription({ directory, ...msg.body });
                 await processTeiTranscription({ directory, ...msg.body });
                 break;
             case "process-image":
@@ -40,6 +36,15 @@ export async function runTask(msg) {
                 await createWebFormats({ directory, identifier, resource });
                 await syncToBucket({ directory, identifier });
                 await runTextractOCR({ directory, identifier, resource });
+                break;
+            case "process-image-without-ocr":
+                log.info(
+                    `Running 'process-image-without-ocr' task for '${identifier}' in ${directory}`
+                );
+                await createImageThumbnail({ directory, identifier, resource });
+                await syncToBucket({ directory, identifier });
+                await createWebFormats({ directory, identifier, resource });
+                await syncToBucket({ directory, identifier });
                 break;
             case "extract-table":
                 log.info(`Running 'extract-table' task for '${identifier}' in ${directory}`);

@@ -21,6 +21,8 @@ import fastifyCompress from "@fastify/compress";
 import cors from "@fastify/cors";
 import fastifySensible from "@fastify/sensible";
 import fastifyIO from "fastify-socket.io";
+import fastifyTusS3Plugin from "@paradisec-platform/fastify-tus-s3-plugin";
+
 const envToLogger = {
     development: {
         transport: {
@@ -33,7 +35,10 @@ const envToLogger = {
     production: true,
     test: false,
 };
-const fastify = Fastify({ logger: envToLogger[process.env.NODE_ENV] });
+const fastify = Fastify({
+    logger: envToLogger[process.env.NODE_ENV],
+    bodyLimit: 256 * 1024 * 1024,
+});
 
 main();
 async function main() {
@@ -45,12 +50,49 @@ async function main() {
         process.exit();
     }
 
-    if (process.env.NODE_ENV === "development") {
-        fastify.register(cors, { origin: "*" });
-    }
+    await fastify.register(cors, {
+        origin: "*",
+        methods: ["OPTIONS", "GET", "HEAD", "PATCH", "POST", "DELETE"],
+        allowedHeaders: [
+            "content-type",
+            "upload-length",
+            "content-length",
+            "upload-offset",
+            "upload-expires",
+            "location",
+            "upload-metadata",
+            "tus-resumable",
+            "tus-version",
+            "tus-max-size",
+            "tus-extension",
+        ],
+        exposedHeaders: [
+            "content-type",
+            "upload-length",
+            "content-length",
+            "upload-offset",
+            "upload-expires",
+            "location",
+            "upload-metadata",
+            "tus-resumable",
+            "tus-version",
+            "tus-max-size",
+            "tus-extension",
+        ],
+    });
     fastify.register(fastifySensible);
     fastify.register(fastifyIO);
     fastify.register(fastifyCompress);
+    fastify.register(fastifyTusS3Plugin, {
+        awsAccessKeyId: configuration.api.services.s3.awsAccessKeyId,
+        awsSecretAccessKey: configuration.api.services.s3.awsSecretAccessKey,
+        region: configuration.api.services.s3.region,
+        endpoint: configuration.api.services.s3.endpointUrl,
+        forcePathStyle: configuration.api.services.s3.forcePathStyle,
+        cachePath: "./.cache",
+        uploadRoutePath: "/files",
+        defaultUploadExpiration: { hours: 6 },
+    });
     fastify.addHook("onRequest", async (req, res) => {
         configuration = await loadConfiguration();
         req.io = fastify.io;

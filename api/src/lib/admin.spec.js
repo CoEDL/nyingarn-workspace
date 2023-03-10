@@ -149,13 +149,13 @@ describe("Admin management tests", () => {
             id: identifier,
             type: "item",
         });
-        await storeItem.createItem();
+        await storeItem.createObject();
 
         let storeCollection = await getStoreHandle({
             id: identifier,
             type: "collection",
         });
-        await storeCollection.createItem();
+        await storeCollection.createObject();
 
         let user = users.filter((u) => !u.administrator)[0];
         let adminUser = users.filter((u) => u.administrator)[0];
@@ -177,14 +177,20 @@ describe("Admin management tests", () => {
 
         // retrieve all items
         let { items } = await getAdminItems({ user: adminUser });
-        expect(items[0]).toMatchObject({ identifier, connected: false });
+        expect(items.filter((i) => i.identifier === identifier)[0]).toMatchObject({
+            identifier,
+            connected: false,
+        });
 
         // import collections
         await importCollectionsFromStorageIntoTheDb({ user: adminUser, configuration });
 
         // retrieve all collections
         let { collections } = await getAdminCollections({ user: adminUser });
-        expect(collections[0]).toMatchObject({ identifier, connected: false });
+        expect(collections.filter((c) => c.identifier === identifier)[0]).toMatchObject({
+            identifier,
+            connected: false,
+        });
 
         await models.item.destroy({ where: { identifier } });
         await models.collection.destroy({ where: { identifier } });

@@ -13,6 +13,7 @@ import {
     lookupItemByIdentifier,
     getItems,
     listItemResources,
+    listItemPermissionForms,
     getItemResource,
     getItemResourceLink,
     putItemResource,
@@ -47,6 +48,7 @@ export function setupRoutes(fastify, options, done) {
         fastify.delete("/items/:identifier", deleteItemHandler);
         fastify.get("/items/:identifier/status", getItemStatisticsHandler);
         fastify.get("/items/:identifier/resources", getItemResourcesHandler);
+        fastify.get("/items/:identifier/permission-forms", getItemPermissionFormsHandler);
         fastify.put("/items/:identifier/reprocess-imports", putReprocessImports);
         fastify.get("/items/:identifier/resources/:resource/files", getResourceFilesListHandler);
         fastify.get(
@@ -259,6 +261,14 @@ async function getItemResourcesHandler(req) {
     return { resources, total };
 }
 
+async function getItemPermissionFormsHandler(req) {
+    let query = {
+        identifier: req.params.identifier,
+    };
+    let { files } = await listItemPermissionForms(query);
+    return { files };
+}
+
 async function putReprocessImports(req) {
     const { identifier } = req.params;
     const files = [
@@ -376,15 +386,14 @@ async function saveItemTranscriptionHandler(req, res) {
     }
 }
 
+// TODO this method does not have tests
 async function postResourceProcessingStatus(req) {
+    const { taskIds } = req.body;
     let tasks = await getResourceProcessingStatus({
         itemId: req.session.item.id,
-        resources: req.body.resources.map((r) => r.resource),
-        dateFrom: req.body.dateFrom,
+        taskIds,
     });
     tasks = tasks.map((t) => t.get());
-    tasks = groupBy(tasks, "resource");
-    tasks = Object.keys(tasks).map((r) => tasks[r].shift());
     return { tasks };
 }
 // TODO: this method does not have tests

@@ -30,8 +30,8 @@
                 <el-tab-pane label="Upload Data" name="upload">
                     <upload-component v-if="data.activeTab === 'upload'" />
                 </el-tab-pane>
-                <el-tab-pane label="Publish" name="publish" v-if="data.isAdmin">
-                    <publish-component v-if="data.activeTab === 'publish'" type="item" />
+                <el-tab-pane label="Publish" name="publish">
+                    <publish-component v-if="data.activeTab === 'publish'" />
                 </el-tab-pane>
                 <el-tab-pane label="Administration" name="administration">
                     <administration-component v-if="data.activeTab === 'administration'" />
@@ -46,7 +46,7 @@ import { getItem } from "../item-services";
 import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
 import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
-import PublishComponent from "../../Publish.component.vue";
+import PublishComponent from "./PublishComponent/Shell.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";

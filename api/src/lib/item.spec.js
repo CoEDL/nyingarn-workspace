@@ -10,6 +10,7 @@ import {
     getItemResourceLink,
     deleteItemResource,
     deleteItemResourceFile,
+    listItemPermissionForms,
     listItemResourceFiles,
     itemResourceExists,
     markResourceComplete,
@@ -221,6 +222,20 @@ describe("Item management tests", () => {
         status = await isResourceComplete({ identifier, resource: `${identifier}-01` });
         expect(status).toBeFalse;
 
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to list item permission forms", async () => {
+        let user = users.filter((u) => !u.administrator)[0];
+        let { item } = await setupTestItem({ identifier, store, user });
+        await store.put({ json: {}, target: `${identifier}-rights-holder-permission.pdf` });
+        await store.put({
+            json: {},
+            target: `${identifier}-language-authority-permission.pdf`,
+        });
+
+        let { files } = await listItemPermissionForms({ identifier });
+        expect(files.length).toEqual(2);
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });

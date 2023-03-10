@@ -36,7 +36,6 @@ describe("Crate tools tests", () => {
 
         await registerAllFiles({ crate, resources });
         expect(crate.rootDataset.hasPart.length).toBe(4);
-        console.log(crate.toJSON());
 
         await models.item.destroy({ where: { identifier } });
         await store.removeObject();

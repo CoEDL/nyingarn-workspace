@@ -61,9 +61,9 @@ export async function linkCollectionToUser({ collectionId, userId }) {
 
 export async function createCollectionLocationInObjectStore({ identifier }) {
     let store = await getStoreHandle({ id: identifier, type: "collection" });
-    let exists = await store.itemExists();
+    let exists = await store.exists();
     if (!exists) {
-        await store.createItem();
+        await store.createObject();
     }
 }
 

@@ -1,42 +1,26 @@
 <template>
     <div class="flex flex-col space-y-2">
-        <div class="bg-yellow-100 p-2 rounded flex flex-row">
-            <div class="text-3xl p-4 text-red-600">
-                <i class="fa-solid fa-exclamation-circle"></i>
-            </div>
-            <div class="text-base py-2">
-                <ol class="pl-2 list-decimal">
-                    <li>Upload the image files</li>
-                </ol>
-            </div>
-        </div>
-        <div class="bg-indigo-100 p-2 rounded flex flex-row">
-            <div class="text-3xl p-4 text-gray-600">
-                <i class="fa-solid fa-lightbulb"></i>
-            </div>
-            <div class="text-base py-2">
-                When uploading images they will pass through Optical Character Recognition (OCR) to
-                try to transcribe the text. This can take some time for each image.
-            </div>
-        </div>
-        <div class="bg-indigo-100 p-2 rounded flex flex-row">
-            <div class="text-3xl p-4 text-gray-600">
-                <i class="fa-solid fa-lightbulb"></i>
-            </div>
-            <div class="text-base py-2">
-                File names must match the form {{ props.identifier }}-{sequence number} where
-                sequence number can be any sequence of digits followed by letters (a-z,A-Z) or _.
-                <div>Accepted images types: tiff and jpg.</div>
-            </div>
-        </div>
+        <InfoBoxComponent
+            msg=" When uploading images they will pass through Optical Character Recognition (OCR) to
+                try to transcribe the text. This can take some time for each image. You can disable
+                this using the toggle below."
+        ></InfoBoxComponent>
+        <InfoBoxComponent :identifier="props.identifier" :msg="message"> </InfoBoxComponent>
     </div>
 </template>
 
 <script setup>
+import InfoBoxComponent from "../../../InfoBox.component.vue";
 const props = defineProps({
     identifier: {
         type: String,
         required: true,
     },
 });
+
+const message = `File names must match the form ${props.identifier}-{sequence number} where
+                sequence number can be any sequence of digits followed by letters (a-z,A-Z) or _.
+                <br/>
+                <br/>
+                <div>Accepted images types: tiff and jpg.</div>`;
 </script>

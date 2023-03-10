@@ -26,6 +26,8 @@ export const specialFiles = [
     "ro-crate-metadata.json",
     "-digivol.csv",
     "-tei.xml",
+    "-rights-holder-permission.pdf",
+    "-language-authority-permission.pdf",
     "nocfl.identifier.json",
     "nocfl.inventory.json",
     completedResources,

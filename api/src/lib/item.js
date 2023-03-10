@@ -279,7 +279,8 @@ export async function getResourceProcessingStatus({ itemId, taskIds }) {
             [Op.or]: taskIds.map((id) => ({ id })),
         },
     };
-    return models.task.findAll({ where, order: [["updatedAt", "DESC"]] });
+    let tasks = await models.task.findAll({ where, order: [["resource", "ASC"]] });
+    return tasks;
 }
 
 export async function statItemFile({ identifier, file }) {

@@ -6,6 +6,6 @@
 </template>
 
 <script setup>
-import LinkRelatedItemComponent from "../../LinkRelatedItem.component.vue";
-import LinkRelatedCollectionComponent from "../../LinkRelatedCollection.component.vue";
+import LinkRelatedItemComponent from "./LinkRelatedItem.component.vue";
+import LinkRelatedCollectionComponent from "./LinkRelatedCollection.component.vue";
 </script>

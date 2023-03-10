@@ -1,26 +1,26 @@
 <template>
     <div class="flex flex-col border border-solid p-2">
         <div class="flex flex-row space-x-2">
-            <div class="pt-1">Associate collections</div>
+            <div class="pt-1">Associate items</div>
             <div class="flex-grow">
                 <el-input
-                    v-model="data.collections.prefix"
-                    placeholder="Filter collections by prefix"
-                    @change="getMyCollections"
+                    v-model="data.items.prefix"
+                    placeholder="Filter items by prefix"
+                    @change="getMyItems"
                     clearable
                 ></el-input>
             </div>
             <el-pagination
                 layout="prev, pager, next, total"
-                :total="data.collections.total"
-                :current-page="data.collections.page"
-                @current-change="handleCollectionPageChange"
+                :total="data.items.total"
+                :page-size="data.pageSize"
+                :current-page="data.items.page"
+                @current-change="handleItemPageChange"
             />
         </div>
-        <el-table :data="data.collections.results" v-loading="data.loading">
-            <template #empty
-                >You have no collections. Get started by creating a collection.</template
-            >
+
+        <el-table :data="data.items.results" v-loading="data.loading">
+            <template #empty>You have no items. Get started by creating an item.</template>
             <el-table-column prop="identifier" label="Identifier"> </el-table-column>
             <el-table-column prop="type" label="Type" width="150"> </el-table-column>
             <el-table-column label="Actions" width="100">
@@ -68,7 +68,7 @@ const props = defineProps({
 const data = reactive({
     type: $route.meta.type,
     loading: false,
-    pageSize: 8,
+    pageSize: 10,
     items: {
         page: 1,
         total: 0,
@@ -90,23 +90,23 @@ function isLinked(item) {
 }
 
 async function init() {
-    getMyCollections({ page: data.collections.page });
+    await getMyItems({ page: data.items.page });
 }
-async function getMyCollections() {
+async function getMyItems() {
     let response = await $http.get({
-        route: `/collections`,
+        route: `/items`,
         params: {
-            offset: (data.collections.page - 1) * data.pageSize,
+            offset: (data.items.page - 1) * data.pageSize,
             limit: data.pageSize,
-            match: data.collections.prefix,
+            match: data.items.prefix,
         },
     });
     if (response.status === 200) {
         response = await response.json();
-        data.collections.results = response.collections.filter(
-            (c) => c.name !== $route.params.identifier
-        );
-        data.collections.total = response.total;
+        // data.items.results = response.items.filter(
+        //     (c) => c.identifier !== $route.params.identifier
+        // );
+        data.items.total = response.total;
     }
 }
 async function linkItemToCollection(item) {
@@ -159,8 +159,8 @@ async function toggleLink({ item, url, successMsg, ErrorMsg }) {
     data.loading = false;
     init();
 }
-async function handleCollectionPageChange(page) {
-    data.collections.page = page;
-    await getMyCollections();
+async function handleItemPageChange(page) {
+    data.items.page = page;
+    await getMyItems();
 }
 </script>

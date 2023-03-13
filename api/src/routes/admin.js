@@ -3,16 +3,9 @@ import {
     demandAuthenticatedUser,
     requireCollectionAccess,
     requireItemAccess,
-    getS3Handle,
 } from "../common/index.js";
-import { lookupItemByIdentifier, linkItemToUser } from "../lib/item.js";
-import { lookupCollectionByIdentifier, linkCollectionToUser } from "../lib/collection.js";
-import models from "../models/index.js";
-import { Op, fn as seqFn, col as seqCol } from "sequelize";
-import lodashPkg from "lodash";
-const { groupBy } = lodashPkg;
-import { ROCrate } from "ro-crate";
-import { getContext } from "../lib/crate-tools.js";
+import { lookupItemByIdentifier } from "../lib/item.js";
+import { lookupCollectionByIdentifier } from "../lib/collection.js";
 import {
     getAdminItems,
     getAdminCollections,

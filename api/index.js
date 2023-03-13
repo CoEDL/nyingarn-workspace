@@ -1,8 +1,7 @@
 import("regenerator-runtime");
-// const restify = require("restify");
-// const server = restify.createServer();
+
 import models from "./src/models/index.js";
-import { loadConfiguration, log } from "./src/common/index.js";
+import { demandAuthenticatedUser, loadConfiguration, log } from "./src/common/index.js";
 import { setupRoutes as setupBaseRoutes } from "./src/routes/base.js";
 import { setupRoutes as setupAdminRoutes } from "./src/routes/admin.js";
 import { setupRoutes as setupAuthRoutes } from "./src/routes/auth.js";
@@ -83,16 +82,24 @@ async function main() {
     fastify.register(fastifySensible);
     fastify.register(fastifyIO);
     fastify.register(fastifyCompress);
-    fastify.register(fastifyTusS3Plugin, {
-        awsAccessKeyId: configuration.api.services.s3.awsAccessKeyId,
-        awsSecretAccessKey: configuration.api.services.s3.awsSecretAccessKey,
-        region: configuration.api.services.s3.region,
-        endpoint: configuration.api.services.s3.endpointUrl,
-        forcePathStyle: configuration.api.services.s3.forcePathStyle,
-        cachePath: "./.cache",
-        uploadRoutePath: "/files",
-        defaultUploadExpiration: { hours: 6 },
+
+    // register the TUS handler
+    fastify.register((fastify, options, done) => {
+        fastify.addHook("preHandler", demandAuthenticatedUser);
+
+        fastify.register(fastifyTusS3Plugin, {
+            awsAccessKeyId: configuration.api.services.s3.awsAccessKeyId,
+            awsSecretAccessKey: configuration.api.services.s3.awsSecretAccessKey,
+            region: configuration.api.services.s3.region,
+            endpoint: configuration.api.services.s3.endpointUrl,
+            forcePathStyle: configuration.api.services.s3.forcePathStyle,
+            cachePath: "./.cache",
+            uploadRoutePath: "/files",
+            defaultUploadExpiration: { hours: 6 },
+        });
+        done();
     });
+
     fastify.addHook("onRequest", async (req, res) => {
         configuration = await loadConfiguration();
         req.io = fastify.io;

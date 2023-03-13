@@ -1,1 +1,739 @@
-{"N":"package","version":"30","packageVersion":"1","saxonVersion":"SaxonJS 2.5","target":"JS","targetVersion":"2","name":"TOP-LEVEL","relocatable":"false","buildDateTime":"2022-12-01T00:56:33.944Z","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/","defaultElementNS":"http://www.tei-c.org/ns/1.0","C":[{"N":"co","binds":"","id":"0","vis":"PRIVATE","ex:uniform":"true","C":[{"N":"function","name":"Q{https://www.w3.org/Style/CSS/}parse-declaration-block","as":"*FM ","slots":"201","ns":"xml=~ xsl=~ css=https://www.w3.org/Style/CSS/ map=~ array=~","module":"css.xsl","baseUri":"file:///srv/tasks/src/xslt/css.xsl","flags":"muu","sig":"1F r[*FM ] a[* ] ","sType":"1F r[*FM ] a[* ] ","line":"8","C":[{"N":"arg","slot":"0","name":"Q{}declaration-block","as":"* ","sType":"* "},{"N":"for","name":"Q{}declaration","slot":"1","sType":"*FM","ns":"= xml=~ fn=~ xsl=~ css=https://www.w3.org/Style/CSS/ map=~ array=~ ","role":"body","line":"15","C":[{"N":"fn","name":"tokenize","C":[{"N":"treat","as":"AS","diag":"0|0||tokenize","C":[{"N":"check","card":"?","diag":"0|0||tokenize","C":[{"N":"cvUntyped","to":"AS","diag":"0|0||tokenize","C":[{"N":"check","card":"?","diag":"0|0||tokenize","C":[{"N":"data","diag":"0|0||tokenize","C":[{"N":"varRef","name":"Q{}declaration-block","slot":"0"}]}]}]}]}]},{"N":"str","val":";"}]},{"N":"ifCall","name":"Q{http://www.w3.org/2005/xpath-functions/map}entry","C":[{"N":"fn","name":"normalize-space","C":[{"N":"fn","name":"substring-before","C":[{"N":"varRef","name":"Q{}declaration","slot":"1"},{"N":"str","val":":"},{"N":"str","val":"http://www.w3.org/2005/xpath-functions/collation/codepoint"}]}]},{"N":"fn","name":"normalize-space","C":[{"N":"fn","name":"substring-after","C":[{"N":"varRef","name":"Q{}declaration","slot":"1"},{"N":"str","val":":"},{"N":"str","val":"http://www.w3.org/2005/xpath-functions/collation/codepoint"}]}]}]}]}]}]},{"N":"co","id":"1","binds":"0 1","C":[{"N":"mode","onNo":"SC","flags":"","patternSlots":"0","name":"Q{}infer-semantics","prec":"","C":[{"N":"templateRule","rank":"0","prec":"1","seq":"3","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/","minImp":"0","flags":"s","slots":"200","baseUri":"file:///srv/tasks/src/xslt/infer-semantics.xsl","line":"67","module":"infer-semantics.xsl","xpath-default-namespace":"http://www.tei-c.org/ns/1.0","expand-text":"false","match":"p[css:parse-declaration-block(@style)('text-align')='center']","prio":"0.5","matches":"NE nQ{http://www.tei-c.org/ns/1.0}p","C":[{"N":"p.withPredicate","role":"match","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}p","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","C":[{"N":"p.nodeTest","test":"NE nQ{http://www.tei-c.org/ns/1.0}p"},{"N":"gc","op":"=","comp":"GAC|http://www.w3.org/2005/xpath-functions/collation/codepoint","card":"1:1","C":[{"N":"data","diag":"1|0||gc","C":[{"N":"ifCall","name":"Q{http://saxon.sf.net/}apply","C":[{"N":"check","card":"1","diag":"0|0|XPTY0004|apply","C":[{"N":"ufCall","name":"Q{https://www.w3.org/Style/CSS/}parse-declaration-block","coId":"0","bSlot":"0","C":[{"N":"axis","name":"attribute","nodeTest":"*NA nQ{}style"}]}]},{"N":"arrayBlock","C":[{"N":"str","val":"text-align"}]}]}]},{"N":"str","val":"center"}]}]},{"N":"elem","name":"label","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}label ","nsuri":"http://www.tei-c.org/ns/1.0","namespaces":"=http://www.tei-c.org/ns/1.0 array=http://www.w3.org/2005/xpath-functions/array css=https://www.w3.org/Style/CSS/","role":"action","line":"68","C":[{"N":"applyT","sType":"* ","mode":"Q{}infer-semantics","bSlot":"1","C":[{"N":"axis","name":"child","nodeTest":"*N u[NT,NP,NC,NE]","sType":"*N u[NT,NP,NC,NE]","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","role":"select","line":"3"}]}]}]},{"N":"templateRule","rank":"1","prec":"1","seq":"2","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/","minImp":"0","flags":"s","slots":"200","baseUri":"file:///srv/tasks/src/xslt/infer-semantics.xsl","line":"62","module":"infer-semantics.xsl","xpath-default-namespace":"http://www.tei-c.org/ns/1.0","expand-text":"false","match":"p      [matches(., '\\p{Nd}+')]      [matches(., '^[\\s\\p{P}\\p{Nd}]+$')]      [preceding-sibling::*[1]/self::pb]      [css:parse-declaration-block(@style)('text-align')='right']     ","prio":"0.5","matches":"NE nQ{http://www.tei-c.org/ns/1.0}p","C":[{"N":"p.withPredicate","role":"match","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}p","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","C":[{"N":"p.withPredicate","C":[{"N":"p.withPredicate","C":[{"N":"p.withPredicate","C":[{"N":"p.nodeTest","test":"NE nQ{http://www.tei-c.org/ns/1.0}p"},{"N":"fn","name":"matches","C":[{"N":"cvUntyped","to":"AS","diag":"0|0||matches","C":[{"N":"atomSing","diag":"0|0||matches","card":"?","C":[{"N":"dot"}]}]},{"N":"str","val":"\\p{Nd}+"}]}]},{"N":"fn","name":"matches","C":[{"N":"cvUntyped","to":"AS","diag":"0|0||matches","C":[{"N":"atomSing","diag":"0|0||matches","card":"?","C":[{"N":"dot"}]}]},{"N":"str","val":"^[\\s\\p{P}\\p{Nd}]+$"}]}]},{"N":"slash","op":"/","C":[{"N":"fn","name":"reverse","C":[{"N":"first","C":[{"N":"axis","name":"preceding-sibling","nodeTest":"*NE"}]}]},{"N":"axis","name":"self","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}pb"}]}]},{"N":"gc","op":"=","comp":"GAC|http://www.w3.org/2005/xpath-functions/collation/codepoint","card":"1:1","C":[{"N":"data","diag":"1|0||gc","C":[{"N":"ifCall","name":"Q{http://saxon.sf.net/}apply","C":[{"N":"check","card":"1","diag":"0|0|XPTY0004|apply","C":[{"N":"ufCall","name":"Q{https://www.w3.org/Style/CSS/}parse-declaration-block","coId":"0","bSlot":"0","C":[{"N":"axis","name":"attribute","nodeTest":"*NA nQ{}style"}]}]},{"N":"arrayBlock","C":[{"N":"str","val":"text-align"}]}]}]},{"N":"str","val":"right"}]}]},{"N":"elem","name":"fw","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}fw ","nsuri":"http://www.tei-c.org/ns/1.0","namespaces":"=http://www.tei-c.org/ns/1.0 array=http://www.w3.org/2005/xpath-functions/array css=https://www.w3.org/Style/CSS/","role":"action","line":"63","C":[{"N":"sequence","sType":"* ","C":[{"N":"att","name":"type","nsuri":"","sType":"1NA ","C":[{"N":"str","sType":"1AS ","val":"page-number"}]},{"N":"applyT","sType":"* ","mode":"Q{}infer-semantics","bSlot":"1","C":[{"N":"axis","name":"child","nodeTest":"*N u[NT,NP,NC,NE]","sType":"*N u[NT,NP,NC,NE]","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","role":"select","line":"3"}]}]}]}]},{"N":"templateRule","rank":"2","prec":"1","seq":"1","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/","minImp":"0","flags":"s","slots":"200","baseUri":"file:///srv/tasks/src/xslt/infer-semantics.xsl","line":"40","module":"infer-semantics.xsl","xpath-default-namespace":"http://www.tei-c.org/ns/1.0","expand-text":"false","match":"hi[contains-token(@rend, 'strikethrough')]","prio":"0.5","matches":"NE nQ{http://www.tei-c.org/ns/1.0}hi","C":[{"N":"p.withPredicate","role":"match","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}hi","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","C":[{"N":"p.nodeTest","test":"NE nQ{http://www.tei-c.org/ns/1.0}hi"},{"N":"fn","name":"contains-token","C":[{"N":"cvUntyped","to":"AS","diag":"0|0||contains-token","C":[{"N":"attVal","name":"Q{}rend"}]},{"N":"str","val":"strikethrough"},{"N":"str","val":"http://www.w3.org/2005/xpath-functions/collation/codepoint"}]}]},{"N":"elem","type":"element()","role":"action","name":"del","sType":"1NE ","nsuri":"http://www.tei-c.org/ns/1.0","line":"41","C":[{"N":"let","var":"Q{}remaining-rend-tokens","slot":"0","sType":"* ","line":"42","C":[{"N":"fn","name":"string-join","sType":"1AS","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","role":"select","line":"42","C":[{"N":"filter","C":[{"N":"fn","name":"tokenize","C":[{"N":"cvUntyped","to":"AS","diag":"0|0||tokenize","C":[{"N":"check","card":"?","diag":"0|0||tokenize","C":[{"N":"attVal","name":"Q{}rend"}]}]}]},{"N":"fn","name":"not","C":[{"N":"compareToString","op":"eq","val":"strikethrough","comp":"GAC|http://www.w3.org/2005/xpath-functions/collation/codepoint","C":[{"N":"dot"}]}]}]},{"N":"str","val":" "}]},{"N":"sequence","sType":"* ","C":[{"N":"choose","sType":"? ","line":"43","C":[{"N":"varRef","name":"Q{}remaining-rend-tokens","slot":"0","sType":"*","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","line":"43"},{"N":"att","name":"rend","sType":"1NA ","line":"44","C":[{"N":"fn","name":"string-join","role":"select","C":[{"N":"forEach","sType":"*AS ","C":[{"N":"data","sType":"*A ","C":[{"N":"mergeAdj","C":[{"N":"varRef","sType":"*","name":"Q{}remaining-rend-tokens","slot":"0","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","role":"select","line":"44"}]}]},{"N":"fn","name":"string","sType":"1AS ","C":[{"N":"dot"}]}]},{"N":"str","sType":"1AS ","val":" "}]}]},{"N":"true"},{"N":"empty","sType":"0 "}]},{"N":"applyT","sType":"* ","line":"46","mode":"Q{}infer-semantics","bSlot":"1","C":[{"N":"axis","name":"child","nodeTest":"*N u[NT,NP,NC,NE]","sType":"*N u[NT,NP,NC,NE]","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","role":"select","line":"46"}]}]}]}]}]},{"N":"templateRule","rank":"3","prec":"1","seq":"0","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/","minImp":"0","flags":"s","slots":"200","baseUri":"file:///srv/tasks/src/xslt/infer-semantics.xsl","line":"24","module":"infer-semantics.xsl","xpath-default-namespace":"http://www.tei-c.org/ns/1.0","expand-text":"true","match":"rs[starts-with(@ref, '#')]","prio":"0.5","matches":"NE nQ{http://www.tei-c.org/ns/1.0}rs","C":[{"N":"p.withPredicate","role":"match","sType":"1NE nQ{http://www.tei-c.org/ns/1.0}rs","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","C":[{"N":"p.nodeTest","test":"NE nQ{http://www.tei-c.org/ns/1.0}rs"},{"N":"fn","name":"starts-with","C":[{"N":"cvUntyped","to":"AS","diag":"0|0||starts-with","C":[{"N":"check","card":"?","diag":"0|0||starts-with","C":[{"N":"attVal","name":"Q{}ref"}]}]},{"N":"str","val":"#"},{"N":"str","val":"http://www.w3.org/2005/xpath-functions/collation/codepoint"}]}]},{"N":"let","var":"Q{}name-type","slot":"0","sType":"*NE ","line":"32","role":"action","C":[{"N":"let","name":"Q{}referred-element","slot":"0","sType":"1AS","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","role":"select","line":"32","C":[{"N":"fn","name":"key","C":[{"N":"str","val":"authority-record-by-id"},{"N":"fn","name":"substring-after","C":[{"N":"cvUntyped","to":"AS","diag":"0|0||substring-after","C":[{"N":"check","card":"?","diag":"0|0||substring-after","C":[{"N":"attVal","name":"Q{}ref"}]}]},{"N":"str","val":"#"},{"N":"str","val":"http://www.w3.org/2005/xpath-functions/collation/codepoint"}]}]},{"N":"choose","C":[{"N":"docOrder","C":[{"N":"slash","op":"/","C":[{"N":"varRef","name":"Q{}referred-element","slot":"0"},{"N":"axis","name":"self","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}place"}]}]},{"N":"str","val":"placeName"},{"N":"true"},{"N":"choose","C":[{"N":"docOrder","C":[{"N":"slash","op":"/","C":[{"N":"varRef","name":"Q{}referred-element","slot":"0"},{"N":"axis","name":"self","nodeTest":"*NE nQ{http://www.tei-c.org/ns/1.0}person"}]}]},{"N":"str","val":"persName"},{"N":"true"},{"N":"str","val":"rs"}]}]}]},{"N":"compElem","sType":"1NE ","line":"33","C":[{"N":"fn","name":"string-join","sType":"1AS ","role":"name","C":[{"N":"convert","type":"AS*","from":"AZ","to":"AS","C":[{"N":"data","C":[{"N":"mergeAdj","sType":"*","C":[{"N":"varRef","name":"Q{}name-type","slot":"0","sType":"*","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","line":"33"}]}]}]},{"N":"str","sType":"1AS ","val":" "}]},{"N":"sequence","role":"content","sType":"* ","C":[{"N":"copyOf","flags":"c","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/ ex=http://ns.saxonica.com/xslt/export","line":"34","sType":"*NA","C":[{"N":"axis","name":"attribute","nodeTest":"*NA","sType":"*NA","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","role":"select","line":"34"}]},{"N":"applyT","sType":"* ","line":"35","mode":"Q{}infer-semantics","bSlot":"1","C":[{"N":"axis","name":"child","nodeTest":"*N u[NT,NP,NC,NE]","sType":"*N u[NT,NP,NC,NE]","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","role":"select","line":"35"}]}]}]}]}]}]}]},{"N":"co","binds":"","id":"2","C":[{"N":"mode","onNo":"TC","flags":"","patternSlots":"0","prec":""}]},{"N":"overridden"},{"N":"key","binds":"","name":"Q{}authority-record-by-id","flags":"u","module":"infer-semantics.xsl","ns":"xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/","baseUri":"file:///srv/tasks/src/xslt/infer-semantics.xsl","line":"23","C":[{"N":"p.withPredicate","role":"match","sType":"1NE u[NE nQ{http://www.tei-c.org/ns/1.0}person,NE nQ{http://www.tei-c.org/ns/1.0}place]","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ","C":[{"N":"p.venn","op":"union","C":[{"N":"p.nodeTest","test":"NE nQ{http://www.tei-c.org/ns/1.0}person"},{"N":"p.nodeTest","test":"NE nQ{http://www.tei-c.org/ns/1.0}place"}]},{"N":"axis","name":"attribute","nodeTest":"*NA nQ{http://www.w3.org/XML/1998/namespace}id"}]},{"N":"data","role":"use","C":[{"N":"data","C":[{"N":"docOrder","sType":"*NA nQ{http://www.w3.org/XML/1998/namespace}id","line":"23","C":[{"N":"slash","role":"select","simple":"1","sType":"*NA nQ{http://www.w3.org/XML/1998/namespace}id","C":[{"N":"treat","as":"N","diag":"13|0|XTTE0510|","C":[{"N":"dot"}]},{"N":"axis","name":"attribute","nodeTest":"*NA nQ{http://www.w3.org/XML/1998/namespace}id","sType":"*NA nQ{http://www.w3.org/XML/1998/namespace}id","ns":"= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ "}]}]}]}]}]},{"N":"output","C":[{"N":"property","name":"Q{http://saxon.sf.net/}stylesheet-version","value":"30"}]},{"N":"decimalFormat"}],"Σ":"9f01602f"}
+{
+    "N": "package",
+    "version": "30",
+    "packageVersion": "1",
+    "saxonVersion": "SaxonJS 2.5",
+    "target": "JS",
+    "targetVersion": "2",
+    "name": "TOP-LEVEL",
+    "relocatable": "false",
+    "buildDateTime": "2023-03-10T08:09:52.719Z",
+    "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/",
+    "defaultElementNS": "http://www.tei-c.org/ns/1.0",
+    "C": [
+        {
+            "N": "co",
+            "binds": "",
+            "id": "0",
+            "vis": "PRIVATE",
+            "ex:uniform": "true",
+            "C": [
+                {
+                    "N": "function",
+                    "name": "Q{https://www.w3.org/Style/CSS/}parse-declaration-block",
+                    "as": "*FM ",
+                    "slots": "201",
+                    "ns": "xml=~ xsl=~ css=https://www.w3.org/Style/CSS/ map=~ array=~",
+                    "module": "css.xsl",
+                    "baseUri": "file:///srv/tasks/src/xslt/css.xsl",
+                    "flags": "muu",
+                    "sig": "1F r[*FM ] a[* ] ",
+                    "sType": "1F r[*FM ] a[* ] ",
+                    "line": "8",
+                    "C": [
+                        {
+                            "N": "arg",
+                            "slot": "0",
+                            "name": "Q{}declaration-block",
+                            "as": "* ",
+                            "sType": "* "
+                        },
+                        {
+                            "N": "for",
+                            "name": "Q{}declaration",
+                            "slot": "1",
+                            "sType": "*FM",
+                            "ns": "= xml=~ fn=~ xsl=~ css=https://www.w3.org/Style/CSS/ map=~ array=~ ",
+                            "role": "body",
+                            "line": "15",
+                            "C": [
+                                {
+                                    "N": "fn",
+                                    "name": "tokenize",
+                                    "C": [
+                                        {
+                                            "N": "treat",
+                                            "as": "AS",
+                                            "diag": "0|0||tokenize",
+                                            "C": [
+                                                {
+                                                    "N": "check",
+                                                    "card": "?",
+                                                    "diag": "0|0||tokenize",
+                                                    "C": [
+                                                        {
+                                                            "N": "cvUntyped",
+                                                            "to": "AS",
+                                                            "diag": "0|0||tokenize",
+                                                            "C": [
+                                                                {
+                                                                    "N": "check",
+                                                                    "card": "?",
+                                                                    "diag": "0|0||tokenize",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "data",
+                                                                            "diag": "0|0||tokenize",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "varRef",
+                                                                                    "name": "Q{}declaration-block",
+                                                                                    "slot": "0"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        { "N": "str", "val": ";" }
+                                    ]
+                                },
+                                {
+                                    "N": "ifCall",
+                                    "name": "Q{http://www.w3.org/2005/xpath-functions/map}entry",
+                                    "C": [
+                                        {
+                                            "N": "fn",
+                                            "name": "normalize-space",
+                                            "C": [
+                                                {
+                                                    "N": "fn",
+                                                    "name": "substring-before",
+                                                    "C": [
+                                                        {
+                                                            "N": "varRef",
+                                                            "name": "Q{}declaration",
+                                                            "slot": "1"
+                                                        },
+                                                        { "N": "str", "val": ":" },
+                                                        {
+                                                            "N": "str",
+                                                            "val": "http://www.w3.org/2005/xpath-functions/collation/codepoint"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "N": "fn",
+                                            "name": "normalize-space",
+                                            "C": [
+                                                {
+                                                    "N": "fn",
+                                                    "name": "substring-after",
+                                                    "C": [
+                                                        {
+                                                            "N": "varRef",
+                                                            "name": "Q{}declaration",
+                                                            "slot": "1"
+                                                        },
+                                                        { "N": "str", "val": ":" },
+                                                        {
+                                                            "N": "str",
+                                                            "val": "http://www.w3.org/2005/xpath-functions/collation/codepoint"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "N": "co",
+            "id": "1",
+            "binds": "0 1",
+            "C": [
+                {
+                    "N": "mode",
+                    "onNo": "SC",
+                    "flags": "",
+                    "patternSlots": "0",
+                    "name": "Q{}infer-semantics",
+                    "prec": "",
+                    "C": [
+                        {
+                            "N": "templateRule",
+                            "rank": "0",
+                            "prec": "1",
+                            "seq": "2",
+                            "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/",
+                            "minImp": "0",
+                            "flags": "s",
+                            "slots": "200",
+                            "baseUri": "file:///srv/tasks/src/xslt/infer-semantics.xsl",
+                            "line": "49",
+                            "module": "infer-semantics.xsl",
+                            "xpath-default-namespace": "http://www.tei-c.org/ns/1.0",
+                            "expand-text": "false",
+                            "match": "p[css:parse-declaration-block(@style)('text-align')='center']",
+                            "prio": "0.5",
+                            "matches": "NE nQ{http://www.tei-c.org/ns/1.0}p",
+                            "C": [
+                                {
+                                    "N": "p.withPredicate",
+                                    "role": "match",
+                                    "sType": "1NE nQ{http://www.tei-c.org/ns/1.0}p",
+                                    "ns": "= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ",
+                                    "C": [
+                                        {
+                                            "N": "p.nodeTest",
+                                            "test": "NE nQ{http://www.tei-c.org/ns/1.0}p"
+                                        },
+                                        {
+                                            "N": "gc",
+                                            "op": "=",
+                                            "comp": "GAC|http://www.w3.org/2005/xpath-functions/collation/codepoint",
+                                            "card": "1:1",
+                                            "C": [
+                                                {
+                                                    "N": "data",
+                                                    "diag": "1|0||gc",
+                                                    "C": [
+                                                        {
+                                                            "N": "ifCall",
+                                                            "name": "Q{http://saxon.sf.net/}apply",
+                                                            "C": [
+                                                                {
+                                                                    "N": "check",
+                                                                    "card": "1",
+                                                                    "diag": "0|0|XPTY0004|apply",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "ufCall",
+                                                                            "name": "Q{https://www.w3.org/Style/CSS/}parse-declaration-block",
+                                                                            "coId": "0",
+                                                                            "bSlot": "0",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "axis",
+                                                                                    "name": "attribute",
+                                                                                    "nodeTest": "*NA nQ{}style"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "N": "arrayBlock",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "str",
+                                                                            "val": "text-align"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                { "N": "str", "val": "center" }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "N": "elem",
+                                    "name": "label",
+                                    "sType": "1NE nQ{http://www.tei-c.org/ns/1.0}label ",
+                                    "nsuri": "http://www.tei-c.org/ns/1.0",
+                                    "namespaces": "=http://www.tei-c.org/ns/1.0 array=http://www.w3.org/2005/xpath-functions/array css=https://www.w3.org/Style/CSS/",
+                                    "role": "action",
+                                    "line": "50",
+                                    "C": [
+                                        {
+                                            "N": "applyT",
+                                            "sType": "* ",
+                                            "mode": "Q{}infer-semantics",
+                                            "bSlot": "1",
+                                            "C": [
+                                                {
+                                                    "N": "axis",
+                                                    "name": "child",
+                                                    "nodeTest": "*N u[NT,NP,NC,NE]",
+                                                    "sType": "*N u[NT,NP,NC,NE]",
+                                                    "ns": "= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ",
+                                                    "role": "select",
+                                                    "line": "3"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "N": "templateRule",
+                            "rank": "1",
+                            "prec": "1",
+                            "seq": "1",
+                            "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/",
+                            "minImp": "0",
+                            "flags": "s",
+                            "slots": "200",
+                            "baseUri": "file:///srv/tasks/src/xslt/infer-semantics.xsl",
+                            "line": "44",
+                            "module": "infer-semantics.xsl",
+                            "xpath-default-namespace": "http://www.tei-c.org/ns/1.0",
+                            "expand-text": "false",
+                            "match": "p      [matches(., '\\p{Nd}+')]      [matches(., '^[\\s\\p{P}\\p{Nd}]+$')]      [preceding-sibling::*[1]/self::pb]      [css:parse-declaration-block(@style)('text-align')='right']     ",
+                            "prio": "0.5",
+                            "matches": "NE nQ{http://www.tei-c.org/ns/1.0}p",
+                            "C": [
+                                {
+                                    "N": "p.withPredicate",
+                                    "role": "match",
+                                    "sType": "1NE nQ{http://www.tei-c.org/ns/1.0}p",
+                                    "ns": "= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ",
+                                    "C": [
+                                        {
+                                            "N": "p.withPredicate",
+                                            "C": [
+                                                {
+                                                    "N": "p.withPredicate",
+                                                    "C": [
+                                                        {
+                                                            "N": "p.withPredicate",
+                                                            "C": [
+                                                                {
+                                                                    "N": "p.nodeTest",
+                                                                    "test": "NE nQ{http://www.tei-c.org/ns/1.0}p"
+                                                                },
+                                                                {
+                                                                    "N": "fn",
+                                                                    "name": "matches",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "cvUntyped",
+                                                                            "to": "AS",
+                                                                            "diag": "0|0||matches",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "atomSing",
+                                                                                    "diag": "0|0||matches",
+                                                                                    "card": "?",
+                                                                                    "C": [
+                                                                                        {
+                                                                                            "N": "dot"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "N": "str",
+                                                                            "val": "\\p{Nd}+"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "N": "fn",
+                                                            "name": "matches",
+                                                            "C": [
+                                                                {
+                                                                    "N": "cvUntyped",
+                                                                    "to": "AS",
+                                                                    "diag": "0|0||matches",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "atomSing",
+                                                                            "diag": "0|0||matches",
+                                                                            "card": "?",
+                                                                            "C": [{ "N": "dot" }]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "N": "str",
+                                                                    "val": "^[\\s\\p{P}\\p{Nd}]+$"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "N": "slash",
+                                                    "op": "/",
+                                                    "C": [
+                                                        {
+                                                            "N": "fn",
+                                                            "name": "reverse",
+                                                            "C": [
+                                                                {
+                                                                    "N": "first",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "axis",
+                                                                            "name": "preceding-sibling",
+                                                                            "nodeTest": "*NE"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "N": "axis",
+                                                            "name": "self",
+                                                            "nodeTest": "*NE nQ{http://www.tei-c.org/ns/1.0}pb"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "N": "gc",
+                                            "op": "=",
+                                            "comp": "GAC|http://www.w3.org/2005/xpath-functions/collation/codepoint",
+                                            "card": "1:1",
+                                            "C": [
+                                                {
+                                                    "N": "data",
+                                                    "diag": "1|0||gc",
+                                                    "C": [
+                                                        {
+                                                            "N": "ifCall",
+                                                            "name": "Q{http://saxon.sf.net/}apply",
+                                                            "C": [
+                                                                {
+                                                                    "N": "check",
+                                                                    "card": "1",
+                                                                    "diag": "0|0|XPTY0004|apply",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "ufCall",
+                                                                            "name": "Q{https://www.w3.org/Style/CSS/}parse-declaration-block",
+                                                                            "coId": "0",
+                                                                            "bSlot": "0",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "axis",
+                                                                                    "name": "attribute",
+                                                                                    "nodeTest": "*NA nQ{}style"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "N": "arrayBlock",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "str",
+                                                                            "val": "text-align"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                { "N": "str", "val": "right" }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "N": "elem",
+                                    "name": "fw",
+                                    "sType": "1NE nQ{http://www.tei-c.org/ns/1.0}fw ",
+                                    "nsuri": "http://www.tei-c.org/ns/1.0",
+                                    "namespaces": "=http://www.tei-c.org/ns/1.0 array=http://www.w3.org/2005/xpath-functions/array css=https://www.w3.org/Style/CSS/",
+                                    "role": "action",
+                                    "line": "45",
+                                    "C": [
+                                        {
+                                            "N": "sequence",
+                                            "sType": "* ",
+                                            "C": [
+                                                {
+                                                    "N": "att",
+                                                    "name": "type",
+                                                    "nsuri": "",
+                                                    "sType": "1NA ",
+                                                    "C": [
+                                                        {
+                                                            "N": "str",
+                                                            "sType": "1AS ",
+                                                            "val": "page-number"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "N": "applyT",
+                                                    "sType": "* ",
+                                                    "mode": "Q{}infer-semantics",
+                                                    "bSlot": "1",
+                                                    "C": [
+                                                        {
+                                                            "N": "axis",
+                                                            "name": "child",
+                                                            "nodeTest": "*N u[NT,NP,NC,NE]",
+                                                            "sType": "*N u[NT,NP,NC,NE]",
+                                                            "ns": "= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ",
+                                                            "role": "select",
+                                                            "line": "3"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "N": "templateRule",
+                            "rank": "2",
+                            "prec": "1",
+                            "seq": "0",
+                            "ns": "xml=~ xsl=~ =http://www.tei-c.org/ns/1.0 array=~ css=https://www.w3.org/Style/CSS/",
+                            "minImp": "0",
+                            "flags": "s",
+                            "slots": "200",
+                            "baseUri": "file:///srv/tasks/src/xslt/infer-semantics.xsl",
+                            "line": "22",
+                            "module": "infer-semantics.xsl",
+                            "xpath-default-namespace": "http://www.tei-c.org/ns/1.0",
+                            "expand-text": "false",
+                            "match": "hi[contains-token(@rend, 'strikethrough')]",
+                            "prio": "0.5",
+                            "matches": "NE nQ{http://www.tei-c.org/ns/1.0}hi",
+                            "C": [
+                                {
+                                    "N": "p.withPredicate",
+                                    "role": "match",
+                                    "sType": "1NE nQ{http://www.tei-c.org/ns/1.0}hi",
+                                    "ns": "= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ",
+                                    "C": [
+                                        {
+                                            "N": "p.nodeTest",
+                                            "test": "NE nQ{http://www.tei-c.org/ns/1.0}hi"
+                                        },
+                                        {
+                                            "N": "fn",
+                                            "name": "contains-token",
+                                            "C": [
+                                                {
+                                                    "N": "cvUntyped",
+                                                    "to": "AS",
+                                                    "diag": "0|0||contains-token",
+                                                    "C": [{ "N": "attVal", "name": "Q{}rend" }]
+                                                },
+                                                { "N": "str", "val": "strikethrough" },
+                                                {
+                                                    "N": "str",
+                                                    "val": "http://www.w3.org/2005/xpath-functions/collation/codepoint"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "N": "elem",
+                                    "type": "element()",
+                                    "role": "action",
+                                    "name": "del",
+                                    "sType": "1NE ",
+                                    "nsuri": "http://www.tei-c.org/ns/1.0",
+                                    "line": "23",
+                                    "C": [
+                                        {
+                                            "N": "let",
+                                            "var": "Q{}remaining-rend-tokens",
+                                            "slot": "0",
+                                            "sType": "* ",
+                                            "line": "24",
+                                            "C": [
+                                                {
+                                                    "N": "fn",
+                                                    "name": "string-join",
+                                                    "sType": "1AS",
+                                                    "ns": "= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ",
+                                                    "role": "select",
+                                                    "line": "24",
+                                                    "C": [
+                                                        {
+                                                            "N": "filter",
+                                                            "C": [
+                                                                {
+                                                                    "N": "fn",
+                                                                    "name": "tokenize",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "cvUntyped",
+                                                                            "to": "AS",
+                                                                            "diag": "0|0||tokenize",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "check",
+                                                                                    "card": "?",
+                                                                                    "diag": "0|0||tokenize",
+                                                                                    "C": [
+                                                                                        {
+                                                                                            "N": "attVal",
+                                                                                            "name": "Q{}rend"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "N": "fn",
+                                                                    "name": "not",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "compareToString",
+                                                                            "op": "eq",
+                                                                            "val": "strikethrough",
+                                                                            "comp": "GAC|http://www.w3.org/2005/xpath-functions/collation/codepoint",
+                                                                            "C": [{ "N": "dot" }]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        { "N": "str", "val": " " }
+                                                    ]
+                                                },
+                                                {
+                                                    "N": "sequence",
+                                                    "sType": "* ",
+                                                    "C": [
+                                                        {
+                                                            "N": "choose",
+                                                            "sType": "? ",
+                                                            "line": "25",
+                                                            "C": [
+                                                                {
+                                                                    "N": "varRef",
+                                                                    "name": "Q{}remaining-rend-tokens",
+                                                                    "slot": "0",
+                                                                    "sType": "*",
+                                                                    "ns": "= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ",
+                                                                    "line": "25"
+                                                                },
+                                                                {
+                                                                    "N": "att",
+                                                                    "name": "rend",
+                                                                    "sType": "1NA ",
+                                                                    "line": "26",
+                                                                    "C": [
+                                                                        {
+                                                                            "N": "fn",
+                                                                            "name": "string-join",
+                                                                            "role": "select",
+                                                                            "C": [
+                                                                                {
+                                                                                    "N": "forEach",
+                                                                                    "sType": "*AS ",
+                                                                                    "C": [
+                                                                                        {
+                                                                                            "N": "data",
+                                                                                            "sType": "*A ",
+                                                                                            "C": [
+                                                                                                {
+                                                                                                    "N": "mergeAdj",
+                                                                                                    "C": [
+                                                                                                        {
+                                                                                                            "N": "varRef",
+                                                                                                            "sType": "*",
+                                                                                                            "name": "Q{}remaining-rend-tokens",
+                                                                                                            "slot": "0",
+                                                                                                            "ns": "= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ",
+                                                                                                            "role": "select",
+                                                                                                            "line": "26"
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "N": "fn",
+                                                                                            "name": "string",
+                                                                                            "sType": "1AS ",
+                                                                                            "C": [
+                                                                                                {
+                                                                                                    "N": "dot"
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "N": "str",
+                                                                                    "sType": "1AS ",
+                                                                                    "val": " "
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                { "N": "true" },
+                                                                { "N": "empty", "sType": "0 " }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "N": "applyT",
+                                                            "sType": "* ",
+                                                            "line": "28",
+                                                            "mode": "Q{}infer-semantics",
+                                                            "bSlot": "1",
+                                                            "C": [
+                                                                {
+                                                                    "N": "axis",
+                                                                    "name": "child",
+                                                                    "nodeTest": "*N u[NT,NP,NC,NE]",
+                                                                    "sType": "*N u[NT,NP,NC,NE]",
+                                                                    "ns": "= xml=~ fn=~ xsl=~ array=~ css=https://www.w3.org/Style/CSS/ ",
+                                                                    "role": "select",
+                                                                    "line": "28"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "N": "co",
+            "binds": "",
+            "id": "2",
+            "C": [{ "N": "mode", "onNo": "TC", "flags": "", "patternSlots": "0", "prec": "" }]
+        },
+        { "N": "overridden" },
+        {
+            "N": "output",
+            "C": [
+                {
+                    "N": "property",
+                    "name": "Q{http://saxon.sf.net/}stylesheet-version",
+                    "value": "30"
+                }
+            ]
+        },
+        { "N": "decimalFormat" }
+    ],
+    "Σ": "af13387e"
+}

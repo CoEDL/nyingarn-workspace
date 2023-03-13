@@ -29,7 +29,6 @@ const store = useStore();
 const $http = inject("$http");
 const $route = useRoute();
 const input = ref(null);
-const progress = ref(null);
 
 const props = defineProps({
     filenamePattern: {
@@ -126,6 +125,9 @@ async function init() {
         endpoint: configuration.ui.tusEndpoint,
         retryDelays: null,
         chunkSize: 64 * 1024 * 1024,
+        headers: {
+            authorization: $http.getHeaders().authorization,
+        },
     });
     uppy.on("upload", () => {
         data.loading = true;

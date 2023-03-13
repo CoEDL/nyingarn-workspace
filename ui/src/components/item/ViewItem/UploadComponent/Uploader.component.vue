@@ -110,6 +110,9 @@ async function init() {
         endpoint: configuration.ui.tusEndpoint,
         retryDelays: null,
         chunkSize: 64 * 1024 * 1024,
+        headers: {
+            authorization: $http.getHeaders().authorization,
+        },
     });
     uppy.on("upload", () => {
         emit("upload-started");

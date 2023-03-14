@@ -5,7 +5,7 @@ import Chance from "chance";
 const chance = new Chance();
 
 describe(`Test assembling a TEI file from the stub files`, () => {
-    it(`Should be able to assemble a TEI file from the stub files`, async () => {
+    it(`Should be able to assemble a simple TEI file from the stub files`, async () => {
         const identifier = 'test'; //chance.word();
         //const directory = path.join("/tmp", chance.word());
         const directory = '/tmp/test';
@@ -26,6 +26,14 @@ describe(`Test assembling a TEI file from the stub files`, () => {
         await assembleTeiDocument({ identifier, directory });
         await remove(directory);
         // await store.deleteItem({ prefix: store.getItemPath() });
+    });
+
+    it(`Should be able to assemble a complex TEI file from the stub files`, async () => {
+        const identifier = 'structured'; 
+        const directory = path.join(__dirname, '../test-data/reconstitute-tei/structured');
+        await ensureDir(directory);
+        await assembleTeiDocument({ identifier, directory });
+        await remove(path.join(directory, 'structured-tei-complete.xml'));
     });
 });
 

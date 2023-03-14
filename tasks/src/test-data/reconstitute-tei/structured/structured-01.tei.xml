@@ -1,0 +1,8 @@
+<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="structured-01"><div xml:id="c1">
+<head>Chapter 1</head>
+<p>This is the text of chapter 1; a minimal chapter consisting of just one paragraph on the start of page 1.</p>
+</div>
+<div xml:id="c2" part="I">
+<head>Chapter 2</head>
+<p>This is the start of the text of chapter 2; a longer chapter beginning on page 1 and continuing onto page 3.</p>
+</div></surface>

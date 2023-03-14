@@ -57,9 +57,12 @@
 					</xenoData>
 				</fileDesc>
 			</teiHeader>
-			<text>
-				<xsl:apply-templates mode="surface-to-text" select="$surfaces"/>
-			</text>
+			<xsl:variable name="text-content">
+				<text>
+					<xsl:apply-templates mode="surface-to-text" select="$surfaces"/>
+				</text>
+			</xsl:variable>
+			<xsl:apply-templates mode="reconstitute" select="$text-content"/>
 		</TEI>
 	</xsl:result-document>
     </xsl:template>
@@ -89,6 +92,16 @@
     the template matching the first <line> in a sequence of <lines> --> 
     <xsl:template match="line[preceding-sibling::*[1]/self::line]" mode="surface-to-text"/>
     
+   <xsl:mode name="reconstitute" on-no-match="shallow-copy"/>
+   <xsl:template match="*[*/@part]" mode="reconstitute">
+    	<xsl:copy>
+    		<xsl:copy-of select="@*"/>
+    		<xsl:call-template name="reconstitute">
+    			<xsl:with-param name="content" select="node()"/>
+    		</xsl:call-template>
+    	</xsl:copy>
+    </xsl:template>
+    
     <xsl:template name="reconstitute">
     	<!-- 
     	The $content parameter is a sequence of nodes which may include subsequences of 
@@ -102,7 +115,7 @@
     	The effect of this is that we should have groups of nodes which start with an "initial" part and run up until
     	the next "final" part, and also groups of nodes which aren't bracketed by an "initial" and "final" part. 
     	--> 
-    	<xsl:for-each-group select="$content" group-starting-with="*[@part='I'] | node()[not(self::pb)][not(@part)]">
+    	<xsl:for-each-group select="$content" group-starting-with="*[@part='I'] | *[not(self::pb)][not(@part)]">
     		<xsl:choose>
     			<xsl:when test="@part='I'">
     				<!-- initial item in the current group is an "initial" part so the group

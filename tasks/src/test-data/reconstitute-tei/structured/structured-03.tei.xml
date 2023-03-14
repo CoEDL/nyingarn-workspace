@@ -1,0 +1,19 @@
+<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="structured-03"><div xml:id="c2" part="F">
+<p>This is the final part of chapter 2, continuing into the start of page 3.</p>
+</div>
+<div xml:id="c3" part="I">
+<head>Chapter 3</head>
+<div xml:id="c3-intro">
+<p>This is the start of the text of chapter 3; a chapter beginning on page 3 and containing subsections of its own.</p>
+<p>Below this point, the text is laid out into columns</p>
+<milestone unit="column" n="1"/>
+<p>Here the text divides into two columns, and this paragraph is in the first column.</p>
+<p>This is another paragraph in the first column.</p>
+<milestone unit="column" n="2"/>
+<p>This paragraph belongs to the second column.</p>
+<milestone unit="column" n="1"/>
+<p>At this point the text goes back to being in a single column.</p>
+</div>
+<div xml:id="c3-s1" part="I">
+<p>This is the start of section 1 of chapter 3, beginning on page 3.</p>
+</div></div></surface>

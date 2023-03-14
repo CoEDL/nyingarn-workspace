@@ -1,0 +1,6 @@
+<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="structured-05"><div xml:id="c3" part="M"><div xml:id="c3-s1" part="F">
+<p>This is the final part of section 1 of chapter 3, taking up the start of page 5.</p>
+</div>
+<div xml:id="c3-s2" part="I">
+<p>This is the start of section 2 of chapter 3, beginning on page 5.</p>
+</div></div></surface>

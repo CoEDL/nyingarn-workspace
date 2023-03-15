@@ -214,6 +214,56 @@ describe(`Check that known good files are processed successfully`, () => {
         expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
         await remove(resourceDirectory);
     });
+    it("L17L27 - should be able to pass a Transkribus file through an XSLT", async () => {
+        let identifier = "L17L27";
+        let resource = "L17L27-tei.xml";
+        let directory = "transkribus-ingestion/L17L27";
+        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
+        let expectedFiles = [
+            "L17L27-01.tei.xml",
+            "L17L27-02.tei.xml",
+            "L17L27-03.tei.xml",
+            "L17L27-04.tei.xml",
+            "L17L27-05.tei.xml",
+            "L17L27-06.tei.xml",
+            "L17L27-07.tei.xml",
+            "L17L27-08.tei.xml",
+            "L17L27-09.tei.xml",
+            "L17L27-10.tei.xml",
+            "L17L27-11.tei.xml",
+            "L17L27-12.tei.xml",
+            "L17L27-13.tei.xml",
+            "L17L27-14.tei.xml",
+            "L17L27-15.tei.xml",
+            "L17L27-16.tei.xml",
+            "L17L27-17.tei.xml",
+            "L17L27-18.tei.xml",
+            "L17L27-19.tei.xml",
+            "L17L27-20.tei.xml",
+            "L17L27-21.tei.xml",
+            "L17L27-22.tei.xml",
+            "L17L27-23.tei.xml",
+            "L17L27-24.tei.xml",
+            "L17L27-25.tei.xml",
+            "L17L27-26.tei.xml",
+            "L17L27-27.tei.xml",
+            "L17L27-28.tei.xml",
+            "L17L27-29.tei.xml",
+            "L17L27-30.tei.xml",
+        ];
+
+        let resourceDirectory = path.join(__dirname, "../test-data", directory, "test-output");
+        await ensureDir(resourceDirectory);
+        await __processTeiTranscriptionXMLProcessor({
+            identifier,
+            sourceURI,
+            output: `file://${resourceDirectory}/`,
+        });
+        let contents = (await readdir(resourceDirectory)).sort();
+        expectedFiles.forEach((file) => expect(contents).toContain(file));
+        expectedFiles.forEach((file) => remove(path.join(resourceDirectory, file)));
+        await remove(resourceDirectory);
+    });
     it("Bates35 - should be able to pass an FTP file through an XSLT", async () => {
         let identifier = "Bates35";
         let resource = "Bates35-tei.xml";

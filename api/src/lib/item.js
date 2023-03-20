@@ -184,9 +184,7 @@ export async function listItemPermissionForms({ identifier }) {
     return { files };
 }
 
-// TODO this method does not have tests
 export async function deleteItemPermissionForm({ identifier, form }) {
-    console.log(identifier, form);
     let store = await getStoreHandle({ id: identifier, type: "item" });
     if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);

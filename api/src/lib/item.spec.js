@@ -10,6 +10,7 @@ import {
     getItemResourceLink,
     deleteItemResource,
     deleteItemResourceFile,
+    deleteItemPermissionForm,
     listItemPermissionForms,
     listItemResourceFiles,
     itemResourceExists,
@@ -236,6 +237,24 @@ describe("Item management tests", () => {
 
         let { files } = await listItemPermissionForms({ identifier });
         expect(files.length).toEqual(2);
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to delete item permission forms", async () => {
+        let user = users.filter((u) => !u.administrator)[0];
+        let { item } = await setupTestItem({ identifier, store, user });
+        await store.put({ json: {}, target: `${identifier}-rights-holder-permission.pdf` });
+        await store.put({
+            json: {},
+            target: `${identifier}-language-authority-permission.pdf`,
+        });
+
+        await deleteItemPermissionForm({
+            identifier,
+            form: `${identifier}-rights-holder-permission.pdf`,
+        });
+        let { files } = await listItemPermissionForms({ identifier });
+        expect(files.length).toEqual(1);
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });

@@ -437,6 +437,36 @@ describe("Item management route tests", () => {
 
         await deleteItem({ id: item.id });
     });
+    it("should be able to delete permission forms", async () => {
+        let user = users.filter((u) => !u.administrator)[0];
+        let session = await createSession({ user });
+        let { item } = await setupTestItem({ identifier, store, user });
+        await store.put({ json: {}, target: `${identifier}-rights-holder-permission.pdf` });
+        await store.put({
+            json: {},
+            target: `${identifier}-language-authority-permission.pdf`,
+        });
+
+        let response = await fetch(
+            `${host}/items/${identifier}/permission-forms/${identifier}-rights-holder-permission.pdf`,
+            {
+                method: "DELETE",
+                headers: headers(session),
+            }
+        );
+        expect(response.status).toEqual(200);
+
+        response = await fetch(`${host}/items/${identifier}/permission-forms`, {
+            method: "GET",
+            headers: headers(session),
+        });
+        expect(response.status).toEqual(200);
+        response = await response.json();
+        expect(response.files.length).toEqual(1);
+        expect(response.files[0].name).toMatch(/language-authority-permission\.pdf/);
+
+        await deleteItem({ id: item.id });
+    });
     it("should fail to get a presigned link to an item resource - not found", async () => {
         let user = users.filter((u) => !u.administrator)[0];
         let session = await createSession({ user });

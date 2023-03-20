@@ -274,7 +274,6 @@ async function getItemPermissionFormsHandler(req) {
     return { files };
 }
 
-// TODO this method does not have tests
 async function deleteItemPermissionFormHandler(req) {
     await deleteItemPermissionForm({ identifier: req.params.identifier, form: req.params.form });
     return {};

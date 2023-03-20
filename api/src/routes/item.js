@@ -14,6 +14,7 @@ import {
     getItems,
     listItemResources,
     listItemPermissionForms,
+    deleteItemPermissionForm,
     getItemResource,
     getItemResourceLink,
     putItemResource,
@@ -49,6 +50,10 @@ export function setupRoutes(fastify, options, done) {
         fastify.get("/items/:identifier/status", getItemStatisticsHandler);
         fastify.get("/items/:identifier/resources", getItemResourcesHandler);
         fastify.get("/items/:identifier/permission-forms", getItemPermissionFormsHandler);
+        fastify.delete(
+            "/items/:identifier/permission-forms/:form",
+            deleteItemPermissionFormHandler
+        );
         fastify.put("/items/:identifier/reprocess-imports", putReprocessImports);
         fastify.get("/items/:identifier/resources/:resource/files", getResourceFilesListHandler);
         fastify.get(
@@ -267,6 +272,12 @@ async function getItemPermissionFormsHandler(req) {
     };
     let { files } = await listItemPermissionForms(query);
     return { files };
+}
+
+// TODO this method does not have tests
+async function deleteItemPermissionFormHandler(req) {
+    await deleteItemPermissionForm({ identifier: req.params.identifier, form: req.params.form });
+    return {};
 }
 
 async function putReprocessImports(req) {

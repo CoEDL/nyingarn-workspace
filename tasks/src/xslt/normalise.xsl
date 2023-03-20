@@ -28,7 +28,10 @@
 		<!-- a "from the page" TEI file -->
 		<xsl:sequence select=" 'from-the-page' "/>
 	    </xsl:when>
-	    <xsl:when test="$document/TEI/teiHeader/fileDesc/publicationStmt/publisher => contains('tranScriptorium')">
+	    <xsl:when test="
+	    	$document/TEI/teiHeader/fileDesc/publicationStmt/publisher => contains('tranScriptorium') or
+	    	$document/TEI/teiHeader/fileDesc/sourceDesc/bibl/idno/@type='Transkribus'
+	    ">
 		<!-- a "Transkribus" TEI file -->
 		<xsl:sequence select=" 'transkribus' "/>
 	    </xsl:when>

@@ -35,12 +35,12 @@ fi
 
 read -p '>> Build the containers and push to docker hub? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
-    docker buildx build --push --rm --platform=linux/amd64,linux/arm64 \
+    docker buildx build --push --rm --platform=linux/amd64 \
         -t ghcr.io/coedl/nyingarn-workspace-api:latest \
         -t ghcr.io/coedl/nyingarn-workspace-api:${VERSION} \
         -f Dockerfile.api-build .
 
-    docker buildx build --push --rm --platform=linux/amd64,linux/arm64 \
+    docker buildx build --push --rm --platform=linux/amd64 \
         -t ghcr.io/coedl/nyingarn-workspace-task-runner:latest \
         -t ghcr.io/coedl/nyingarn-workspace-task-runner:${VERSION} \
         -f Dockerfile.tasks-build .
@@ -49,13 +49,8 @@ if [ "$resp" == "y" ] ; then
         -v $PWD/ui:/srv/ui \
         -v ui_node_modules:/srv/ui/node_modules \
         -w /srv/ui node:14-buster bash -l -c "npm run build"
-    docker buildx build --push --rm --platform linux/amd64,linux/arm64 \
+    docker buildx build --push --rm --platform linux/amd64 \
         -t ghcr.io/coedl/nyingarn-workspace-ui:latest \
         -t ghcr.io/coedl/nyingarn-workspace-ui:${VERSION} \
         -f Dockerfile.ui-build .
-
-    # docker buildx build --push --rm --platform linux/amd64,linux/arm64 \
-    #     -t ghcr.io/coedl/nyingarn-workspace-tusd:latest \
-    #     -t ghcr.io/coedl/nyingarn-workspace-tusd:${VERSION} \
-    #     -f Dockerfile.tus-build .
 fi

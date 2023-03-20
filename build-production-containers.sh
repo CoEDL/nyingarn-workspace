@@ -54,8 +54,8 @@ if [ "$resp" == "y" ] ; then
         -t ghcr.io/coedl/nyingarn-workspace-ui:${VERSION} \
         -f Dockerfile.ui-build .
 
-    docker buildx build --push --rm --platform linux/amd64,linux/arm64 \
-        -t ghcr.io/coedl/nyingarn-workspace-tusd:latest \
-        -t ghcr.io/coedl/nyingarn-workspace-tusd:${VERSION} \
-        -f Dockerfile.tus-build .
+    # docker buildx build --push --rm --platform linux/amd64,linux/arm64 \
+    #     -t ghcr.io/coedl/nyingarn-workspace-tusd:latest \
+    #     -t ghcr.io/coedl/nyingarn-workspace-tusd:${VERSION} \
+    #     -f Dockerfile.tus-build .
 fi

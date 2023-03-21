@@ -42,7 +42,7 @@ describe(`Test Textract OCR processing`, () => {
 
         await remove(directory);
         await bucket.removeObjects({ prefix: store.getObjectPath() });
-    });
+    }, 10000);
     it(`should be able send an image with a table to textract for OCR and get a result`, async () => {
         const identifier = chance.word();
         const task = {

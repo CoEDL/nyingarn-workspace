@@ -23,7 +23,7 @@ describe(`Test `, () => {
         const resource = `${identifier}-01.tiff`;
 
         let store = await getStoreHandle({ id: identifier, type: "test" });
-        await store.createItem();
+        await store.createObject();
 
         await ensureDir(directory);
         await store.put({ localPath: path.join("src", "tasks", "index.js"), target: "index.js" });
@@ -42,7 +42,7 @@ describe(`Test `, () => {
         expect(contents).toEqual(["index.spec.js"]);
 
         await remove(directory);
-        await bucket.removeObjects({ prefix: store.getItemPath() });
+        await bucket.removeObjects({ prefix: store.getObjectPath() });
     });
     it(`should be able to setup a local working directory`, async () => {
         const identifier = chance.word();
@@ -52,7 +52,7 @@ describe(`Test `, () => {
         const resource = "test-image-text.jpg";
 
         let store = await getStoreHandle({ id: identifier, type: "test" });
-        await store.createItem();
+        await store.createObject();
         await store.put({
             localPath: path.join("src", "test-data", "image-processing", resource),
             target: resource,
@@ -64,7 +64,7 @@ describe(`Test `, () => {
         expect(contents).toEqual([resource]);
 
         await remove(directory);
-        await bucket.removeObjects({ prefix: store.getItemPath() });
+        await bucket.removeObjects({ prefix: store.getObjectPath() });
     });
     it(`should be able to cleanup a local working directory`, async () => {
         const identifier = chance.word();
@@ -93,7 +93,7 @@ describe(`Test `, () => {
             "ro-crate-metadata.json",
             resource,
         ]);
-        await bucket.removeObjects({ prefix: store.getItemPath() });
+        await bucket.removeObjects({ prefix: store.getObjectPath() });
     });
     it(`should be able to sync a local working directory to the store`, async () => {
         const identifier = chance.word();
@@ -103,7 +103,7 @@ describe(`Test `, () => {
         const resource = "test-image-text.jpg";
 
         let store = await getStoreHandle({ id: identifier, type: "test" });
-        await store.createItem();
+        await store.createObject();
         await store.put({
             localPath: path.join("src", "test-data", "image-processing", resource),
             target: resource,
@@ -132,6 +132,6 @@ describe(`Test `, () => {
             resource,
         ]);
         await remove(directory);
-        await bucket.removeObjects({ prefix: store.getItemPath() });
+        await bucket.removeObjects({ prefix: store.getObjectPath() });
     });
 });

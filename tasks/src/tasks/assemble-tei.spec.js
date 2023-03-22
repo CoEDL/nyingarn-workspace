@@ -6,13 +6,13 @@ const chance = new Chance();
 
 describe(`Test assembling a TEI file from the stub files`, () => {
     it(`Should be able to assemble a simple TEI file from the stub files`, async () => {
-        const identifier = 'test'; //chance.word();
+        const identifier = "test"; //chance.word();
         //const directory = path.join("/tmp", chance.word());
-        const directory = '/tmp/test';
+        const directory = "/tmp/test";
         await ensureDir(directory);
         // let store = await getStoreHandle({ id: identifier, className: "item" });
         // await store.createItem();
-        for (let i of ['01', '02', '03']) {
+        for (let i of ["01", "02", "03"]) {
             // await store.put({
             //     target: `${identifier}-${i}.tei.xml`,
             //     content: sampleDocument(identifier, i),
@@ -29,11 +29,11 @@ describe(`Test assembling a TEI file from the stub files`, () => {
     });
 
     it(`Should be able to assemble a complex TEI file from the stub files`, async () => {
-        const identifier = 'structured'; 
-        const directory = path.join(__dirname, '../test-data/reconstitute-tei/structured');
+        const identifier = "structured";
+        const directory = path.join(__dirname, "../test-data/reconstitute-tei/structured");
         await ensureDir(directory);
         await assembleTeiDocument({ identifier, directory });
-        await remove(path.join(directory, 'structured-tei-complete.xml'));
+        await remove(path.join(directory, "structured-tei-complete.xml"));
     });
 });
 

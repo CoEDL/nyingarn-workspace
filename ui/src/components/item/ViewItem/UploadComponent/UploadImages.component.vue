@@ -41,7 +41,7 @@ import { reactive, computed, inject } from "vue";
 import UploaderComponent from "./Uploader.component.vue";
 import ImageHelpComponent from "./HelpImages.component.vue";
 import WarningBoxComponent from "../../../WarningBox.component.vue";
-import ProcessingStatusComponent from "./ProcessingStatus.component.vue";
+import ProcessingStatusComponent from "../ProcessingStatus.component.vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 const $route = useRoute();

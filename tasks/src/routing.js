@@ -1,3 +1,4 @@
+import path from "path";
 import { createImageThumbnail, createWebFormats } from "./tasks/image-processing.js";
 import { runTextractOCR } from "./tasks/ocr-processing.js";
 import {
@@ -5,8 +6,14 @@ import {
     processTeiTranscription,
 } from "./tasks/transcription-processing.js";
 import { assembleTeiDocument } from "./tasks/assemble-tei.js";
-import { prepare, cleanup, cleanupAfterFailure, syncToBucket } from "./tasks/index.js";
-import { log } from "/srv/api/src/common/index.js";
+import {
+    prepare,
+    cleanup,
+    cleanupAfterFailure,
+    syncToBucket,
+    removeOverlappingNewContent,
+} from "./tasks/index.js";
+import { log, getStoreHandle } from "/srv/api/src/common/index.js";
 import { updateTask, deleteTask } from "./common/task.js";
 
 export function setupHandlers({ rabbit }) {
@@ -25,10 +32,12 @@ export async function runTask(msg) {
             case "process-digivol":
                 log.info(`Running 'process-digivol' task for '${identifier}' in ${directory}`);
                 await processDigivolTranscription({ directory, ...msg.body });
+                await removeOverlappingNewContent({ directory, identifier });
                 break;
             case "process-tei":
                 log.info(`Running 'process-tei' task for '${identifier}' in ${directory}`);
                 await processTeiTranscription({ directory, ...msg.body });
+                await removeOverlappingNewContent({ directory, identifier });
                 break;
             case "process-image":
                 log.info(`Running 'process-image' task for '${identifier}' in ${directory}`);
@@ -55,7 +64,24 @@ export async function runTask(msg) {
                 log.info(
                     `Running 'assemble-tei-document' task for '${identifier}' in ${directory}`
                 );
+                let store = await getStoreHandle({ id: identifier, type: "item" });
+                let resources = await store.listResources();
+                const re = new RegExp(`${identifier}-.*.tei.xml`);
+                resources = resources
+                    .filter((r) => {
+                        return r.Key.match(re) || r.Key === "ro-crate-metadata.json";
+                    })
+                    .map((r) => r.Key);
+                for (let resource of resources) {
+                    await store.get({
+                        target: resource,
+                        localPath: path.join(directory, resource),
+                    });
+                }
+                await store.delete({ target: `${identifier}-tei-complete.xml` });
                 await assembleTeiDocument({ task, identifier, directory });
+                await removeOverlappingNewContent({ directory, identifier });
+
                 break;
         }
 

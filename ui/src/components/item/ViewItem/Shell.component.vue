@@ -1,9 +1,6 @@
 <template>
     <div class="flex flex-col h-screen">
-        <div class="text-xl mb-2 bg-indigo-200 p-4 text-gray-700">
-            <i class="fa-solid fa-file-image"></i>
-            {{ props.identifier }}
-        </div>
+        <NavbarComponent />
         <div class="px-6" v-if="data.userIsPermitted">
             <el-tabs v-model="data.activeTab" @tab-click="updateRouteOnTabSelect">
                 <el-tab-pane label="View Item Content" name="view">
@@ -47,6 +44,7 @@ import ViewItemContentComponent from "./ViewItemContent/Shell.component.vue";
 import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
 import PublishComponent from "./PublishComponent/Shell.component.vue";
+import NavbarComponent from "./Navbar.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";

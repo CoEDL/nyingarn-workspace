@@ -33,6 +33,11 @@ export function setupRoutes(fastify, options, done) {
         { preHandler: requireItemAccess },
         extractTableHandler
     );
+    fastify.post(
+        "/process/assemble-tei/:identifier",
+        { preHandler: requireItemAccess },
+        assembleTeiHandler
+    );
     done();
 }
 
@@ -48,13 +53,30 @@ async function extractTableHandler(req) {
     await store.delete({ target: textractFile });
     const name = "extract-table";
 
-    log.info(`Process: ${identifier}/${resource}`);
+    log.info(`Process extract table: ${identifier}/${resource}`);
     let task = await submitTask({
         rabbit: this.rabbit,
         configuration: req.session.configuration,
         item: req.session.item,
         name,
         body: { resource: imageFile },
+    });
+
+    return { taskId: task.id };
+}
+
+async function assembleTeiHandler(req) {
+    const { identifier } = req.params;
+
+    const name = "assemble-tei-document";
+
+    log.info(`Process assemble tei: ${identifier}`);
+    let task = await submitTask({
+        rabbit: this.rabbit,
+        configuration: req.session.configuration,
+        item: req.session.item,
+        name,
+        body: {},
     });
 
     return { taskId: task.id };

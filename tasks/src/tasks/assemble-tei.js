@@ -1,6 +1,6 @@
-import { getStoreHandle, getLogger, loadConfiguration } from "/srv/api/src/common/index.js";
+import { getLogger, loadConfiguration } from "/srv/api/src/common/index.js";
 import fsExtraPkg from "fs-extra";
-const { ensureDir, copy, remove, writeFile, writeJSON, readdir } = fsExtraPkg;
+const { readdir } = fsExtraPkg;
 import SaxonJS from "saxon-js";
 
 const log = getLogger();

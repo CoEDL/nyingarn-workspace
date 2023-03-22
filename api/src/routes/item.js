@@ -38,8 +38,8 @@ export function setupRoutes(fastify, options, done) {
     fastify.get("/items", getItemsHandler);
     fastify.post("/items", postItemHandler);
 
-    // user routes - access specific item
     fastify.register((fastify, options, done) => {
+        // user routes - access specific item
         fastify.addHook("preHandler", requireItemAccess);
 
         fastify.get("/items/:identifier", getItemHandler);
@@ -55,6 +55,8 @@ export function setupRoutes(fastify, options, done) {
             deleteItemPermissionFormHandler
         );
         fastify.put("/items/:identifier/reprocess-imports", putReprocessImports);
+
+        // user routes - access item resources
         fastify.get("/items/:identifier/resources/:resource/files", getResourceFilesListHandler);
         fastify.get(
             "/items/:identifier/resources/:resource/status",

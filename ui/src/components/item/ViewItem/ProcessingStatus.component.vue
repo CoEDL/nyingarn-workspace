@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import ErrorReporterComponent from "./ErrorReporter.component.vue";
+import ErrorReporterComponent from "./UploadComponent/ErrorReporter.component.vue";
 import { format, parseISO } from "date-fns";
 import { reactive, onMounted, onBeforeUnmount, inject, computed } from "vue";
 import { useRoute } from "vue-router";

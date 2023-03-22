@@ -13,7 +13,6 @@ export async function removeOverlappingNewContent({ directory, identifier, type 
     let store = await getStoreHandle({ id: identifier, type });
     let storeResources = (await store.listResources()).map((r) => r.Key);
 
-    directory = path.join(directory, identifier);
     await walk(directory, async (err, pathname, dirent) => {
         if (dirent.isFile()) {
             if (storeResources.includes(path.relative(directory, pathname))) {
@@ -24,11 +23,17 @@ export async function removeOverlappingNewContent({ directory, identifier, type 
 }
 
 export async function prepare({ task, identifier, resource, type = "item" }) {
-    let store = await getStoreHandle({ id: identifier, type });
-    const directory = await ensureDir(path.join("/tmp", task.id, identifier));
+    const directory = path.join("/tmp", task.id, identifier);
+    await ensureDir(directory);
     log.debug(`Setting up task to run in directory: ${directory}.`);
 
-    await store.get({ target: resource, localPath: path.join(directory, identifier, resource) });
+    if (resource) {
+        let store = await getStoreHandle({ id: identifier, type });
+        await store.get({
+            target: resource,
+            localPath: path.join(directory, resource),
+        });
+    }
     return directory;
 }
 
@@ -54,7 +59,6 @@ export async function cleanupAfterFailure({ directory }) {
 export async function syncToBucket({ directory, identifier, type = "item" }) {
     log.debug(`Sync'ing back to bucket.`);
     let store = await getStoreHandle({ id: identifier, type });
-    directory = path.join(directory, identifier);
 
     let batch = [];
 

@@ -39,19 +39,18 @@ export async function runTextractOCR({
         region: configuration.api.services.aws.region,
     };
 
-    let localFiles = await readdir(path.join(directory, identifier));
+    let localFiles = await readdir(path.join(directory));
     const sourceImage = localFiles
         .filter((f) => f.match(/\.jpe?g/i))
         .filter((f) => !f.match(/thumbnail/))
         .pop();
     const sourceBasename = path.basename(sourceImage, path.extname(sourceImage));
-    const source = path.join(directory, identifier, sourceImage);
+    const source = path.join(directory, sourceImage);
     let targetOCROutput = path.join(
         directory,
-        identifier,
         `${sourceBasename}.textract_ocr-${configuration.api.filenaming.adminTag}.json`
     );
-    let targetTei = path.join(directory, identifier, `${sourceBasename}.tei.xml`);
+    let targetTei = path.join(directory, `${sourceBasename}.tei.xml`);
 
     let fileStat = await stat(source);
     if (fileStat.size > 10 * 1024 * 1024) {

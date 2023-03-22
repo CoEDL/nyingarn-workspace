@@ -21,7 +21,7 @@
 <script setup>
 import { reactive, computed, inject, defineAsyncComponent } from "vue";
 import HelpTranscriptionComponent from "./HelpTranscription.component.vue";
-import ProcessingStatusComponent from "./ProcessingStatus.component.vue";
+import ProcessingStatusComponent from "../ProcessingStatus.component.vue";
 import { useRoute } from "vue-router";
 const $route = useRoute();
 const $http = inject("$http");

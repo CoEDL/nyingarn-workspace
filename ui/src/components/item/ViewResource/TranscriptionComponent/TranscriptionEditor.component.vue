@@ -301,52 +301,34 @@ async function save() {
     }, 1500);
 }
 async function reprocessPageAsTable() {
-    const dateFrom = new Date();
+    const { identifier, resource } = $route.params;
     let response = await $http.post({
-        route: `/process/extract-table/${$route.params.identifier}/${$route.params.resource}`,
+        route: `/process/extract-table/${identifier}/${resource}`,
     });
     if (response.status !== 200) {
         return;
     }
-    let taskId = (await response.json()).taskId;
+    const taskId = (await response.json()).taskId;
 
     data.extractTableProcessing = true;
-    await new Promise((resolve) => setTimeout(resolve, 6000));
-    await checkProcessingStatus({
-        $http,
-        identifier: $route.params.identifier,
-        resources: [
-            { itemId: $route.params.identifier, resource: `${$route.params.resource}.jpg` },
-        ],
-        taskId,
-        dateFrom,
-    });
+    let status = await updateProcessingStatus({ taskId });
+    while (status === "in progress") {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        status = await updateProcessingStatus({ taskId });
+    }
 
     let document = await loadTranscription();
     formatDocument({ view, document });
     data.extractTableProcessing = false;
 
-    async function checkProcessingStatus({ $http, identifier, resources, taskId, dateFrom }) {
+    async function updateProcessingStatus({ taskId }) {
         let response = await $http.post({
             route: `/items/${identifier}/resources/processing-status`,
-            body: { resources, dateFrom },
+            body: { taskIds: [taskId] },
         });
         let { tasks } = await response.json();
-        let task = tasks.filter((task) => task.id === taskId)[0];
-        if (!task) {
-            // no task found - do nothing
-        } else if (task.status !== "done" && task.status !== "failed") {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            await checkProcessingStatus({
-                $http,
-                identifier: $route.params.identifier,
-                resources: [
-                    { itemId: $route.params.identifier, resource: `${$route.params.resource}.jpg` },
-                ],
-                taskId,
-                dateFrom,
-            });
-        }
+        const task = tasks.pop();
+        return task.status;
     }
 }
 function decreaseFontSize() {

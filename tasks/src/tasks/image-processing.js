@@ -7,8 +7,8 @@ import { thumbnailHeight } from "./index.js";
 export async function createImageThumbnail({ directory, identifier, resource }) {
     let resourceBasename = path.basename(resource, path.extname(resource));
     let thumbnail = `${resourceBasename}.thumbnail_h${thumbnailHeight}.jpg`;
-    let source = path.join(directory, identifier, resource);
-    let target = path.join(directory, identifier, thumbnail);
+    let source = path.join(directory, resource);
+    let target = path.join(directory, thumbnail);
     log.debug(`Creating '${target}' from '${source}'`);
     try {
         await sharp(source).resize({ height: thumbnailHeight }).toFile(target);
@@ -20,17 +20,17 @@ export async function createImageThumbnail({ directory, identifier, resource }) 
 
 export async function createWebFormats({ directory, identifier, resource }) {
     const resourceBasename = path.basename(resource, path.extname(resource));
-    const source = path.join(directory, identifier, resource);
+    const source = path.join(directory, resource);
     if (path.extname(resource).match(/tif{1,2}/i)) {
         // resource is a tif image - create jpeg and webp webformats
-        let target = path.join(directory, identifier, `${resourceBasename}.jpg`);
+        let target = path.join(directory, `${resourceBasename}.jpg`);
         await createImage({ source, target });
 
-        target = path.join(directory, identifier, `${resourceBasename}.webp`);
+        target = path.join(directory, `${resourceBasename}.webp`);
         await createImage({ source, target });
     } else if (path.extname(resource).match(/jpe?g/i)) {
         // resource is a jpg - create webp format
-        let target = path.join(directory, identifier, `${resourceBasename}.webp`);
+        let target = path.join(directory, `${resourceBasename}.webp`);
         await createImage({ source, target });
     }
 

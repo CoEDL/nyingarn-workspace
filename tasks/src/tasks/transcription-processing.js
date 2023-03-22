@@ -2,14 +2,13 @@ import path from "path";
 import SaxonJS from "saxon-js";
 import { log, loadConfiguration } from "/srv/api/src/common/index.js";
 import { expandError } from "../common/errors.js";
-import { removeOverlappingNewContent } from "./index.js";
 
 export async function processTEIToPageFilesAsStrings({ directory, identifier, resource }) {
     //TODO ask SaxonJS to return the documents in memory, rather than write them directly to disk
     // so that the storage bucket can be checked for pre-existing files, to avoid overwriting them.
     // NB use of this implementation is currently blocked by a bug in SaxonJS: https://saxonica.plan.io/issues/5430
     // and instead the processTEIToPageFiles function (below) is used, which returns the TEI fragments as files on disk.
-    let sourceURI = "file://" + path.join(directory, identifier, resource);
+    let sourceURI = "file://" + path.join(directory, resource);
     try {
         SaxonJS.transform({
             /* log the URIs of result documents */
@@ -34,9 +33,8 @@ export async function processTEIToPageFilesAsStrings({ directory, identifier, re
 }
 
 export async function processTeiTranscription({ directory, identifier, resource }) {
-    let sourceURI = "file://" + path.join(directory, identifier, resource);
+    let sourceURI = "file://" + path.join(directory, resource);
     await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
-    await removeOverlappingNewContent({ directory, identifier, resource });
 }
 
 /*
@@ -111,9 +109,8 @@ export async function __processTeiTranscriptionXMLProcessor({
 }
 
 export async function processDigivolTranscription({ directory, identifier, resource }) {
-    let sourceURI = "file://" + path.join(directory, identifier, resource);
+    let sourceURI = "file://" + path.join(directory, resource);
     await __processDigivolTranscriptionXMLProcessor({ identifier, sourceURI });
-    await removeOverlappingNewContent({ directory, identifier, resource });
 }
 
 export async function __processDigivolTranscriptionXMLProcessor({

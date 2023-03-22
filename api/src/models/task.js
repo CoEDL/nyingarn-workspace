@@ -16,7 +16,7 @@ export default function (sequelize, DataTypes) {
             },
             resource: {
                 type: DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
             },
             name: {
                 type: DataTypes.STRING,

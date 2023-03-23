@@ -24,7 +24,7 @@
 import { reactive, inject, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { getFileUrl } from "../item-services.js";
-import { ELMessage } from "element-plus";
+import { ElMessage } from "element-plus";
 
 const $route = useRoute();
 const $http = inject("$http");
@@ -53,9 +53,10 @@ async function downloadTeiDocument() {
             if (status === "done") {
                 await getLink({ name: `${data.identifier}-tei-complete.xml` });
             } else {
-                ELMessage.error(
-                    `There was an issue assembling the TEI file. It's likely one of the fragment files is invalid.`
-                );
+                ElMessage({
+                    message: `There was an issue assembling the TEI file. It's likely one of the page transcriptions is invalid.`,
+                    type: "error",
+                });
             }
         } else if (response.link) {
             await triggerDownload({ link: response.link });

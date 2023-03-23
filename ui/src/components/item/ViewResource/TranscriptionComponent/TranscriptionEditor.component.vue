@@ -55,7 +55,7 @@
         </div>
         <div class="flex flex-col flex-grow px-2">
             <!-- topbar control -->
-            <div class="flex flex-row space-x-2">
+            <div class="flex flex-row space-x-2" :class="{ 'rounded bg-red-200 p-2': data.error }">
                 <div>
                     <el-button
                         @click="save"
@@ -72,6 +72,18 @@
                             &nbsp;save
                         </div>
                     </el-button>
+                </div>
+                <div v-if="data.error" class="text-3xl text-red-700">
+                    <el-popover placement="top-start" :width="500" trigger="hover">
+                        <template #reference>
+                            <div>
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                            </div>
+                        </template>
+                        <div class="bg-red-200 rounded p-4">
+                            {{ data.error.message }}
+                        </div>
+                    </el-popover>
                 </div>
                 <div class="flex flex-grow"></div>
                 <el-tooltip
@@ -170,7 +182,11 @@ import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { xml, xmlLanguage } from "@codemirror/lang-xml";
-import { CodemirrorEditorControls, formatDocument } from "./codemirror-editor.js";
+import {
+    CodemirrorEditorControls,
+    formatDocument,
+    transformDocument,
+} from "./codemirror-editor.js";
 import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
@@ -206,6 +222,7 @@ let data = reactive({
         "text-5xl",
         "text-6xl",
     ],
+    error: undefined,
 });
 
 const codemirror = ref(null);
@@ -248,6 +265,7 @@ async function loadTranscription() {
         data.transcription = "";
         return;
     }
+    checkDocumentIsValid();
     try {
         return (await response.json()).content;
     } catch (error) {
@@ -289,16 +307,25 @@ function format() {
 }
 async function save() {
     let document = view.state.doc.toString();
-    await $http.put({
+    let response = await $http.put({
         route: `/items/${data.identifier}/resources/${data.resource}/saveTranscription`,
         body: { datafiles: props.data, document },
     });
+
     data.saved = true;
     format();
+    checkDocumentIsValid();
 
     setTimeout(() => {
         data.saved = false;
     }, 1500);
+}
+async function checkDocumentIsValid() {
+    let { document, error } = await transformDocument({
+        identifier: data.identifier,
+        resource: data.resource,
+    });
+    data.error = error ? error : undefined;
 }
 async function reprocessPageAsTable() {
     const { identifier, resource } = $route.params;

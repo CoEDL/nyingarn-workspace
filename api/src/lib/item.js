@@ -309,12 +309,12 @@ export async function markResourceComplete({ identifier, resource, complete = fa
         status = JSON.parse(await store.get({ target: completedResources }));
     } catch (error) {}
     resource = path.join(identifier, resource);
-    status[resource] = String(complete) === "true";
+    status[resource] = complete;
 
     await store.put({ json: status, target: completedResources, registerFile: false });
 }
 
-export async function markAllResourcesComplete({ identifier, resources, complete = true }) {
+export async function markAllResourcesComplete({ identifier, resources }) {
     let store = await getStoreHandle({ id: identifier, type: "item" });
     if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
@@ -323,20 +323,17 @@ export async function markAllResourcesComplete({ identifier, resources, complete
     let status = {};
     try {
         status = JSON.parse(await store.get({ target: completedResources }));
+        for (let resource of resources) {
+            resource = path.join(identifier, resource);
+            status[resource] = true;
+        }
+        await store.put({ json: status, target: completedResources, registerFile: false });
     } catch (error) {}
-    for (let resource of resources) {
-        resource = path.join(identifier, resource);
-        status[resource] = String(complete) === "true";
-    }
-
-    await store.put({ json: status, target: completedResources, registerFile: false });
 }
 
 export async function isResourceComplete({ identifier, resource }) {
     let status = {};
-    try {
-        status = JSON.parse(await getItemResource({ identifier, resource: completedResources }));
-    } catch (error) {}
+    status = JSON.parse(await getItemResource({ identifier, resource: completedResources }));
     resource = path.join(identifier, resource);
-    return status[resource] ? status[resource] : false;
+    return status[resource];
 }

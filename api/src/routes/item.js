@@ -385,17 +385,35 @@ async function getItemResourceFileLinkHandler(req, res) {
 
 async function saveItemTranscriptionHandler(req, res) {
     const { identifier, resource } = req.params;
-    let { datafiles, document } = req.body;
+    let { document } = req.body;
     let file = `${resource}.tei.xml`;
+    if (isEmpty(document)) return {};
     try {
-        if (!isEmpty(document)) {
-            await putItemResource({ identifier, resource: file, content: document });
-        }
-        return {};
+        await putItemResource({ identifier, resource: file, content: document });
     } catch (error) {
         log.error(`Error saving transcription: ${error.message}`);
         return res.internalServerError();
     }
+
+    try {
+        document = await transformDocument({ document });
+        await markResourceComplete({
+            identifier,
+            resource,
+            ...req.query,
+            complete: false,
+        });
+    } catch (error) {
+        if (error)
+            await markResourceComplete({
+                identifier,
+                resource,
+                ...req.query,
+                complete: "not well formed",
+            });
+        return { error };
+    }
+    return {};
 }
 
 // TODO this method does not have tests
@@ -413,6 +431,10 @@ async function getTransformTeiDocumentHandler(req) {
     const { identifier, resource } = req.params;
     let store = await getStoreHandle({ id: identifier, type: "item" });
     let document = await store.get({ target: `${resource}.tei.xml` });
-    document = await transformDocument({ document });
-    return { document };
+    try {
+        document = await transformDocument({ document });
+        return { document };
+    } catch (error) {
+        return { error };
+    }
 }

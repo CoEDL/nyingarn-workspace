@@ -1,6 +1,7 @@
 import { undo as codemirrorUndo, redo as codemirrorRedo } from "@codemirror/commands";
 import format from "xml-formatter";
 import { compact } from "lodash";
+import { $http } from "../../../../routes.js";
 
 export class CodemirrorEditorControls {
     constructor({ view }) {
@@ -157,4 +158,14 @@ export function formatDocument({ view, document = undefined }) {
         // couldn't format - likely not an XML document
         return { error };
     }
+}
+
+export async function transformDocument({ identifier, resource }) {
+    let response = await $http.get({
+        route: `/items/${identifier}/resources/${resource}/transform`,
+    });
+    if (response.status !== 200) {
+    }
+    let { document, error } = await response.json();
+    return { document, error };
 }

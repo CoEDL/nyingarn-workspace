@@ -14,16 +14,10 @@ import { authenticateTusRequest, triggerProcessing, getUploadDetails } from "./u
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
 
-    // fastify.get("/upload/pre-create", authenticateTusRequest);
-    // fastify.get(
-    //     "/upload/pre-create/:itemType/:identifier",
-    //     { preHandler: requireItemAccess },
-    //     getUploadDetails
-    // );
     fastify.get(
-        "/upload/post-finish/:identifier/:resource",
+        "/upload/pre-create/:itemType/:identifier",
         { preHandler: requireItemAccess },
-        triggerProcessing
+        getUploadDetails
     );
     fastify.post(
         "/process/post-finish/:identifier/:resource",

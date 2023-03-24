@@ -303,7 +303,7 @@ function convertToTei() {
 }
 function format() {
     let { error } = formatDocument({ view });
-    data.error = { message: error } ?? undefined;
+    data.error = error ? { message: error } : undefined;
 }
 async function save() {
     let document = view.state.doc.toString();

@@ -143,21 +143,29 @@ export class CodemirrorEditorControls {
 }
 
 export function formatDocument({ view, document = undefined }) {
-    try {
-        document = document ? document : view.state.doc.toString();
-        let documentLength = view.state.doc.length;
-        document = format(document, { indentation: "  ", collapseContent: true });
-        let changes = {
-            from: 0,
-            to: documentLength,
-            insert: document,
-        };
-        view.dispatch({ changes });
-        return {};
-    } catch (error) {
-        // couldn't format - likely not an XML document
-        return { error };
+    document = document ? document : view.state.doc.toString();
+
+    // see if the document is well formed or not
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(document, "application/xml");
+    const errorNode = doc.querySelector("parsererror");
+    if (errorNode?.textContent) {
+        let textContent = errorNode.textContent.split("\n");
+        return { error: [textContent[0], textContent[2]].join(" ") };
     }
+
+    let documentLength = view.state.doc.length;
+    document = format(document, {
+        indentation: "  ",
+        collapseContent: true,
+    });
+    let changes = {
+        from: 0,
+        to: documentLength,
+        insert: document,
+    };
+    view.dispatch({ changes });
+    return {};
 }
 
 export async function transformDocument({ identifier, resource }) {

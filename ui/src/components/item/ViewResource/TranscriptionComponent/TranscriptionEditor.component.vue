@@ -265,7 +265,6 @@ async function loadTranscription() {
         data.transcription = "";
         return;
     }
-    checkDocumentIsValid();
     try {
         return (await response.json()).content;
     } catch (error) {
@@ -304,6 +303,7 @@ function convertToTei() {
 }
 function format() {
     let { error } = formatDocument({ view });
+    data.error = { message: error } ?? undefined;
 }
 async function save() {
     let document = view.state.doc.toString();
@@ -314,18 +314,10 @@ async function save() {
 
     data.saved = true;
     format();
-    checkDocumentIsValid();
 
     setTimeout(() => {
         data.saved = false;
     }, 1500);
-}
-async function checkDocumentIsValid() {
-    let { document, error } = await transformDocument({
-        identifier: data.identifier,
-        resource: data.resource,
-    });
-    data.error = error ? error : undefined;
 }
 async function reprocessPageAsTable() {
     const { identifier, resource } = $route.params;

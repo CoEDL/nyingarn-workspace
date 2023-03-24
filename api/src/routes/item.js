@@ -395,24 +395,24 @@ async function saveItemTranscriptionHandler(req, res) {
         return res.internalServerError();
     }
 
-    try {
-        document = await transformDocument({ document });
-        await markResourceComplete({
-            identifier,
-            resource,
-            ...req.query,
-            complete: false,
-        });
-    } catch (error) {
-        if (error)
-            await markResourceComplete({
-                identifier,
-                resource,
-                ...req.query,
-                complete: "not well formed",
-            });
-        return { error };
-    }
+    // try {
+    //     document = await transformDocument({ document });
+    //     await markResourceComplete({
+    //         identifier,
+    //         resource,
+    //         ...req.query,
+    //         complete: false,
+    //     });
+    // } catch (error) {
+    //     if (error)
+    //         await markResourceComplete({
+    //             identifier,
+    //             resource,
+    //             ...req.query,
+    //             complete: "not well formed",
+    //         });
+    //     return { error };
+    // }
     return {};
 }
 

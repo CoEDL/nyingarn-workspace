@@ -309,7 +309,7 @@ export async function markResourceComplete({ identifier, resource, complete = fa
         status = JSON.parse(await store.get({ target: completedResources }));
     } catch (error) {}
     resource = path.join(identifier, resource);
-    status[resource] = complete;
+    status[resource] = JSON.parse(complete);
 
     await store.put({ json: status, target: completedResources, registerFile: false });
 }

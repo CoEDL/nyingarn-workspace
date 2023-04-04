@@ -5,6 +5,7 @@ import {
     getStoreHandle,
     demandAuthenticatedUser,
     requireItemAccess,
+    resourceStatusFile,
 } from "../common/index.js";
 import lodashPkg from "lodash";
 const { groupBy, isEmpty } = lodashPkg;
@@ -26,7 +27,8 @@ import {
     getResourceProcessingStatus,
     statItemFile,
     markResourceComplete,
-    isResourceComplete,
+    getResourceStatus,
+    saveItemTranscription,
 } from "../lib/item.js";
 import { transformDocument } from "../lib/transform.js";
 const log = getLogger();
@@ -212,40 +214,18 @@ async function deleteItemHandler(req, res) {
     return {};
 }
 
+// TODO: revise tests
 async function getItemStatisticsHandler(req) {
-    let { resources, total } = await listItemResources({
-        identifier: req.params.identifier,
-        groupByResource: true,
-    });
-    let statistics = { total };
-    return { statistics };
+    const { identifier } = req.params;
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    let statusFile = await store.getJSON({ target: resourceStatusFile });
+    return { status: statusFile.item };
 }
 
+// TODO: revise tests
 async function getResourceProcessingStatusHandler(req) {
-    let completed = {};
     const { identifier, resource } = req.params;
-
-    let files = (await listItemResourceFiles({ identifier, resource })).files;
-    if (!files) {
-        res.send({ completed: (completed[resource] = {}) });
-        return next();
-    }
-
-    completed[resource] = {};
-    completed[resource].markedComplete = await isResourceComplete({ identifier, resource });
-    completed[resource].thumbnail = files.filter((f) => f.match(/thumbnail/)).length ? true : false;
-    completed[resource].webformats = (() => {
-        let jpeg = files.filter((f) => f.match(/\.jpe?g/)).length ? true : false;
-        let webp = files.filter((f) => f.match(/\.webp/)).length ? true : false;
-        return jpeg && webp ? true : false;
-    })();
-    completed[resource].tesseract =
-        files.filter((f) => f.match(/\.tesseract_ocr/)).length === 2 ? true : false;
-    completed[resource].textract =
-        files.filter((f) => f.match(/\.textract_ocr/)).length === 1 ? true : false;
-    completed[resource].tei =
-        files.filter((f) => f.match(/\.tei\.xml/)).length === 1 ? true : false;
-    return { completed: completed[resource] };
+    return await getResourceStatus({ identifier, resource });
 }
 
 async function putResourceCompleteHandler(req) {
@@ -386,40 +366,16 @@ async function getItemResourceFileLinkHandler(req, res) {
 async function saveItemTranscriptionHandler(req, res) {
     const { identifier, resource } = req.params;
     let { document } = req.body;
-    let file = `${resource}.tei.xml`;
     if (isEmpty(document)) return {};
-    try {
-        await putItemResource({ identifier, resource: file, content: document });
-    } catch (error) {
-        log.error(`Error saving transcription: ${error.message}`);
-        return res.internalServerError();
-    }
 
-    // try {
-    //     document = await transformDocument({ document });
-    //     await markResourceComplete({
-    //         identifier,
-    //         resource,
-    //         ...req.query,
-    //         complete: false,
-    //     });
-    // } catch (error) {
-    //     if (error)
-    //         await markResourceComplete({
-    //             identifier,
-    //             resource,
-    //             ...req.query,
-    //             complete: "not well formed",
-    //         });
-    //     return { error };
-    // }
-    return {};
+    return await saveItemTranscription({ identifier, resource, document });
 }
 
 // TODO this method does not have tests
 async function postResourceProcessingStatus(req) {
     const { taskIds } = req.body;
     let tasks = await getResourceProcessingStatus({
+        identifier: req.session.item.identifier,
         itemId: req.session.item.id,
         taskIds,
     });

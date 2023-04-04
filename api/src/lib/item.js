@@ -4,10 +4,11 @@ import {
     loadConfiguration,
     getS3Handle,
     getStoreHandle,
-    completedResources,
+    resourceStatusFile,
     specialFiles,
     imageExtensions,
 } from "../common/index.js";
+import { transformDocument } from "../lib/transform.js";
 import path from "path";
 import lodashPkg from "lodash";
 const { compact, groupBy, uniq, isNumber } = lodashPkg;
@@ -81,6 +82,11 @@ export async function createItemLocationInObjectStore({ identifier }) {
     let exists = await store.exists();
     if (!exists) {
         await store.createObject();
+        await store.put({
+            target: resourceStatusFile,
+            json: { item: {}, resources: {} },
+            registerFile: false,
+        });
     }
 }
 
@@ -112,7 +118,11 @@ export async function deleteItemResource({ identifier, resource }) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
     await store.delete({ prefix: resource });
-    await markResourceComplete({ identifier, resource, complete: false });
+    let statusFile = await store.getJSON({ target: resourceStatusFile });
+    delete statusFile.resources[resource];
+    const itemStatus = updateItemStatus({ statusFile });
+    statusFile.item = itemStatus;
+    await store.put({ target: resourceStatusFile, json: statusFile, registerFile: false });
 }
 
 export async function putItemResource({
@@ -280,7 +290,21 @@ export function groupFilesByResource({ identifier, files, naming }) {
 }
 
 // TODO this method does not have tests
-export async function getResourceProcessingStatus({ itemId, taskIds }) {
+export async function getResourceProcessingStatus({ identifier, itemId, taskIds }) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+    let statusFile;
+    try {
+        statusFile = await store.getJSON({ target: resourceStatusFile });
+    } catch (error) {
+        statusFile = {
+            item: {},
+            resources: {},
+        };
+    }
+
     let where = {
         [Op.and]: {
             itemId,
@@ -288,6 +312,18 @@ export async function getResourceProcessingStatus({ itemId, taskIds }) {
         },
     };
     let tasks = await models.task.findAll({ where, order: [["resource", "ASC"]] });
+    for (let task of tasks) {
+        if (task.status !== "in progress" && task.resource) {
+            const resource = path.basename(task.resource, path.extname(task.resource));
+            statusFile = await updateResourceStatus({ identifier, resource, statusFile });
+        }
+    }
+
+    const itemStatus = updateItemStatus({ statusFile });
+    statusFile.item = itemStatus;
+
+    await store.put({ target: resourceStatusFile, json: statusFile, registerFile: false });
+
     return tasks;
 }
 
@@ -304,14 +340,12 @@ export async function markResourceComplete({ identifier, resource, complete = fa
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
 
-    let status = {};
-    try {
-        status = JSON.parse(await store.get({ target: completedResources }));
-    } catch (error) {}
-    resource = path.join(identifier, resource);
-    status[resource] = JSON.parse(complete);
-
-    await store.put({ json: status, target: completedResources, registerFile: false });
+    let statusFile = await store.getJSON({ target: resourceStatusFile });
+    if (!statusFile.resources[resource]) statusFile.resources[resource] = { tei: {} };
+    statusFile.resources[resource].complete = JSON.parse(complete);
+    const itemStatus = updateItemStatus({ statusFile });
+    statusFile.item = itemStatus;
+    await store.put({ json: statusFile, target: resourceStatusFile, registerFile: false });
 }
 
 export async function markAllResourcesComplete({ identifier, resources }) {
@@ -319,21 +353,101 @@ export async function markAllResourcesComplete({ identifier, resources }) {
     if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
-
-    let status = {};
-    try {
-        status = JSON.parse(await store.get({ target: completedResources }));
-        for (let resource of resources) {
-            resource = path.join(identifier, resource);
-            status[resource] = true;
-        }
-        await store.put({ json: status, target: completedResources, registerFile: false });
-    } catch (error) {}
+    let statusFile = await store.getJSON({ target: resourceStatusFile });
+    for (let resource of resources) {
+        if (!statusFile.resources[resource]) statusFile.resources[resource] = { tei: {} };
+        statusFile.resources[resource].complete = true;
+    }
+    const itemStatus = updateItemStatus({ statusFile });
+    statusFile.item = itemStatus;
+    await store.put({ json: statusFile, target: resourceStatusFile, registerFile: false });
 }
 
-export async function isResourceComplete({ identifier, resource }) {
-    let status = {};
-    status = JSON.parse(await getItemResource({ identifier, resource: completedResources }));
-    resource = path.join(identifier, resource);
-    return status[resource];
+export async function updateResourceStatus({ identifier, resource, statusFile }) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+
+    let files = (await listItemResourceFiles({ identifier, resource })).files;
+    if (!files) return;
+
+    // update the resource status
+    let status = {
+        complete: statusFile.resources?.[resource]?.complete ?? false,
+        thumbnail: files.filter((f) => f.match(/thumbnail/)).length ? true : false,
+        webformats: (() => {
+            let jpeg = files.filter((f) => f.match(/\.jpe?g/)).length ? true : false;
+            let webp = files.filter((f) => f.match(/\.webp/)).length ? true : false;
+            return jpeg && webp ? true : false;
+        })(),
+        textract: files.filter((f) => f.match(/\.textract_ocr/)).length === 1 ? true : false,
+        tei: {
+            exists: files.filter((f) => f.match(/\.tei\.xml/)).length === 1 ? true : false,
+            wellFormed: false,
+        },
+    };
+    if (status.tei.exists) {
+        let document = await store.get({ target: `${resource}.tei.xml` });
+        try {
+            document = await transformDocument({ document });
+            status.tei.wellFormed = true;
+            status.tei.error = undefined;
+        } catch (error) {
+            status.complete = false;
+            status.tei.wellFormed = false;
+            status.tei.error = error.message;
+        }
+    } else {
+        status.complete = false;
+        status.tei.wellFormed = false;
+    }
+
+    statusFile.resources[resource] = status;
+    return statusFile;
+}
+
+// TODO this method does not have tests
+export function updateItemStatus({ statusFile }) {
+    // update the item statistics based on all resources
+    const resources = Object.keys(statusFile.resources).map((key) => statusFile.resources[key]);
+    let itemStatus = {
+        pages: {
+            total: resources.length,
+            completed: resources.filter((resource) => resource.complete).length,
+            bad: resources.filter((resource) => !resource.tei.wellFormed).length,
+        },
+    };
+    return itemStatus;
+}
+
+export async function getResourceStatus({ identifier, resource }) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+
+    let statusFile = await store.getJSON({ target: resourceStatusFile });
+    return { status: statusFile.resources[resource] };
+}
+
+export async function saveItemTranscription({ identifier, resource, document }) {
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    if (!(await store.exists())) {
+        throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
+    }
+    let file = `${resource}.tei.xml`;
+    try {
+        await putItemResource({ identifier, resource: file, content: document });
+    } catch (error) {
+        log.error(`Error saving transcription: ${error.message}`);
+        return res.internalServerError();
+    }
+
+    let statusFile = await store.getJSON({ target: resourceStatusFile });
+    statusFile = await updateResourceStatus({ identifier, resource, statusFile });
+    const itemStatus = updateItemStatus({ statusFile });
+    statusFile.item = itemStatus;
+    await store.put({ target: resourceStatusFile, json: statusFile, registerFile: false });
+    return { status: statusFile[resource] };
 }

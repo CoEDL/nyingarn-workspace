@@ -339,7 +339,7 @@ describe("Admin management tests", () => {
 
         let resources = await objectRepository.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(7);
+        expect(resources.length).toEqual(8);
 
         let objectExistsInWorkspace = await objectWorkspace.exists();
         expect(objectExistsInWorkspace).toBeFalse;
@@ -373,7 +373,7 @@ describe("Admin management tests", () => {
         expect(objectExistsInWorkspace).toBeTrue;
         let resources = await objectWorkspace.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(7);
+        expect(resources.length).toEqual(8);
 
         // change the metadata file so it versions
         let crateFile = await objectWorkspace.getJSON({ target: "ro-crate-metadata.json" });
@@ -382,7 +382,7 @@ describe("Admin management tests", () => {
 
         resources = await objectWorkspace.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(7);
+        expect(resources.length).toEqual(8);
 
         // deposit into the repo a second time and check metadata versioned
         await depositObjectIntoRepository({
@@ -393,7 +393,7 @@ describe("Admin management tests", () => {
 
         resources = await objectRepository.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(8);
+        expect(resources.length).toEqual(9);
 
         let crateFileVersions = await objectRepository.listFileVersions({
             target: "ro-crate-metadata.json ",

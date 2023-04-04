@@ -19,19 +19,21 @@ export {
 } from "./test-utils.js";
 
 export const completedResources = ".completed-resources.json";
+export const resourceStatusFile = ".item-status.json";
 export const specialFiles = [
     "LICENCE.md",
     "LICENCE.txt",
     "LICENCE",
     "ro-crate-metadata.json",
+    "nocfl.identifier.json",
+    "nocfl.inventory.json",
     "-digivol.csv",
     "-tei.xml",
     "-tei-complete.xml",
     "-rights-holder-permission.pdf",
     "-language-authority-permission.pdf",
-    "nocfl.identifier.json",
-    "nocfl.inventory.json",
     completedResources,
+    resourceStatusFile,
 ];
 export const imageExtensions = ["jpe?g", "png", "webp", "tif{1,2}"];
 export const webFormats = [{ ext: "jpg", match: "jpe?g" }, "webp"];

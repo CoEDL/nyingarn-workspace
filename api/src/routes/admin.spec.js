@@ -298,7 +298,7 @@ describe("Admin route tests", () => {
         expect(await repositoryObject.exists()).toBeTrue;
         let resources = await repositoryObject.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(8);
+        expect(resources.length).toEqual(9);
 
         await models.item.destroy({ where: { identifier } });
         await workspaceObject.removeObject();

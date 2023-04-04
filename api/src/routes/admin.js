@@ -3,8 +3,17 @@ import {
     demandAuthenticatedUser,
     requireCollectionAccess,
     requireItemAccess,
+    getS3Handle,
+    getStoreHandle,
+    resourceStatusFile,
+    completedResources,
 } from "../common/index.js";
-import { lookupItemByIdentifier } from "../lib/item.js";
+import {
+    lookupItemByIdentifier,
+    listItemResources,
+    updateResourceStatus,
+    updateItemStatus,
+} from "../lib/item.js";
 import { lookupCollectionByIdentifier } from "../lib/collection.js";
 import {
     getAdminItems,
@@ -20,7 +29,6 @@ import {
     depositObjectIntoRepository,
     restoreObjectIntoWorkspace,
 } from "../lib/admin.js";
-import path from "path";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -189,3 +197,72 @@ async function putObjectNeedsWorkHandler(req, res) {
 
     await objectRequiresMoreWork({ user: req.session.user, type, identifier });
 }
+
+// async function migrateBackend(req) {
+//     console.log("migrate backend");
+//     const { bucket } = await getS3Handle();
+
+//     let items = [];
+//     let objects = await bucket.listObjects({ prefix: "nyingarn.net/workspace/item" });
+//     items.push(
+//         ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
+//             (file) => file.Key
+//         )
+//     );
+//     let continuationToken = objects.NextContinuationToken;
+//     while (continuationToken) {
+//         let objects = await bucket.listObjects({
+//             prefix: "nyingarn.net/workspace/item",
+//             continuationToken,
+//         });
+//         items.push(
+//             ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
+//                 (file) => file.Key
+//             )
+//         );
+//         continuationToken = objects.NextContinuationToken;
+//     }
+//     // console.log(items);
+//     for (let item of items) {
+//         try {
+//             item = await bucket.readJSON({ target: item });
+//             console.log(item);
+//             item.type = "item";
+//             const identifier = item.id;
+
+//             let store = await getStoreHandle(item);
+
+//             // get completed file
+//             let completed = {};
+//             try {
+//                 completed = await store.getJSON({ target: completedResources });
+//             } catch (error) {}
+
+//             let statusFile = { item: {}, resources: {} };
+//             try {
+//                 statusFile = await store.getJSON({ target: resourceStatusFile });
+//                 continue;
+//             } catch (error) {}
+
+//             let { resources } = await listItemResources({ identifier });
+//             resources = resources.map((r) => r.name);
+
+//             for (let resource of resources) {
+//                 console.log("processing ", resource);
+//                 statusFile = await updateResourceStatus({ identifier, resource, statusFile });
+//                 if (
+//                     statusFile.resources[resource].tei.exists &&
+//                     statusFile.resources[resource].tei.wellFormed
+//                 ) {
+//                     statusFile.resources[resource].complete = completed[resource] ?? false;
+//                 }
+//             }
+//             const itemStatus = updateItemStatus({ statusFile });
+//             statusFile.item = itemStatus;
+//             await store.put({ target: resourceStatusFile, json: statusFile, registerFile: false });
+//         } catch (error) {
+//             console.log(error);
+//         }
+//     }
+//     console.log("done");
+// }

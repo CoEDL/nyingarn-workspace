@@ -1,9 +1,16 @@
 require("regenerator-runtime");
-import { deleteItem, createItem } from "../lib/item";
+import { deleteItem, createItem, updateResourceStatus } from "../lib/item";
 import { createSession } from "../lib/session";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";
-import { getStoreHandle, TestSetup, setupTestItem, headers, host } from "../common";
+import {
+    getStoreHandle,
+    TestSetup,
+    setupTestItem,
+    headers,
+    host,
+    resourceStatusFile,
+} from "../common";
 import models from "../models";
 
 describe("Item management route tests", () => {
@@ -287,6 +294,14 @@ describe("Item management route tests", () => {
         let session = await createSession({ user });
         let { item } = await setupTestItem({ identifier, store, user });
 
+        let statusFile = await store.getJSON({ target: resourceStatusFile });
+        statusFile = await updateResourceStatus({
+            identifier,
+            resource: `${identifier}-01`,
+            statusFile,
+        });
+        await store.put({ target: resourceStatusFile, json: statusFile, registerFile: false });
+
         let response = await fetch(
             `${host}/items/${identifier}/resources/${identifier}-01/status`,
             {
@@ -296,15 +311,12 @@ describe("Item management route tests", () => {
         );
         expect(response.status).toEqual(200);
         response = await response.json();
-        expect(response).toEqual({
-            completed: {
-                markedComplete: false,
-                thumbnail: false,
-                webformats: false,
-                tesseract: false,
-                textract: false,
-                tei: false,
-            },
+        expect(response.status).toEqual({
+            complete: false,
+            thumbnail: false,
+            webformats: false,
+            textract: false,
+            tei: { exists: false, wellFormed: false },
         });
 
         await deleteItem({ id: item.id });
@@ -331,16 +343,7 @@ describe("Item management route tests", () => {
             params: { complete: true },
         });
         response = await response.json();
-        expect(response).toEqual({
-            completed: {
-                markedComplete: true,
-                thumbnail: false,
-                webformats: false,
-                tesseract: false,
-                textract: false,
-                tei: false,
-            },
-        });
+        expect(response.status).toEqual({ tei: {}, complete: true });
 
         response = await fetch(
             `${host}/items/${identifier}/resources/${identifier}-01/status?complete=false`,
@@ -358,16 +361,7 @@ describe("Item management route tests", () => {
             params: { complete: true },
         });
         response = await response.json();
-        expect(response).toEqual({
-            completed: {
-                markedComplete: false,
-                thumbnail: false,
-                webformats: false,
-                tesseract: false,
-                textract: false,
-                tei: false,
-            },
-        });
+        expect(response.status).toEqual({ tei: {}, complete: false });
 
         await deleteItem({ id: item.id });
     });

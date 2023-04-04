@@ -56,7 +56,7 @@
         <div class="flex flex-col flex-grow px-2">
             <!-- topbar control -->
             <div class="flex flex-row space-x-2" :class="{ 'rounded bg-red-200 p-2': data.error }">
-                <div>
+                <div v-loading="data.saving">
                     <el-button
                         @click="save"
                         :type="data.saved ? 'success' : 'primary'"
@@ -93,7 +93,7 @@
                     placement="top-start"
                 >
                     <el-switch
-                        v-model="data.isComplete"
+                        v-model="data.status.complete"
                         active-text="Complete"
                         inactive-text="In progress"
                         @change="markComplete"
@@ -204,8 +204,9 @@ let data = reactive({
     extractTableProcessing: false,
     ...$route.params,
     transcription: undefined,
-    isComplete: false,
+    status: {},
     saved: false,
+    saving: false,
     markupControl: "add",
     editorContols: {},
     controls: $store.state.configuration.ui.teiEditorControls,
@@ -230,7 +231,7 @@ let view;
 let editorControls;
 
 onBeforeMount(async () => {
-    await checkIfResourceIsComplete();
+    await getResourceStatus();
 });
 onMounted(async () => {
     data.transcription = await loadTranscription();
@@ -282,17 +283,15 @@ async function markComplete(status) {
         route: `/items/${data.identifier}/resources/${data.resource}/status`,
         params: { complete: status },
     });
-    if (response.status === 200) {
-        data.isComplete = status;
-    }
+    await getResourceStatus();
 }
-async function checkIfResourceIsComplete() {
+async function getResourceStatus() {
     let response = await $http.get({
         route: `/items/${data.identifier}/resources/${data.resource}/status`,
     });
     if (response.status === 200) {
-        let { completed } = await response.json();
-        data.isComplete = completed.markedComplete;
+        response = await response.json();
+        data.status = response.status;
     }
 }
 function deleteTranscription() {
@@ -300,12 +299,14 @@ function deleteTranscription() {
 }
 function convertToTei() {
     editorControls.convertToTei({ $route });
+    format();
 }
 function format() {
     let { error } = formatDocument({ view });
     data.error = error ? { message: error } : undefined;
 }
 async function save() {
+    data.saving = true;
     let document = view.state.doc.toString();
     let response = await $http.put({
         route: `/items/${data.identifier}/resources/${data.resource}/saveTranscription`,
@@ -313,6 +314,7 @@ async function save() {
     });
 
     data.saved = true;
+    data.saving = false;
     format();
 
     setTimeout(() => {
@@ -364,7 +366,7 @@ function increaseFontSize() {
 
 <style scoped>
 .editor {
-    height: calc(100vh - 320px);
+    height: calc(100vh - 340px);
 }
 
 .min-max-width {

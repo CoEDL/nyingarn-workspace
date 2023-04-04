@@ -6,7 +6,7 @@
                 <div class="flex-grow">
                     <el-input
                         v-model="data.prefix"
-                        placeholder="Filter collections by prefix"
+                        placeholder="Filter collections by name match"
                         @change="loadCollections"
                         clearable
                     ></el-input>
@@ -33,10 +33,10 @@
         </template>
 
         <div class="w-full" :class="{ 'h-40': data.loading }" v-loading="data.loading">
-            <el-table :data="data.collections" :height="550" size="small" v-show="!data.loading">
-                <template #empty
-                    >You have no collections. Get started by creating a collection.</template
-                >
+            <el-table :data="data.collections" size="small" v-show="!data.loading">
+                <template #empty>
+                    <div class="text-lg text-gray-700">There are no matching collections.</div>
+                </template>
                 <el-table-column prop="identifier" label="">
                     <template #default="scope">
                         <router-link

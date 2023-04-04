@@ -6,7 +6,7 @@
                 <div class="flex-grow">
                     <el-input
                         v-model="data.prefix"
-                        placeholder="Filter items by prefix"
+                        placeholder="Filter items by name match"
                         @change="loadItems"
                         clearable
                     ></el-input>
@@ -28,11 +28,14 @@
                     :total="data.total"
                     @current-change="pageItems"
                 >
-                </el-pagination></div
-        ></template>
+                </el-pagination>
+            </div>
+        </template>
         <div class="w-full" :class="{ 'h-40': data.loading }" v-loading="data.loading">
-            <el-table :data="data.items" :height="550" size="small" v-show="!data.loading">
-                <template #empty>You have no items. Get started by creating an item.</template>
+            <el-table :data="data.items" size="small" v-show="!data.loading">
+                <template #empty class="text-xl">
+                    <div class="text-lg text-gray-700">There are no matching items.</div>
+                </template>
                 <el-table-column prop="identifier" label="">
                     <template #default="scope">
                         <router-link
@@ -44,16 +47,26 @@
                         <div v-else class="text-base">{{ scope.row.identifier }}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="status" label="Status" width="150">
+                <el-table-column prop="status" label="Status" width="150" align="center">
                     <template #default="scope">
                         <status-badge-component :status="scope.row.publicationStatus" />
                     </template>
                 </el-table-column>
-                <el-table-column prop="total" label="Pages" width="100"> </el-table-column>
+                <el-table-column prop="pages.total" label="Pages" width="100" align="center">
+                </el-table-column>
+                <el-table-column
+                    prop="pages.completed"
+                    label="Completed"
+                    width="100"
+                    align="center"
+                >
+                </el-table-column>
+                <el-table-column prop="pages.bad" label="TEI Errors" width="100" align="center">
+                </el-table-column>
                 <el-table-column label="Actions" width="200">
                     <template #default="scope">
                         <div class="flex flex-row space-x-1">
-                            <div v-if="data.isAdmin && scope.row.publicationStatus === 'published'">
+                            <div v-if="scope.row.publicationStatus === 'published'">
                                 <el-button
                                     type="primary"
                                     size="small"
@@ -151,10 +164,10 @@ async function loadItems() {
         if (item.publicationStatus === "published") continue;
         response = await itemServices.getStatus({ $http, identifier: item.identifier });
         if (response.status == 200) {
-            let { statistics } = await response.json();
+            response = await response.json();
             item = {
                 ...item,
-                ...statistics,
+                ...response.status,
             };
             data.items = data.items.map((i) => {
                 return i.identifier === item.identifier ? item : i;

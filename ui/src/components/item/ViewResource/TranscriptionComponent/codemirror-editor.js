@@ -41,7 +41,12 @@ export class CodemirrorEditorControls {
             ...document.map((l) => `<line>${l}</line>`),
             "</surface>",
         ];
-        formatDocument({ view: this.view, document: tei.join("\n") });
+        let changes = {
+            from: 0,
+            to: this.view.state.doc.length,
+            insert: tei.join("\n"),
+        };
+        this.view.dispatch({ changes });
     }
     add({ element, pre, post }) {
         this.applyMarkup({ element, pre, post });
@@ -143,7 +148,7 @@ export class CodemirrorEditorControls {
 }
 
 export function formatDocument({ view, document = undefined }) {
-    document = document ? document : view.state.doc.toString();
+    document = document ?? view.state.doc.toString();
 
     // see if the document is well formed or not
     const parser = new DOMParser();

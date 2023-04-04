@@ -9,17 +9,18 @@ import {
     getItemResource,
     getItemResourceLink,
     deleteItemResource,
-    deleteItemResourceFile,
     deleteItemPermissionForm,
     listItemPermissionForms,
     listItemResourceFiles,
     itemResourceExists,
     markResourceComplete,
     markAllResourcesComplete,
-    isResourceComplete,
+    getResourceStatus,
+    updateResourceStatus,
+    saveItemTranscription,
 } from "./item";
 const chance = require("chance").Chance();
-import { getStoreHandle, TestSetup, setupTestItem } from "../common";
+import { getStoreHandle, TestSetup, setupTestItem, resourceStatusFile } from "../common";
 import models from "../models";
 
 describe("Item management tests", () => {
@@ -52,9 +53,10 @@ describe("Item management tests", () => {
         let item = await createItem({ identifier, userId: user.id });
         expect(item.identifier).toEqual(identifier);
         let files = await store.listResources();
-        expect(files.length).toEqual(3);
+        expect(files.length).toEqual(4);
         files = files.map((c) => c.Key).sort();
         expect(files).toEqual([
+            ".item-status.json",
             "nocfl.identifier.json",
             "nocfl.inventory.json",
             "ro-crate-metadata.json",
@@ -216,15 +218,51 @@ describe("Item management tests", () => {
         let { item } = await setupTestItem({ identifier, store, user });
 
         await markResourceComplete({ identifier, resource: `${identifier}-01`, complete: true });
-        let status = await isResourceComplete({ identifier, resource: `${identifier}-01` });
-        expect(status).toBeTrue;
+        let status = await getResourceStatus({ identifier, resource: `${identifier}-01` });
+        expect(status).toEqual({ status: { tei: {}, complete: true } });
 
         await markResourceComplete({ identifier, resource: `${identifier}-01`, complete: false });
-        status = await isResourceComplete({ identifier, resource: `${identifier}-01` });
-        expect(status).toBeFalse;
+        status = await getResourceStatus({ identifier, resource: `${identifier}-01` });
+        expect(status).toEqual({ status: { tei: {}, complete: false } });
 
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to mark all resources as complete", async () => {
+        let user = users.filter((u) => !u.administrator)[0];
+        let { item } = await setupTestItem({ identifier, store, user });
+
+        await markAllResourcesComplete({
+            identifier,
+            resources: [`${identifier}-01`],
+            complete: true,
+        });
+        let status = await getResourceStatus({ identifier, resource: `${identifier}-01` });
+        expect(status).toEqual({ status: { tei: {}, complete: true } });
+
+        await item.destroy();
+        await bucket.removeObjects({ prefix: identifier });
+    });
+    it("should be able to update resource status", async () => {
+        let user = users.filter((u) => !u.administrator)[0];
+        let { item } = await setupTestItem({ identifier, store, user });
+
+        let statusFile = await store.getJSON({ target: resourceStatusFile });
+        statusFile = await updateResourceStatus({
+            identifier,
+            resource: `${identifier}-01`,
+            statusFile,
+        });
+        expect(statusFile.resources[`${identifier}-01`]).toEqual({
+            complete: false,
+            thumbnail: false,
+            webformats: false,
+            textract: false,
+            tei: {
+                exists: false,
+                wellFormed: false,
+            },
+        });
     });
     it("should be able to list item permission forms", async () => {
         let user = users.filter((u) => !u.administrator)[0];
@@ -258,19 +296,37 @@ describe("Item management tests", () => {
         await item.destroy();
         await bucket.removeObjects({ prefix: identifier });
     });
-    it("should be able to mark all resources as complete", async () => {
+    it("should be able to save an item transcription", async () => {
         let user = users.filter((u) => !u.administrator)[0];
         let { item } = await setupTestItem({ identifier, store, user });
+        const resource = `${identifier}-01`;
 
-        await markAllResourcesComplete({
+        await saveItemTranscription({
             identifier,
-            resources: [`${identifier}-01`],
-            complete: true,
+            resource,
+            document: `<xml></xml>`,
         });
-        let status = await isResourceComplete({ identifier, resource: `${identifier}-01` });
-        expect(status).toBeTrue;
+        let { status } = await getResourceStatus({ identifier, resource });
+        expect(status).toEqual({
+            complete: false,
+            thumbnail: false,
+            webformats: false,
+            textract: false,
+            tei: { exists: true, wellFormed: true },
+        });
 
-        await item.destroy();
-        await bucket.removeObjects({ prefix: identifier });
+        await saveItemTranscription({
+            identifier,
+            resource,
+            document: `<xml></xm`,
+        });
+        ({ status } = await getResourceStatus({ identifier, resource }));
+        expect(status).toMatchObject({
+            complete: false,
+            thumbnail: false,
+            webformats: false,
+            textract: false,
+            tei: { exists: true, wellFormed: false, error: "Unclosed root tag at line 0 column 9" },
+        });
     });
 });

@@ -2,8 +2,9 @@
     <div
         class="flex flex-row space-x-2 border border-gray-400 p-4"
         :class="{
-            'bg-green-100 border-green-200': completed.markedComplete,
-            'bg-red-100 border-red-200': completed.markedComplete === 'not well formed',
+            'bg-green-100 border-green-200':
+                status.complete && status.tei.exists && status.tei.wellFormed,
+            'bg-red-100 border-red-200': !status.tei.exists || !status.tei.wellFormed,
         }"
     >
         <display-image-thumbnail-component
@@ -15,16 +16,13 @@
         <div class="flex flex-col">
             <div @click="viewResource" class="flex flex-col flex-grow cursor-pointer">
                 <div class="text-center my-4 text-lg">{{ resource }}</div>
-                <display-status-property-component
-                    property="Thumbnail"
-                    :value="completed.thumbnail"
-                />
+                <display-status-property-component property="Thumbnail" :value="status.thumbnail" />
                 <display-status-property-component
                     property="Webformats"
-                    :value="completed.webformats"
+                    :value="status.webformats"
                 />
-                <display-status-property-component property="OCR" :value="completed.textract" />
-                <display-status-property-component property="TEI" :value="completed.tei" />
+                <display-status-property-component property="OCR" :value="status.textract" />
+                <display-status-property-component property="TEI" :value="status.tei.exists" />
             </div>
             <div class="flex flex-row">
                 <div class="flex-grow"></div>
@@ -65,7 +63,7 @@ export default {
     data() {
         return {
             identifier: this.$route.params.identifier,
-            completed: {},
+            status: { tei: {} },
             files: [],
             thumbnail: undefined,
         };
@@ -75,9 +73,9 @@ export default {
     },
     methods: {
         async init() {
+            await this.getStatus();
             await this.getResourceFiles();
             await this.getImageThumbnailUrl();
-            await this.getStatus();
         },
         async getResourceFiles() {
             let response = await getResourceFiles({
@@ -96,7 +94,8 @@ export default {
                 resource: this.resource,
             });
             if (response.status === 200) {
-                this.completed = { ...(await response.json()).completed };
+                response = await response.json();
+                this.status = response.status;
             }
         },
         async getImageThumbnailUrl() {

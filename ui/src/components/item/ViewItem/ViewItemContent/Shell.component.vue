@@ -17,9 +17,10 @@
             <div class="flex flex-row flex-wrap overflow-scroll">
                 <view-item-component
                     class="cursor-pointer m-2 h-80"
-                    v-for="r in data.resources"
-                    :key="r.name"
-                    :resource="r.name"
+                    v-for="(resource, idx) in data.resources"
+                    :key="resource.name"
+                    :resource="resource.name"
+                    :idx="idx"
                     @refresh="init"
                 />
             </div>

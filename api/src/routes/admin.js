@@ -73,7 +73,7 @@ export function setupRoutes(fastify, options, done) {
             done();
         });
 
-        // fastify.get("/admin/migrate", migrateBackend);
+        fastify.get("/admin/migrate", migrateBackend);
 
         done();
     });
@@ -198,71 +198,88 @@ async function putObjectNeedsWorkHandler(req, res) {
     await objectRequiresMoreWork({ user: req.session.user, type, identifier });
 }
 
-// async function migrateBackend(req) {
-//     console.log("migrate backend");
-//     const { bucket } = await getS3Handle();
+async function migrateBackend(req) {
+    console.log("NOT RUNNING: migrate backend");
+    return;
+    const { bucket } = await getS3Handle();
 
-//     let items = [];
-//     let objects = await bucket.listObjects({ prefix: "nyingarn.net/workspace/item" });
-//     items.push(
-//         ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
-//             (file) => file.Key
-//         )
-//     );
-//     let continuationToken = objects.NextContinuationToken;
-//     while (continuationToken) {
-//         let objects = await bucket.listObjects({
-//             prefix: "nyingarn.net/workspace/item",
-//             continuationToken,
-//         });
-//         items.push(
-//             ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
-//                 (file) => file.Key
-//             )
-//         );
-//         continuationToken = objects.NextContinuationToken;
-//     }
-//     // console.log(items);
-//     for (let item of items) {
-//         try {
-//             item = await bucket.readJSON({ target: item });
-//             console.log(item);
-//             item.type = "item";
-//             const identifier = item.id;
+    let items = [];
+    let objects = await bucket.listObjects({ prefix: "nyingarn.net/workspace/item" });
+    items.push(
+        ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
+            (file) => file.Key
+        )
+    );
+    let continuationToken = objects.NextContinuationToken;
+    while (continuationToken) {
+        let objects = await bucket.listObjects({
+            prefix: "nyingarn.net/workspace/item",
+            continuationToken,
+        });
+        items.push(
+            ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
+                (file) => file.Key
+            )
+        );
+        continuationToken = objects.NextContinuationToken;
+    }
+    for (let item of items) {
+        try {
+            item = await bucket.readJSON({ target: item });
+            console.log(item);
+            item.type = "item";
+            const identifier = item.id;
 
-//             let store = await getStoreHandle(item);
+            let store = await getStoreHandle(item);
 
-//             // get completed file
-//             let completed = {};
-//             try {
-//                 completed = await store.getJSON({ target: completedResources });
-//             } catch (error) {}
+            // get completed file
+            // let completed = {};
+            // try {
+            //     completed = await store.getJSON({ target: completedResources });
+            // } catch (error) {
+            //     // if no completed file - nothing to do
+            //     continue;
+            // }
 
-//             let statusFile = { item: {}, resources: {} };
-//             try {
-//                 statusFile = await store.getJSON({ target: resourceStatusFile });
-//                 continue;
-//             } catch (error) {}
+            // let statusFile = { item: {}, resources: {} };
+            // try {
+            //     statusFile = await store.getJSON({ target: resourceStatusFile });
+            // } catch (error) {
+            //     // if no status file - nothing to do
+            //     continue;
+            // }
 
-//             let { resources } = await listItemResources({ identifier });
-//             resources = resources.map((r) => r.name);
+            // for (let resource of Object.keys(completed)) {
+            //     let isCompleted = completed[resource];
+            //     resource = resource.replace(`${identifier}/`, "");
+            //     if (
+            //         statusFile.resources?.[resource]?.tei?.exists &&
+            //         statusFile.resources?.[resource]?.tei?.wellFormed
+            //     ) {
+            //         statusFile.resources[resource].complete = isCompleted;
+            //     }
+            // }
 
-//             for (let resource of resources) {
-//                 console.log("processing ", resource);
-//                 statusFile = await updateResourceStatus({ identifier, resource, statusFile });
-//                 if (
-//                     statusFile.resources[resource].tei.exists &&
-//                     statusFile.resources[resource].tei.wellFormed
-//                 ) {
-//                     statusFile.resources[resource].complete = completed[resource] ?? false;
-//                 }
-//             }
-//             const itemStatus = updateItemStatus({ statusFile });
-//             statusFile.item = itemStatus;
-//             await store.put({ target: resourceStatusFile, json: statusFile, registerFile: false });
-//         } catch (error) {
-//             console.log(error);
-//         }
-//     }
-//     console.log("done");
-// }
+            // let { resources } = await listItemResources({ identifier });
+            // resources = resources.map((r) => r.name);
+
+            // for (let resource of resources) {
+            //     console.log("processing ", resource);
+            //     statusFile = await updateResourceStatus({ identifier, resource, statusFile });
+            //     if (
+            //         statusFile.resources[resource].tei.exists &&
+            //         statusFile.resources[resource].tei.wellFormed
+            //     ) {
+            //         statusFile.resources[resource].complete = completed[resource] ?? false;
+            //     }
+            // }
+            // const itemStatus = updateItemStatus({ statusFile });
+            // statusFile.item = itemStatus;
+            // await store.put({ target: resourceStatusFile, json: statusFile, registerFile: false });
+            // await store.delete({ target: completedResources });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    console.log("done");
+}

@@ -1,9 +1,16 @@
 <template>
     <div>
         <div v-if="!data.showProcessingStatus">
-            <el-button @click="downloadTeiDocument" type="primary">
+            <el-button
+                v-if="!data.disableTeiGeneration"
+                @click="downloadTeiDocument"
+                type="primary"
+            >
                 Download the TEI document
             </el-button>
+            <div v-if="data.disableTeiGeneration" class="text-base">
+                This item has pages with invalid TEI markup
+            </div>
         </div>
         <div v-if="data.showProcessingStatus" class="text-blue-600">
             <span class="fa-stack">
@@ -21,19 +28,35 @@
 </template>
 
 <script setup>
-import { reactive, inject, nextTick } from "vue";
+import { reactive, inject, nextTick, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { getFileUrl } from "../item-services.js";
+import { getFileUrl, getStatus as getItemStatus } from "../item-services.js";
 import { ElMessage } from "element-plus";
 
 const $route = useRoute();
 const $http = inject("$http");
 
 let data = reactive({
+    disableTeiGeneration: false,
     identifier: $route.params.identifier,
     showProcessingStatus: false,
     downloadLink: undefined,
 });
+
+onMounted(() => {
+    getStatus();
+});
+
+async function getStatus() {
+    let response = await getItemStatus({
+        $http,
+        identifier: data.identifier,
+    });
+    if (response.status === 200) {
+        response = await response.json();
+        if (response.status.pages.bad !== 0) data.disableTeiGeneration = true;
+    }
+}
 
 async function downloadTeiDocument() {
     let response = await $http.post({

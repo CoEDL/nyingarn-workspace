@@ -1,6 +1,6 @@
 {
     "name": "tasks",
-    "version": "0.50.2",
+    "version": "0.50.3",
     "description": "",
     "author": "Marco La Rosa",
     "main": "index.js",

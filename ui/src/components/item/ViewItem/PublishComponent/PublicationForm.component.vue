@@ -37,6 +37,13 @@
                         Permission forms loaded
                     </div>
                 </el-form-item>
+                <el-form-item label="TEI Document">
+                    <GenerateCompleteTeiDocumentComponent
+                        v-if="!data.teiGenerated"
+                        @tei-generated="data.teiGenerated = true"
+                    />
+                    <div v-else>The complete TEI file has been generated and is up to date</div>
+                </el-form-item>
                 <el-form-item label="Visibility">
                     <div class="flex flex-col">
                         <el-switch
@@ -84,7 +91,11 @@
                     </el-form-item>
                 </span>
                 <el-form-item>
-                    <el-button type="primary" @click="publish" :disabled="data.disablePublish">
+                    <el-button
+                        type="primary"
+                        @click="publish"
+                        :disabled="data.permissionsNotLoaded || !data.teiGenerated"
+                    >
                         Publish this item
                     </el-button>
                     <el-button
@@ -112,6 +123,7 @@
 import RightsHolderPermissionUploadComponent from "./RightsHolderPermissionUpload.component.vue";
 import LanguageAuthorityPermissionUploadComponent from "./LanguageAuthorityPermissionUpload.component.vue";
 import StatusBadgeComponent from "../../../StatusBadge.component.vue";
+import GenerateCompleteTeiDocumentComponent from "./GenerateCompleteTeiDocument.component.vue";
 import { reactive, computed, inject, onMounted } from "vue";
 import { flattenDeep } from "lodash";
 import { io } from "socket.io-client";
@@ -130,7 +142,6 @@ $socket.on("publish-collection", ({ msg, date }) => {
 
 const data = reactive({
     loading: false,
-    checkingPermissionFormsLoaded: false,
     user: {},
     status: "",
     showNarrativeRequirement: false,
@@ -143,7 +154,9 @@ const data = reactive({
         rightsHolderPermissionLoaded: false,
         languageAuthorityPermissionLoaded: false,
     },
-    disablePublish: false,
+    checkingPermissionFormsLoaded: false,
+    permissionsNotLoaded: false,
+    teiGenerated: false,
     publishLogs: [],
 });
 const identifier = computed(() => $route.params.identifier);
@@ -186,9 +199,9 @@ async function getPermissionForms() {
     }
 
     if (data.form.rightsHolderPermissionLoaded && data.form.languageAuthorityPermissionLoaded) {
-        data.disablePublish = false;
+        data.permissionsNotLoaded = false;
     } else {
-        data.disablePublish = true;
+        data.permissionsNotLoaded = true;
     }
     data.checkingPermissionFormsLoaded = false;
 }

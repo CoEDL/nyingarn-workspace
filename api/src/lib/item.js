@@ -312,8 +312,10 @@ export async function getResourceProcessingStatus({ identifier, itemId, taskIds 
         },
     };
     let tasks = await models.task.findAll({ where, order: [["resource", "ASC"]] });
+    let { resources } = await listItemResources({ identifier });
+    resources = resources.map((r) => r.name);
     for (let task of tasks) {
-        if (task.status !== "in progress" && task.resource) {
+        if (task.status !== "in progress" && task.resource && resources.includes(task.resource)) {
             const resource = path.basename(task.resource, path.extname(task.resource));
             statusFile = await updateResourceStatus({ identifier, resource, statusFile });
         }

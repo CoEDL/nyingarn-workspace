@@ -7,6 +7,7 @@ import {
     getStoreHandle,
     resourceStatusFile,
     completedResources,
+    listObjects,
 } from "../common/index.js";
 import {
     lookupItemByIdentifier,
@@ -201,28 +202,8 @@ async function putObjectNeedsWorkHandler(req, res) {
 async function migrateBackend(req) {
     console.log("NOT RUNNING: migrate backend");
     return;
-    const { bucket } = await getS3Handle();
 
-    let items = [];
-    let objects = await bucket.listObjects({ prefix: "nyingarn.net/workspace/item" });
-    items.push(
-        ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
-            (file) => file.Key
-        )
-    );
-    let continuationToken = objects.NextContinuationToken;
-    while (continuationToken) {
-        let objects = await bucket.listObjects({
-            prefix: "nyingarn.net/workspace/item",
-            continuationToken,
-        });
-        items.push(
-            ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
-                (file) => file.Key
-            )
-        );
-        continuationToken = objects.NextContinuationToken;
-    }
+    let items = await listObjects({ prefix: `/nyingarn.net/workspace/item` });
     for (let item of items) {
         try {
             item = await bucket.readJSON({ target: item });

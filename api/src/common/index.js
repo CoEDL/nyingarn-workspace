@@ -65,23 +65,31 @@ export async function loadFiles({ prefix, continuationToken }) {
     }
 }
 
-export async function listObjects({ prefix, continuationToken }) {
+export async function listObjects({ prefix }) {
     let { bucket } = await getS3Handle();
-    let resources = await bucket.listObjects({ prefix, continuationToken });
-    if (resources.NextContinuationToken) {
-        return [
-            ...resources.Contents?.filter((r) => r.Key.match(/nocfl\.identifier\.json/)).map(
-                (r) => {
-                    return path.basename(path.dirname(r.Key));
-                }
-            ),
-            ...(await listObjects({ prefix, continuationToken: resources.NextContinuationToken })),
-        ];
-    } else {
-        return resources.Contents?.filter((r) => r.Key.match(/nocfl\.identifier\.json/)).map(
-            (r) => {
-                return path.basename(path.dirname(r.Key));
-            }
+    let files = [];
+    let objects = await bucket.listObjects({ prefix });
+    files.push(
+        ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
+            (file) => file.Key
+        )
+    );
+    let continuationToken = objects.NextContinuationToken;
+    while (continuationToken) {
+        let objects = await bucket.listObjects({
+            prefix: "nyingarn.net/workspace/item",
+            continuationToken,
+        });
+        files.push(
+            ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
+                (file) => file.Key
+            )
         );
+        continuationToken = objects.NextContinuationToken;
     }
+    let items = [];
+    for (let file of files) {
+        items.push(await bucket.readJSON({ target: file }));
+    }
+    return items;
 }

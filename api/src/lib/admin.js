@@ -76,7 +76,7 @@ export async function importItemsFromStorageIntoTheDb({ user, configuration }) {
     }
     let items =
         (await listObjects({ prefix: `/${configuration.api.domain}/workspace/item` })) || [];
-    items = items.map((i) => ({ identifier: i }));
+    items = items.map((item) => ({ identifier: item.id }));
 
     // insert any items found on the backend storage not already in the DB
     for (let item of items) {
@@ -99,7 +99,7 @@ export async function importCollectionsFromStorageIntoTheDb({ user, configuratio
     }
     let collections =
         (await listObjects({ prefix: `/${configuration.api.domain}/workspace/collection` })) || [];
-    collections = collections.map((i) => ({ identifier: i }));
+    collections = collections.map((collection) => ({ identifier: collection.id }));
 
     // insert any collections found on the backend storage not already in the DB
     for (let collection of collections) {

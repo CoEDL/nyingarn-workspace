@@ -37,6 +37,7 @@ const envToLogger = {
 const fastify = Fastify({
     logger: envToLogger[process.env.NODE_ENV],
     bodyLimit: 256 * 1024 * 1024,
+    keepAliveTimeout: 0,
 });
 
 main();

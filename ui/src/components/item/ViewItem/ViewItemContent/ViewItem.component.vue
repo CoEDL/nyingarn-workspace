@@ -3,8 +3,11 @@
         class="flex flex-row space-x-2 border border-gray-400 p-4"
         :class="{
             'bg-green-100 border-green-200':
-                data.status.complete && data.status.tei.exists && data.status.tei.wellFormed,
-            'bg-red-100 border-red-200': !data.status.tei.exists || !data.status.tei.wellFormed,
+                props.resource.status.complete &&
+                props.resource.status.tei.exists &&
+                props.resource.status.tei.wellFormed,
+            'bg-red-100 border-red-200':
+                !props.resource.status.tei.exists || !props.resource.status.tei.wellFormed,
         }"
     >
         <display-image-thumbnail-component
@@ -15,17 +18,23 @@
         />
         <div class="flex flex-col">
             <div @click="viewResource" class="flex flex-col flex-grow cursor-pointer">
-                <div class="text-center my-4 text-lg">{{ props.resource }}</div>
+                <div class="text-center my-4 text-lg">{{ props.resource.name }}</div>
                 <display-status-property-component
                     property="Thumbnail"
-                    :value="data.status.thumbnail"
+                    :value="props.resource.status.thumbnail"
                 />
                 <display-status-property-component
                     property="Webformats"
-                    :value="data.status.webformats"
+                    :value="props.resource.status.webformats"
                 />
-                <display-status-property-component property="OCR" :value="data.status.textract" />
-                <display-status-property-component property="TEI" :value="data.status.tei.exists" />
+                <display-status-property-component
+                    property="OCR"
+                    :value="props.resource.status.textract"
+                />
+                <display-status-property-component
+                    property="TEI"
+                    :value="props.resource.status.tei.exists"
+                />
             </div>
             <div class="flex flex-row">
                 <div class="flex-grow"></div>
@@ -65,11 +74,7 @@ const $router = useRouter();
 
 const props = defineProps({
     resource: {
-        type: String,
-        required: true,
-    },
-    idx: {
-        type: Number,
+        type: Object,
         required: true,
     },
 });
@@ -81,44 +86,16 @@ const data = reactive({
     files: [],
     thumbnail: undefined,
 });
-onMounted(() => {
-    init();
-});
-async function init() {
-    await new Promise((resolve) => setTimeout(resolve, props.index * 30));
-    await getStatus();
-    await getImageThumbnailUrl();
-}
-async function getStatus() {
-    let response = await getItemStatus({
-        $http,
-        identifier: data.identifier,
-        resource: props.resource,
-    });
-    if (response.status === 200) {
-        response = await response.json();
-        if (response.status) data.status = response.status;
-    }
-}
-
+getImageThumbnailUrl();
 async function getImageThumbnailUrl() {
-    let response = await getResourceFiles({
+    let response = await getFileUrl({
         $http,
         identifier: data.identifier,
-        resource: props.resource,
+        file: `${props.resource.name}.thumbnail_h300.jpg`,
     });
-    if (response.status === 200) {
-        let files = (await response.json()).files;
-        let image = files.filter((image) => image.match("thumbnail"));
-        response = await getFileUrl({
-            $http,
-            identifier: data.identifier,
-            file: image,
-        });
-        if (response.status == 200) {
-            let link = (await response.json()).link;
-            data.thumbnail = link;
-        }
+    if (response.status == 200) {
+        let link = (await response.json()).link;
+        data.thumbnail = link;
     }
 }
 function viewResource() {

@@ -19,7 +19,7 @@
                     class="cursor-pointer m-2 h-80"
                     v-for="(resource, idx) in data.resources"
                     :key="resource.name"
-                    :resource="resource.name"
+                    :resource="resource"
                     :idx="idx"
                     @refresh="init"
                 />
@@ -30,7 +30,7 @@
 
 <script setup>
 import ViewItemComponent from "./ViewItem.component.vue";
-import { getItemResources } from "../../item-services.js";
+import { getItemResources, getStatus as getItemStatus } from "../../item-services.js";
 import { reactive, onMounted, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
@@ -50,6 +50,7 @@ onMounted(() => {
     init();
 });
 async function init() {
+    data.resources = [];
     let limit = data.pageSize;
     let offset = (data.currentPage - 1) * data.pageSize;
 
@@ -65,13 +66,30 @@ async function init() {
     }
     let { resources, total } = await response.json();
 
-    data.resources = [...resources];
+    for (let resource of resources) {
+        let status = await getStatus({ resource: resource.name });
+        data.resources.push({
+            ...resource,
+            status,
+        });
+    }
+
     data.total = total;
 }
 function pageSizeChange() {
     data.currentPage = 1;
     init();
 }
-</script>
 
-l
+async function getStatus({ resource }) {
+    let response = await getItemStatus({
+        $http,
+        identifier: data.identifier,
+        resource,
+    });
+    if (response.status === 200) {
+        response = await response.json();
+        return response.status;
+    }
+}
+</script>

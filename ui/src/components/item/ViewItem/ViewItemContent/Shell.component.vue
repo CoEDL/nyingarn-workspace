@@ -13,6 +13,8 @@
             </el-pagination>
         </div>
 
+        <div v-if="data.loading" v-loading="data.loading" class="w-full h-10"></div>
+
         <div :style="{ height: data.panelHeight }" class="overflow-scroll">
             <div class="flex flex-row flex-wrap overflow-scroll">
                 <view-item-component
@@ -39,6 +41,7 @@ const route = useRoute();
 const $http = inject("$http");
 
 let data = reactive({
+    loading: false,
     identifier: route.params.identifier,
     resources: [],
     total: 0,
@@ -50,6 +53,7 @@ onMounted(() => {
     init();
 });
 async function init() {
+    data.loading = true;
     data.resources = [];
     let limit = data.pageSize;
     let offset = (data.currentPage - 1) * data.pageSize;
@@ -65,6 +69,8 @@ async function init() {
         return;
     }
     let { resources, total } = await response.json();
+    data.total = total;
+    data.loading = false;
 
     for (let resource of resources) {
         let status = (await getStatus({ resource: resource.name })) ?? {
@@ -79,8 +85,6 @@ async function init() {
             status,
         });
     }
-
-    data.total = total;
 }
 function pageSizeChange() {
     data.currentPage = 1;

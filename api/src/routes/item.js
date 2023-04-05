@@ -29,6 +29,8 @@ import {
     markResourceComplete,
     getResourceStatus,
     saveItemTranscription,
+    updateResourceStatus,
+    updateItemStatus,
 } from "../lib/item.js";
 import { transformDocument } from "../lib/transform.js";
 const log = getLogger();
@@ -57,6 +59,7 @@ export function setupRoutes(fastify, options, done) {
             deleteItemPermissionFormHandler
         );
         fastify.put("/items/:identifier/reprocess-imports", putReprocessImports);
+        fastify.put("/items/:identifier/verify-item", putVerifyItemHandler);
 
         // user routes - access item resources
         fastify.get("/items/:identifier/resources/:resource/files", getResourceFilesListHandler);
@@ -382,6 +385,7 @@ async function postResourceProcessingStatus(req) {
     tasks = tasks.map((t) => t.get());
     return { tasks };
 }
+
 // TODO: this method does not have tests
 async function getTransformTeiDocumentHandler(req) {
     const { identifier, resource } = req.params;
@@ -393,4 +397,24 @@ async function getTransformTeiDocumentHandler(req) {
     } catch (error) {
         return { error };
     }
+}
+
+// TODO: this method does not have tests
+async function putVerifyItemHandler(req) {
+    const identifier = req.params.identifier;
+    let store = await getStoreHandle({ identifier, type: "item" });
+
+    let statusFile = { item: {}, resources: {} };
+    let { resources } = await listItemResources({ identifier });
+    resources = resources.map((r) => r.name);
+
+    for (let resource of resources) {
+        log.debug(`Verifying: ${resource}`);
+        statusFile = await updateResourceStatus({ identifier, resource, statusFile });
+    }
+    const itemStatus = updateItemStatus({ statusFile });
+    statusFile.item = itemStatus;
+    await store.put({ target: resourceStatusFile, json: statusFile, registerFile: false });
+
+    return {};
 }

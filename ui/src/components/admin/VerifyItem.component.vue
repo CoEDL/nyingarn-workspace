@@ -12,6 +12,13 @@ import { useRoute } from "vue-router";
 const $route = useRoute();
 const $http = inject("$http");
 
+const props = defineProps({
+    resource: {
+        type: Object,
+        required: true,
+    },
+});
+
 const data = reactive({
     loading: false,
 });
@@ -19,13 +26,19 @@ async function verifyItem() {
     data.loading = true;
     let response = await verifyItemResources({
         $http,
-        identifier: $route.params.identifier,
+        identifier: props.resource.identifier,
     });
-    console.log("done");
-    // ElMessage({
-    //     message: "Reprocessing tasks have been submitted. They should complete soon.",
-    //     type: "success",
-    // });
+    if (response.status === 200) {
+        ElMessage({
+            message: "Verification complete.",
+            type: "success",
+        });
+    } else {
+        ElMessage({
+            message: "The item verification failed.",
+            type: "error",
+        });
+    }
     data.loading = false;
 }
 </script>

@@ -55,14 +55,14 @@
                     </el-table-column>
                     <el-table-column label="Actions" width="200">
                         <template #default="scope">
-                            <div class="flex flex-row space-x-2">
+                            <div class="flex flex-row justify-between space-x-2">
                                 <div v-if="!scope.row.connected">
                                     <el-button type="primary" @click="connectItem(scope.row)">
                                         connect
                                     </el-button>
                                 </div>
                                 <div v-else>connected</div>
-                                <VerifyItemComponent />
+                                <VerifyItemComponent :resource="scope.row" />
                             </div>
                         </template>
                     </el-table-column>
@@ -104,7 +104,10 @@
                         <template #default="scope">
                             <div class="flex flex-row">
                                 <div v-if="!scope.row.connected">
-                                    <el-button type="primary" @click="connectCollection(scope.row)">
+                                    <el-button
+                                        type="primary"
+                                        @click="connectCollection(scope.row.identifier)"
+                                    >
                                         connect
                                     </el-button>
                                 </div>

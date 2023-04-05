@@ -67,7 +67,13 @@ async function init() {
     let { resources, total } = await response.json();
 
     for (let resource of resources) {
-        let status = await getStatus({ resource: resource.name });
+        let status = (await getStatus({ resource: resource.name })) ?? {
+            complete: false,
+            thumbnail: false,
+            webformats: false,
+            textract: false,
+            tei: { exists: true, wellFormed: false },
+        };
         data.resources.push({
             ...resource,
             status,

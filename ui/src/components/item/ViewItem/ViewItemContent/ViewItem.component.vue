@@ -60,12 +60,7 @@
 import { ElMessage } from "element-plus";
 import DisplayImageThumbnailComponent from "./DisplayImageThumbnail.component.vue";
 import DisplayStatusPropertyComponent from "./DisplayStatusProperty.component.vue";
-import {
-    getResourceFiles,
-    getStatus as getItemStatus,
-    getFileUrl,
-    deleteResource as deleteItemResource,
-} from "../../item-services.js";
+import { getFileUrl, deleteResource as deleteItemResource } from "../../item-services.js";
 import { reactive, onMounted, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 const $http = inject("$http");
@@ -99,14 +94,14 @@ async function getImageThumbnailUrl() {
     }
 }
 function viewResource() {
-    $router.push(`/resource/${data.identifier}/${props.resource}`);
+    $router.push(`/resource/${data.identifier}/${props.resource.name}`);
 }
 async function deleteResource() {
     try {
         await deleteItemResource({
             $http,
             identifier: data.identifier,
-            resource: props.resource,
+            resource: props.resource.name,
         });
         $emit("refresh");
     } catch (error) {

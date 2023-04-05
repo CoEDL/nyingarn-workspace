@@ -62,6 +62,7 @@
                                     </el-button>
                                 </div>
                                 <div v-else>connected</div>
+                                <VerifyItemComponent />
                             </div>
                         </template>
                     </el-table-column>
@@ -118,6 +119,7 @@
 </template>
 
 <script setup>
+import VerifyItemComponent from "./VerifyItem.component.vue";
 import { reactive, computed, onMounted, inject, nextTick } from "vue";
 import * as lib from "./lib.js";
 import { useRouter } from "vue-router";

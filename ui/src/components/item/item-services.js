@@ -92,3 +92,9 @@ export async function reprocessImports({ $http, identifier, userId }) {
         route: `/items/${identifier}/reprocess-imports`,
     });
 }
+
+export async function verifyItem({ $http, identifier }) {
+    return await $http.put({
+        route: `/items/${identifier}/verify-item`,
+    });
+}

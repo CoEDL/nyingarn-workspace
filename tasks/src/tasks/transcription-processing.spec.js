@@ -9,7 +9,7 @@ import SaxonJS from "saxon-js";
 import path from "path";
 import { readdir, remove, ensureDir, pathExists } from "fs-extra";
 
-jest.setTimeout(20000); // 20s because the CSV processing test is slow
+jest.setTimeout(20000); // 20s because some tests are too slow otherwise
 
 describe(`Check that known good files are processed successfully`, () => {
     let log, warn;
@@ -23,9 +23,8 @@ describe(`Check that known good files are processed successfully`, () => {
     });
     it("BM1648A91 - should be able to process a digivol csv file", async () => {
         let identifier = "BM1648A91";
-        let directory = "Succeeds-digivol-upload/BM1648A91";
+        let directory =  path.join(__dirname, "../test-data/Succeeds-digivol-upload/BM1648A91");
         let resource = "BM1648A91-digivol.csv";
-        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
         let expectedFiles = [
             "BM1648A91-0001.tei.xml",
             "BM1648A91-0002.tei.xml",
@@ -104,18 +103,105 @@ describe(`Check that known good files are processed successfully`, () => {
             "BM1648A96-0006.tei.xml",
             "BM1648A96-0007.tei.xml",
         ];
-        let resourceDirectory = path.join(__dirname, "../test-data", directory, "test-output");
+        let resourceDirectory = path.join(directory, "test-output");
         await ensureDir(resourceDirectory);
         try {
             await __processDigivolTranscriptionXMLProcessor({
-                identifier,
-                sourceURI,
+                directory, 
+                identifier, 
+                resource,
                 output: `file://${resourceDirectory}/`,
             });
             let contents = (await readdir(resourceDirectory)).sort();
 
             expectedFiles.forEach((file) => expect(contents).toContain(file));
             unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
+        } catch (error) {
+            throw error;
+        } finally {
+            await remove(resourceDirectory);
+        }
+    });
+    it("NewNorcia38c - should be able to process a digivol csv file", async () => {
+        let identifier = "NewNorcia38c";
+        let directory = path.join(__dirname, "../test-data/Issue-digivol_upload_failure/NewNorcia38c");
+        let resource = "NewNorcia38c-digivol.csv";
+        let expectedFiles = [
+            "NewNorcia38c-4000.tei.xml",
+            "NewNorcia38c-4001.tei.xml",
+            "NewNorcia38c-4002.tei.xml",
+            "NewNorcia38c-4003.tei.xml",
+            "NewNorcia38c-4004.tei.xml",
+            "NewNorcia38c-4005.tei.xml",
+            "NewNorcia38c-4006.tei.xml",
+            "NewNorcia38c-4007.tei.xml",
+            "NewNorcia38c-4008.tei.xml",
+            "NewNorcia38c-4009.tei.xml",
+            "NewNorcia38c-4010.tei.xml",
+            "NewNorcia38c-4011.tei.xml",
+            "NewNorcia38c-4012.tei.xml",
+            "NewNorcia38c-4013.tei.xml",
+            "NewNorcia38c-4014.tei.xml",
+            "NewNorcia38c-4015.tei.xml",
+            "NewNorcia38c-4016.tei.xml",
+            "NewNorcia38c-4017.tei.xml",
+            "NewNorcia38c-4018.tei.xml",
+            "NewNorcia38c-4019.tei.xml",
+            "NewNorcia38c-4020.tei.xml",
+            "NewNorcia38c-4021.tei.xml",
+            "NewNorcia38c-4022.tei.xml",
+            "NewNorcia38c-4023.tei.xml",
+            "NewNorcia38c-4024.tei.xml",
+            "NewNorcia38c-4025.tei.xml",
+            "NewNorcia38c-4026.tei.xml",
+            "NewNorcia38c-4027.tei.xml",
+            "NewNorcia38c-4028.tei.xml",
+            "NewNorcia38c-4029.tei.xml",
+            "NewNorcia38c-4030.tei.xml",
+            "NewNorcia38c-4031.tei.xml",
+            "NewNorcia38c-4032.tei.xml",
+            "NewNorcia38c-4033.tei.xml",
+            "NewNorcia38c-4034.tei.xml",
+            "NewNorcia38c-4035.tei.xml",
+            "NewNorcia38c-4036.tei.xml",
+            "NewNorcia38c-4037.tei.xml",
+            "NewNorcia38c-4038.tei.xml",
+            "NewNorcia38c-4039.tei.xml",
+            "NewNorcia38c-4040.tei.xml",
+            "NewNorcia38c-4042.tei.xml",
+            "NewNorcia38c-4043.tei.xml",
+            "NewNorcia38c-4045.tei.xml",
+            "NewNorcia38c-4046.tei.xml",
+            "NewNorcia38c-4047.tei.xml",
+            "NewNorcia38c-4048.tei.xml",
+            "NewNorcia38c-4049.tei.xml",
+            "NewNorcia38c-4050.tei.xml",
+            "NewNorcia38c-4051.tei.xml",
+            "NewNorcia38c-4052.tei.xml",
+            "NewNorcia38c-4053.tei.xml",
+            "NewNorcia38c-4054.tei.xml",
+            "NewNorcia38c-4055.tei.xml",
+            "NewNorcia38c-4056.tei.xml",
+            "NewNorcia38c-4065.tei.xml",
+            "NewNorcia38c-4066.tei.xml",
+            "NewNorcia38c-4067.tei.xml",
+            "NewNorcia38c-4068.tei.xml",
+            "NewNorcia38c-4070.tei.xml",
+            "NewNorcia38c-4071.tei.xml",
+            "NewNorcia38c-4072.tei.xml"
+        ];
+        let resourceDirectory = path.join(directory, "test-output");
+        await ensureDir(resourceDirectory);
+        try {
+            await __processDigivolTranscriptionXMLProcessor({
+                directory, 
+                identifier, 
+                resource,
+                output: `file://${resourceDirectory}/`,
+            });
+            let contents = (await readdir(resourceDirectory)).sort();
+
+            expectedFiles.forEach((file) => expect(contents).toContain(file));
         } catch (error) {
             throw error;
         } finally {
@@ -908,12 +994,11 @@ describe(`Confirm non-UTF-8-encoding of DigiVol CSV file is rejected`, () => {
     });
     it("should fail to ingest BM1648A91-digivol.csv as it's not encoded in UTF-8", async () => {
         let identifier = "BM1648A91";
-        let directory = "Issue-digivol_upload_failure/BM1648A91";
+        let directory = path.join(__dirname, "../test-data/Issue-digivol_upload_failure/BM1648A91");
         let resource = "BM1648A91-digivol.csv";
-        let sourceURI = "file://" + path.join(__dirname, "../test-data", directory, resource);
 
         try {
-            await __processDigivolTranscriptionXMLProcessor({ identifier, sourceURI });
+            await __processDigivolTranscriptionXMLProcessor({ directory, identifier, resource });
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.name).toBe("CharacterEncodingError");

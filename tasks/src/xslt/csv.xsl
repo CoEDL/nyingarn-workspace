@@ -6,12 +6,12 @@
 
 	<xsl:import href="error.xsl"/>
 	
-	<xsl:function name="csv:doc" as="map(*)*">
-		<!-- Reads a CSV file and returns its contents as a sequence of maps -->
+	<xsl:function name="csv:doc" as="array(map(*))">
+		<!-- Reads a CSV file and returns its contents as an array of maps -->
 		<xsl:param name="href"/>
 		<xsl:try>
 			<xsl:variable name="text" select="unparsed-text($href)"/>
-			<xsl:sequence select="csv:parse($text)"/>
+			<xsl:sequence select="array{csv:parse($text)}"/>
 			<!-- catch character encoding errors and throw Nyingarn encoding error -->
 			<xsl:catch errors="err:FOUT1190 err:FOUT1200" select="
 				nyingarn:error(

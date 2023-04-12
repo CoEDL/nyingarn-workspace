@@ -6,7 +6,7 @@
                 <uploader-component
                     :overwrite="data.overwrite"
                     @upload-started="data.showProcessingStatus = false"
-                    @file-uploaded="handleUploadedTranscription"
+                    @file-uploaded="processUploadedImage"
                     @file-removed="fileRemoved"
                 />
                 <div class="flex flex-col space-y-2 px-2" v-if="!data.showProcessingStatus">
@@ -59,7 +59,7 @@ function fileRemoved(file) {
     data.showProcessingStatus = false;
     data.taskIds = [];
 }
-async function handleUploadedTranscription(file) {
+async function processUploadedImage(file) {
     let action;
     if (!data.ocr) action = "process-image-without-ocr";
     let response = await $http.post({

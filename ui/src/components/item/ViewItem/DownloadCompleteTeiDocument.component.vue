@@ -24,6 +24,7 @@
 import { reactive, inject, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { getFileUrl } from "../item-services.js";
+import { ElMessage } from "element-plus";
 
 const $route = useRoute();
 const $http = inject("$http");
@@ -41,15 +42,25 @@ async function downloadTeiDocument() {
     });
     if (response.status === 200) {
         response = await response.json();
-        const taskId = response.taskId;
         data.showProcessingStatus = true;
-
-        let status = await updateProcessingStatus({ taskId });
-        while (status === "in progress") {
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-            status = await updateProcessingStatus({ taskId: response.taskId });
+        if (response.taskId) {
+            const taskId = response.taskId;
+            let status = await updateProcessingStatus({ taskId });
+            while (status === "in progress") {
+                await new Promise((resolve) => setTimeout(resolve, 3000));
+                status = await updateProcessingStatus({ taskId });
+            }
+            if (status === "done") {
+                await getLink({ name: `${data.identifier}-tei-complete.xml` });
+            } else {
+                ElMessage({
+                    message: `There was an issue assembling the TEI file. It's likely one of the page transcriptions is invalid.`,
+                    type: "error",
+                });
+            }
+        } else if (response.link) {
+            await triggerDownload({ link: response.link });
         }
-        await triggerDownload({ name: `${data.identifier}-tei-complete.xml` });
         data.showProcessingStatus = false;
     }
 }
@@ -64,7 +75,7 @@ async function updateProcessingStatus({ taskId }) {
     return task.status;
 }
 
-async function triggerDownload({ name }) {
+async function getLink({ name }) {
     let response = await getFileUrl({
         $http,
         identifier: data.identifier,
@@ -73,12 +84,16 @@ async function triggerDownload({ name }) {
     });
     if (response.status === 200) {
         let { link } = await response.json();
-        data.downloadLink = link;
-        nextTick(() => {
-            let elem = document.getElementById("link");
-            elem.click();
-            data.downloadLink = undefined;
-        });
+        triggerDownload({ link });
     }
+}
+
+function triggerDownload({ link }) {
+    data.downloadLink = link;
+    nextTick(() => {
+        let elem = document.getElementById("link");
+        elem.click();
+        data.downloadLink = undefined;
+    });
 }
 </script>

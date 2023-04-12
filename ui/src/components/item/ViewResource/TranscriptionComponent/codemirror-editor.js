@@ -1,6 +1,7 @@
 import { undo as codemirrorUndo, redo as codemirrorRedo } from "@codemirror/commands";
 import format from "xml-formatter";
 import { compact } from "lodash";
+import { $http } from "../../../../routes.js";
 
 export class CodemirrorEditorControls {
     constructor({ view }) {
@@ -142,19 +143,37 @@ export class CodemirrorEditorControls {
 }
 
 export function formatDocument({ view, document = undefined }) {
-    try {
-        document = document ? document : view.state.doc.toString();
-        let documentLength = view.state.doc.length;
-        document = format(document, { indentation: "  ", collapseContent: true });
-        let changes = {
-            from: 0,
-            to: documentLength,
-            insert: document,
-        };
-        view.dispatch({ changes });
-        return {};
-    } catch (error) {
-        // couldn't format - likely not an XML document
-        return { error };
+    document = document ? document : view.state.doc.toString();
+
+    // see if the document is well formed or not
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(document, "application/xml");
+    const errorNode = doc.querySelector("parsererror");
+    if (errorNode?.textContent) {
+        let textContent = errorNode.textContent.split("\n");
+        return { error: [textContent[0], textContent[2]].join(" ") };
     }
+
+    let documentLength = view.state.doc.length;
+    document = format(document, {
+        indentation: "  ",
+        collapseContent: true,
+    });
+    let changes = {
+        from: 0,
+        to: documentLength,
+        insert: document,
+    };
+    view.dispatch({ changes });
+    return {};
+}
+
+export async function transformDocument({ identifier, resource }) {
+    let response = await $http.get({
+        route: `/items/${identifier}/resources/${resource}/transform`,
+    });
+    if (response.status !== 200) {
+    }
+    let { document, error } = await response.json();
+    return { document, error };
 }

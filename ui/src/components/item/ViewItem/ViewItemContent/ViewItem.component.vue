@@ -1,7 +1,10 @@
 <template>
     <div
         class="flex flex-row space-x-2 border border-gray-400 p-4"
-        :class="{ 'bg-green-100 border-green-200': completed.markedComplete }"
+        :class="{
+            'bg-green-100 border-green-200': completed.markedComplete,
+            'bg-red-100 border-red-200': completed.markedComplete === 'not well formed',
+        }"
     >
         <display-image-thumbnail-component
             class="w-36 cursor-pointer"

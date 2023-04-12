@@ -5,7 +5,7 @@
             <FileUploadComponent
                 :filename-pattern="['-tei.xml', '-digivol.csv']"
                 @upload-started="data.showProcessingStatus = false"
-                @file-uploaded="handleUploadedTranscription"
+                @file-uploaded="processUploadedTranscription"
             />
         </div>
         <div class="w-1/2 lg:w-3/5 px-2">
@@ -33,7 +33,7 @@ const data = reactive({
 });
 const identifier = computed(() => $route.params.identifier);
 
-async function handleUploadedTranscription(file) {
+async function processUploadedTranscription(file) {
     let response = await $http.post({
         route: `/process/post-finish/${identifier.value}/${file.name}`,
         body: {},

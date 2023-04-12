@@ -6,22 +6,18 @@ import {
     submitTask,
 } from "../../common/index.js";
 const log = getLogger();
+import { differenceInMinutes } from "date-fns";
+import { getItemResourceLink } from "../../lib/item.js";
 
 import { authenticateTusRequest, triggerProcessing, getUploadDetails } from "./upload.js";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
 
-    fastify.get("/upload/pre-create", authenticateTusRequest);
     fastify.get(
         "/upload/pre-create/:itemType/:identifier",
         { preHandler: requireItemAccess },
         getUploadDetails
-    );
-    fastify.get(
-        "/upload/post-finish/:identifier/:resource",
-        { preHandler: requireItemAccess },
-        triggerProcessing
     );
     fastify.post(
         "/process/post-finish/:identifier/:resource",
@@ -68,16 +64,29 @@ async function extractTableHandler(req) {
 async function assembleTeiHandler(req) {
     const { identifier } = req.params;
 
-    const name = "assemble-tei-document";
+    // see if we have a transcription that is less than 30 minutes old
+    //   if we do - return a link to that
+    const store = await getStoreHandle({ identifier, type: "item" });
+    let fileStat = await store.stat({ path: `${identifier}-tei-complete.xml` });
+    const now = new Date();
+    if (differenceInMinutes(now, fileStat.LastModified) < 30) {
+        let link = await getItemResourceLink({
+            identifier,
+            resource: `${identifier}-tei-complete.xml`,
+            download: true,
+        });
+        return { link };
+    } else {
+        const name = "assemble-tei-document";
+        log.info(`Process assemble tei: ${identifier}`);
+        let task = await submitTask({
+            rabbit: this.rabbit,
+            configuration: req.session.configuration,
+            item: req.session.item,
+            name,
+            body: {},
+        });
 
-    log.info(`Process assemble tei: ${identifier}`);
-    let task = await submitTask({
-        rabbit: this.rabbit,
-        configuration: req.session.configuration,
-        item: req.session.item,
-        name,
-        body: {},
-    });
-
-    return { taskId: task.id };
+        return { taskId: task.id };
+    }
 }

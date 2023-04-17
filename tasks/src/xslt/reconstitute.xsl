@@ -77,20 +77,28 @@
     
     <!-- sequences of n <line> container elements are replaced with an anonymous block <ab> element
     divided by n-1 <lb/> milestone elements -->
-    <xsl:key name="lines-by-first-line-id" match="line" use="preceding-sibling::line[last()] => generate-id()"/>
     <xsl:template match="line" mode="surface-to-text">
-    	<xsl:element name="ab">
-    		<xsl:copy-of select="@*"/>
-    		<xsl:apply-templates mode="surface-to-text"/>
-    		<xsl:for-each select="key('lines-by-first-line-id', generate-id())">
-    			<xsl:element name="lb"><xsl:copy-of select="@*"/></xsl:element>
-    			<xsl:apply-templates select="node()" mode="surface-to-text"/>
-    		</xsl:for-each>
-    	</xsl:element>
+        <xsl:element name="ab">
+            <xsl:copy-of select="@*"/>
+            <xsl:apply-templates select="." mode="line-to-lb"/>
+        </xsl:element>
     </xsl:template>
+
     <!-- a second or subsequent <line> element is ignored in "surface-to-text" mode because it's handled by 
     the template matching the first <line> in a sequence of <lines> --> 
     <xsl:template match="line[preceding-sibling::*[1]/self::line]" mode="surface-to-text"/>
+    
+    <!-- this recursive template unwraps a line element and all the line elements which follow
+    it continguously, interspersing an lb element (and a new line character) between them -->
+    <xsl:template match="line" mode="line-to-lb">
+        <xsl:apply-templates mode="surface-to-text"/>
+        <xsl:variable name="following-line" select="following-sibling::*[1]/self::line"/>
+        <xsl:if test="$following-line">
+            <xsl:element name="lb"><xsl:copy-of select="$following-line/@*"/></xsl:element>
+            <xsl:value-of select="codepoints-to-string(10)"/>
+            <xsl:apply-templates mode="line-to-lb" select="$following-line"/>
+        </xsl:if>
+    </xsl:template>
     
    <xsl:mode name="reconstitute" on-no-match="shallow-copy"/>
    <xsl:template match="*[*/@part]" mode="reconstitute">

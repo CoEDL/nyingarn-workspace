@@ -276,6 +276,12 @@
 		<xsl:next-match/>
 	</xsl:template>
 	
+	<!-- lines should always produce an explicit line break-->
+	<xsl:template match="line" mode="create-content">
+		<xsl:apply-templates/>
+		<xsl:element name="br"/>
+	</xsl:template>
+	
 	<!-- lists and tables -->
 	<xsl:template match="list" priority="1">
 		<xsl:apply-templates select="tei:head"/><!-- HTML list headings must precede <ul> element -->

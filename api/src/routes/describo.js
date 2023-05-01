@@ -45,6 +45,7 @@ async function postLinkItemsHandler(req) {
     }
 
     for (let update of req.body.updates) {
+        const property = update.sourceType === "item" ? "memberOf" : "hasMember";
         const id = assembleUrl({ targetType: update.targetType, identifier: update.target });
 
         let store = await getStoreHandle({ id: update.source, type: update.sourceType });
@@ -63,16 +64,16 @@ async function postLinkItemsHandler(req) {
                 // the root dataset
 
                 // attach the property
-                e["hasMember"] = [e["hasMember"]];
-                e["hasMember"] = flattenDeep(e["hasMember"]);
+                e[property] = [e[property]];
+                e[property] = flattenDeep(e[property]);
 
                 // add the link
-                e["hasMember"].push({
+                e[property].push({
                     "@id": id,
                     "@type": "URL",
                 });
-                e["hasMember"] = uniqBy(e["hasMember"], "@id");
-                e["hasMember"] = compact(e["hasMember"]);
+                e[property] = uniqBy(e[property], "@id");
+                e[property] = compact(e[property]);
             }
             return e;
         });
@@ -100,6 +101,7 @@ async function postUnlinkItemsHandler(req) {
         await source.removeItem(target);
     }
     for (let update of req.body.updates) {
+        const property = update.sourceType === "item" ? "memberOf" : "hasMember";
         const id = assembleUrl({ targetType: update.targetType, identifier: update.target });
 
         let store = await getStoreHandle({ id: update.source, type: update.sourceType });
@@ -118,10 +120,10 @@ async function postUnlinkItemsHandler(req) {
                 // the root dataset
 
                 // remove the association
-                e["hasMember"] = [e["hasMember"]];
-                e["hasMember"] = flattenDeep(e["hasMember"]);
-                e["hasMember"] = e["hasMember"].filter((e) => e?.["@id"] !== id);
-                if (!e["hasMember"].length) delete e["hasMember"];
+                e[property] = [e[property]];
+                e[property] = flattenDeep(e[property]);
+                e[property] = e[property].filter((e) => e?.["@id"] !== id);
+                if (!e[property].length) delete e[property];
             }
             return e;
         });

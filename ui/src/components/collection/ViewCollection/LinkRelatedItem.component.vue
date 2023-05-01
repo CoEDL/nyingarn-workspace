@@ -103,9 +103,9 @@ async function getMyItems() {
     });
     if (response.status === 200) {
         response = await response.json();
-        // data.items.results = response.items.filter(
-        //     (c) => c.identifier !== $route.params.identifier
-        // );
+        data.items.results = response.items.filter(
+            (c) => c.identifier !== $route.params.identifier
+        );
         data.items.total = response.total;
     }
 }

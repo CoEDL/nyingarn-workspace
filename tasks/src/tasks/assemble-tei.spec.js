@@ -35,17 +35,24 @@ describe(`Test assembling a TEI file from the stub files`, () => {
         await assembleTeiDocument({ identifier, directory });
         await remove(path.join(directory, "structured-tei-complete.xml"));
     });
+    
 });
 
 function sampleDocument(identifier, page) {
-    return `
-    <surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${identifier}-${page}">
-    <line>
-        NATIVE <unclear>VOCABULARY.</unclear>
-    </line>
-    <line>
-        blah blah blah
-    </line>
+   // NB some ingestion pathways produce <surface> documents containing <line> elements,
+   // which represent a typographical line of text, with no other semantics.
+   // These <line> elements are only valid inside a <surface>, in an "embedded" transcription.
+   // See https://tei-c.org/release/doc/tei-p5-doc/en/html/PH.html#PHZLAB
+   // In the reconstituted TEI file we need to convert these to regular transcriptional elements.
+   // A sequence of <line> elements is replaced with an <ab> (anonymous block), containing 
+   // the content of each <line>, separated by an <lb/>
+    return `<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${identifier}-${page}">
+    <line>blah blah 1</line>
+    <line>blah blah 2</line>
+    <label>NATIVE <unclear>VOCABULARY.</unclear></label>
+    <line>blah blah blah 3</line>
+    <line>blah blah blah 4</line>
+    <line>blah blah blah 5</line>
 </surface>`;
 }
 

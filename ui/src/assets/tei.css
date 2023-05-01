@@ -77,3 +77,10 @@ td.tei-cell {
 .tei-del {
 	text-decoration: line-through;
 }
+
+/* text not in the source but supplied by the encoder */
+.tei-supplied {
+	background-color: yellow;
+	padding: 2pt;
+	color: black;
+}

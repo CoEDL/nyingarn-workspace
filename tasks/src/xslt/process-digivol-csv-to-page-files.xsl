@@ -1,23 +1,47 @@
 <xsl:transform version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 	xmlns:csv="https://datatracker.ietf.org/doc/html/rfc4180" 
+	xmlns:err="http://www.w3.org/2005/xqt-errors"
 	xmlns:map="http://www.w3.org/2005/xpath-functions/map"
 	xmlns:nyingarn="https://nyingarn.net/ns/functions"
 	xmlns="http://www.tei-c.org/ns/1.0">
 	
 	<!-- CSV-parsing utility library -->
-	<xsl:import href="csv.xsl"/>
 	<xsl:import href="error.xsl"/>
 	
+	<xsl:function name="csv:json-doc" as="array(map(*))">
+		<!-- Reads a CSV file that's been converted to JSON as an array of maps -->
+		<!-- Catches encoding errors and throws a nyingarn friendly error instead -->
+		<xsl:param name="href"/>
+		<xsl:try>
+			<xsl:sequence select="json-doc($href)"/>
+			<xsl:catch errors="err:FOUT1190 err:FOUT1200" select="
+				nyingarn:error(
+					'character-encoding-error',
+					'Could not decode characters from the file',
+					map{
+						'code': $err:code,
+						'description': $err:description,
+						'source-type': 'digivol'
+					}
+				)
+			"/>
+		</xsl:try>
+	</xsl:function>
+		
 	<xsl:template name="xsl:initial-template">
 		<!-- the identifier of the document in the Nyingarn workspace -->
 		<xsl:param name="identifier"/>
-		<!-- a complete path name to the file "file:///some-folder/{$identifier}/{$identifier}-tei.csv" -->
+		<!-- a complete path name to the file "file:///some-folder/{$identifier}/{$identifier}-tei.csv.json" -->
+		<!-- NB the source file is a JSON file resulting from converting a CSV file -->
+		<!-- The JSON data is an array of maps, where each item in the array is a row from the CSV,
+		and each of the maps in each array item has keys which are the values of the CSV's header row, 
+		and values which are the correspending data items from that array item's row of the CSV -->
 		<xsl:param name="source-uri"/>
 		<!-- a regular expression for validating the identifiers of pages within the tei doc -->
 		<xsl:param name="page-identifier-regex"/>
 		
-		<!-- parse the CSV to produce a sequence of maps, each representing one page -->
-		<xsl:variable name="surfaces" select="csv:doc($source-uri)"/>
+		<!-- read the parsed CSV as a sequence of maps, each representing one page -->
+		<xsl:variable name="surfaces" select="csv:json-doc($source-uri)?*"/>
 		
 		<xsl:variable name="exportable-surfaces" select="
 			$surfaces

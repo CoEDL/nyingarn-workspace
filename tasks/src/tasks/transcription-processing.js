@@ -1,5 +1,10 @@
+import fsPackage from 'fs-extra';
+const { createReadStream, writeFile, remove } = fsPackage;
 import path from "path";
 import SaxonJS from "saxon-js";
+import { parse } from "csv-parse";
+import lodashPackage from 'lodash';
+const { zipObject } = lodashPackage;
 import { log, loadConfiguration } from "/srv/api/src/common/index.js";
 import { expandError } from "../common/errors.js";
 
@@ -109,16 +114,45 @@ export async function __processTeiTranscriptionXMLProcessor({
 }
 
 export async function processDigivolTranscription({ directory, identifier, resource }) {
-    let sourceURI = "file://" + path.join(directory, resource);
-    await __processDigivolTranscriptionXMLProcessor({ identifier, sourceURI });
+    await __processDigivolTranscriptionXMLProcessor({ directory, identifier, resource });
 }
 
 export async function __processDigivolTranscriptionXMLProcessor({
+    directory, 
     identifier,
-    sourceURI,
+    resource,
     output = undefined,
 }) {
+    // Parses a DigiVol CSV file into an equivalent JSON data structure, saves it to a file, and
+    // passes the URI of the file to an XSLT to perform the remainder of the ingestion work.
+    
+    // Parse the CSV file into an array of objects representing lines of the file, where
+    // each object has keys which are the column headers and values which are cell contents
+    let csvFile = path.join(directory, resource);
+    let data = [];
+    const records = [];
+    // NB createReadStream will happily read a file containing non UTF-8 byte sequences,
+    // even if you explicitly pass encoding 'utf-8' as the encoding. So the encoding error
+    // will be propagated to the JSON file and caught by the XSLT when parsing the JSON.
+    const parser = createReadStream(csvFile).pipe(
+        parse({
+            // CSV options if any
+        })
+    );
+    for await (const record of parser) {
+        // Work with each record
+        records.push(record);
+    }
+    let properties = records.shift();
+    for (let record of records) {
+        data.push(zipObject(properties, record));
+    }
+    // serialize the data as a JSON file
+    let jsonFile = csvFile + '.json';
+    await writeFile(jsonFile, JSON.stringify(data));
+    
     let configuration = await loadConfiguration();
+    let sourceURI = "file://" + jsonFile;
     try {
         const transformationResults = await SaxonJS.transform(
             {
@@ -129,13 +163,16 @@ export async function __processDigivolTranscriptionXMLProcessor({
                     "source-uri": sourceURI,
                     "page-identifier-regex": configuration.ui.filename.checkNameStructure,
                 },
-                baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
+                baseOutputURI: output ? output : sourceURI // output into the same folder as the source data file
             },
             "async"
         );
     } catch (error) {
         decodeSaxonJSError(error); // unwrap the JSON-formatted error data in the JS XError object thrown by SaxonJS
         throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
+    } finally {
+        // remove the temporary JSON file
+        await remove(jsonFile);
     }
 }
 

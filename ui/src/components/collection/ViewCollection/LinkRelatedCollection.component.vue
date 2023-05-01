@@ -103,7 +103,6 @@ async function getMyCollections() {
     });
     if (response.status === 200) {
         response = await response.json();
-        console.log(response.collections);
         data.collections.results = response.collections.filter(
             (c) => c.identifier !== $route.params.identifier
         );

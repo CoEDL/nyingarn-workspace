@@ -31,7 +31,7 @@
             {
                 "icon": "<i class='fa-solid fa-chevron-right'>",
                 "help": "Insert a right chevron",
-                "markup": { "pre": "&rt;" }
+                "markup": { "pre": "&gt;" }
             },
             {
                 "icon": "<i class='fa-solid fa-underline'></i>",

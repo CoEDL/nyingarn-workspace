@@ -42,7 +42,7 @@ async function querySearch(queryString, cb) {
     } else if (props.type === "collections") {
         items = await getMyCollections({ match: queryString });
     }
-    const results = items.map((r) => ({ name: r.name, value: r.name }));
+    const results = items.map((r) => ({ name: r.identifier, value: r.identifier }));
     cb(results);
 }
 async function getMyItems({ match }) {

@@ -136,6 +136,21 @@ async function postCopyCrateHandler(req) {
     const copy = req.body.copy;
     let store = await getStoreHandle({ id: copy.source, type: copy.sourceType });
     let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+    console.log(crate);
+
+    // remove properties that will be specific to the crate we're copying from
+    let rootDescriptor = crate["@graph"].filter(
+        (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
+    )[0];
+    crate["@graph"] = crate["@graph"].map((e) => {
+        if (e["@id"] === rootDescriptor.about["@id"]) {
+            delete e["hasMember"];
+            delete e["hasPart"];
+            delete e["licence"];
+        }
+        return e;
+    });
+
     store = await getStoreHandle({ id: copy.target, type: copy.sourceType });
     await store.put({ json: crate, target: "ro-crate-metadata.json" });
     return;

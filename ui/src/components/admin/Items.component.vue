@@ -104,10 +104,7 @@
                         <template #default="scope">
                             <div class="flex flex-row">
                                 <div v-if="!scope.row.connected">
-                                    <el-button
-                                        type="primary"
-                                        @click="connectCollection(scope.row.identifier)"
-                                    >
+                                    <el-button type="primary" @click="connectCollection(scope.row)">
                                         connect
                                     </el-button>
                                 </div>

@@ -63,16 +63,16 @@ async function postLinkItemsHandler(req) {
                 // the root dataset
 
                 // attach the property
-                e[update.property] = [e[update.property]];
-                e[update.property] = flattenDeep(e[update.property]);
+                e["hasMember"] = [e["hasMember"]];
+                e["hasMember"] = flattenDeep(e["hasMember"]);
 
                 // add the link
-                e[update.property].push({
+                e["hasMember"].push({
                     "@id": id,
                     "@type": "URL",
                 });
-                e[update.property] = uniqBy(e[update.property], "@id");
-                e[update.property] = compact(e[update.property]);
+                e["hasMember"] = uniqBy(e["hasMember"], "@id");
+                e["hasMember"] = compact(e["hasMember"]);
             }
             return e;
         });
@@ -118,10 +118,10 @@ async function postUnlinkItemsHandler(req) {
                 // the root dataset
 
                 // remove the association
-                e[update.property] = [e[update.property]];
-                e[update.property] = flattenDeep(e[update.property]);
-                e[update.property] = e[update.property].filter((e) => e?.["@id"] !== id);
-                if (!e[update.property].length) delete e[update.property];
+                e["hasMember"] = [e["hasMember"]];
+                e["hasMember"] = flattenDeep(e["hasMember"]);
+                e["hasMember"] = e["hasMember"].filter((e) => e?.["@id"] !== id);
+                if (!e["hasMember"].length) delete e["hasMember"];
             }
             return e;
         });

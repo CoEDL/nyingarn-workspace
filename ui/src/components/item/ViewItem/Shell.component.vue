@@ -18,6 +18,7 @@
                         :enable-context-editor="false"
                         :enable-crate-preview="true"
                         :enable-browse-entities="true"
+                        :enable-internal-routing="true"
                         :purge-unlinked-entities-before-save="true"
                         @ready="data.metadataComponent.loading = false"
                         @save:crate="saveCrate"

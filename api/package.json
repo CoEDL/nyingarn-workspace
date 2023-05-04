@@ -15,7 +15,7 @@
     },
     "devDependencies": {
         "@babel/cli": "^7.21.5",
-        "@babel/core": "^7.21.5",
+        "@babel/core": "^7.21.8",
         "@babel/node": "^7.20.7",
         "@babel/plugin-proposal-optional-chaining": "^7.21.0",
         "@babel/plugin-syntax-import-assertions": "^7.20.0",
@@ -23,15 +23,10 @@
         "babel-jest": "^29.5.0",
         "babel-loader": "^9.1.2",
         "chance": "^1.1.11",
-        "clean-webpack-plugin": "^4.0.0",
-        "copy-webpack-plugin": "^11.0.0",
         "debug": "^4.3.4",
         "jest": "^29.5.0",
         "jest-fetch-mock": "^3.0.3",
-        "nodemon": "^2.0.22",
-        "webpack": "^5.81.0",
-        "webpack-cli": "^5.0.2",
-        "webpack-node-externals": "^3.0.0"
+        "nodemon": "^2.0.22"
     },
     "dependencies": {
         "@coedl/nocfl-js": "^2.0.0",
@@ -45,7 +40,7 @@
         "date-fns": "^2.30.0",
         "fastify": "^4.17.0",
         "fastify-socket.io": "^4.0.0",
-        "foo-foo-mq": "^8.0.0",
+        "foo-foo-mq": "^8.0.1",
         "fs-extra": "^11.1.1",
         "jose": "^4.14.4",
         "lodash": "^4.17.20",
@@ -58,7 +53,7 @@
         "regenerator-runtime": "^0.13.11",
         "ro-crate": "^3.3.1",
         "saxon-js": "^2.5.0",
-        "sequelize": "^6.31.0",
+        "sequelize": "^6.31.1",
         "sequelize-cli": "^6.6.0",
         "uuid": "^9.0.0",
         "validator": "^13.9.0",

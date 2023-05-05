@@ -1,22 +1,5 @@
 <template>
     <div class="flex flex-col space-y-2" v-loading="data.loading">
-        <div class="p-8 bg-blue-200">
-            <div>
-                If this is a new system, then you first need to import the items and collections on
-                the backend storage into the DB. You can do this with this control. You should only
-                really do this once though nothing will break if you run it again.
-            </div>
-            <div>
-                <el-button @click="importObjectsInTheStore">
-                    Import items and collections on the storage backend
-                </el-button>
-            </div>
-
-            <!-- <div><el-button @click="init">init</el-button></div> -->
-        </div>
-        <!-- <div>
-            <el-button @click="migrate">migrate backend</el-button>
-        </div> -->
         <div
             class="flex flex-col space-y-2 xl:flex-row xl:space-x-2 xl:space-y-0"
             v-loading="data.loading"
@@ -221,16 +204,5 @@ async function connectCollection(collection) {
 }
 function loadCollection(collection) {
     if (collection.connected) lib.loadCollection({ $router, identifier: collection.identifier });
-}
-async function importObjectsInTheStore() {
-    data.loading = true;
-    await $http.get({ route: `/admin/items/import` });
-    await $http.get({ route: `/admin/collections/import` });
-    await loadItems();
-    await loadCollections();
-    data.loading = false;
-}
-async function migrate() {
-    await $http.get({ route: `/admin/migrate` });
 }
 </script>

@@ -65,6 +65,7 @@ export default {
                     icon: "fa-solid fa-magnifying-glass",
                 },
                 { name: "Workspace Items", path: "/admin/items", icon: "fa-solid fa-file-image" },
+                { name: "Operations", path: "/admin/operations", icon: "fa-solid fa-cog" },
             ],
         };
     },

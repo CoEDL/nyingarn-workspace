@@ -11,6 +11,7 @@ import AdminWhitelistUsersComponent from "./components/admin/users/WhitelistUser
 import AdminLogsComponent from "./components/admin/Logs.component.vue";
 import AdminAwaitingReviewComponent from "./components/admin/AwaitingReview.component.vue";
 import AdminItemsComponent from "./components/admin/Items.component.vue";
+import AdminOperationsComponent from "./components/admin/AdminOperations.component.vue";
 import HTTPService from "./http.service.js";
 import { createRouter, createWebHistory } from "vue-router";
 const routes = [
@@ -128,13 +129,19 @@ const routes = [
                         name: "admin.review",
                         path: "awaiting-review",
                         component: AdminAwaitingReviewComponent,
-                        meta: { name: "Items and Collections Awaiting Review" },
+                        meta: { name: "items and collections Awaiting Review" },
                     },
                     {
                         name: "admin.items",
                         path: "items",
                         component: AdminItemsComponent,
-                        meta: { name: "items in the workspace" },
+                        meta: { name: "items and collections in the workspace" },
+                    },
+                    {
+                        name: "admin.operations",
+                        path: "operations",
+                        component: AdminOperationsComponent,
+                        meta: { name: "administrator operations" },
                     },
                 ],
             },

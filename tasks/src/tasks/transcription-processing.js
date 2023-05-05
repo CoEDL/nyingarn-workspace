@@ -1,9 +1,9 @@
-import fsPackage from 'fs-extra';
+import fsPackage from "fs-extra";
 const { createReadStream, writeFile, remove } = fsPackage;
 import path from "path";
 import SaxonJS from "saxon-js";
 import { parse } from "csv-parse";
-import lodashPackage from 'lodash';
+import lodashPackage from "lodash";
 const { zipObject } = lodashPackage;
 import { log, loadConfiguration } from "/srv/api/src/common/index.js";
 import { expandError } from "../common/errors.js";
@@ -118,14 +118,14 @@ export async function processDigivolTranscription({ directory, identifier, resou
 }
 
 export async function __processDigivolTranscriptionXMLProcessor({
-    directory, 
+    directory,
     identifier,
     resource,
     output = undefined,
 }) {
     // Parses a DigiVol CSV file into an equivalent JSON data structure, saves it to a file, and
     // passes the URI of the file to an XSLT to perform the remainder of the ingestion work.
-    
+
     // Parse the CSV file into an array of objects representing lines of the file, where
     // each object has keys which are the column headers and values which are cell contents
     let csvFile = path.join(directory, resource);
@@ -148,9 +148,9 @@ export async function __processDigivolTranscriptionXMLProcessor({
         data.push(zipObject(properties, record));
     }
     // serialize the data as a JSON file
-    let jsonFile = csvFile + '.json';
+    let jsonFile = csvFile + ".json";
     await writeFile(jsonFile, JSON.stringify(data));
-    
+
     let configuration = await loadConfiguration();
     let sourceURI = "file://" + jsonFile;
     try {
@@ -163,7 +163,7 @@ export async function __processDigivolTranscriptionXMLProcessor({
                     "source-uri": sourceURI,
                     "page-identifier-regex": configuration.ui.filename.checkNameStructure,
                 },
-                baseOutputURI: output ? output : sourceURI // output into the same folder as the source data file
+                baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
             },
             "async"
         );

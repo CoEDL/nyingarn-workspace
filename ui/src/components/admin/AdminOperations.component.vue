@@ -2,14 +2,13 @@
     <div class="flex flex-col space-y-2" v-loading="data.loading">
         <div class="p-8 bg-blue-200">
             <div>
-                If this is a new system, then you first need to import the items and collections on
-                the backend storage into the DB. You can do this with this control. You should only
-                really do this once though nothing will break if you run it again.
+                The Nyngarn Workspace stores all of the content (data, metadata and state) in the S3
+                bucket. In order to use the service with the data in the bucket, the service first
+                needs to be configured from the data. Whilst you should only do this when the
+                service is first installed, nothing will break if you run this operation again.
             </div>
             <div>
-                <el-button @click="importObjectsInTheStore">
-                    Import items and collections on the storage backend
-                </el-button>
+                <el-button @click="importStore"> configure the service </el-button>
             </div>
 
             <!-- <div><el-button @click="init">init</el-button></div> -->
@@ -17,10 +16,12 @@
         <!-- <div>
             <el-button @click="migrate">migrate backend</el-button>
         </div> -->
+        <IndexItemComponent />
     </div>
 </template>
 
 <script setup>
+import IndexItemComponent from "./IndexItem.component.vue";
 import { reactive, computed, onMounted, inject, nextTick } from "vue";
 import * as lib from "./lib.js";
 import { useRouter } from "vue-router";
@@ -45,10 +46,9 @@ let data = reactive({
         rows: [],
     },
 });
-async function importObjectsInTheStore() {
+async function importStore() {
     data.loading = true;
-    await $http.get({ route: `/admin/items/import` });
-    await $http.get({ route: `/admin/collections/import` });
+    await $http.get({ route: `/admin/setup-service` });
     data.loading = false;
 }
 async function migrate() {

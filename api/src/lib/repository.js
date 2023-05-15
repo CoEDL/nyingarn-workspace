@@ -1,5 +1,4 @@
 import { listObjects } from "../common/index.js";
-import {} from "./collection.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
 

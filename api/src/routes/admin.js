@@ -3,18 +3,11 @@ import {
     demandAuthenticatedUser,
     requireCollectionAccess,
     requireItemAccess,
-    getS3Handle,
     getStoreHandle,
-    resourceStatusFile,
-    completedResources,
     listObjects,
+    getLogger,
 } from "../common/index.js";
-import {
-    lookupItemByIdentifier,
-    listItemResources,
-    updateResourceStatus,
-    updateItemStatus,
-} from "../lib/item.js";
+import { lookupItemByIdentifier } from "../lib/item.js";
 import { lookupCollectionByIdentifier } from "../lib/collection.js";
 import {
     getAdminItems,
@@ -30,6 +23,8 @@ import {
     depositObjectIntoRepository,
     restoreObjectIntoWorkspace,
 } from "../lib/admin.js";
+import { importRepositoryContentFromStorageIntoTheDb } from "../lib/repository.js";
+const log = getLogger();
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -50,13 +45,12 @@ export function setupRoutes(fastify, options, done) {
         fastify.addHook("preHandler", demandAdministrator);
 
         fastify.get("/admin", async (req, res) => {});
-        fastify.get("/admin/entries/items", getAdminEntriesItemsHandler);
-        fastify.get("/admin/entries/collections", getAdminEntriesCollectionsHandler);
+        fastify.get("/admin/setup-service", getAdminSetupServiceHanlder);
 
-        fastify.get("/admin/items/import", importItemsFromStorageIntoTheDbHandler);
+        fastify.get("/admin/entries/items", getAdminEntriesItemsHandler);
         fastify.get("/admin/items/awaiting-review", getItemsAwaitingReviewHandler);
 
-        fastify.get("/admin/collections/import", importCollectionsFromStorageIntoTheDbHandler);
+        fastify.get("/admin/entries/collections", getAdminEntriesCollectionsHandler);
         fastify.get("/admin/collections/awaiting-review", getCollectionsAwaitingReviewHandler);
 
         fastify.put("/admin/:type/:identifier/connect-user", putAdminConnectUserHandler);
@@ -99,22 +93,40 @@ async function getAdminEntriesCollectionsHandler(req) {
     return { collections, total };
 }
 
-async function importItemsFromStorageIntoTheDbHandler(req) {
-    await importItemsFromStorageIntoTheDb({
-        user: req.session.user,
-        configuration: req.session.configuration,
-    });
-    return {};
-}
+async function getAdminSetupServiceHanlder(req) {
+    log.info(`Importing the workspace items`);
+    try {
+        await importItemsFromStorageIntoTheDb({
+            user: req.session.user,
+            configuration: req.session.configuration,
+        });
+    } catch (error) {
+        log.error(`There was an issue importing repository items into the database`);
+        console.error(error);
+    }
 
-async function importCollectionsFromStorageIntoTheDbHandler(req) {
-    await importCollectionsFromStorageIntoTheDb({
-        user: req.session.user,
-        configuration: req.session.configuration,
-    });
-    return {};
-}
+    log.info(`Importing the workspace collections`);
+    try {
+        await importCollectionsFromStorageIntoTheDb({
+            user: req.session.user,
+            configuration: req.session.configuration,
+        });
+    } catch (error) {
+        log.error(`There was an issue importing workspace collections into the database`);
+        console.error(error);
+    }
 
+    log.info(`Importing the repository content`);
+    try {
+        await importRepositoryContentFromStorageIntoTheDb({
+            user: req.session.user,
+            configuration: req.session.configuration,
+        });
+    } catch (error) {
+        log.error(`There was an issue importing repository content into the database`);
+        console.error(error);
+    }
+}
 async function putAdminConnectUserHandler(req) {
     if (req.params.type === "items") {
         await connectAdminToItem({ identifier: req.params.identifier, user: req.session.user });

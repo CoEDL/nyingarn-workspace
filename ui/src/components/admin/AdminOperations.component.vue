@@ -49,8 +49,6 @@ async function importObjectsInTheStore() {
     data.loading = true;
     await $http.get({ route: `/admin/items/import` });
     await $http.get({ route: `/admin/collections/import` });
-    await loadItems();
-    await loadCollections();
     data.loading = false;
 }
 async function migrate() {

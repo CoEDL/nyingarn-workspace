@@ -77,7 +77,7 @@ export async function listObjects({ prefix }) {
     let continuationToken = objects.NextContinuationToken;
     while (continuationToken) {
         let objects = await bucket.listObjects({
-            prefix: "nyingarn.net/workspace/item",
+            prefix,
             continuationToken,
         });
         files.push(

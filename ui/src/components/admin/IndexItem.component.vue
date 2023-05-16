@@ -1,7 +1,7 @@
 <template>
     <el-card>
         <template #header>Index a specific item or collection in the repository</template>
-        <div class="flex flex-row space-x-1">
+        <div class="flex flex-row space-x-1" v-loading="data.loading">
             <el-select
                 class="w-full"
                 v-model="data.selectedItemIdentifier"
@@ -27,12 +27,13 @@
 </template>
 
 <script setup>
-import { ElCard, ElSelect, ElOption } from "element-plus";
+import { ElCard, ElSelect, ElOption, vLoading } from "element-plus";
 import * as lib from "./lib.js";
 import { reactive, inject, onMounted } from "vue";
 const $http = inject("$http");
 
 const data = reactive({
+    loading: false,
     selectedItem: undefined,
     options: [],
     items: {
@@ -60,8 +61,10 @@ async function findItem(prefix) {
     data.loading = false;
     return rows;
 }
-async function indexItem(item) {
+async function indexItem() {
+    data.loading = true;
     await lib.indexRepositoryContent({ $http, id: data.selectedItemIdentifier });
     data.selectedItemIdentifier = undefined;
+    data.loading = false;
 }
 </script>

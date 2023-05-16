@@ -182,11 +182,9 @@ import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { xml, xmlLanguage } from "@codemirror/lang-xml";
-import {
-    CodemirrorEditorControls,
-    formatDocument,
-    transformDocument,
-} from "./codemirror-editor.js";
+import { CodemirrorEditorControls, formatDocument } from "./codemirror-editor.js";
+import { unclearHighlight } from "./decorators";
+import { Prec } from "@codemirror/state";
 import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
@@ -246,7 +244,14 @@ onBeforeUnmount(async () => {
 function setupCodeMirror() {
     const initialState = EditorState.create({
         doc: data.transcription,
-        extensions: [basicSetup, EditorView.lineWrapping, oneDark, xml(), xmlLanguage],
+        extensions: [
+            basicSetup,
+            EditorView.lineWrapping,
+            oneDark,
+            xml(),
+            xmlLanguage,
+            Prec.highest(unclearHighlight),
+        ],
     });
 
     const view = new EditorView({

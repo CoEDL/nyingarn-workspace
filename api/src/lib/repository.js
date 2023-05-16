@@ -3,6 +3,7 @@ import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
 
 import { Client } from "@elastic/elasticsearch";
+import { ROCrate } from "ro-crate";
 
 export async function getRepositoryItems({ user, prefix, limit = 10, offset = 0 }) {
     if (!user.administrator) {
@@ -64,8 +65,7 @@ export async function indexRepositoryItem({ user, configuration, id }) {
         throw new Error(`User must be an admin`);
     }
 
-    let item = await models.repoitem.findOne({ where: { id } });
-    console.log(item.get());
+    const item = await models.repoitem.findOne({ where: { id } });
 
     let store = await getStoreHandle({
         identifier: item.identifier,
@@ -73,10 +73,21 @@ export async function indexRepositoryItem({ user, configuration, id }) {
         location: "repository",
     });
     let metadata = await store.getJSON({ target: "ro-crate-metadata.json" });
-    // console.log(metadata);
+    const crate = new ROCrate(metadata, { array: true, link: true });
+    let document = crate.getTree({ valueObject: false });
+    const indexIdentifier = `/${item.type}/${item.identifier}`;
 
     const client = new Client({
         node: configuration.api.services.elastic.host,
     });
-    console.log(client);
+    try {
+        await client.indices.get({ index: "documents" });
+    } catch (error) {
+        await client.indices.create({ index: "documents" });
+    }
+    await client.index({
+        index: "documents",
+        id: indexIdentifier,
+        document,
+    });
 }

@@ -22,6 +22,10 @@ async function getRepositoryLookupContentHandler(req) {
 
 async function getRepositoryIndexContentHandler(req) {
     let { id } = req.params;
-    await indexRepositoryItem({ user: req.session.user, id });
+    await indexRepositoryItem({
+        configuration: req.session.configuration,
+        user: req.session.user,
+        id,
+    });
     return {};
 }

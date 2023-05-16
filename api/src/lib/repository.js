@@ -1,6 +1,8 @@
-import { listObjects } from "../common/index.js";
+import { listObjects, getStoreHandle } from "../common/index.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
+
+import { Client } from "@elastic/elasticsearch";
 
 export async function getRepositoryItems({ user, prefix, limit = 10, offset = 0 }) {
     if (!user.administrator) {
@@ -9,7 +11,7 @@ export async function getRepositoryItems({ user, prefix, limit = 10, offset = 0 
 
     const query = {
         order: [[seqFn("lower", seqCol("repoitem.identifier")), "ASC"]],
-        attributes: ["identifier", "type"],
+        attributes: ["id", "identifier", "type"],
     };
     if (limit) {
         query.offset = offset;
@@ -55,4 +57,26 @@ export async function importRepositoryContentFromStorageIntoTheDb({ user, config
     }
 
     return {};
+}
+
+export async function indexRepositoryItem({ user, configuration, id }) {
+    if (!user.administrator) {
+        throw new Error(`User must be an admin`);
+    }
+
+    let item = await models.repoitem.findOne({ where: { id } });
+    console.log(item.get());
+
+    let store = await getStoreHandle({
+        identifier: item.identifier,
+        type: item.type,
+        location: "repository",
+    });
+    let metadata = await store.getJSON({ target: "ro-crate-metadata.json" });
+    // console.log(metadata);
+
+    const client = new Client({
+        node: configuration.api.services.elastic.host,
+    });
+    console.log(client);
 }

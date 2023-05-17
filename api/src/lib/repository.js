@@ -86,7 +86,7 @@ export async function indexRepositoryItem({ user, configuration, id }) {
         await client.indices.create({ index: "documents" });
     }
     await client.index({
-        index: "documents",
+        index: "content",
         id: indexIdentifier,
         document,
     });

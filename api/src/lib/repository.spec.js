@@ -67,7 +67,6 @@ describe("Repository management tests", () => {
         await storeItem.removeObject();
         await storeCollection.removeObject();
     });
-
     it("should be able to index a repository item", async () => {
         let storeItem = await getStoreHandle({
             id: identifier,

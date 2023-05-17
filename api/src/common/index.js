@@ -69,6 +69,7 @@ export async function listObjects({ prefix }) {
     let { bucket } = await getS3Handle();
     let files = [];
     let objects = await bucket.listObjects({ prefix });
+    if (!objects.Contents) objects.Contents = [];
     files.push(
         ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
             (file) => file.Key

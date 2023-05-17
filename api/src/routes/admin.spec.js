@@ -177,8 +177,8 @@ describe("Admin route tests", () => {
         let adminUser = users.filter((u) => u.administrator)[0];
         let session = await createSession({ user: adminUser });
 
-        // import items
-        let response = await fetch(`${host}/admin/items/import`, {
+        // import items and collections from the storage layer
+        let response = await fetch(`${host}/admin/setup-service`, {
             method: "GET",
             headers: headers(session),
         });
@@ -191,13 +191,6 @@ describe("Admin route tests", () => {
         });
         response = await response.json();
         expect(response.items.length).toBeGreaterThanOrEqual(1);
-
-        // import collections
-        response = await fetch(`${host}/admin/collections/import`, {
-            method: "GET",
-            headers: headers(session),
-        });
-        expect(response.status).toEqual(200);
 
         // retrieve all collections
         response = await fetch(`${host}/admin/entries/collections`, {

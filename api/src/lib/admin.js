@@ -1,12 +1,4 @@
-import {
-    listObjects,
-    demandAdministrator,
-    demandAuthenticatedUser,
-    getStoreHandle,
-    getS3Handle,
-    authorisedUsersFile,
-    imageExtensions,
-} from "../common/index.js";
+import { listObjects, getStoreHandle, getS3Handle, authorisedUsersFile } from "../common/index.js";
 import { lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
 import {
     lookupCollectionByIdentifier,
@@ -14,7 +6,6 @@ import {
     getCollections,
 } from "../lib/collection.js";
 import models from "../models/index.js";
-import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
 import { ROCrate } from "ro-crate";

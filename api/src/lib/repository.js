@@ -1,4 +1,4 @@
-import { listObjects, getStoreHandle } from "../common/index.js";
+import { listObjects, getStoreHandle, loadConfiguration } from "../common/index.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
 
@@ -60,20 +60,9 @@ export async function importRepositoryContentFromStorageIntoTheDb({ user, config
     return {};
 }
 
-export async function indexRepositoryItem({ user, configuration, id }) {
-    if (!user.administrator) {
-        throw new Error(`User must be an admin`);
-    }
-
-    const item = await models.repoitem.findOne({ where: { id } });
-
-    let store = await getStoreHandle({
-        identifier: item.identifier,
-        type: item.type,
-        location: "repository",
-    });
-    let metadata = await store.getJSON({ target: "ro-crate-metadata.json" });
-    const crate = new ROCrate(metadata, { array: true, link: true });
+export async function indexRepositoryItem({ item, crate }) {
+    let configuration = await loadConfiguration();
+    crate = new ROCrate(crate, { array: true, link: true });
     let document = crate.getTree({ valueObject: false });
     const indexIdentifier = `/${item.type}/${item.identifier}`;
 
@@ -81,9 +70,9 @@ export async function indexRepositoryItem({ user, configuration, id }) {
         node: configuration.api.services.elastic.host,
     });
     try {
-        await client.indices.get({ index: "documents" });
+        await client.indices.get({ index: "content" });
     } catch (error) {
-        await client.indices.create({ index: "documents" });
+        await client.indices.create({ index: "content" });
     }
     await client.index({
         index: "content",

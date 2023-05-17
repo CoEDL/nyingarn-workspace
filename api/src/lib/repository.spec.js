@@ -77,7 +77,6 @@ describe("Repository management tests", () => {
 
         let user = users.filter((u) => !u.administrator)[0];
         let adminUser = users.filter((u) => u.administrator)[0];
-        const configuration = await loadConfiguration();
 
         // import repository content
         await importRepositoryContentFromStorageIntoTheDb({ user: adminUser, configuration });
@@ -85,7 +84,13 @@ describe("Repository management tests", () => {
         let { items } = await getRepositoryItems({ user: adminUser });
         expect(items.length).toEqual(1);
 
-        await indexRepositoryItem({ user: adminUser, configuration, id: items[0].id });
+        let crate = await storeItem.getJSON({
+            target: "ro-crate-metadata.json",
+        });
+        await indexRepositoryItem({
+            item: { identifier, type: "item" },
+            crate,
+        });
 
         const client = new Client({
             node: configuration.api.services.elastic.host,

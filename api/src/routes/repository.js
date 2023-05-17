@@ -1,5 +1,11 @@
-import { demandAdministrator, demandAuthenticatedUser, getLogger } from "../common/index.js";
+import {
+    demandAdministrator,
+    demandAuthenticatedUser,
+    getLogger,
+    getStoreHandle,
+} from "../common/index.js";
 import { getRepositoryItems, indexRepositoryItem } from "../lib/repository.js";
+import models from "../models/index.js";
 
 const log = getLogger();
 
@@ -24,13 +30,17 @@ async function getRepositoryLookupContentHandler(req) {
 
 async function indexRepositoryItemHandler(req) {
     let { id } = req.params;
+    const item = await models.repoitem.findOne({ where: { id } });
+
+    let store = await getStoreHandle({
+        identifier: item.identifier,
+        type: item.type,
+        location: "repository",
+    });
+    let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
 
     // index the specified item
-    await indexRepositoryItem({
-        configuration: req.session.configuration,
-        user: req.session.user,
-        id,
-    });
+    await indexRepositoryItem({ item, crate });
 
     return {};
 }
@@ -46,11 +56,13 @@ async function indexAllRepositoryContentHandler(req) {
         });
 
         for (let item of items) {
-            await indexRepositoryItem({
-                configuration: req.session.configuration,
-                user: req.session.user,
-                id: item.id,
+            let store = await getStoreHandle({
+                identifier: item.identifier,
+                type: item.type,
+                location: "repository",
             });
+            let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+            await indexRepositoryItem({ item, crate });
             itemsIndexed += 1;
         }
         if (itemsIndexed < total) await indexItems(itemsIndexed);

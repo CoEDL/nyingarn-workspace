@@ -1,6 +1,5 @@
 <template>
     <div class="flex flex-col space-y-4" v-loading="data.loading">
-        <IndexItemComponent />
         <div class="p-8 bg-blue-200 rounded">
             <div>
                 The Nyngarn Workspace stores all of the content (data, metadata and state) in the S3
@@ -29,11 +28,7 @@
 </template>
 
 <script setup>
-import IndexItemComponent from "./IndexItem.component.vue";
-import { reactive, computed, onMounted, inject, nextTick } from "vue";
-import * as lib from "./lib.js";
-import { useRouter } from "vue-router";
-const $router = useRouter();
+import { reactive, inject } from "vue";
 const $http = inject("$http");
 
 let data = reactive({

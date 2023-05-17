@@ -10,6 +10,7 @@ import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
 import { ROCrate } from "ro-crate";
 import { getContext } from "../lib/crate-tools.js";
+import { indexRepositoryItem } from "./repository.js";
 import path from "path";
 
 export async function getAdminItems({ user, prefix, offset = 0 }) {
@@ -318,6 +319,10 @@ export async function depositObjectIntoRepository({
         date: new Date(),
     });
     await objectWorkspace.removeObject();
+
+    // index the item in data in the repository
+    let crate = await objectRepository.getJSON({ target: "ro-crate-metadata.json" });
+    await indexRepositoryItem({ item: { identifier, type }, crate });
 }
 
 export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit: () => {} } }) {

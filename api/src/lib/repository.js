@@ -1,6 +1,8 @@
 import { listObjects, getStoreHandle, loadConfiguration } from "../common/index.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
+import lodashPkg from "lodash";
+const { isArray, isString, isPlainObject } = lodashPkg;
 
 import { Client } from "@elastic/elasticsearch";
 import { ROCrate } from "ro-crate";
@@ -80,7 +82,26 @@ export async function indexRepositoryItem({ item, crate }) {
         document,
     });
 
-    // for (let entity of crate.entities()) {
-    //     console.log(entity);
-    // }
+    for (let entity of crate.entities()) {
+        if (!["ro-crate-metadata.json", "./"].includes(entity["@id"])) {
+            if (!isArray(entity["@type"])) entity["@type"] = [entity["@type"]];
+
+            entity = entity.toJSON();
+            if (!isArray(entity["@type"])) entity["@type"] = [entity["@type"]];
+            for (let type of entity["@type"]) {
+                //  walk the entity and remove links to other things
+                for (let property of Object.keys(entity)) {
+                    if (isString(entity[property])) continue;
+                    if (isPlainObject(entity[property])) entity[property] = [entity[property]];
+                    entity[property] = entity[property].filter((instance) => isString(instance));
+                    if (!entity[property].length) delete entity[property];
+                }
+                await client.index({
+                    index: type.toLowerCase(),
+                    id: `${entity["@id"]}`,
+                    document: entity,
+                });
+            }
+        }
+    }
 }

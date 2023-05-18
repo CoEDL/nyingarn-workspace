@@ -75,18 +75,30 @@ describe("Repository management tests", () => {
         });
         await storeItem.createObject();
 
-        let user = users.filter((u) => !u.administrator)[0];
-        let adminUser = users.filter((u) => u.administrator)[0];
+        let crate = await storeItem.getJSON({ target: "ro-crate-metadata.json" });
 
-        // import repository content
-        await importRepositoryContentFromStorageIntoTheDb({ user: adminUser, configuration });
+        crate["@graph"] = [
+            crate["@graph"][0],
+            {
+                "@id": "./",
+                "@type": "Dataset",
+                name: "crate",
+                author: { "@id": "#person1" },
+                thingo: { "@id": "#thingo1" },
+            },
+            {
+                "@id": "#person1",
+                "@type": "Person",
+                name: "person1",
+                thing: { "@id": "#thingo1" },
+            },
+            {
+                "@id": "#thingo1",
+                "@type": ["Thing", "SubThing"],
+                name: "thingo1",
+            },
+        ];
 
-        let { items } = await getRepositoryItems({ user: adminUser });
-        expect(items.length).toEqual(1);
-
-        let crate = await storeItem.getJSON({
-            target: "ro-crate-metadata.json",
-        });
         await indexRepositoryItem({
             item: { identifier, type: "item" },
             crate,
@@ -97,12 +109,23 @@ describe("Repository management tests", () => {
         });
         let document = await client.get({
             index: "metadata",
-            id: `/item/${items[0].identifier}`,
+            id: `/item/${identifier}`,
         });
-        expect(document._source).toEqual({
+        expect(document._source).toMatchObject({
             "@id": "./",
             "@type": ["Dataset"],
-            name: ["My Research Object Crate"],
+            name: ["crate"],
+            author: [{}],
+            thingo: [{}],
+        });
+        let person = await client.get({
+            index: "person",
+            id: `#person1`,
+        });
+        expect(person._source).toMatchObject({
+            "@id": "#person1",
+            "@type": ["Person"],
+            name: "person1",
         });
 
         await models.repoitem.destroy({ where: { identifier } });

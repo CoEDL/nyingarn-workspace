@@ -10,7 +10,7 @@ import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
 import { ROCrate } from "ro-crate";
 import { getContext } from "../lib/crate-tools.js";
-import { indexRepositoryItem } from "./repository.js";
+import { indexItem } from "./elastic-index.js";
 import path from "path";
 
 export async function getAdminItems({ user, prefix, offset = 0 }) {
@@ -176,6 +176,15 @@ export async function publishObject({ user, type, identifier, configuration }) {
         throw new Error(`Error getting / handling RO Crate file`);
     }
 
+    // try indexing the content and fail early if the metadata is bad
+    try {
+        await indexItem({ item: { identifier, type }, crate: crate.toJSON() });
+    } catch (error) {
+        throw new Error(
+            `Metadata is invalid and can't be indexed. It needs to be fixed in order to publish the object.`
+        );
+    }
+
     let licence;
     if (type === "collection") {
         const collection = await lookupCollectionByIdentifier({ identifier });
@@ -322,7 +331,7 @@ export async function depositObjectIntoRepository({
 
     // index the item in data in the repository
     let crate = await objectRepository.getJSON({ target: "ro-crate-metadata.json" });
-    await indexRepositoryItem({ item: { identifier, type }, crate });
+    await indexItem({ item: { identifier, type }, crate });
 }
 
 export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit: () => {} } }) {

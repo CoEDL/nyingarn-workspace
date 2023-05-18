@@ -81,7 +81,6 @@ async function getAdminEntriesItemsHandler(req) {
     let { items, total } = await getAdminItems({ user: req.session.user, prefix, offset });
     return { items, total };
 }
-
 async function getAdminEntriesCollectionsHandler(req) {
     let { prefix, offset } = req.query;
 
@@ -92,7 +91,6 @@ async function getAdminEntriesCollectionsHandler(req) {
     });
     return { collections, total };
 }
-
 async function getAdminSetupServiceHanlder(req) {
     log.info(`Importing the workspace items`);
     try {
@@ -137,18 +135,15 @@ async function putAdminConnectUserHandler(req) {
         });
     }
 }
-
 async function getItemsAwaitingReviewHandler(req) {
     let { items } = await getItemsAwaitingReview({ user: req.session.user });
     return { items };
 }
-
 async function getCollectionsAwaitingReviewHandler(req) {
     let { collections } = await getCollectionsAwaitingReview({ user: req.session.user });
     return { collections };
 }
-
-async function putDepositObjectHandler(req) {
+async function putDepositObjectHandler(req, res) {
     let { type, identifier } = req.params;
     const version = req.body.version;
     type = type === "items" ? "item" : "collection";
@@ -158,12 +153,16 @@ async function putDepositObjectHandler(req) {
         msg: `Setting the ${type} status to 'Published'`,
         date: new Date(),
     });
-    await publishObject({
-        user: req.session.user,
-        type,
-        identifier,
-        configuration: req.session.configuration,
-    });
+    try {
+        await publishObject({
+            user: req.session.user,
+            type,
+            identifier,
+            configuration: req.session.configuration,
+        });
+    } catch (error) {
+        return res.badRequest(error.message);
+    }
 
     // deposit it into the repository
     req.io.to(req.query.clientId).emit(`deposit-${type}`, {
@@ -179,7 +178,6 @@ async function putDepositObjectHandler(req) {
 
     req.io.to(req.query.clientId).emit(`deposit-${type}`, { msg: `Done`, date: new Date() });
 }
-
 async function putRestoreObjectHandler(req) {
     let { type, identifier } = req.params;
     type = type === "items" ? "item" : "collection";
@@ -203,14 +201,12 @@ async function putRestoreObjectHandler(req) {
 
     req.io.to(req.query.clientId).emit(`restore-${type}`, { msg: `Done`, date: new Date() });
 }
-
 async function putObjectNeedsWorkHandler(req, res) {
     let { type, identifier } = req.params;
     type = type === "items" ? "item" : "collection";
 
     await objectRequiresMoreWork({ user: req.session.user, type, identifier });
 }
-
 async function migrateBackend(req) {
     console.log("NOT RUNNING: migrate backend");
     return;

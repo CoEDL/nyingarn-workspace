@@ -4,7 +4,8 @@ import {
     getLogger,
     getStoreHandle,
 } from "../common/index.js";
-import { getRepositoryItems, indexRepositoryItem } from "../lib/repository.js";
+import { getRepositoryItems } from "../lib/repository.js";
+import { indexItem } from "../lib/elastic-index.js";
 import models from "../models/index.js";
 
 const log = getLogger();
@@ -40,7 +41,7 @@ async function indexRepositoryItemHandler(req) {
     let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
 
     // index the specified item
-    await indexRepositoryItem({ item, crate });
+    await indexItem({ item, crate });
 
     return {};
 }
@@ -62,7 +63,7 @@ async function indexAllRepositoryContentHandler(req) {
                 location: "repository",
             });
             let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
-            await indexRepositoryItem({ item, crate });
+            await indexItem({ item, crate });
             itemsIndexed += 1;
         }
         if (itemsIndexed < total) await indexItems(itemsIndexed);

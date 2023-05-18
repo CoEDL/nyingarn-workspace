@@ -91,7 +91,7 @@ export async function indexRepositoryItem({ item, crate }) {
             for (let type of entity["@type"]) {
                 //  walk the entity and remove links to other things
                 for (let property of Object.keys(entity)) {
-                    if (isString(entity[property])) continue;
+                    if (!isArray(entity[property]) && !isPlainObject(entity[property])) continue;
                     if (isPlainObject(entity[property])) entity[property] = [entity[property]];
                     entity[property] = entity[property].filter((instance) => isString(instance));
                     if (!entity[property].length) delete entity[property];

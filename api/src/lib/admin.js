@@ -1,4 +1,10 @@
-import { listObjects, getStoreHandle, getS3Handle, authorisedUsersFile } from "../common/index.js";
+import {
+    listObjects,
+    getStoreHandle,
+    getS3Handle,
+    authorisedUsersFile,
+    indexItem,
+} from "../common/index.js";
 import { lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
 import {
     lookupCollectionByIdentifier,
@@ -10,7 +16,6 @@ import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
 import { ROCrate } from "ro-crate";
 import { getContext } from "../lib/crate-tools.js";
-import { indexItem } from "./elastic-index.js";
 import path from "path";
 
 export async function getAdminItems({ user, prefix, offset = 0 }) {

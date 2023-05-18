@@ -1,7 +1,6 @@
-import { loadConfiguration } from "../common/index.js";
+import { loadConfiguration } from "./index.js";
 import lodashPkg from "lodash";
 const { isArray, isString, isPlainObject } = lodashPkg;
-
 import { Client } from "@elastic/elasticsearch";
 import { ROCrate } from "ro-crate";
 

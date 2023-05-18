@@ -17,6 +17,7 @@ export {
     setupTestItem,
     setupTestCollection,
 } from "./test-utils.js";
+export { indexItem } from "./elastic-index.js";
 
 export const completedResources = ".completed-resources.json";
 export const resourceStatusFile = ".item-status.json";

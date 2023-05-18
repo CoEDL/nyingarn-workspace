@@ -3,9 +3,9 @@ import {
     demandAuthenticatedUser,
     getLogger,
     getStoreHandle,
+    indexItem,
 } from "../common/index.js";
 import { getRepositoryItems } from "../lib/repository.js";
-import { indexItem } from "../lib/elastic-index.js";
 import models from "../models/index.js";
 
 const log = getLogger();

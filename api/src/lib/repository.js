@@ -1,11 +1,6 @@
-import { listObjects, getStoreHandle, loadConfiguration } from "../common/index.js";
+import { listObjects } from "../common/index.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
-import lodashPkg from "lodash";
-const { isArray, isString, isPlainObject } = lodashPkg;
-
-import { Client } from "@elastic/elasticsearch";
-import { ROCrate } from "ro-crate";
 
 export async function getRepositoryItems({ user, prefix, limit = 10, offset = 0 }) {
     if (!user.administrator) {

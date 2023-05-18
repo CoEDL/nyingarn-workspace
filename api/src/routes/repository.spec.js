@@ -77,7 +77,7 @@ describe("Repository route tests", () => {
             node: configuration.api.services.elastic.host,
         });
         let document = await client.get({
-            index: "content",
+            index: "metadata",
             id: `/item/${item.identifier}`,
         });
         expect(document._source).toMatchObject({
@@ -118,7 +118,7 @@ describe("Repository route tests", () => {
             node: configuration.api.services.elastic.host,
         });
         let document = await client.get({
-            index: "content",
+            index: "metadata",
             id: `/item/${identifier}`,
         });
         expect(document._source).toMatchObject({

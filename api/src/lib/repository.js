@@ -70,13 +70,17 @@ export async function indexRepositoryItem({ item, crate }) {
         node: configuration.api.services.elastic.host,
     });
     try {
-        await client.indices.get({ index: "content" });
+        await client.indices.get({ index: "metadata" });
     } catch (error) {
-        await client.indices.create({ index: "content" });
+        await client.indices.create({ index: "metadata" });
     }
     await client.index({
-        index: "content",
+        index: "metadata",
         id: indexIdentifier,
         document,
     });
+
+    // for (let entity of crate.entities()) {
+    //     console.log(entity);
+    // }
 }

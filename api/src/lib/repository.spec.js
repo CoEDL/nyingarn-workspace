@@ -96,7 +96,7 @@ describe("Repository management tests", () => {
             node: configuration.api.services.elastic.host,
         });
         let document = await client.get({
-            index: "content",
+            index: "metadata",
             id: `/item/${items[0].identifier}`,
         });
         expect(document._source).toEqual({

@@ -7,7 +7,7 @@
         "keywords": ["languages", "Australian Languages", "Collection Metadata"]
     },
     "hide": {
-        "Dataset": []
+        "Dataset": ["identifier", "hasPart", "licence"]
     },
     "layouts": {
         "Dataset": [

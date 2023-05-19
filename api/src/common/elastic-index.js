@@ -8,7 +8,6 @@ export async function indexItem({ item, crate }) {
     let configuration = await loadConfiguration();
     crate = new ROCrate(crate, { array: true, link: true });
     let document = crate.getTree({ valueObject: false });
-    const indexIdentifier = `/${item.type}/${item.identifier}`;
 
     const client = new Client({
         node: configuration.api.services.elastic.host,
@@ -24,11 +23,12 @@ export async function indexItem({ item, crate }) {
         });
     }
     try {
-        await client.indices.get({ index: "data" });
+        await client.indices.get({ index: "entities" });
     } catch (error) {
-        await client.indices.create({ index: "data" });
+        await client.indices.create({ index: "entities" });
     }
 
+    const indexIdentifier = `/${item.type}/${item.identifier}`;
     await client.index({
         index: "metadata",
         id: indexIdentifier,
@@ -50,8 +50,8 @@ export async function indexItem({ item, crate }) {
                     if (!entity[property].length) delete entity[property];
                 }
                 await client.index({
-                    index: "data",
-                    id: `${entity["@id"]}`,
+                    index: "entities",
+                    id: encodeURIComponent(entity["@id"]),
                     document: entity,
                 });
             }

@@ -31,6 +31,7 @@ export const specialFiles = [
     "-digivol.csv",
     "-tei.xml",
     "-tei-complete.xml",
+    "-tei-complete.*.xml",
     "-rights-holder-permission.pdf",
     "-language-authority-permission.pdf",
     completedResources,

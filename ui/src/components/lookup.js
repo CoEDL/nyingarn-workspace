@@ -41,7 +41,7 @@ export class Lookup {
             //
             // it's up to you to get it to the elastic search server. In this example
             //   it's hardcoded in the _execute method
-            return await this._execute({ query: elasticQuery });
+            return await this._execute({ query: elasticQuery, indexPath: "data" });
         } else {
             // do the lookup yourself in whatever way you want
             //
@@ -57,20 +57,52 @@ export class Lookup {
         }
     }
 
+    /**
+     *
+     * @param {Object} elasticQuery: a query object to be used against an elastic search server
+     * @param {Array | String} type: the type array or type string of the entity being looked up
+     * @param {String} queryString: the query string typed in by the user
+     * @param {Array | String} fields: the fields to search against in the data pack json objects
+     * @param {Array | String} datapack: the datapack or packs with the data to be used for this entity type
+     * @param {Number} limit=10: the number of matches to return - default = 10
+     *
+     * @returns
+     */
+    async entities({
+        elasticQuery = undefined,
+        type = undefined,
+        queryString = undefined,
+        fields = undefined,
+        limit = 10,
+    }) {
+        if (elasticQuery) {
+            // query: the elastic query to perform
+            //
+            // The crate builder component will pass a fully formed elastic search query to this method
+            // It's up to you to get it to the elastic search server. In this example
+            //   it's hardcoded in the _execute method
+            let results = await this._execute({ query: elasticQuery, indexPath: "entities" });
+            return results;
+        } else {
+            // do the lookup yourself in whatever way you want
+            //
+            // the value of 'datapack' will be whatever the profile author defined so
+            //  that's your datasource. How you implement that lookup is totally
+            //  up to you.
+            //
+            // return array of json-ld objects matching the query:
+            // ---------------------------------------------------
+            // let documents = [{json-ld object}, {json-ld object}, ...]
+            // return { total: documents.length, documents }
+        }
+    }
+
     /** private method */
-    async _execute({ query }) {
-        // let response = await fetch(url, {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify(query),
-        // });
-        let response = await this.$http.post({ route: "/search/datapacks", body: { query } });
-        let status = response.status;
+    async _execute({ query, indexPath }) {
+        let response = await this.$http.post({ route: `/search/${indexPath}`, body: { query } });
         response = await response.json();
-        if (status !== 200) {
-            return response;
+        if (response?.error) {
+            return { total: 0, documents: [] };
         }
         const total = response.hits.total.value;
         const documents = response.hits.hits.map((doc) => ({ ...doc._source }));

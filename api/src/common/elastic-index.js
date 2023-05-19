@@ -13,6 +13,8 @@ export async function indexItem({ item, crate }) {
     const client = new Client({
         node: configuration.api.services.elastic.host,
     });
+
+    // ensure we have all of the indices we need
     try {
         await client.indices.get({ index: "metadata" });
     } catch (error) {
@@ -21,6 +23,12 @@ export async function indexItem({ item, crate }) {
             settings: { "index.mapping.ignore_malformed": true },
         });
     }
+    try {
+        await client.indices.get({ index: "data" });
+    } catch (error) {
+        await client.indices.create({ index: "data" });
+    }
+
     await client.index({
         index: "metadata",
         id: indexIdentifier,
@@ -41,13 +49,8 @@ export async function indexItem({ item, crate }) {
                     entity[property] = entity[property].filter((instance) => isString(instance));
                     if (!entity[property].length) delete entity[property];
                 }
-                try {
-                    await client.indices.get({ index: type.toLowerCase() });
-                } catch (error) {
-                    await client.indices.create({ index: type.toLowerCase() });
-                }
                 await client.index({
-                    index: type.toLowerCase(),
+                    index: "data",
                     id: `${entity["@id"]}`,
                     document: entity,
                 });

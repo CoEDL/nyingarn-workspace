@@ -9,7 +9,6 @@
                 <el-tab-pane label="Item Metadata" name="metadata">
                     <describo-crate-builder
                         v-if="data.activeTab === 'metadata' && data.metadataComponent.display"
-                        v-loading="data.metadataComponent.loading"
                         :style="{ height: metadataPanelHeight }"
                         class="overflow-scroll"
                         :crate="data.crate"

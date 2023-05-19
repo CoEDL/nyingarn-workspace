@@ -122,7 +122,7 @@ describe("Repository management tests", () => {
             thingo: [{}],
         });
         let person = await client.get({
-            index: "person",
+            index: "data",
             id: `#person1`,
         });
         expect(person._source).toMatchObject({

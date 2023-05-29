@@ -8,6 +8,7 @@ import {
     TestSetup,
     setupTestItem,
     setupTestCollection,
+    getS3Handle,
 } from "../common/index.js";
 import models from "../models/index.js";
 import {
@@ -24,6 +25,7 @@ import {
     depositObjectIntoRepository,
     restoreObjectIntoWorkspace,
 } from "./admin.js";
+import { Client } from "@elastic/elasticsearch";
 
 describe("Admin management tests", () => {
     let configuration, users, userEmail, adminEmail, bucket;
@@ -31,8 +33,11 @@ describe("Admin management tests", () => {
     const tester = new TestSetup();
 
     beforeAll(async () => {
+        configuration = await loadConfiguration();
         ({ userEmail, adminEmail, configuration, bucket } = await tester.setupBeforeAll());
         users = await tester.setupUsers({ emails: [userEmail], adminEmails: [adminEmail] });
+        let { bucket } = await getS3Handle();
+        await bucket.removeObjects({ prefix: "nyingarn.net/workspace" });
     });
     beforeEach(async () => {
         identifier = chance.word();
@@ -343,6 +348,18 @@ describe("Admin management tests", () => {
 
         let objectExistsInWorkspace = await objectWorkspace.exists();
         expect(objectExistsInWorkspace).toBeFalse;
+
+        const client = new Client({
+            node: configuration.api.services.elastic.host,
+        });
+        let document = await client.get({
+            index: "metadata",
+            id: `/item/${identifier}`,
+        });
+        expect(document._source).toMatchObject({
+            "@id": "./",
+            "@type": ["Dataset"],
+        });
 
         await objectWorkspace.removeObject();
         await objectRepository.removeObject();

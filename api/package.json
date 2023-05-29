@@ -1,6 +1,6 @@
 {
     "name": "api",
-    "version": "0.52.0",
+    "version": "0.53.1",
     "description": "",
     "author": "Marco La Rosa",
     "main": "index.js",
@@ -31,6 +31,7 @@
     "dependencies": {
         "@coedl/nocfl-js": "^2.0.0",
         "@describo/data-packs": "^0.10.0",
+        "@elastic/elasticsearch": "^8.7.0",
         "@fastify/compress": "^6.2.1",
         "@fastify/cors": "^8.2.1",
         "@fastify/one-line-logger": "^1.1.1",

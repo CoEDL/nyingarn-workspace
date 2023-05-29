@@ -10,7 +10,8 @@ import AdminManageUsersComponent from "./components/admin/users/ManageUsers.comp
 import AdminWhitelistUsersComponent from "./components/admin/users/WhitelistUsers.component.vue";
 import AdminLogsComponent from "./components/admin/Logs.component.vue";
 import AdminAwaitingReviewComponent from "./components/admin/AwaitingReview.component.vue";
-import AdminItemsComponent from "./components/admin/Items.component.vue";
+import AdminWorkspaceItemsComponent from "./components/admin/WorkspaceItems.component.vue";
+import AdminRepositoryItemsComponent from "./components/admin/RepositoryItems.component.vue";
 import AdminOperationsComponent from "./components/admin/AdminOperations.component.vue";
 import HTTPService from "./http.service.js";
 import { createRouter, createWebHistory } from "vue-router";
@@ -133,9 +134,15 @@ const routes = [
                     },
                     {
                         name: "admin.items",
-                        path: "items",
-                        component: AdminItemsComponent,
+                        path: "workspace-items",
+                        component: AdminWorkspaceItemsComponent,
                         meta: { name: "items and collections in the workspace" },
+                    },
+                    {
+                        name: "admin.repositoryItems",
+                        path: "repository-items",
+                        component: AdminRepositoryItemsComponent,
+                        meta: { name: "items and collections in the repository" },
                     },
                     {
                         name: "admin.operations",

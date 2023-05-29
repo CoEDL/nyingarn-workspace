@@ -1,18 +1,25 @@
 <template>
-    <div class="flex flex-col space-y-2" v-loading="data.loading">
-        <div class="p-8 bg-blue-200">
+    <div class="flex flex-col space-y-4" v-loading="data.loading">
+        <div class="p-8 bg-blue-200 rounded">
             <div>
-                If this is a new system, then you first need to import the items and collections on
-                the backend storage into the DB. You can do this with this control. You should only
-                really do this once though nothing will break if you run it again.
+                The Nyngarn Workspace stores all of the content (data, metadata and state) in the S3
+                bucket. In order to use the service with the data in the bucket, the service first
+                needs to be configured from the data. Whilst you should only do this when the
+                service is first installed, nothing will break if you run this operation again.
             </div>
             <div>
-                <el-button @click="importObjectsInTheStore">
-                    Import items and collections on the storage backend
-                </el-button>
+                <el-button @click="importStore"> configure the service </el-button>
             </div>
-
-            <!-- <div><el-button @click="init">init</el-button></div> -->
+        </div>
+        <div class="p-8 bg-red-200 rounded">
+            <div>
+                When the workspace is first initialised, it's also necessary to build the repository
+                index. This should only be done once and only if you know that it's required. In
+                other words, DON'T DO THIS UNLESS YOU ARE CERTAIN THAT YOU SHOULD!
+            </div>
+            <div>
+                <el-button @click="indexRepository"> index the repository</el-button>
+            </div>
         </div>
         <!-- <div>
             <el-button @click="migrate">migrate backend</el-button>
@@ -21,10 +28,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, onMounted, inject, nextTick } from "vue";
-import * as lib from "./lib.js";
-import { useRouter } from "vue-router";
-const $router = useRouter();
+import { reactive, inject } from "vue";
 const $http = inject("$http");
 
 let data = reactive({
@@ -45,12 +49,14 @@ let data = reactive({
         rows: [],
     },
 });
-async function importObjectsInTheStore() {
+async function importStore() {
     data.loading = true;
-    await $http.get({ route: `/admin/items/import` });
-    await $http.get({ route: `/admin/collections/import` });
-    await loadItems();
-    await loadCollections();
+    await $http.get({ route: `/admin/setup-service` });
+    data.loading = false;
+}
+async function indexRepository() {
+    data.loading = true;
+    await $http.get({ route: `/repository/index-all-content` });
     data.loading = false;
 }
 async function migrate() {

@@ -3,18 +3,11 @@ import {
     demandAuthenticatedUser,
     requireCollectionAccess,
     requireItemAccess,
-    getS3Handle,
     getStoreHandle,
-    resourceStatusFile,
-    completedResources,
     listObjects,
+    getLogger,
 } from "../common/index.js";
-import {
-    lookupItemByIdentifier,
-    listItemResources,
-    updateResourceStatus,
-    updateItemStatus,
-} from "../lib/item.js";
+import { lookupItemByIdentifier } from "../lib/item.js";
 import { lookupCollectionByIdentifier } from "../lib/collection.js";
 import {
     getAdminItems,
@@ -30,6 +23,8 @@ import {
     depositObjectIntoRepository,
     restoreObjectIntoWorkspace,
 } from "../lib/admin.js";
+import { importRepositoryContentFromStorageIntoTheDb } from "../lib/repository.js";
+const log = getLogger();
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -50,13 +45,12 @@ export function setupRoutes(fastify, options, done) {
         fastify.addHook("preHandler", demandAdministrator);
 
         fastify.get("/admin", async (req, res) => {});
-        fastify.get("/admin/entries/items", getAdminEntriesItemsHandler);
-        fastify.get("/admin/entries/collections", getAdminEntriesCollectionsHandler);
+        fastify.get("/admin/setup-service", getAdminSetupServiceHanlder);
 
-        fastify.get("/admin/items/import", importItemsFromStorageIntoTheDbHandler);
+        fastify.get("/admin/entries/items", getAdminEntriesItemsHandler);
         fastify.get("/admin/items/awaiting-review", getItemsAwaitingReviewHandler);
 
-        fastify.get("/admin/collections/import", importCollectionsFromStorageIntoTheDbHandler);
+        fastify.get("/admin/entries/collections", getAdminEntriesCollectionsHandler);
         fastify.get("/admin/collections/awaiting-review", getCollectionsAwaitingReviewHandler);
 
         fastify.put("/admin/:type/:identifier/connect-user", putAdminConnectUserHandler);
@@ -87,7 +81,6 @@ async function getAdminEntriesItemsHandler(req) {
     let { items, total } = await getAdminItems({ user: req.session.user, prefix, offset });
     return { items, total };
 }
-
 async function getAdminEntriesCollectionsHandler(req) {
     let { prefix, offset } = req.query;
 
@@ -98,23 +91,40 @@ async function getAdminEntriesCollectionsHandler(req) {
     });
     return { collections, total };
 }
+async function getAdminSetupServiceHanlder(req) {
+    log.info(`Importing the workspace items`);
+    try {
+        await importItemsFromStorageIntoTheDb({
+            user: req.session.user,
+            configuration: req.session.configuration,
+        });
+    } catch (error) {
+        log.error(`There was an issue importing repository items into the database`);
+        console.error(error);
+    }
 
-async function importItemsFromStorageIntoTheDbHandler(req) {
-    await importItemsFromStorageIntoTheDb({
-        user: req.session.user,
-        configuration: req.session.configuration,
-    });
-    return {};
+    log.info(`Importing the workspace collections`);
+    try {
+        await importCollectionsFromStorageIntoTheDb({
+            user: req.session.user,
+            configuration: req.session.configuration,
+        });
+    } catch (error) {
+        log.error(`There was an issue importing workspace collections into the database`);
+        console.error(error);
+    }
+
+    log.info(`Importing the repository content`);
+    try {
+        await importRepositoryContentFromStorageIntoTheDb({
+            user: req.session.user,
+            configuration: req.session.configuration,
+        });
+    } catch (error) {
+        log.error(`There was an issue importing repository content into the database`);
+        console.error(error);
+    }
 }
-
-async function importCollectionsFromStorageIntoTheDbHandler(req) {
-    await importCollectionsFromStorageIntoTheDb({
-        user: req.session.user,
-        configuration: req.session.configuration,
-    });
-    return {};
-}
-
 async function putAdminConnectUserHandler(req) {
     if (req.params.type === "items") {
         await connectAdminToItem({ identifier: req.params.identifier, user: req.session.user });
@@ -125,18 +135,15 @@ async function putAdminConnectUserHandler(req) {
         });
     }
 }
-
 async function getItemsAwaitingReviewHandler(req) {
     let { items } = await getItemsAwaitingReview({ user: req.session.user });
     return { items };
 }
-
 async function getCollectionsAwaitingReviewHandler(req) {
     let { collections } = await getCollectionsAwaitingReview({ user: req.session.user });
     return { collections };
 }
-
-async function putDepositObjectHandler(req) {
+async function putDepositObjectHandler(req, res) {
     let { type, identifier } = req.params;
     const version = req.body.version;
     type = type === "items" ? "item" : "collection";
@@ -146,12 +153,16 @@ async function putDepositObjectHandler(req) {
         msg: `Setting the ${type} status to 'Published'`,
         date: new Date(),
     });
-    await publishObject({
-        user: req.session.user,
-        type,
-        identifier,
-        configuration: req.session.configuration,
-    });
+    try {
+        await publishObject({
+            user: req.session.user,
+            type,
+            identifier,
+            configuration: req.session.configuration,
+        });
+    } catch (error) {
+        return res.badRequest(error.message);
+    }
 
     // deposit it into the repository
     req.io.to(req.query.clientId).emit(`deposit-${type}`, {
@@ -167,7 +178,6 @@ async function putDepositObjectHandler(req) {
 
     req.io.to(req.query.clientId).emit(`deposit-${type}`, { msg: `Done`, date: new Date() });
 }
-
 async function putRestoreObjectHandler(req) {
     let { type, identifier } = req.params;
     type = type === "items" ? "item" : "collection";
@@ -191,14 +201,12 @@ async function putRestoreObjectHandler(req) {
 
     req.io.to(req.query.clientId).emit(`restore-${type}`, { msg: `Done`, date: new Date() });
 }
-
 async function putObjectNeedsWorkHandler(req, res) {
     let { type, identifier } = req.params;
     type = type === "items" ? "item" : "collection";
 
     await objectRequiresMoreWork({ user: req.session.user, type, identifier });
 }
-
 async function migrateBackend(req) {
     console.log("NOT RUNNING: migrate backend");
     return;

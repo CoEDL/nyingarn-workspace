@@ -17,6 +17,7 @@ export {
     setupTestItem,
     setupTestCollection,
 } from "./test-utils.js";
+export { indexItem } from "./elastic-index.js";
 
 export const completedResources = ".completed-resources.json";
 export const resourceStatusFile = ".item-status.json";
@@ -30,6 +31,7 @@ export const specialFiles = [
     "-digivol.csv",
     "-tei.xml",
     "-tei-complete.xml",
+    "-tei-complete.*.xml",
     "-rights-holder-permission.pdf",
     "-language-authority-permission.pdf",
     completedResources,
@@ -69,6 +71,7 @@ export async function listObjects({ prefix }) {
     let { bucket } = await getS3Handle();
     let files = [];
     let objects = await bucket.listObjects({ prefix });
+    if (!objects.Contents) objects.Contents = [];
     files.push(
         ...objects.Contents.filter((file) => file.Key.match(/nocfl.identifier.json/)).map(
             (file) => file.Key
@@ -77,7 +80,7 @@ export async function listObjects({ prefix }) {
     let continuationToken = objects.NextContinuationToken;
     while (continuationToken) {
         let objects = await bucket.listObjects({
-            prefix: "nyingarn.net/workspace/item",
+            prefix,
             continuationToken,
         });
         files.push(

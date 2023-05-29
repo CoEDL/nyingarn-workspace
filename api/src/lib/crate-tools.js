@@ -2,7 +2,7 @@ import { specialFiles } from "../common/index.js";
 import path from "path";
 import mime from "mime-types";
 import lodashPkg from "lodash";
-const { difference } = lodashPkg;
+const { difference, uniqBy } = lodashPkg;
 
 // TODO: this code does not have tests
 export async function registerAllFiles({ crate, resources }) {
@@ -12,22 +12,21 @@ export async function registerAllFiles({ crate, resources }) {
 
     for (let file of files) {
         let entity = crate.getEntity(file.Key);
-        if (!entity) {
-            entity = {
-                "@id": file.Key,
-                "@type": "File",
-                name: file.Key,
-                contentSize: file.Size,
-                dateModified: file.LastModified,
-                "@reverse": {
-                    hasPart: [{ "@id": "./" }],
-                },
-            };
-            crate.addEntity(entity);
-            let parts = crate.rootDataset.hasPart;
-            parts.push({ "@id": entity["@id"] });
-            crate.rootDataset.hasPart = parts;
-        }
+        if (entity) crate.deleteEntity(file.Key);
+        entity = {
+            "@id": file.Key,
+            "@type": "File",
+            name: file.Key,
+            contentSize: file.Size,
+            dateModified: file.LastModified.toISOString(),
+            "@reverse": {
+                hasPart: [{ "@id": "./" }],
+            },
+        };
+        crate.addEntity(entity);
+        let parts = crate.rootDataset.hasPart;
+        parts.push({ "@id": entity["@id"] });
+        crate.rootDataset.hasPart = uniqBy(parts, "@id");
     }
 
     // set the mimetype on all files in the crate

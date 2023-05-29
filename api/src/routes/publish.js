@@ -122,9 +122,6 @@ async function postPublishItemHandler(req, res) {
         console.log(error);
     }
 
-    // check that permission forms are loaded
-    //  TODO: not yet implemented
-
     // reset the properties first
     req.io.to(req.query.clientId).emit("publish-item", {
         msg: `Setting the item status to 'Awaiting Review'`,

@@ -1,11 +1,9 @@
 import {
     listObjects,
-    demandAdministrator,
-    demandAuthenticatedUser,
     getStoreHandle,
     getS3Handle,
     authorisedUsersFile,
-    imageExtensions,
+    indexItem,
 } from "../common/index.js";
 import { lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
 import {
@@ -14,7 +12,6 @@ import {
     getCollections,
 } from "../lib/collection.js";
 import models from "../models/index.js";
-import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
 import { ROCrate } from "ro-crate";
@@ -184,6 +181,15 @@ export async function publishObject({ user, type, identifier, configuration }) {
         throw new Error(`Error getting / handling RO Crate file`);
     }
 
+    // try indexing the content and fail early if the metadata is bad
+    try {
+        await indexItem({ item: { identifier, type }, crate: crate.toJSON() });
+    } catch (error) {
+        throw new Error(
+            `Metadata is invalid and can't be indexed. It needs to be fixed in order to publish the object.`
+        );
+    }
+
     let licence;
     if (type === "collection") {
         const collection = await lookupCollectionByIdentifier({ identifier });
@@ -327,6 +333,10 @@ export async function depositObjectIntoRepository({
         date: new Date(),
     });
     await objectWorkspace.removeObject();
+
+    // index the item in data in the repository
+    let crate = await objectRepository.getJSON({ target: "ro-crate-metadata.json" });
+    await indexItem({ item: { identifier, type }, crate });
 }
 
 export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit: () => {} } }) {

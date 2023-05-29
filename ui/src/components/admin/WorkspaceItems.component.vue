@@ -141,21 +141,10 @@ onMounted(() => {
 
 async function loadItems() {
     data.loading = true;
-    const params = { offset: (data.items.currentPage - 1) * 10 };
-    if (data.items.prefix) params.prefix = data.items.prefix;
-    let response = await $http.get({
-        route: "/admin/entries/items",
-        params,
-    });
-    if (response.status !== 200) {
-        // report error
-        data.loading = false;
-        return;
-    }
-    let { items, total } = await response.json();
-    data.items.rows = [...items];
+    const offset = (data.items.currentPage - 1) * 10;
+    let { rows, total } = await lib.loadItems({ $http, offset, prefix: data.items.prefix });
+    data.items.rows = rows;
     data.items.total = total;
-
     data.loading = false;
 }
 function pageItems(page) {
@@ -164,21 +153,14 @@ function pageItems(page) {
 }
 async function loadCollections() {
     data.loading = true;
-    const params = { offset: (data.collections.currentPage - 1) * 10 };
-    if (data.collections.prefix) params.prefix = data.collections.prefix;
-    let response = await $http.get({
-        route: "/admin/entries/collections",
-        params,
+    const offset = (data.collections.currentPage - 1) * 10;
+    let { rows, total } = await lib.loadCollections({
+        $http,
+        offset,
+        prefix: data.collections.prefix,
     });
-    if (response.status !== 200) {
-        // report error
-        data.loading = false;
-        return;
-    }
-    let { collections, total } = await response.json();
-    data.collections.rows = [...collections];
+    data.collections.rows = rows;
     data.collections.total = total;
-
     data.loading = false;
 }
 function pageCollections(page) {

@@ -64,7 +64,16 @@ export default {
                     path: "/admin/awaiting-review",
                     icon: "fa-solid fa-magnifying-glass",
                 },
-                { name: "Workspace Items", path: "/admin/items", icon: "fa-solid fa-file-image" },
+                {
+                    name: "Workspace Items",
+                    path: "/admin/workspace-items",
+                    icon: "fa-solid fa-file-image",
+                },
+                {
+                    name: "Repository Items",
+                    path: "/admin/repository-items",
+                    icon: "fa-solid fa-landmark",
+                },
                 { name: "Operations", path: "/admin/operations", icon: "fa-solid fa-cog" },
             ],
         };

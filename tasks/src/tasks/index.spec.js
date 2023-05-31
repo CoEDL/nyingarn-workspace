@@ -19,7 +19,7 @@ describe(`Test `, () => {
 
     it(`should be able to remove local content that overlaps with what's in the store`, async () => {
         const identifier = chance.word();
-        const directory = path.join("/tmp", chance.word());
+        const directory = path.join("/tmp", identifier);
         const resource = `${identifier}-01.tiff`;
 
         let store = await getStoreHandle({ id: identifier, type: "test" });
@@ -28,17 +28,14 @@ describe(`Test `, () => {
         await ensureDir(directory);
         await store.put({ localPath: path.join("src", "tasks", "index.js"), target: "index.js" });
 
-        await copy(
-            path.join("src", "tasks", "index.js"),
-            path.join(directory, identifier, "index.js")
-        );
+        await copy(path.join("src", "tasks", "index.js"), path.join(directory, "index.js"));
         await copy(
             path.join("src", "tasks", "index.spec.js"),
-            path.join(directory, identifier, "index.spec.js")
+            path.join(directory, "index.spec.js")
         );
         await removeOverlappingNewContent({ directory, identifier, type: "test" });
 
-        let contents = await readdir(path.join(directory, identifier));
+        let contents = await readdir(directory);
         expect(contents).toEqual(["index.spec.js"]);
 
         await remove(directory);
@@ -60,7 +57,7 @@ describe(`Test `, () => {
 
         let directory = await prepare({ identifier, task, resource, type: "test" });
 
-        let contents = await readdir(path.join(directory, identifier));
+        let contents = await readdir(directory);
         expect(contents).toEqual([resource]);
 
         await remove(directory);
@@ -111,13 +108,10 @@ describe(`Test `, () => {
 
         let directory = await prepare({ identifier, task, resource, type: "test" });
         // console.log(directory);
-        await copy(
-            path.join("src", "tasks", "index.js"),
-            path.join(directory, identifier, "index.js")
-        );
+        await copy(path.join("src", "tasks", "index.js"), path.join(directory, "index.js"));
         await copy(
             path.join("src", "tasks", "index.spec.js"),
-            path.join(directory, identifier, "index.spec.js")
+            path.join(directory, "index.spec.js")
         );
 
         await syncToBucket({ directory, identifier, type: "test" });

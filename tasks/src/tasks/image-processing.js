@@ -4,7 +4,7 @@ import { log } from "/srv/api/src/common/index.js";
 import { remove } from "fs-extra";
 import { thumbnailHeight } from "./index.js";
 
-export async function createImageThumbnail({ directory, identifier, resource }) {
+export async function createImageThumbnail({ directory, resource }) {
     let resourceBasename = path.basename(resource, path.extname(resource));
     let thumbnail = `${resourceBasename}.thumbnail_h${thumbnailHeight}.jpg`;
     let source = path.join(directory, resource);
@@ -18,7 +18,7 @@ export async function createImageThumbnail({ directory, identifier, resource }) 
     }
 }
 
-export async function createWebFormats({ directory, identifier, resource }) {
+export async function createWebFormats({ directory, resource }) {
     const resourceBasename = path.basename(resource, path.extname(resource));
     const source = path.join(directory, resource);
     if (path.extname(resource).match(/tif{1,2}/i)) {

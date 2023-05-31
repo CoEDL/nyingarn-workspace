@@ -30,7 +30,7 @@ describe(`Test Textract OCR processing`, () => {
         let directory = await prepare({ identifier, task, resource, type: "test" });
 
         await runTextractOCR({ directory, identifier, resource, type: "test" });
-        let contents = await readdir(path.join(directory, identifier));
+        let contents = await readdir(directory);
 
         expect(contents.sort()).toEqual([
             "test-image-text.jpg",
@@ -66,7 +66,7 @@ describe(`Test Textract OCR processing`, () => {
             resource,
             type: "test",
         });
-        let contents = await readdir(path.join(directory, identifier));
+        let contents = await readdir(directory);
 
         expect(contents.sort()).toEqual([
             "test-image-table-1.jpg",
@@ -78,7 +78,7 @@ describe(`Test Textract OCR processing`, () => {
 
         await remove(directory);
         await bucket.removeObjects({ prefix: store.getObjectPath() });
-    });
+    }, 10000);
     it(`should be able process a textract document without tables`, async () => {
         const identifier = "Bates34";
         const resource = "001";

@@ -39,7 +39,7 @@ export async function runTextractOCR({
         region: configuration.api.services.aws.region,
     };
 
-    let localFiles = await readdir(path.join(directory));
+    let localFiles = await readdir(directory);
     const sourceImage = localFiles
         .filter((f) => f.match(/\.jpe?g/i))
         .filter((f) => !f.match(/thumbnail/))

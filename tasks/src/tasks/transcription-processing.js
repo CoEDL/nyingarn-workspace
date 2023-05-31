@@ -33,7 +33,7 @@ export async function processTEIToPageFilesAsStrings({ directory, identifier, re
             destination: "serialized",
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
@@ -150,6 +150,7 @@ export async function __processDigivolTranscriptionXMLProcessor({
     // serialize the data as a JSON file
     let jsonFile = csvFile + ".json";
     await writeFile(jsonFile, JSON.stringify(data));
+    // console.log(data);
 
     let configuration = await loadConfiguration();
     let sourceURI = "file://" + jsonFile;
@@ -168,8 +169,9 @@ export async function __processDigivolTranscriptionXMLProcessor({
             "async"
         );
     } catch (error) {
+        // console.error(error);
         decodeSaxonJSError(error); // unwrap the JSON-formatted error data in the JS XError object thrown by SaxonJS
-        throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
+        throw expandError(error); // expand the error using the error-definitions file, and throw the expanded error
     } finally {
         // remove the temporary JSON file
         await remove(jsonFile);
@@ -205,7 +207,7 @@ function decodeSaxonJSError(error) {
         try {
             error.errorObject = JSON.parse(error.errorObject["value"]);
         } catch (failedToDecodeErrorObject) {
-            console.log("decodeSaxonJSError failed to decode errorObject", error.errorObject);
+            console.error("decodeSaxonJSError failed to decode errorObject", error.errorObject);
         }
     }
 }

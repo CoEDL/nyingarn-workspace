@@ -7,7 +7,8 @@ import {
 } from "./transcription-processing";
 import SaxonJS from "saxon-js";
 import path from "path";
-import { readdir, remove, ensureDir, pathExists } from "fs-extra";
+import { readdir, remove, ensureDir, pathExists, copy } from "fs-extra";
+import { prepare, cleanup } from "./index.js";
 
 jest.setTimeout(20000); // 20s because some tests are too slow otherwise
 
@@ -21,9 +22,16 @@ describe(`Check that known good files are processed successfully`, () => {
         warn.mockReset();
         log.mockReset();
     });
-    it("BM1648A91 - should be able to process a digivol csv file", async () => {
+    it.only("BM1648A91 - should be able to process a digivol csv file", async () => {
         let identifier = "BM1648A91";
-        let directory =  path.join(__dirname, "../test-data/Succeeds-digivol-upload/BM1648A91");
+        const sourceDataFolder = path.join(
+            __dirname,
+            "../test-data/Succeeds-digivol-upload/BM1648A91"
+        );
+        const directory = path.join("/tmp", "Succeeds-digivol-upload", "BM1648A91");
+        await ensureDir(directory);
+        await copy(sourceDataFolder, directory);
+
         let resource = "BM1648A91-digivol.csv";
         let expectedFiles = [
             "BM1648A91-0001.tei.xml",
@@ -103,28 +111,30 @@ describe(`Check that known good files are processed successfully`, () => {
             "BM1648A96-0006.tei.xml",
             "BM1648A96-0007.tei.xml",
         ];
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
+
         try {
             await __processDigivolTranscriptionXMLProcessor({
-                directory, 
-                identifier, 
+                directory,
+                identifier,
                 resource,
-                output: `file://${resourceDirectory}/`,
+                output: `file://${directory}/`,
             });
             let contents = (await readdir(resourceDirectory)).sort();
-
             expectedFiles.forEach((file) => expect(contents).toContain(file));
             unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
         } catch (error) {
+            console.error(error);
             throw error;
         } finally {
-            await remove(resourceDirectory);
+            await remove(directory);
         }
     });
     it("NewNorcia38c - should be able to process a digivol csv file", async () => {
         let identifier = "NewNorcia38c";
-        let directory = path.join(__dirname, "../test-data/Issue-digivol_upload_failure/NewNorcia38c");
+        let directory = path.join(
+            __dirname,
+            "../test-data/Issue-digivol_upload_failure/NewNorcia38c"
+        );
         let resource = "NewNorcia38c-digivol.csv";
         let expectedFiles = [
             "NewNorcia38c-4000.tei.xml",
@@ -188,14 +198,14 @@ describe(`Check that known good files are processed successfully`, () => {
             "NewNorcia38c-4068.tei.xml",
             "NewNorcia38c-4070.tei.xml",
             "NewNorcia38c-4071.tei.xml",
-            "NewNorcia38c-4072.tei.xml"
+            "NewNorcia38c-4072.tei.xml",
         ];
         let resourceDirectory = path.join(directory, "test-output");
         await ensureDir(resourceDirectory);
         try {
             await __processDigivolTranscriptionXMLProcessor({
-                directory, 
-                identifier, 
+                directory,
+                identifier,
                 resource,
                 output: `file://${resourceDirectory}/`,
             });

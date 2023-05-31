@@ -1,7 +1,8 @@
 import fsExtraPkg from "fs-extra";
 const { readJSON } = fsExtraPkg;
+import errorDefinitions from "/srv/configuration/error-definitions.json" assert { type: "json" };
 
-export async function expandError(error) {
+export function expandError(error) {
     /*
 
     The error-definitions.json file lists various types of recognisable Error, and for each type of Error,
@@ -30,7 +31,6 @@ export async function expandError(error) {
 
     */
 
-    let errorDefinitions = await readJSON("/srv/configuration/error-definitions.json");
     // Find the error definitions matching this error in the error-definitions file, and
     // sort the matching definitions by specificity, with the LEAST specific matches first.
     // We then process the matching error definitions in order of increasing specificity,

@@ -37,7 +37,7 @@ describe(`Check that known good files are processed successfully`, () => {
         warn.mockReset();
         log.mockReset();
     });
-    it.only("BM1648A91 - should be able to process a digivol csv file", async () => {
+    it("BM1648A91 - should be able to process a digivol csv file", async () => {
         let identifier = "BM1648A91";
         const directory = await makeScratchCopy("Succeeds-digivol-upload/BM1648A91");
         let resource = "BM1648A91-digivol.csv";

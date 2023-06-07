@@ -52,14 +52,16 @@
 					<sourceDesc>
 						<p>{$ro-crate-root-properties('description')}</p>
 					</sourceDesc>
-					<xenoData type="application/ld+json">
-						<xsl:sequence select="serialize($ro-crate, map{'method': 'json', 'indent': true()})"/>
-					</xenoData>
 				</fileDesc>
+				<xenoData type="application/ld+json">
+					<xsl:sequence select="serialize($ro-crate, map{'method': 'json', 'indent': true()})"/>
+				</xenoData>
 			</teiHeader>
 			<xsl:variable name="text-content">
 				<text>
-					<xsl:apply-templates mode="surface-to-text" select="$surfaces"/>
+					<body>
+						<xsl:apply-templates mode="surface-to-text" select="$surfaces"/>
+					</body>
 				</text>
 			</xsl:variable>
 			<xsl:apply-templates mode="reconstitute" select="$text-content"/>

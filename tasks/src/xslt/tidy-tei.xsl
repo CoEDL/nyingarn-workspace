@@ -3,7 +3,6 @@
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     xmlns="http://www.tei-c.org/ns/1.0"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
-    xmlns:css="https://www.w3.org/Style/CSS/"
 >
     <!--
 	Tidies up a TEI file.
@@ -13,29 +12,30 @@
 	Trims white space from the start of each line.
 	Discards <hi> elements with no @rend
     -->
-
-    <!-- CSS declaration parsing -->
-    <xsl:import href="css.xsl"/>
-
-    <!-- discard leading white space after a line break -->
-    <xsl:template match="text()[contains(., codepoints-to-string(10))]" mode="tidy">
-	<xsl:sequence select="replace(., '\n\s+', codepoints-to-string(10))"/>
-    </xsl:template>
-
-    <!-- trim white space before <lb/> elements -->
-    <xsl:template match="text()[following-sibling::*[1]/self::lb][matches(., '\s$')]" mode="tidy">
-	<xsl:sequence select="replace(., '\s+$', '')"/>
+    
+    <!-- remove whitespace chars that either:
+        • immediately follow a newline character
+        • immediately precede a newline chararacter
+        • immediately precede an lb element
+    -->
+    <xsl:template match="text()" mode="tidy">
+    	<xsl:variable name="without-leading-whitespace" select="replace(., '\n\s+', codepoints-to-string(10))"/>
+    	<xsl:variable name="without-trailing-whitespace" select="
+    		if (
+    			(parent::p and not(following-sibling::*)) or (: last text node in a p :)
+    			(following-sibling::*[1]/self::lb) (: immediately followed by a lb :)
+    		) then 
+    			replace($without-leading-whitespace, '\s+$', '')
+    		else
+    			$without-leading-whitespace
+    	"/>
+    	<xsl:sequence select="$without-trailing-whitespace"/>
     </xsl:template>
 
     <!-- add newline after <lb/> elements -->
     <xsl:template match="lb" mode="tidy">
 	<xsl:next-match/>
 	<xsl:sequence select="codepoints-to-string(10)"/>
-    </xsl:template>
-
-    <!-- trim trailing white space inside <p> elements -->
-    <xsl:template match="p/text()[not(following-sibling::node())][matches(., '\s$')]" mode="tidy">
-	<xsl:sequence select="replace(., '\s+$', '')"/>
     </xsl:template>
     
     <!-- discard highlight elements where the nature of the highlight is missing (has been stripped out in a prior step -->

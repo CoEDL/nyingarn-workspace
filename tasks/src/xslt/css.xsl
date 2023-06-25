@@ -5,12 +5,14 @@
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
 >
 	<!-- parses a CSS declaration block and returns it as an XDM map mapping property names to value strings -->
-    <xsl:function name="css:parse-declaration-block" as="map(*)*">
+    <xsl:function name="css:parse-declaration-block" as="map(*)">
     	<xsl:param name="declaration-block"/>
     	<xsl:sequence select="
-		for $declaration in $declaration-block => tokenize(';') return map:entry(
-			$declaration => substring-before(':') => normalize-space(),
-			$declaration => substring-after(':') => normalize-space()
+    		map:merge(
+			for $declaration in $declaration-block => tokenize(';') return map:entry(
+				$declaration => substring-before(':') => normalize-space(),
+				$declaration => substring-after(':') => normalize-space()
+			)
 		)
     	"/>
     </xsl:function>

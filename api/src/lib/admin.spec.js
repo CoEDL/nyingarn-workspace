@@ -252,7 +252,7 @@ describe("Admin management tests", () => {
         await storeItem.removeObject();
         await storeCollection.removeObject();
     });
-    it("should be able to publish an object", async () => {
+    it("should be able to publish an openAccess object", async () => {
         let storeItem = await getStoreHandle({
             id: identifier,
             type: "item",
@@ -269,6 +269,73 @@ describe("Admin management tests", () => {
         } catch (error) {
             expect(error.message).toEqual("User must be an admin");
         }
+        // set up the expected metadata
+        let item = await models.item.findOne({ where: { identifier } });
+        expect(item.publicationStatus).toEqual("inProgress");
+
+        item.publicationMetadata = {
+            accessType: "open",
+        };
+        await item.save();
+
+        // publish the item
+        await publishObject({
+            user: adminUser,
+            type: "item",
+            identifier,
+            configuration,
+        });
+
+        await item.reload();
+        expect(item.publicationStatus).toEqual("published");
+
+        let crate = await storeItem.getJSON({ target: "ro-crate-metadata.json" });
+        let licence = crate["@graph"].filter((e) => e["@id"] === "LICENCE.md")[0];
+        expect(licence).toEqual({
+            "@id": "LICENCE.md",
+            "@type": ["File", "DataReuselicence"],
+            name: "Open (subject to agreeing to Nyingarn access conditions)",
+            access: {
+                "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
+            },
+            authorizationWorkflow: {
+                "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms",
+            },
+        });
+
+        await models.item.destroy({ where: { identifier } });
+        await storeItem.removeObject();
+    });
+    it("should be able to publish a restricted object", async () => {
+        let storeItem = await getStoreHandle({
+            id: identifier,
+            type: "item",
+        });
+
+        //  setup
+        let user = users.filter((u) => !u.administrator)[0];
+        let adminUser = users.filter((u) => u.administrator)[0];
+        await setupTestItem({ identifier, store: storeItem, user });
+        const configuration = await loadConfiguration();
+
+        try {
+            await publishObject({ user, type: "item", identifier, configuration });
+        } catch (error) {
+            expect(error.message).toEqual("User must be an admin");
+        }
+        // set up the expected metadata
+        let item = await models.item.findOne({ where: { identifier } });
+        expect(item.publicationStatus).toEqual("inProgress");
+
+        let now = new Date().toISOString();
+        item.publicationMetadata = {
+            accessType: "restricted",
+            accessNarrative: {
+                text: "closed",
+                reviewDate: now,
+            },
+        };
+        await item.save();
 
         // deposit the item
         await publishObject({
@@ -278,21 +345,28 @@ describe("Admin management tests", () => {
             configuration,
         });
 
-        let item = await models.item.findOne({ where: { identifier } });
+        await item.reload();
         expect(item.publicationStatus).toEqual("published");
 
         let crate = await storeItem.getJSON({ target: "ro-crate-metadata.json" });
         let licence = crate["@graph"].filter((e) => e["@id"] === "LICENCE.md")[0];
-        expect(licence).toEqual({
+        expect(licence).toMatchObject({
             "@id": "LICENCE.md",
             "@type": ["File", "DataReuselicence"],
-            name: "Open (subject to agreeing to PDSC access conditions)",
             access: {
-                "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
+                "@id": "http://purl.archive.org/language-data-commons/terms#AuthorizedAccess",
             },
-            authorizationWorkflow: {
-                "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms",
-            },
+            authorizationWorkflow: [
+                {
+                    "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms",
+                },
+                {
+                    "@id": "http://purl.archive.org/language-data-commons/terms#AccessControlList",
+                },
+            ],
+            description: "closed",
+            reviewDate: now,
+            accessControlList: "file://.authorised-users.json",
         });
 
         await models.item.destroy({ where: { identifier } });
@@ -332,19 +406,31 @@ describe("Admin management tests", () => {
             location: "repository",
         });
 
-        // setup an item in the workspace
-        let { item } = await setupTestItem({
+        let user = users.filter((u) => !u.administrator)[0];
+        let adminUser = users.filter((u) => u.administrator)[0];
+        await setupTestItem({ identifier, store: objectWorkspace, user });
+        const configuration = await loadConfiguration();
+
+        // publish the item
+        let item = await models.item.findOne({ where: { identifier } });
+        item.publicationMetadata = {
+            accessType: "open",
+        };
+        await item.save();
+        await publishObject({
+            user: adminUser,
+            type: "item",
             identifier,
-            store: objectWorkspace,
-            user: users.filter((u) => !u.administrator)[0],
+            configuration,
         });
+        await item.reload();
 
         // deposit into the repo
         await depositObjectIntoRepository({ type: "item", identifier });
 
         let resources = await objectRepository.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(8);
+        expect(resources.length).toEqual(9);
 
         let objectExistsInWorkspace = await objectWorkspace.exists();
         expect(objectExistsInWorkspace).toBeFalse;
@@ -373,12 +459,24 @@ describe("Admin management tests", () => {
             location: "repository",
         });
 
-        // setup an item in the workspace
-        let { item } = await setupTestItem({
+        let user = users.filter((u) => !u.administrator)[0];
+        let adminUser = users.filter((u) => u.administrator)[0];
+        await setupTestItem({ identifier, store: objectWorkspace, user });
+        const configuration = await loadConfiguration();
+
+        // publish the item
+        let item = await models.item.findOne({ where: { identifier } });
+        item.publicationMetadata = {
+            accessType: "open",
+        };
+        await item.save();
+        await publishObject({
+            user: adminUser,
+            type: "item",
             identifier,
-            store: objectWorkspace,
-            user: users.filter((u) => !u.administrator)[0],
+            configuration,
         });
+        await item.reload();
 
         // deposit into the repo
         await depositObjectIntoRepository({ type: "item", identifier });
@@ -390,7 +488,7 @@ describe("Admin management tests", () => {
         expect(objectExistsInWorkspace).toBeTrue;
         let resources = await objectWorkspace.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(8);
+        expect(resources.length).toEqual(9);
 
         // change the metadata file so it versions
         let crateFile = await objectWorkspace.getJSON({ target: "ro-crate-metadata.json" });
@@ -399,7 +497,7 @@ describe("Admin management tests", () => {
 
         resources = await objectWorkspace.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(8);
+        expect(resources.length).toEqual(9);
 
         // deposit into the repo a second time and check metadata versioned
         await depositObjectIntoRepository({
@@ -410,7 +508,7 @@ describe("Admin management tests", () => {
 
         resources = await objectRepository.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(9);
+        expect(resources.length).toEqual(10);
 
         let crateFileVersions = await objectRepository.listFileVersions({
             target: "ro-crate-metadata.json ",

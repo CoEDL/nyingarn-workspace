@@ -11,7 +11,9 @@ import {
     host,
     setupTestItem,
     setupTestCollection,
+    loadConfiguration,
 } from "../common/index.js";
+import { publishObject } from "../lib/admin.js";
 import models from "../models/index.js";
 
 describe("Admin route tests", () => {
@@ -268,12 +270,32 @@ describe("Admin route tests", () => {
             location: "repository",
         });
 
-        //  setup as a normal user
         let user = users.filter((u) => !u.administrator)[0];
+        let adminUser = users.filter((u) => u.administrator)[0];
         await setupTestItem({ identifier, store: workspaceObject, user });
+        const configuration = await loadConfiguration();
+
+        // set up the expected metadata
+        let item = await models.item.findOne({ where: { identifier } });
+        expect(item.publicationStatus).toEqual("inProgress");
+
+        item.publicationMetadata = {
+            accessType: "open",
+        };
+        await item.save();
+
+        // publish the item
+        await publishObject({
+            user: adminUser,
+            type: "item",
+            identifier,
+            configuration,
+        });
+
+        await item.reload();
+        expect(item.publicationStatus).toEqual("published");
 
         // connect as an admin
-        let adminUser = users.filter((u) => u.administrator)[0];
         let session = await createSession({ user: adminUser });
 
         // deposit the item
@@ -284,7 +306,7 @@ describe("Admin route tests", () => {
         });
         expect(response.status).toEqual(200);
 
-        let item = await models.item.findOne({ where: { identifier } });
+        item = await models.item.findOne({ where: { identifier } });
         expect(item.publicationStatus).toEqual("published");
 
         expect(await workspaceObject.exists()).toBeFalse;
@@ -308,12 +330,32 @@ describe("Admin route tests", () => {
             location: "repository",
         });
 
-        //  setup as a normal user
         let user = users.filter((u) => !u.administrator)[0];
-        await setupTestItem({ identifier, store: workspaceObject, user });
-
-        // connect as an admin
         let adminUser = users.filter((u) => u.administrator)[0];
+        await setupTestItem({ identifier, store: workspaceObject, user });
+        const configuration = await loadConfiguration();
+
+        // set up the expected metadata
+        let item = await models.item.findOne({ where: { identifier } });
+        expect(item.publicationStatus).toEqual("inProgress");
+
+        item.publicationMetadata = {
+            accessType: "open",
+        };
+        await item.save();
+
+        // publish the item
+        await publishObject({
+            user: adminUser,
+            type: "item",
+            identifier,
+            configuration,
+        });
+
+        await item.reload();
+        expect(item.publicationStatus).toEqual("published");
+
+        // connect as admin
         let session = await createSession({ user: adminUser });
 
         // deposit the item
@@ -324,7 +366,7 @@ describe("Admin route tests", () => {
         });
         expect(response.status).toEqual(200);
 
-        let item = await models.item.findOne({ where: { identifier } });
+        item = await models.item.findOne({ where: { identifier } });
         expect(item.publicationStatus).toEqual("published");
 
         response = await fetch(`${host}/admin/items/${identifier}/restore`, {

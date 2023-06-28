@@ -110,6 +110,7 @@ describe("Repository management tests", () => {
         const client = new Client({
             node: configuration.api.services.elastic.host,
         });
+
         let document = await client.get({
             index: "metadata",
             id: `/item/${identifier}`,
@@ -122,8 +123,8 @@ describe("Repository management tests", () => {
             thingo: [{}],
         });
         let person = await client.get({
-            index: "data",
-            id: `#person1`,
+            index: "entities",
+            id: encodeURIComponent("#person1"),
         });
         expect(person._source).toMatchObject({
             "@id": "#person1",

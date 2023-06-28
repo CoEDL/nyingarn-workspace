@@ -139,8 +139,13 @@ export async function putItemResource({
     await store.put({ target: resource, localPath, content, json });
 }
 
-export async function getItemResourceLink({ identifier, resource, download }) {
-    let store = await getStoreHandle({ id: identifier, type: "item" });
+export async function getItemResourceLink({
+    identifier,
+    resource,
+    location = "workspace",
+    download,
+}) {
+    let store = await getStoreHandle({ id: identifier, type: "item", location });
     if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }
@@ -152,9 +157,9 @@ export async function getItemResourceLink({ identifier, resource, download }) {
     }
 }
 
-export async function listItemResources({ identifier, offset = 0, limit }) {
+export async function listItemResources({ identifier, offset = 0, limit, location = "workspace" }) {
     const configuration = await loadConfiguration();
-    let store = await getStoreHandle({ id: identifier, type: "item" });
+    let store = await getStoreHandle({ id: identifier, type: "item", location });
     if (!(await store.exists())) {
         throw new Error(`Item with identifier '${identifier}' does not exist in the store`);
     }

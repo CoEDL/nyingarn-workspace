@@ -49,34 +49,6 @@ services:
             timeout: 20s
             retries: 3
 
-    # tus:
-    #     image: arkisto/workspace-tusd:latest
-    #     restart: always
-    #     ports:
-    #         - 1080:1080
-    #     volumes:
-    #         - TUS_VOLUME:/data
-    #     user: root
-    #     environment:
-    #         AWS_DEFAULT_REGION: us-east-1
-    #         AWS_ACCESS_KEY_ID: "${S3_ACCESS_KEY_ID}"
-    #         AWS_SECRET_ACCESS_KEY: "${S3_SECRET_ACCESS_KEY}"
-    #         S3_ENDPOINT_URL: "${S3_ENDPOINT_URL}"
-    #         S3_BUCKET: "${S3_BUCKET}"
-    #         PRE_CREATE: "http://api:8080/upload/pre-create"
-    #         POST_FINISH: "http://api:8080/upload/post-finish"
-    #     entrypoint:
-    #         [
-    #             "/usr/local/bin/tusd",
-    #             "-verbose",
-    #             "-hooks-enabled-events",
-    #             "pre-create,post-finish",
-    #             "-upload-dir",
-    #             "/data",
-    #             "-hooks-dir",
-    #             "/srv/tusd-hooks"
-    #         ]
-
     rabbit:
         image: rabbitmq:3-management
         hostname: rabbit
@@ -158,9 +130,23 @@ services:
             TERM: "xterm-256color"
             NODE_ENV: "development"
         volumes:
+            # - ui_node_modules:/srv/ui/node_modules:delegated
             - ./ui:/srv/ui:delegated
             - .git:/srv/ui/.git:delegated
-            - ui_node_modules:/srv/ui/node_modules:delegated
+        working_dir: /srv/ui
+        command: [ "npm", "run", "develop" ]
+
+    ui-repository:
+        image: node:18-bullseye
+        hostname: ui-repository
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "development"
+        volumes:
+            # - ui_node_modules:/srv/ui/node_modules:delegated
+            - ./ui-repository:/srv/ui:delegated
+            - .git:/srv/ui/.git:delegated
         working_dir: /srv/ui
         command: [ "npm", "run", "develop" ]
 
@@ -206,3 +192,4 @@ services:
             ]
         ports:
             - 9000:9000
+            - 9001:9001

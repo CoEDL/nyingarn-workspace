@@ -11,6 +11,7 @@ import { router, $http } from "./routes";
 import { store } from "./store";
 import ElementPlus from "element-plus";
 import DescriboCrateBuilder from "@describo/crate-builder-component";
+import "./assets/describo-override-styles.css";
 
 (async () => {
     let response = await fetch("/api/configuration");

@@ -5,6 +5,7 @@ export { getS3Handle, getStoreHandle } from "./getS3Handle.js";
 export {
     demandAuthenticatedUser,
     demandAdministrator,
+    isUserAuthenticated,
     requireCollectionAccess,
     requireItemAccess,
 } from "./middleware.js";

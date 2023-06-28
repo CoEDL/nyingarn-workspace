@@ -45,7 +45,7 @@ export function setupRoutes(fastify, options, done) {
         fastify.addHook("preHandler", demandAdministrator);
 
         fastify.get("/admin", async (req, res) => {});
-        fastify.get("/admin/setup-service", getAdminSetupServiceHanlder);
+        fastify.get("/admin/setup-service", getAdminSetupServiceHandler);
 
         fastify.get("/admin/entries/items", getAdminEntriesItemsHandler);
         fastify.get("/admin/items/awaiting-review", getItemsAwaitingReviewHandler);
@@ -91,7 +91,7 @@ async function getAdminEntriesCollectionsHandler(req) {
     });
     return { collections, total };
 }
-async function getAdminSetupServiceHanlder(req) {
+async function getAdminSetupServiceHandler(req) {
     log.info(`Importing the workspace items`);
     try {
         await importItemsFromStorageIntoTheDb({

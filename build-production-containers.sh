@@ -51,7 +51,7 @@ if [ "$resp" == "y" ] ; then
     docker run -it --rm \
         -v $PWD/ui:/srv/ui \
         -v ui_node_modules:/srv/ui/node_modules \
-        -w /srv/ui node:14-buster bash -l -c "npm run build"
+        -w /srv/ui node:18-bullseye bash -l -c "npm run build"
     docker buildx build --push --rm --platform linux/amd64 \
         -t ghcr.io/coedl/nyingarn-workspace-ui:latest \
         -t ghcr.io/coedl/nyingarn-workspace-ui:${VERSION} \
@@ -61,9 +61,9 @@ if [ "$resp" == "y" ] ; then
     docker run -it --rm \
         -v $PWD/ui-repository:/srv/ui \
         -v ui_node_modules:/srv/ui/node_modules \
-        -w /srv/ui node:14-buster bash -l -c "npm run build"
+        -w /srv/ui node:18-bullseye bash -l -c "npm run build"
     docker buildx build --push --rm --platform linux/amd64 \
-        -t ghcr.io/coedl/nyingarn-workspace-ui:latest \
-        -t ghcr.io/coedl/nyingarn-workspace-ui:${VERSION} \
+        -t ghcr.io/coedl/nyingarn-repository-ui:latest \
+        -t ghcr.io/coedl/nyingarn-repository-ui:${VERSION} \
         -f Dockerfile.ui-build .
 fi

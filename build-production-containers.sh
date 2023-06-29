@@ -65,5 +65,5 @@ if [ "$resp" == "y" ] ; then
     docker buildx build --push --rm --platform linux/amd64 \
         -t ghcr.io/coedl/nyingarn-repository-ui:latest \
         -t ghcr.io/coedl/nyingarn-repository-ui:${VERSION} \
-        -f Dockerfile.ui-build .
+        -f Dockerfile.ui-repository-build .
 fi

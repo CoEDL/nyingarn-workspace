@@ -13,13 +13,14 @@
 	<xsl:import href="paginate.xsl"/>
 	<xsl:import href="normalise.xsl"/>
 
+	<!-- the identifier of the document in the Nyingarn workspace -->
+	<xsl:param name="identifier"/>
+	<!-- a complete path name to the file "file:///some-folder/{$identifier}/{$identifier}-tei.xml" -->
+	<xsl:param name="source-uri"/>
+	<!-- a regular expression for validating the identifiers of pages within the tei doc -->
+	<xsl:param name="page-identifier-regex"/>
+
 	<xsl:template name="xsl:initial-template">
-		<xsl:param name="identifier"/>
-		<!-- the identifier of the document in the Nyingarn workspace -->
-		<xsl:param name="source-uri"/>
-		<!-- a complete path name to the file "file:///some-folder/{$identifier}/{$identifier}-tei.xml" -->
-		<xsl:param name="page-identifier-regex"/>
-		<!-- a regular expression for validating the identifiers of pages within the tei doc -->
 		<xsl:variable name="source" select="document($source-uri)"/>
 		<xsl:variable name="normalised">
 			<!-- the normalisation step will convert any source-specific conventions into a standard form of TEI -->

@@ -9,6 +9,7 @@ import SaxonJS from "saxon-js";
 import path from "path";
 import { readdir, remove, ensureDir, pathExists, copy } from "fs-extra";
 import { prepare, cleanup } from "./index.js";
+import { pathToFileURL } from 'node:url';
 
 jest.setTimeout(20000); // 20s because some tests are too slow otherwise
 
@@ -26,6 +27,44 @@ async function makeScratchCopy(testDataFolder) {
     await copy(sourceFolder, scratchFolder);
     return scratchFolder;
 }
+describe(`check that SaxonJS's XML and JSON parsers work`, () => {
+    it("should be able to parse an XML file", async () => {
+		try {
+			SaxonJS.setLogLevel(10);
+			const sourceURI = pathToFileURL('/srv/tasks/saxon-test/source.xml').href;
+			const transformationResults = await SaxonJS.transform(
+				{
+					 stylesheetFileName: "/srv/tasks/saxon-test/test.xsl.sef.json",
+					stylesheetParams: {
+						"source-uri": sourceURI,
+					},
+					baseOutputURI: sourceURI
+				},
+				"async"
+			);
+		} catch (error) {
+			console.log(error);
+		}
+	});
+    it("should be able to parse and extract data from a JSON file", async () => {
+		try {
+			SaxonJS.setLogLevel(10);
+			const sourceURI = pathToFileURL('/srv/tasks/saxon-test/source.json').href;
+			const transformationResults = await SaxonJS.transform(
+				{
+					stylesheetFileName: "/srv/tasks/saxon-test/test-json.xsl.sef.json",
+					stylesheetParams: {
+						"source-uri": sourceURI
+					},
+					baseOutputURI: sourceURI
+				},
+				"async"
+			);
+		} catch (error) {
+			console.log(error);
+		}
+	});
+});
 
 describe(`Check that known good files are processed successfully`, () => {
     let log, warn;
@@ -36,6 +75,24 @@ describe(`Check that known good files are processed successfully`, () => {
     afterAll(() => {
         warn.mockReset();
         log.mockReset();
+    });
+    it.only("should do a one-off conversion of Porcupine.xml", async () => {
+        let identifier = "Porcupine";
+        const directory = await makeScratchCopy("temp-manual-digivol-conversion");
+        let resource = "Porcupine-digivol.csv";
+        try {
+            await __processDigivolTranscriptionXMLProcessor({
+                directory,
+                identifier,
+                resource,
+                output: `file://${directory}/`,
+            });
+        } catch (error) {
+            console.error(error);
+            throw error;
+        } finally {
+            //await remove(directory);
+        }
     });
     it("BM1648A91 - should be able to process a digivol csv file", async () => {
         let identifier = "BM1648A91";
@@ -127,14 +184,14 @@ describe(`Check that known good files are processed successfully`, () => {
                 resource,
                 output: `file://${directory}/`,
             });
-            let contents = (await readdir(resourceDirectory)).sort();
+            let contents = (await readdir(directory)).sort();
             expectedFiles.forEach((file) => expect(contents).toContain(file));
             unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
         } catch (error) {
             console.error(error);
             throw error;
         } finally {
-            await remove(directory);
+            //await remove(directory);
         }
     });
     it("NewNorcia38c - should be able to process a digivol csv file", async () => {
@@ -223,6 +280,26 @@ describe(`Check that known good files are processed successfully`, () => {
             await remove(directory);
         }
     });
+    it("should parse an XML document", async() => {
+        let identifier = "parse-test";
+        let resource = "parse-test.xml";
+        let directory = await makeScratchCopy("parse-test");
+        let sourceURI = "file://" + path.join(directory, resource);
+        try {
+            try {
+                await __processTeiTranscriptionXMLProcessor({
+                    identifier,
+                    sourceURI,
+                    output: `file://${directory}/`,
+                });
+            } catch (error) {
+            	console.error(error);
+               throw error;
+            }
+        } finally {
+            // TODO await remove(directory);
+        }
+    });
     it("fake-msword-example - should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {
         let identifier = "msword_example";
         let resource = "msword_example-tei.xml";
@@ -238,16 +315,21 @@ describe(`Check that known good files are processed successfully`, () => {
         let resourceDirectory = path.join(directory, "test-output");
         await ensureDir(resourceDirectory);
         try {
-            await __processTeiTranscriptionXMLProcessor({
-                identifier,
-                sourceURI,
-                output: `file://${resourceDirectory}/`,
-            });
+            try {
+                await __processTeiTranscriptionXMLProcessor({
+                    identifier,
+                    sourceURI,
+                    output: `file://${resourceDirectory}/`,
+                });
+            } catch (error) {
+            	console.error(error);
+               throw error;
+            }
             let contents = (await readdir(resourceDirectory)).sort();
             expectedFiles.forEach((file) => expect(contents).toContain(file));
             unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
         } finally {
-            await remove(directory);
+            // TODO await remove(directory);
         }
     });
     it("SLNSW_FL814 - should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {

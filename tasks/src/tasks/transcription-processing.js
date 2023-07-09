@@ -92,13 +92,15 @@ export async function __processTeiTranscriptionXMLProcessor({
     sourceURI,
     output = undefined,
 }) {
-    /* identifier = e.g. "Bates23"; sourceURI = "file:///blah/blah/Bates23/Bates23-tei.xml" */
+    // identifier = e.g. "Bates23"; sourceURI = "file:///blah/blah/Bates23/Bates23-tei.xml"
     let configuration = await loadConfiguration();
     try {
+        SaxonJS.setLogLevel(10);
         const transformationResults = await SaxonJS.transform(
             {
+            	 //stylesheetFileName: "/srv/tasks/saxon-test/test.xsl.sef.json",
                 stylesheetFileName: "/srv/tasks/src/xslt/process-tei-to-page-files.xsl.sef.json",
-                templateParams: {
+                stylesheetParams: {
                     identifier: identifier,
                     "source-uri": sourceURI,
                     "page-identifier-regex": configuration.ui.filename.checkNameStructure,
@@ -159,7 +161,7 @@ export async function __processDigivolTranscriptionXMLProcessor({
             {
                 stylesheetFileName:
                     "/srv/tasks/src/xslt/process-digivol-csv-to-page-files.xsl.sef.json",
-                templateParams: {
+                stylesheetParams: {
                     identifier: identifier,
                     "source-uri": sourceURI,
                     "page-identifier-regex": configuration.ui.filename.checkNameStructure,
@@ -174,7 +176,7 @@ export async function __processDigivolTranscriptionXMLProcessor({
         throw expandError(error); // expand the error using the error-definitions file, and throw the expanded error
     } finally {
         // remove the temporary JSON file
-        await remove(jsonFile);
+        //await remove(jsonFile);
     }
 }
 

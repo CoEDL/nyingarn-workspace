@@ -14,8 +14,9 @@
         <div class="p-8 bg-red-200 rounded">
             <div>
                 When the workspace is first initialised, it's also necessary to build the repository
-                index. This should only be done once and only if you know that it's required. In
-                other words, DON'T DO THIS UNLESS YOU ARE CERTAIN THAT YOU SHOULD!
+                index. This should only be done once and only if you know that it's required. It
+                doesn't hurt if you do run it but it can take a long time as it walks the whole
+                repository and reindexes all of the content.
             </div>
             <div>
                 <el-button @click="indexRepository"> index the repository</el-button>

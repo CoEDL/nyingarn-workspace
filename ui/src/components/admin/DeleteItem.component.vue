@@ -1,6 +1,6 @@
 <template>
     <el-card>
-        <template #header>Index a specific item or collection in the repository</template>
+        <template #header>Delete a specific item or collection in the repository</template>
         <div class="flex flex-row space-x-1" v-loading="data.loading">
             <el-select
                 class="w-full"
@@ -21,7 +21,9 @@
                     {{ item.identifier }} ({{ item.type }})
                 </el-option>
             </el-select>
-            <div><el-button @click="indexItem" type="primary">Index item</el-button></div>
+            <div>
+                <el-button @click="deleteItem" type="danger">Delete item</el-button>
+            </div>
         </div>
     </el-card>
 </template>
@@ -49,9 +51,10 @@ async function findItem(prefix) {
     data.loading = false;
     return rows;
 }
-async function indexItem() {
+async function deleteItem() {
     data.loading = true;
-    await lib.indexRepositoryContent({ $http, id: data.selectedItemIdentifier });
+    const item = data.options.filter((i) => i.id === data.selectedItemIdentifier)[0];
+    await lib.deleteItemFromRepository({ $http, ...item });
     data.selectedItemIdentifier = undefined;
     data.loading = false;
 }

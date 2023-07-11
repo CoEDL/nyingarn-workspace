@@ -24,6 +24,7 @@ import {
     objectRequiresMoreWork,
     depositObjectIntoRepository,
     restoreObjectIntoWorkspace,
+    deleteItemFromRepository,
 } from "./admin.js";
 import { Client } from "@elastic/elasticsearch";
 
@@ -514,6 +515,49 @@ describe("Admin management tests", () => {
             target: "ro-crate-metadata.json ",
         });
         expect(crateFileVersions.length).toEqual(2);
+
+        await objectWorkspace.removeObject();
+        await objectRepository.removeObject();
+        await deleteItem({ id: item.id });
+    });
+    it("should be able to delete an item from the repository", async () => {
+        let objectWorkspace = await getStoreHandle({ identifier, type: "item" });
+        let objectRepository = await getStoreHandle({
+            identifier,
+            type: "item",
+            location: "repository",
+        });
+
+        let user = users.filter((u) => !u.administrator)[0];
+        let adminUser = users.filter((u) => u.administrator)[0];
+        await setupTestItem({ identifier, store: objectWorkspace, user });
+        const configuration = await loadConfiguration();
+
+        // publish the item
+        let item = await models.item.findOne({ where: { identifier } });
+        item.publicationMetadata = {
+            accessType: "open",
+        };
+        await item.save();
+        await publishObject({
+            user: adminUser,
+            type: "item",
+            identifier,
+            configuration,
+        });
+        await item.reload();
+
+        // deposit into the repo
+        await depositObjectIntoRepository({ type: "item", identifier });
+
+        // delete the item from the repository
+        await deleteItemFromRepository({ type: "item", identifier, configuration });
+
+        let exists = await objectRepository.exists();
+        expect(exists).toEqual(false);
+
+        let repoitem = await models.repoitem.findOne({ where: { identifier } });
+        expect(repoitem).toEqual(null);
 
         await objectWorkspace.removeObject();
         await objectRepository.removeObject();

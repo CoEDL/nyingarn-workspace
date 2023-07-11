@@ -3,9 +3,9 @@ import {
     getStoreHandle,
     getS3Handle,
     authorisedUsersFile,
-    indexItem,
     getLogger,
 } from "../common/index.js";
+import { indexItem, deleteItemFromIndex } from "../common/elastic-index.js";
 import { lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
 import {
     lookupCollectionByIdentifier,
@@ -367,7 +367,7 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
 
     const workspaceObjectExists = await objectWorkspace.exists();
     if (!workspaceObjectExists) {
-        // create the object location in the repo
+        // create the object location in the workspace storage
         io.emit(`restore-${type}`, {
             msg: `Creating the ${type} in the workspace`,
             date: new Date(),
@@ -386,11 +386,11 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
     let resources = await objectRepository.listResources();
     resources = resources
         .filter((resource) => !resource.Key.match(/nocfl.*/))
-        .filter((resource) => {
-            return !resource.Key.match(
-                /.*\.v\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z).*/
-            );
-        })
+        // .filter((resource) => {
+        //     return !resource.Key.match(
+        //         /.*\.v\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z).*/
+        //     );
+        // })
         .map((resource) => {
             return {
                 target: resource.Key,
@@ -403,6 +403,7 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
         date: new Date(),
     });
     await objectWorkspace.copy({ batch: resources });
+    resources = await objectWorkspace.listResources();
 }
 
 export async function setRepositoryItemMetadata({ item, store }) {
@@ -447,4 +448,24 @@ export async function setRepositoryItemMetadata({ item, store }) {
         item.accessControlList = [];
         await item.save();
     }
+}
+
+export async function deleteItemFromRepository({ type, identifier, configuration }) {
+    // restore the object from the repo back into the workspace
+    await restoreObjectIntoWorkspace({ type: "item", identifier });
+
+    //  delete the item from the storage
+    const objectRepository = await getStoreHandle({
+        identifier,
+        type,
+        location: "repository",
+    });
+    await objectRepository.removeObject();
+
+    //  delete it from elastic
+    let item = await models.repoitem.findOne({ where: { identifier, type } });
+    await deleteItemFromIndex({ item, configuration });
+
+    //  delete it from the db
+    await models.repoitem.destroy({ where: { identifier } });
 }

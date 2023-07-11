@@ -22,6 +22,7 @@ import {
     publishObject,
     depositObjectIntoRepository,
     restoreObjectIntoWorkspace,
+    deleteItemFromRepository,
 } from "../lib/admin.js";
 import { importRepositoryContentFromStorageIntoTheDb } from "../lib/repository.js";
 const log = getLogger();
@@ -65,6 +66,7 @@ export function setupRoutes(fastify, options, done) {
             });
             fastify.put("/admin/:type/:identifier/deposit", putDepositObjectHandler);
             fastify.put("/admin/:type/:identifier/needs-work", putObjectNeedsWorkHandler);
+
             done();
         });
 
@@ -178,6 +180,7 @@ async function putDepositObjectHandler(req, res) {
 
     req.io.to(req.query.clientId).emit(`deposit-${type}`, { msg: `Done`, date: new Date() });
 }
+
 async function putRestoreObjectHandler(req) {
     let { type, identifier } = req.params;
     type = type === "items" ? "item" : "collection";

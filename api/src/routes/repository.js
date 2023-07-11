@@ -6,6 +6,7 @@ import {
     getStoreHandle,
     indexItem,
 } from "../common/index.js";
+import { deleteItemFromRepository } from "../lib/admin.js";
 import { listItemResources, getItemResourceLink } from "../lib/item.js";
 import { getRepositoryItems } from "../lib/repository.js";
 import { transformDocument } from "../lib/transform.js";
@@ -28,6 +29,7 @@ export function setupRoutes(fastify, options, done) {
         fastify.get("/repository/lookup-content", getRepositoryLookupContentHandler);
         fastify.get("/repository/index-all-content", indexAllRepositoryContentHandler);
         fastify.get("/repository/index/:id", indexRepositoryItemHandler);
+        fastify.delete("/repository/:type/:identifier", deleteRepositoryObjectHandler);
         done();
     });
     done();
@@ -222,4 +224,19 @@ async function indexAllRepositoryContentHandler(req) {
         if (itemsIndexed < total) await indexItems(itemsIndexed);
     }
     return {};
+}
+
+async function deleteRepositoryObjectHandler(req, res) {
+    let { type, identifier } = req.params;
+    try {
+        await deleteItemFromRepository({
+            type,
+            identifier,
+            configuration: req.session.configuration,
+        });
+    } catch (error) {
+        log.error(`There was a problem removing the item from the repository`);
+        console.error(error);
+        return res.internalServerError();
+    }
 }

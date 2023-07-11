@@ -18,7 +18,7 @@ export {
     setupTestItem,
     setupTestCollection,
 } from "./test-utils.js";
-export { indexItem } from "./elastic-index.js";
+export { indexItem, deleteItemFromIndex } from "./elastic-index.js";
 
 export const completedResources = ".completed-resources.json";
 export const resourceStatusFile = ".item-status.json";
@@ -35,6 +35,7 @@ export const specialFiles = [
     "-tei-complete.*.xml",
     "-rights-holder-permission.pdf",
     "-language-authority-permission.pdf",
+    "vd{4}-[01]d-[0-3]dT[0-2]d:[0-5]d:[0-5]d.d+([+-][0-2]d:[0-5]d|Z)",
     completedResources,
     resourceStatusFile,
 ];

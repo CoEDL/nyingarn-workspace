@@ -15,6 +15,7 @@ import {
 } from "../common/index.js";
 import models from "../models/index.js";
 import { importRepositoryContentFromStorageIntoTheDb } from "../lib/repository.js";
+import { publishObject } from "../lib/admin.js";
 import { Client } from "@elastic/elasticsearch";
 
 describe("Repository route tests", () => {
@@ -232,5 +233,66 @@ describe("Repository route tests", () => {
 
         await models.repoitem.destroy({ where: { identifier } });
         await store.removeObject();
+    });
+    it("should be able to delete an item from the repository", async () => {
+        let workspaceObject = await getStoreHandle({
+            id: identifier,
+            type: "item",
+        });
+        let repositoryObject = await getStoreHandle({
+            id: identifier,
+            type: "item",
+            location: "repository",
+        });
+
+        let user = users.filter((u) => !u.administrator)[0];
+        let adminUser = users.filter((u) => u.administrator)[0];
+        await setupTestItem({ identifier, store: workspaceObject, user });
+        const configuration = await loadConfiguration();
+
+        // set up the expected metadata
+        let item = await models.item.findOne({ where: { identifier } });
+        expect(item.publicationStatus).toEqual("inProgress");
+
+        item.publicationMetadata = {
+            accessType: "open",
+        };
+        await item.save();
+
+        // publish the item
+        await publishObject({
+            user: adminUser,
+            type: "item",
+            identifier,
+            configuration,
+        });
+
+        await item.reload();
+        expect(item.publicationStatus).toEqual("published");
+
+        // connect as admin
+        let session = await createSession({ user: adminUser });
+
+        // deposit the item
+        let response = await fetch(`${host}/admin/items/${identifier}/deposit`, {
+            method: "PUT",
+            headers: headers(session),
+            body: JSON.stringify({}),
+        });
+        expect(response.status).toEqual(200);
+
+        // delete the item from the repository
+        response = await fetch(`${host}/repository/item/${identifier}`, {
+            method: "DELETE",
+            headers: headers(session),
+        });
+        expect(response.status).toEqual(200);
+
+        let exists = await repositoryObject.exists();
+        expect(exists).toEqual(false);
+
+        await models.item.destroy({ where: { identifier } });
+        await workspaceObject.removeObject();
+        await repositoryObject.removeObject();
     });
 });

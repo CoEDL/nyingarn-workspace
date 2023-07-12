@@ -31,7 +31,7 @@
             <div class="flex flex-col space-y-4 w-4/5">
                 <div v-for="language of languages">
                     <div>
-                        {{ language.name }}
+                        {{ language.name[0] }}
                         <span class="hidden text-sm">
                             (Also known as:
                             {{ language.alternateName.join(", ") }} )
@@ -66,15 +66,17 @@ let crate = computed(() => {
 });
 
 let languages = computed(() => {
-    let languages = props.crate["@graph"].filter((e) => e["@type"] === "Language");
     let crate = new ROCrate(props.crate, { array: true, link: true });
-    languages = languages.map((l) => {
-        const geo = crate.getEntity(l?.geo?.["@id"]);
-        return {
-            ...l,
-            geo,
-        };
-    });
+    let languages = [];
+    for (let e of crate.entities()) {
+        if (e["@type"].includes("Language")) {
+            const geo = crate.getEntity(e?.geo?.["@id"]);
+            languages.push({
+                ...e,
+                geo,
+            });
+        }
+    }
     return languages;
 });
 </script>

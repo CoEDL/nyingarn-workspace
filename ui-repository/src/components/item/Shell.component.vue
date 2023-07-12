@@ -1,26 +1,27 @@
 <template>
-    <div class="flex flex-col p-4 panel-height overflow-scroll">
+    <div class="flex flex-col p-4 panel-height overflow-scroll" v-if="data.ready">
         <div>
             <el-button @click="toggleDetailedMetadata" link>
                 <div v-if="!data.detailedMetadata">show detailed metadata</div>
                 <div v-if="data.detailedMetadata">hide detailed metadata</div>
             </el-button>
         </div>
-        <div v-if="data.ready && !data.detailedMetadata">
+        <div v-if="!data.detailedMetadata">
             <simple-metadata-display-component :crate="data.crate" />
+            <ViewerComponent />
         </div>
 
-        <div v-if="data.ready && data.detailedMetadata">
+        <div v-if="data.detailedMetadata">
             <describo-crate-builder
                 :crate="data.crate"
                 :readonly="true"
                 :enable-internal-routing="true"
             />
         </div>
-
-        <div v-if="data.ready && !data.detailedMetadata">
-            <ViewerComponent />
-        </div>
+    </div>
+    <div v-if="data.noSuchItem" class="text-center text-xl">That item is not available.</div>
+    <div v-if="data.error" class="text-center text-xl">
+        There was a problem loading the metadata for that item.
     </div>
 </template>
 
@@ -45,6 +46,8 @@ const data = reactive({
     ready: false,
     crate: {},
     detailedMetadata: false,
+    noSuchItem: false,
+    error: false,
 });
 
 onMounted(() => {
@@ -73,6 +76,10 @@ async function loadItemMetadata() {
         data.crate = { ...response.crate };
 
         data.ready = true;
+    } else if (response.status === 404) {
+        data.noSuchItem = true;
+    } else {
+        data.error = true;
     }
 }
 

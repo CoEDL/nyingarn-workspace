@@ -77,14 +77,21 @@ async function postRepositorySearchHandler(req) {
     return result.hits;
 }
 
-async function getRepositoryItemMetadataHandler(req) {
-    let store = await getStoreHandle({
-        identifier: req.params.identifier,
-        type: "item",
-        location: "repository",
-    });
-    let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
-    return { crate };
+async function getRepositoryItemMetadataHandler(req, res) {
+    try {
+        let store = await getStoreHandle({
+            identifier: req.params.identifier,
+            type: "item",
+            location: "repository",
+        });
+        let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        return { crate };
+    } catch (error) {
+        if (error.Code === "NoSuchKey") {
+            return res.notFound();
+        }
+        res.badRequest();
+    }
 }
 
 async function getItemResourcesHandler(req) {

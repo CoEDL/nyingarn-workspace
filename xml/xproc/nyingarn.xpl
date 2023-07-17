@@ -42,6 +42,23 @@
 							<p:document href="../xslt/process-tei-to-page-files.xsl"/>
 						</p:input>
 					</p:xslt>
+					<p:choose>
+						<p:when test="/fn:map" xmlns:fn="http://www.w3.org/2005/xpath-functions"><!-- an error -->
+							<p:template name="http-response">
+								<p:input port="parameters"><p:empty/></p:input>
+								<p:input port="template">
+									<p:inline>
+										<c:response status="400">
+											<c:body content-type="application/json">{xml-to-json(/*)}</c:body>
+										</c:response>
+									</p:inline>
+								</p:input>
+							</p:template>
+						</p:when>
+						<p:otherwise><!-- TEI -->
+							<z:make-http-response/>
+						</p:otherwise>
+					</p:choose>
 				</p:when>
 				<p:otherwise>
 				<!-- file was not uploaded; display an upload form, for manual testing -->
@@ -62,31 +79,13 @@
 							</p:inline>
 						</p:input>
 					</p:identity>
+					<z:make-http-response/>
 				</p:otherwise>
 			</p:choose>
 		</p:when>
 		<p:otherwise>
-			<p:identity/>
+			<p:identity/>	
+			<z:make-http-response/>
 		</p:otherwise>
 	</p:choose>
-    <!--
-    <p:choose>
-        <p:when test="$uri-path='nyingarn/ingest-tei'">
-            <p:choose>
-                <p:when test="/c:param-set/c:param">
-                    <p:identity/>
-                </p:when>
-                <p:otherwise>
-                    <p:identity/>
-                </p:otherwise>
-            </p:choose>
-        </p:when>
-        <p:otherwise>
-            <p:identity/>
-        </p:otherwise>
-    </p:choose>
-    -->
-	
-	<z:make-http-response/>
-
 </p:declare-step>

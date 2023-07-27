@@ -14,13 +14,13 @@
             "code": "Q{https://nyingarn.net/ns/errors}no-pages-with-suitable-identifiers"
         },
         "name": "NoPagesWithSuitableIdentifiers",
-        "messageTemplate": "The document did not contain any pages whose identifiers started with '${errorObject.document-identifier}' and matched the regular expression '${errorObject.page-identifier-regex}'.",
+        "messageTemplate": "The document did not contain any pages whose identifiers started with '${cause.document-identifier}' and matched the regular expression '${cause.page-identifier-regex}'.",
         "remarks": "The document had page breaks in it but none of them matched the document's id. "
     },
     {
         "matchingProperties": {
             "name": "XError",
-            "errorObject.source-type": "digivol"
+            "cause.source-type": "digivol"
         },
         "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
         "remarks": "Provides a link to a format-specific help page. "
@@ -28,7 +28,7 @@
     {
         "matchingProperties": {
             "name": "XError",
-            "errorObject.source-type": "digivol"
+            "cause.source-type": "digivol"
         },
         "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
         "remarks": "Provides a link to a format-specific help page. "
@@ -36,7 +36,7 @@
     {
         "matchingProperties": {
             "name": "XError",
-            "errorObject.source-type": "transkribus"
+            "cause.source-type": "transkribus"
         },
         "url": "https://nyingarn.net/support/uploading-digivol-data-into-the-workspace/",
         "remarks": "Provides a link to a format-specific help page. "
@@ -44,7 +44,7 @@
     {
         "matchingProperties": {
             "name": "XError",
-            "errorObject.source-type": "docx-via-oxgarage"
+            "cause.source-type": "docx-via-oxgarage"
         },
         "url": "https://nyingarn.net/word-transcriptions/",
         "remarks": "Provides a link to a format-specific help page. "
@@ -64,8 +64,8 @@
             "code": "Q{https://nyingarn.net/ns/errors}duplicate-page-identifiers-found"
         },
         "name": "DuplicatePageIdentifiers",
-        "messageTemplate": "ERROR: all page identifiers must be unique, but the following duplicate page identifiers were found: ${errorObject.duplicate-identifiers}",
-        "remarks": "The SaxonJS.XError object has an 'errorObject' property containing properties passed from the XSLT"
+        "messageTemplate": "ERROR: all page identifiers must be unique, but the following duplicate page identifiers were found: ${cause.duplicate-identifiers}",
+        "remarks": "The error has a 'cause' property which is an object containing properties thrown by the XSLT"
     },
     {
         "matchingProperties": {

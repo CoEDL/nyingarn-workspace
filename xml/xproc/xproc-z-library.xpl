@@ -96,7 +96,7 @@
 		<p:input port="source"/>
 		<p:output port="result"/>
 		<p:option name="status" select=" '200' "/>
-		<p:option name="content-type" select=" 'application/xml' "/>
+		<p:option name="content-type" select=" 'application/xml; charset=utf-8' "/>
 		<p:in-scope-names name="parameters"/>
 		<p:template name="http-response">
 			<p:input port="source">

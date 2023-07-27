@@ -32,6 +32,7 @@
 		empty sequence if the information is not available. The value may be approximate. -->
 		<xsl:param name="column-number" as="xs:integer?"/>
 		<fn:map xsl:expand-text="yes">
+			<fn:string key="name">XError</fn:string>
 			<fn:string key="code" xsl:expand-text="no"><xsl:text>Q{</xsl:text>
 				<xsl:value-of select="namespace-uri-from-QName($code)"/>
 				<xsl:text>}</xsl:text>

@@ -2,27 +2,27 @@
     version="3.0"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     xmlns="http://www.tei-c.org/ns/1.0"
+    xmlns:c="http://www.w3.org/ns/xproc-step" 
+    exclude-result-prefixes="c"
     expand-text="yes">
 
     <xsl:output indent="yes" method="xml"/>
 
-    <xsl:template name="xsl:initial-template">
-	<xsl:param name="files"/><!-- a space-delimited list of names of files from which to reconstitute the TEI document (including the TEI surface files, but also e.g. the ro-crate file) -->
-	<xsl:param name="identifier"/><!-- the identifier of the TEI document e.g. "Bates32" -->
-	<xsl:param name="page-identifier-regex"/><!-- a regular expression which constrains the names of the fragment files (a valid name would be e.g. "Bates32-01.tei.xml" -->
-	<xsl:param name="base-uri"/><!-- base URI of input and output files -->
-	
-	<xsl:variable name="surface-files" select="
-		($files => tokenize() => sort())
-			[. => starts-with( $identifier || '-')] (: the surface's id must start with the id of the item, followed by a hyphen :)
-			[. => matches($page-identifier-regex)]
-	"/>
+    <xsl:template match="/">
+    	<!-- the identifier of the TEI document e.g. "Bates32" -->
+	<xsl:variable name="identifier" select="//c:body[contains(@disposition, 'name=&#34;identifier&#34;')]"/>
+	<!-- a regular expression which constrains the names of the fragment files (a valid name would be e.g. "Bates32-01.tei.xml" -->
+	<xsl:variable name="page-identifier-regex" select="//c:body[contains(@disposition, 'name=&#34;page-identifier-regex&#34;')]"/>
 	
 	<!-- a full TEI file will be regenerated from the TEI surface files generated at the time of ingestion into Nyingarn -->
-	<xsl:variable name="surfaces" select="$surface-files ! resolve-uri(., $base-uri) ! doc(.) (: parse the surface files :)"/>
+	<xsl:variable name="surfaces" select="
+		//c:body/surface
+			[starts-with(@xml:id, $identifier || '-')] (: the surface's id must start with the id of the item, followed by a hyphen :)
+			[matches(@xml:id || '.xml', $page-identifier-regex)]
+	"/>
 	
-	
-	<xsl:variable name="ro-crate" select=" 'ro-crate-metadata.json' => resolve-uri($base-uri) => json-doc() (: parse the ro-crate json file :)"/>
+	<xsl:variable name="ro-crate-upload" select="//c:body[contains(@disposition, 'name=&#34;ro-crate&#34;')]"/>
+	<xsl:variable name="ro-crate" select="parse-json($ro-crate-upload)"/>
 	<xsl:variable name="ro-crate-properties" select="$ro-crate('@graph')?* (: get all the properties from the @graph array :)"/>
 	<xsl:variable name="ro-crate-root-id" select="
 		(: find the identifier of the 'root' object in the ro-crate :)
@@ -39,7 +39,7 @@
 		$ro-crate-properties[.('@id') = $ro-crate-root-id]
 	"/>
 	
-	<xsl:result-document href="{$identifier}-tei-complete.xml">
+	<!--<xsl:result-document href="{$identifier}-tei-complete.xml">-->
 		<TEI xml:id="{$identifier}">
 			<teiHeader>
 				<fileDesc>
@@ -66,7 +66,7 @@
 			</xsl:variable>
 			<xsl:apply-templates mode="reconstitute" select="$text-content"/>
 		</TEI>
-	</xsl:result-document>
+	<!--</xsl:result-document>-->
     </xsl:template>
     
     <xsl:mode name="surface-to-text" on-no-match="shallow-copy"/>

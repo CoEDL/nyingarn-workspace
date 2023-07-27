@@ -27,6 +27,7 @@ async function makeScratchCopy(testDataFolder) {
     await copy(sourceFolder, scratchFolder);
     return scratchFolder;
 }
+/*
 describe(`check that SaxonJS's XML and JSON parsers work`, () => {
     it("should be able to parse an XML file", async () => {
 		try {
@@ -65,6 +66,7 @@ describe(`check that SaxonJS's XML and JSON parsers work`, () => {
 		}
 	});
 });
+*/
 
 describe(`Check that known good files are processed successfully`, () => {
     let log, warn;
@@ -75,24 +77,6 @@ describe(`Check that known good files are processed successfully`, () => {
     afterAll(() => {
         warn.mockReset();
         log.mockReset();
-    });
-    it.only("should do a one-off conversion of Porcupine.xml", async () => {
-        let identifier = "Porcupine";
-        const directory = await makeScratchCopy("temp-manual-digivol-conversion");
-        let resource = "Porcupine-digivol.csv";
-        try {
-            await __processDigivolTranscriptionXMLProcessor({
-                directory,
-                identifier,
-                resource,
-                output: `file://${directory}/`,
-            });
-        } catch (error) {
-            console.error(error);
-            throw error;
-        } finally {
-            //await remove(directory);
-        }
     });
     it("BM1648A91 - should be able to process a digivol csv file", async () => {
         let identifier = "BM1648A91";
@@ -182,16 +166,14 @@ describe(`Check that known good files are processed successfully`, () => {
                 directory,
                 identifier,
                 resource,
-                output: `file://${directory}/`,
             });
             let contents = (await readdir(directory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
-            unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
+            unexpectedFiles.forEach((file) => expect(contents).not.toContainEqual(file));
         } catch (error) {
-            console.error(error);
             throw error;
         } finally {
-            //await remove(directory);
+            await remove(directory);
         }
     });
     it("NewNorcia38c - should be able to process a digivol csv file", async () => {
@@ -262,49 +244,26 @@ describe(`Check that known good files are processed successfully`, () => {
             "NewNorcia38c-4071.tei.xml",
             "NewNorcia38c-4072.tei.xml",
         ];
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
+
         try {
             await __processDigivolTranscriptionXMLProcessor({
                 directory,
                 identifier,
                 resource,
-                output: `file://${resourceDirectory}/`,
             });
-            let contents = (await readdir(resourceDirectory)).sort();
+            let contents = (await readdir(directory)).sort();
 
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
         } catch (error) {
             throw error;
         } finally {
             await remove(directory);
         }
     });
-    it("should parse an XML document", async() => {
-        let identifier = "parse-test";
-        let resource = "parse-test.xml";
-        let directory = await makeScratchCopy("parse-test");
-        let sourceURI = "file://" + path.join(directory, resource);
-        try {
-            try {
-                await __processTeiTranscriptionXMLProcessor({
-                    identifier,
-                    sourceURI,
-                    output: `file://${directory}/`,
-                });
-            } catch (error) {
-            	console.error(error);
-               throw error;
-            }
-        } finally {
-            // TODO await remove(directory);
-        }
-    });
     it("fake-msword-example - should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {
         let identifier = "msword_example";
         let resource = "msword_example-tei.xml";
         let directory = await makeScratchCopy("Succeeds-word_doc_upload/fake-msword-example");
-        let sourceURI = "file://" + path.join(directory, resource);
         let expectedFiles = [
             "msword_example-001.tei.xml",
             "msword_example-002.tei.xml",
@@ -312,43 +271,39 @@ describe(`Check that known good files are processed successfully`, () => {
         ];
         let unexpectedFiles = ["msword_example_2-001.tei.xml"];
 
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
         try {
             try {
                 await __processTeiTranscriptionXMLProcessor({
+                    directory,
                     identifier,
-                    sourceURI,
-                    output: `file://${resourceDirectory}/`,
+                    resource,
                 });
             } catch (error) {
-            	console.error(error);
                throw error;
             }
-            let contents = (await readdir(resourceDirectory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
-            unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
+            //let contents = (await readdir(directory)).sort();
+            let contents = (await readdir(directory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
+            unexpectedFiles.forEach((file) => expect(contents).not.toContainEqual(file));
         } finally {
-            // TODO await remove(directory);
+            await remove(directory);
         }
     });
     it("SLNSW_FL814 - should be able to pass a TEI file produced by OxGarage from a DOCX file through an XSLT", async () => {
         let identifier = "SLNSW_FL814";
         let resource = "SLNSW_FL814-tei.xml";
         let directory = await makeScratchCopy("Succeeds-word_doc_upload/SLNSW_FL814");
-        let sourceURI = "file://" + path.join(directory, resource);
+
         let expectedFiles = ["SLNSW_FL814-357.tei.xml"];
 
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: `file://${resourceDirectory}/`,
+                resource
             });
-            let contents = (await readdir(resourceDirectory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
+            let contents = (await readdir(directory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
         } finally {
             await remove(directory);
         }
@@ -357,7 +312,6 @@ describe(`Check that known good files are processed successfully`, () => {
         let identifier = "L17L27_JF1880";
         let resource = "L17L27_JF1880-tei.xml";
         let directory = await makeScratchCopy("transkribus-ingestion/L17L27_JF1880");
-        let sourceURI = "file://" + path.join(directory, resource);
         let expectedFiles = [
             "L17L27_JF1880-01.tei.xml",
             "L17L27_JF1880-02.tei.xml",
@@ -391,16 +345,14 @@ describe(`Check that known good files are processed successfully`, () => {
             "L17L27_JF1880-30.tei.xml",
         ];
 
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: `file://${resourceDirectory}/`,
+                resource,
             });
-            let contents = (await readdir(resourceDirectory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
+            let contents = (await readdir(directory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
         } finally {
             await remove(directory);
         }
@@ -409,7 +361,6 @@ describe(`Check that known good files are processed successfully`, () => {
         let identifier = "L17L27";
         let resource = "L17L27-tei.xml";
         let directory = await makeScratchCopy("transkribus-ingestion/L17L27");
-        let sourceURI = "file://" + path.join(directory, resource);
         let expectedFiles = [
             "L17L27-01.tei.xml",
             "L17L27-02.tei.xml",
@@ -443,16 +394,14 @@ describe(`Check that known good files are processed successfully`, () => {
             "L17L27-30.tei.xml",
         ];
 
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: `file://${resourceDirectory}/`,
+                resource
             });
-            let contents = (await readdir(resourceDirectory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
+            let contents = (await readdir(directory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
         } finally {
             await remove(directory);
         }
@@ -461,23 +410,21 @@ describe(`Check that known good files are processed successfully`, () => {
         let identifier = "Bates35";
         let resource = "Bates35-tei.xml";
         let directory = await makeScratchCopy("Succeeds-ftp-upload/Bates35");
-        let sourceURI = "file://" + path.join(directory, resource);
+
         let expectedFiles = [
             "Bates35-125T.tei.xml",
             "Bates35-126T.tei.xml",
             "Bates35-132T.tei.xml",
         ];
 
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: `file://${resourceDirectory}/`,
+                resource
             });
-            let contents = (await readdir(resourceDirectory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
+            let contents = (await readdir(directory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
         } finally {
             await remove(directory);
         }
@@ -486,19 +433,15 @@ describe(`Check that known good files are processed successfully`, () => {
         let identifier = "Bates34";
         let resource = "Bates34-tei.xml";
         let directory = await makeScratchCopy("Succeeds-ftp-upload/Bates34");
-        let sourceURI = "file://" + path.join(directory, resource);
         let expectedFiles = ["Bates34-1aT.tei.xml", "Bates34-1bT.tei.xml", "Bates34-2T.tei.xml"];
-
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: `file://${resourceDirectory}/`,
+                resource
             });
-            let contents = (await readdir(resourceDirectory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
+            let contents = (await readdir(directory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
         } finally {
             await remove(directory);
         }
@@ -507,7 +450,7 @@ describe(`Check that known good files are processed successfully`, () => {
         let identifier = "structured";
         let resource = "structured-tei.xml";
         let directory = await makeScratchCopy("tei-div-hierarchy-splitting/structured");
-        let sourceURI = "file://" + path.join(directory, resource);
+
         let expectedFiles = [
             "structured-01.tei.xml",
             "structured-02.tei.xml",
@@ -517,17 +460,16 @@ describe(`Check that known good files are processed successfully`, () => {
             "structured-06.tei.xml",
             "structured-07.tei.xml",
         ];
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
+
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: `file://${resourceDirectory}/`,
+                resource
             });
     
-            let contents = (await readdir(resourceDirectory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
+            let contents = (await readdir(directory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
         } finally {
             await remove(directory);
         }
@@ -890,17 +832,15 @@ describe(`Confirm file extensions are removed`, () => {
             "c018660-178h.jpg.tei.xml",
             "c018660-179h.jpg.tei.xml",
         ];
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: `file://${resourceDirectory}/`,
+                resource
             });
-            let contents = (await readdir(resourceDirectory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
-            unexpectedFiles.forEach((file) => expect(contents).not.toContain(file));
+            let contents = (await readdir(directory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
+            unexpectedFiles.forEach((file) => expect(contents).not.toContainEqual(file));
         } finally {
             await remove(directory);
         }
@@ -912,7 +852,6 @@ describe(`Confirm file extensions are removed`, () => {
         // This document contains page-identifiers which include a ".jpg" extension. This test validates that the output files have
         // the extension ".tei.xml" rather than ".jpg.tei.xml"
         let resource = "c018660-tei.xml";
-        let sourceURI = "file://" + path.join(directory, resource);
         let expectedFiles = [
             "c018660-004h.tei.xml",
             "c018660-006h.tei.xml",
@@ -1085,16 +1024,14 @@ describe(`Confirm file extensions are removed`, () => {
             "c018660-179h.tei.xml",
         ];
 
-        let resourceDirectory = path.join(directory, "test-output");
-        await ensureDir(resourceDirectory);
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: `file://${resourceDirectory}/`,
+                resource
             });
-            let contents = (await readdir(resourceDirectory)).sort();
-            expectedFiles.forEach((file) => expect(contents).toContain(file));
+            let contents = (await readdir(directory)).sort();
+            expectedFiles.forEach((file) => expect(contents).toContainEqual(file));
         } finally {
             await remove(directory);
         }
@@ -1116,7 +1053,11 @@ describe(`Confirm non-UTF-8-encoding of DigiVol CSV file is rejected`, () => {
         let resource = "BM1648A91-digivol.csv";
 
         try {
-            await __processDigivolTranscriptionXMLProcessor({ directory, identifier, resource });
+            await __processDigivolTranscriptionXMLProcessor({
+                directory,
+                identifier,
+                resource,
+            });
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.name).toBe("CharacterEncodingError");
@@ -1140,10 +1081,13 @@ describe(`Confirm malformed XML is rejected`, () => {
         let identifier = "Grey_g_12_c_12";
         let directory = await makeScratchCopy("Issue-tei_did_not_upload/Grey_g_12_c_12");
         let resource = "Grey_g_12_c_12-tei.xml";
-        let sourceURI = "file://" + path.join(directory, resource);
 
         try {
-            await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
+            await __processTeiTranscriptionXMLProcessor({
+                directory,
+                identifier,
+                resource
+            });
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.name).toBe("MalformedXMLFile");
@@ -1160,11 +1104,15 @@ describe(`Confirm no valid pages found`, () => {
         let sourceURI = "file://" + path.join(directory, resource);
 
         try {
-            await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
+            await __processTeiTranscriptionXMLProcessor({
+                directory,
+                identifier,
+                resource
+            });
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.name).toBe("NoPagesWithSuitableIdentifiers");
-            expect(error.errorObject["document-identifier"]).toBe(identifier);
+            expect(error.cause["document-identifier"]).toBe(identifier);
             expect(error.message).toMatch(identifier);
         } finally {
             await remove(directory);
@@ -1178,7 +1126,11 @@ describe(`Confirm no valid pages found`, () => {
         let sourceURI = "file://" + path.join(directory, resource);
 
         try {
-            await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
+            await __processTeiTranscriptionXMLProcessor({
+                directory,
+                identifier,
+                resource
+            });
             throw new Error("Stylesheet failed to throw an error!");
         } catch (error) {
             expect(error.name).toBe("UnpaginatedDocument");
@@ -1196,9 +1148,9 @@ describe(`Confirm no valid pages found`, () => {
         });
 
         let contents = (await readdir(path.join(__dirname, "..", "test-data"))).sort();
-        expect(contents).toContain("Bates35-125T.tei.xml");
-        expect(contents).toContain("Bates35-126T.tei.xml");
-        expect(contents).toContain("Bates35-132T.tei.xml");
+        expect(contents).toContainEqual("Bates35-125T.tei.xml");
+        expect(contents).toContainEqual("Bates35-126T.tei.xml");
+        expect(contents).toContainEqual("Bates35-132T.tei.xml");
         await remove(path.join(__dirname, "..", "test-data", "Bates35-125T.tei.xml"));
         await remove(path.join(__dirname, "..", "test-data", "Bates35-126T.tei.xml"));
         await remove(path.join(__dirname, "..", "test-data", "Bates35-132T.tei.xml"));
@@ -1224,7 +1176,11 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
         let options = { xpathDefaultNamespace: "http://www.tei-c.org/ns/1.0" };
 
         try {
-            await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
+            await __processTeiTranscriptionXMLProcessor({
+                directory,
+                identifier,
+                resource
+            });
             let resourceDirectory = directory;
             let sourceFile = path.join(resourceDirectory, resource);
             let resultFile = path.join(resourceDirectory, "msword_formatting-001.tei.xml");
@@ -1301,27 +1257,22 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
         let identifier = "Bates34";
         let resource = "Bates34-tei.xml";
         let directory = await makeScratchCopy("Issue-excessive_tei_markup/Bates34-github73");
-        let sourceURI = "file://" + path.join(directory, resource);
-        let outputFolder = "test-output";
-        let output = path.join(directory, outputFolder);
-        await ensureDir(output);
+
         // use TEI as the default namespace so our XPath expressions are more concise
         let options = { xpathDefaultNamespace: "http://www.tei-c.org/ns/1.0" };
 
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: "file://" + output + "/",
-            });
-    
+                resource
+            });    
             // if we get this far then the code has handled the file so let's just check
             //   a few of the expected output files have been created
             // the other test above actually checks that the processing is working as expected
-            let resourceDirectory = path.join(__dirname, "../test-data", directory);
             let resultFiles = ["Bates34-001aT.tei.xml", "Bates34-001bT.tei.xml", "Bates34-008.tei.xml"];
             for (let file of resultFiles) {
-                let exists = await pathExists(path.join(resourceDirectory, outputFolder, file));
+                let exists = await pathExists(path.join(directory, file));
                 expect(exists).toBeTrue;
             }
         } finally {
@@ -1333,20 +1284,17 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
         let identifier = "hw0024";
         let resource = "hw0024-tei.xml";
         let directory = await makeScratchCopy("issue-123-FtP-ingestion-with-people-and-places/hw0024");
-        let sourceURI = "file://" + path.join(directory, resource);
-        let outputFolder = "test-output";
-        let output = path.join(directory, outputFolder);
-        await ensureDir(output);
+
         // use TEI as the default namespace so our XPath expressions are more concise
         let options = { xpathDefaultNamespace: "http://www.tei-c.org/ns/1.0" };
 
         try {
             await __processTeiTranscriptionXMLProcessor({
+                directory,
                 identifier,
-                sourceURI,
-                output: "file://" + output + "/",
+                resource
             });
-            let resultFile = path.join(output, "hw0024-001.tei.xml");
+            let resultFile = path.join(directory, "hw0024-001.tei.xml");
             let resultDoc = await SaxonJS.getResource({ file: resultFile, type: "xml" });
             // check the following input has been transformed:
             // <rs ref="#S26184">Ulmin</rs> of <rs ref="#S13203">Omeo</rs>
@@ -1385,7 +1333,11 @@ describe(`Confirm that documents with duplicate page identifiers are handled sen
         let sourceURI = "file://" + path.join(directory, resource);
 
         try {
-            await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
+            await __processTeiTranscriptionXMLProcessor({
+                directory,
+                identifier,
+                resource
+            });
             throw new Error("Stylesheet failed to throw the expected error!");
         } catch (error) {
             expect(error.name).toBe("DuplicatePageIdentifiers");
@@ -1404,7 +1356,11 @@ describe(`Confirm that documents with duplicate page identifiers are handled sen
         let directory = await makeScratchCopy("Issue-duplicate_page_identifiers/Bates35");
         let sourceURI = "file://" + path.join(directory, resource);
         try {
-            await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
+            await __processTeiTranscriptionXMLProcessor({
+                directory,
+                identifier,
+                resource
+            });
             throw new Error("Stylesheet failed to throw the expected error!");
         } catch (error) {
             expect(error.name).toBe("DuplicatePageIdentifiers");

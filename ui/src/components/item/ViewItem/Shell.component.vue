@@ -117,9 +117,9 @@ function updateRouteOnTabSelect(tab) {
     if (tab.paneName === "metadata") loadMetadata();
 }
 async function loadMetadata() {
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    await load();
+    await new Promise((resolve) => setTimeout(resolve, 50));
     data.metadataComponent.display = true;
-    await data.debouncedLoad();
 }
 async function load() {
     if (!$route.meta.type && !$route.params.identifier) return;

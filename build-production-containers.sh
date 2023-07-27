@@ -35,22 +35,35 @@ fi
 
 read -p '>> Build the containers and push to docker hub? [y|N] ' resp
 if [ "$resp" == "y" ] ; then
+    # build the API container
     docker buildx build --push --rm --platform=linux/amd64 \
         -t ghcr.io/coedl/nyingarn-workspace-api:latest \
         -t ghcr.io/coedl/nyingarn-workspace-api:${VERSION} \
         -f Dockerfile.api-build .
 
+    # build the Task Runner container
     docker buildx build --push --rm --platform=linux/amd64 \
         -t ghcr.io/coedl/nyingarn-workspace-task-runner:latest \
         -t ghcr.io/coedl/nyingarn-workspace-task-runner:${VERSION} \
         -f Dockerfile.tasks-build .
 
+    # build the UI container
     docker run -it --rm \
         -v $PWD/ui:/srv/ui \
         -v ui_node_modules:/srv/ui/node_modules \
-        -w /srv/ui node:14-buster bash -l -c "npm run build"
+        -w /srv/ui node:18-bullseye bash -l -c "npm run build"
     docker buildx build --push --rm --platform linux/amd64 \
         -t ghcr.io/coedl/nyingarn-workspace-ui:latest \
         -t ghcr.io/coedl/nyingarn-workspace-ui:${VERSION} \
         -f Dockerfile.ui-build .
+
+    # build the UI Repository container
+    docker run -it --rm \
+        -v $PWD/ui-repository:/srv/ui \
+        -v ui_node_modules:/srv/ui/node_modules \
+        -w /srv/ui node:18-bullseye bash -l -c "npm run build"
+    docker buildx build --push --rm --platform linux/amd64 \
+        -t ghcr.io/coedl/nyingarn-repository-ui:latest \
+        -t ghcr.io/coedl/nyingarn-repository-ui:${VERSION} \
+        -f Dockerfile.ui-repository-build .
 fi

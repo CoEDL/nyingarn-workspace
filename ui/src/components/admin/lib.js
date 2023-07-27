@@ -45,6 +45,11 @@ export async function indexRepositoryContent({ $http, id }) {
         route: `/repository/index/${id}`,
     });
 }
+export async function deleteItemFromRepository({ $http, type, identifier }) {
+    let response = await $http.delete({
+        route: `/repository/${type}/${identifier}`,
+    });
+}
 export async function connectItem({ $http, identifier }) {
     await $http.put({ route: `/admin/items/${identifier}/connect-user` });
 }

@@ -24,6 +24,23 @@ export async function demandAuthenticatedUser(req, res) {
     }
 }
 
+export async function isUserAuthenticated(req) {
+    if (!req.headers.authorization) return false;
+    try {
+        let user = await verifyToken({
+            token: req.headers.authorization.split("Bearer ")[1],
+            configuration: req.session.configuration,
+        });
+        user = await getUser({ userId: user.id });
+        if (!user) {
+            return false;
+        }
+        return user;
+    } catch (error) {
+        return false;
+    }
+}
+
 export async function demandAdministrator(req, res) {
     if (!req.session.user.administrator) {
         return res.forbidden();

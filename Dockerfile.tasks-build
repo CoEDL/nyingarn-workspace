@@ -1,6 +1,7 @@
 FROM --platform=$TARGETPLATFORM node:18-bullseye AS tasks-builder
 COPY tasks /srv/tasks
 COPY api /srv/api
+COPY configuration /srv/configuration
 WORKDIR /srv/tasks
 RUN npm install
 RUN npm run build:production

@@ -22,6 +22,7 @@ import {
     publishObject,
     depositObjectIntoRepository,
     restoreObjectIntoWorkspace,
+    deleteItemFromRepository,
 } from "../lib/admin.js";
 import { importRepositoryContentFromStorageIntoTheDb } from "../lib/repository.js";
 const log = getLogger();
@@ -45,7 +46,7 @@ export function setupRoutes(fastify, options, done) {
         fastify.addHook("preHandler", demandAdministrator);
 
         fastify.get("/admin", async (req, res) => {});
-        fastify.get("/admin/setup-service", getAdminSetupServiceHanlder);
+        fastify.get("/admin/setup-service", getAdminSetupServiceHandler);
 
         fastify.get("/admin/entries/items", getAdminEntriesItemsHandler);
         fastify.get("/admin/items/awaiting-review", getItemsAwaitingReviewHandler);
@@ -65,6 +66,7 @@ export function setupRoutes(fastify, options, done) {
             });
             fastify.put("/admin/:type/:identifier/deposit", putDepositObjectHandler);
             fastify.put("/admin/:type/:identifier/needs-work", putObjectNeedsWorkHandler);
+
             done();
         });
 
@@ -91,7 +93,7 @@ async function getAdminEntriesCollectionsHandler(req) {
     });
     return { collections, total };
 }
-async function getAdminSetupServiceHanlder(req) {
+async function getAdminSetupServiceHandler(req) {
     log.info(`Importing the workspace items`);
     try {
         await importItemsFromStorageIntoTheDb({
@@ -178,6 +180,7 @@ async function putDepositObjectHandler(req, res) {
 
     req.io.to(req.query.clientId).emit(`deposit-${type}`, { msg: `Done`, date: new Date() });
 }
+
 async function putRestoreObjectHandler(req) {
     let { type, identifier } = req.params;
     type = type === "items" ? "item" : "collection";

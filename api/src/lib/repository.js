@@ -1,6 +1,9 @@
-import { listObjects } from "../common/index.js";
+import { listObjects, getStoreHandle, getLogger, authorisedUsersFile } from "../common/index.js";
+import { setRepositoryItemMetadata } from "./admin.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
+import { ROCrate } from "ro-crate";
+const log = getLogger();
 
 export async function getRepositoryItems({ user, prefix, limit = 10, offset = 0 }) {
     if (!user.administrator) {
@@ -37,10 +40,17 @@ export async function importRepositoryContentFromStorageIntoTheDb({ user, config
         (await listObjects({ prefix: `/${configuration.api.domain}/repository/item` })) || [];
     items = items.map((item) => ({ identifier: item.id, type: "item" }));
     for (let item of items) {
-        await models.repoitem.findOrCreate({
+        let store = await getStoreHandle({ ...item, location: "repository" });
+
+        // register the repository item in the database
+        item = await models.repoitem.findOrCreate({
             where: { ...item },
             default: { ...item },
         });
+        item = item[0];
+
+        // setup the metadata in the db
+        await setRepositoryItemMetadata({ item, store });
     }
 
     // insert any collections found on the backend storage not already in the DB
@@ -49,8 +59,8 @@ export async function importRepositoryContentFromStorageIntoTheDb({ user, config
     collections = collections.map((item) => ({ identifier: item.id, type: "collection" }));
     for (let collection of collections) {
         await models.repoitem.findOrCreate({
-            where: { ...collection },
-            default: { ...collection },
+            where: { ...collection, openAccess: true },
+            default: { ...collection, openAccess: true },
         });
     }
 

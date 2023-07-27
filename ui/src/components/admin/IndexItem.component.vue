@@ -36,18 +36,6 @@ const data = reactive({
     loading: false,
     selectedItem: undefined,
     options: [],
-    items: {
-        prefix: undefined,
-        total: 0,
-        currentPage: 1,
-        rows: [],
-    },
-    collections: {
-        prefix: undefined,
-        total: 0,
-        currentPage: 1,
-        rows: [],
-    },
 });
 
 onMounted(() => {

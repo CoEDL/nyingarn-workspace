@@ -178,7 +178,7 @@ async function postPublishItemHandler(req, res) {
         crate = crate.toJSON();
         crate["@context"] = getContext();
 
-        if (req.session.item.accessType === "restricted") {
+        if (req.session.item.publicationMetadata.accessType === "restricted") {
             await store.put({ target: authorisedUsersFile, json: req.body.access.acl ?? [] });
         }
 

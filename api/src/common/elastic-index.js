@@ -58,3 +58,15 @@ export async function indexItem({ item, crate }) {
         }
     }
 }
+
+export async function deleteItemFromIndex({ item, configuration }) {
+    const client = new Client({
+        node: configuration.api.services.elastic.host,
+    });
+
+    const indexIdentifier = `/${item.type}/${item.identifier}`;
+    await client.delete({
+        index: "metadata",
+        id: indexIdentifier,
+    });
+}

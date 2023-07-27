@@ -1,6 +1,6 @@
 {
     "name": "api",
-    "version": "0.53.1",
+    "version": "0.54.2",
     "description": "",
     "author": "Marco La Rosa",
     "main": "index.js",
@@ -39,6 +39,7 @@
         "@paradisec-platform/fastify-tus-s3-plugin": "^1.0.0",
         "cross-fetch": "^3.1.6",
         "date-fns": "^2.30.0",
+        "elastic-builder": "^2.19.0",
         "fastify": "^4.17.0",
         "fastify-socket.io": "^4.0.0",
         "foo-foo-mq": "^8.0.1",

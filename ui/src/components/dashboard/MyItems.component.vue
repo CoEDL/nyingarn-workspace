@@ -63,20 +63,16 @@
                 </el-table-column>
                 <el-table-column prop="pages.bad" label="TEI Errors" width="100" align="center">
                 </el-table-column>
-                <el-table-column label="Actions" width="200">
+                <el-table-column label="Actions" width="240">
                     <template #default="scope">
                         <div class="flex flex-row space-x-1">
                             <div v-if="scope.row.publicationStatus === 'published'">
-                                <el-button
-                                    type="primary"
-                                    size="small"
-                                    @click="restoreItem(scope.row)"
-                                >
+                                <el-button type="primary" @click="restoreItem(scope.row)">
                                     <i class="fa-solid fa-rotate-left"></i>&nbsp; restore
                                 </el-button>
                             </div>
                             <div v-if="data.isAdmin">
-                                <el-button type="primary" size="small" @click="unlinkMe(scope.row)">
+                                <el-button type="primary" @click="unlinkMe(scope.row)">
                                     <i class="fa-solid fa-unlink"></i>
                                 </el-button>
                             </div>
@@ -89,7 +85,7 @@
                                     width="300"
                                 >
                                     <template #reference>
-                                        <el-button type="danger" size="small">
+                                        <el-button type="danger">
                                             <i class="fa-solid fa-trash"></i>
                                         </el-button>
                                     </template>

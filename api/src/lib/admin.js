@@ -3,8 +3,9 @@ import {
     getStoreHandle,
     getS3Handle,
     authorisedUsersFile,
-    indexItem,
+    getLogger,
 } from "../common/index.js";
+import { indexItem, deleteItemFromIndex } from "../common/elastic-index.js";
 import { lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
 import {
     lookupCollectionByIdentifier,
@@ -17,6 +18,7 @@ const { groupBy } = lodashPkg;
 import { ROCrate } from "ro-crate";
 import { getContext } from "../lib/crate-tools.js";
 import path from "path";
+const log = getLogger();
 
 export async function getAdminItems({ user, prefix, offset = 0 }) {
     if (!user.administrator) {
@@ -180,6 +182,11 @@ export async function publishObject({ user, type, identifier, configuration }) {
         console.log(error);
         throw new Error(`Error getting / handling RO Crate file`);
     }
+    // cleanup the crate file
+    crate.deleteEntity("http://purl.archive.org/language-data-commons/terms#OpenAccess");
+    crate.deleteEntity("http://purl.archive.org/language-data-commons/terms#AgreeToTerms");
+    crate.deleteEntity("http://purl.archive.org/language-data-commons/terms#AuthorizedAccess");
+    crate.deleteEntity("http://purl.archive.org/language-data-commons/terms#AccessControlList");
 
     // try indexing the content and fail early if the metadata is bad
     try {
@@ -200,7 +207,7 @@ export async function publishObject({ user, type, identifier, configuration }) {
         licence = {
             "@id": configuration.api.licence,
             "@type": ["File", "DataReuselicence"],
-            name: "Open (subject to agreeing to PDSC access conditions)",
+            name: "Open (subject to agreeing to Nyingarn access conditions)",
             access: {
                 "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
             },
@@ -216,7 +223,7 @@ export async function publishObject({ user, type, identifier, configuration }) {
         licence = {
             "@id": configuration.api.licence,
             "@type": ["File", "DataReuselicence"],
-            name: "Open (subject to agreeing to PDSC access conditions)",
+            name: "Open (subject to agreeing to Nyingarn access conditions)",
             access: {
                 "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
             },
@@ -224,9 +231,10 @@ export async function publishObject({ user, type, identifier, configuration }) {
                 { "@id": "http://purl.archive.org/language-data-commons/terms#AgreeToTerms" },
             ],
         };
-        if (item.accessType === "restricted") {
-            licence.description = item.accessNarrative.text;
-            licence.reviewDate = item.accessNarrative?.reviewDate;
+        if (item.publicationMetadata.accessType === "restricted") {
+            licence.name = "Restricted";
+            licence.description = item.publicationMetadata.accessNarrative.text;
+            licence.reviewDate = item.publicationMetadata.accessNarrative?.reviewDate;
             licence.access = {
                 "@id": "http://purl.archive.org/language-data-commons/terms#AuthorizedAccess",
             };
@@ -243,6 +251,7 @@ export async function publishObject({ user, type, identifier, configuration }) {
     crate.rootDataset.identifier = identifier;
     crate = crate.toJSON();
     crate["@context"] = getContext();
+
     await store.put({ target: "ro-crate-metadata.json", json: crate });
     await store.put({
         target: configuration.api.licence,
@@ -334,9 +343,15 @@ export async function depositObjectIntoRepository({
     });
     await objectWorkspace.removeObject();
 
-    // index the item in data in the repository
-    let crate = await objectRepository.getJSON({ target: "ro-crate-metadata.json" });
-    await indexItem({ item: { identifier, type }, crate });
+    // register the repository item in the database
+    let item = await models.repoitem.findOrCreate({
+        where: { identifier, type },
+        default: { identifier, type },
+    });
+    item = item[0];
+
+    // setup the metadata in the db
+    await setRepositoryItemMetadata({ item, store: objectRepository });
 }
 
 export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit: () => {} } }) {
@@ -352,7 +367,7 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
 
     const workspaceObjectExists = await objectWorkspace.exists();
     if (!workspaceObjectExists) {
-        // create the object location in the repo
+        // create the object location in the workspace storage
         io.emit(`restore-${type}`, {
             msg: `Creating the ${type} in the workspace`,
             date: new Date(),
@@ -371,11 +386,11 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
     let resources = await objectRepository.listResources();
     resources = resources
         .filter((resource) => !resource.Key.match(/nocfl.*/))
-        .filter((resource) => {
-            return !resource.Key.match(
-                /.*\.v\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z).*/
-            );
-        })
+        // .filter((resource) => {
+        //     return !resource.Key.match(
+        //         /.*\.v\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z).*/
+        //     );
+        // })
         .map((resource) => {
             return {
                 target: resource.Key,
@@ -388,4 +403,69 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
         date: new Date(),
     });
     await objectWorkspace.copy({ batch: resources });
+    resources = await objectWorkspace.listResources();
+}
+
+export async function setRepositoryItemMetadata({ item, store }) {
+    const { identifier, type } = item;
+
+    let crate;
+    try {
+        crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        crate = new ROCrate(crate, { array: true });
+    } catch (error) {
+        console.log(error);
+        throw new Error(`Error getting / handling RO Crate file`);
+    }
+
+    try {
+        let licence = crate.getEntity("LICENCE.md");
+        if (!licence) throw new Error(`no licence found - setting to closed`);
+        let openAccess = false;
+        let accessControlList = null;
+        let accessNarrative = null;
+        let reviewDate = null;
+        if (licence?.access?.[0]?.["@id"]?.match(/OpenAccess/)) {
+            openAccess = true;
+        } else {
+            accessNarrative = licence.description.join("\n");
+            reviewDate = licence?.reviewDate?.[0];
+            accessControlList = await store.getJSON({ target: authorisedUsersFile });
+        }
+
+        item.openAccess = openAccess;
+        item.accessNarrative = accessNarrative ?? null;
+        item.reviewDate = reviewDate ?? null;
+        item.accessControlList = accessControlList ?? null;
+        await item.save();
+
+        // index the item data in the repository
+        await indexItem({ item: { identifier, type }, crate: crate.toJSON() });
+    } catch (error) {
+        log.error(`There was an issue depositing '${type}:${identifier}: ${error.message}`);
+        item.openAccess = false;
+        item.accessNarrative = "Error depositing item. Automatically set to restricted.";
+        item.accessControlList = [];
+        await item.save();
+    }
+}
+
+export async function deleteItemFromRepository({ type, identifier, configuration }) {
+    // restore the object from the repo back into the workspace
+    await restoreObjectIntoWorkspace({ type: "item", identifier });
+
+    //  delete the item from the storage
+    const objectRepository = await getStoreHandle({
+        identifier,
+        type,
+        location: "repository",
+    });
+    await objectRepository.removeObject();
+
+    //  delete it from elastic
+    let item = await models.repoitem.findOne({ where: { identifier, type } });
+    await deleteItemFromIndex({ item, configuration });
+
+    //  delete it from the db
+    await models.repoitem.destroy({ where: { identifier } });
 }

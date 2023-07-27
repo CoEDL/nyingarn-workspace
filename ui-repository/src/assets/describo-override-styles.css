@@ -1,0 +1,8 @@
+/* set styles here to override the colour of the linking elements */
+.describo-render-item-link {
+    @apply rounded-none font-light hover:bg-nyingarn-dark hover:text-nyingarn-light
+}
+
+/* set styles here to override the colour of the property rows*/
+.describo-property-background {
+}

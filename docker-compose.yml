@@ -75,6 +75,7 @@ services:
         volumes:
             - api_node_modules:/srv/api/node_modules:delegated
             - ./tasks:/srv/tasks:delegated
+            - ./saxon-test:/srv/saxon-test:delegated
             - ./api:/srv/api:delegated
             - ./.git:/srv/tasks/.git:delegated
             - ./.git:/srv/api/.git:delegated
@@ -193,3 +194,16 @@ services:
         ports:
             - 9000:9000
             - 9001:9001
+
+    xml-processor:
+        image: tomcat:9.0.76-jdk21-openjdk-slim
+        hostname: xml
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+        volumes:
+            - ./xml:/srv/xml
+            - ./xml/tomcat-config:/usr/local/tomcat/conf/Catalina/localhost/
+        ports:
+            - "8888:8080"
+        restart: unless-stopped

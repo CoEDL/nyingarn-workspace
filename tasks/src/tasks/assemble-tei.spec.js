@@ -24,16 +24,20 @@ describe(`Test assembling a TEI file from the stub files`, () => {
         }
         await writeJSON(path.join(directory, "ro-crate-metadata.json"), roCrateFile());
         await assembleTeiDocument({ identifier, directory });
-        await remove(directory);
+        //await remove(directory);
         // await store.deleteItem({ prefix: store.getItemPath() });
     });
 
     it(`Should be able to assemble a complex TEI file from the stub files`, async () => {
-        const identifier = "structured";
-        const directory = path.join(__dirname, "../test-data/reconstitute-tei/structured");
+        // copy test data to a scratch folder
+        const directory = "/tmp/test";
         await ensureDir(directory);
+        const sourceFolder = path.join(__dirname, "../test-data/reconstitute-tei/structured");
+        await copy(sourceFolder, directory);
+        // assemble the source files into a new TEI file
+        const identifier = "structured";
         await assembleTeiDocument({ identifier, directory });
-        await remove(path.join(directory, "structured-tei-complete.xml"));
+        //await remove(directory);
     });
     
 });

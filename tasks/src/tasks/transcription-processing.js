@@ -7,39 +7,19 @@ import lodashPackage from "lodash";
 const { zipObject } = lodashPackage;
 import { log, loadConfiguration } from "/srv/api/src/common/index.js";
 import { expandError } from "../common/errors.js";
-
-export async function processTEIToPageFilesAsStrings({ directory, identifier, resource }) {
-    //TODO ask SaxonJS to return the documents in memory, rather than write them directly to disk
-    // so that the storage bucket can be checked for pre-existing files, to avoid overwriting them.
-    // NB use of this implementation is currently blocked by a bug in SaxonJS: https://saxonica.plan.io/issues/5430
-    // and instead the processTEIToPageFiles function (below) is used, which returns the TEI fragments as files on disk.
-    let sourceURI = "file://" + path.join(directory, resource);
-    try {
-        SaxonJS.transform({
-            /* log the URIs of result documents */
-            deliverResultDocument: function (resultDocumentURI) {
-                return {
-                    destination: "serialized",
-                    save: function (documentURI, documentContent, encoding) {
-                        console.log(documentURI);
-                    },
-                };
-            },
-            stylesheetFileName: "/srv/tasks/src/xslt/process-tei-to-page-files.xsl.sef.json",
-            templateParams: {
-                "source-uri": sourceURI,
-            },
-            baseOutputURI: sourceURI, // output into the same folder as the source data file
-            destination: "serialized",
-        });
-    } catch (error) {
-        console.error(error);
-    }
-}
+import FormData from 'form-data';
+import fetch, {
+  Blob,
+  blobFrom,
+  blobFromSync,
+  File,
+  fileFrom,
+  fileFromSync,
+} from 'node-fetch';
+import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
 
 export async function processTeiTranscription({ directory, identifier, resource }) {
-    let sourceURI = "file://" + path.join(directory, resource);
-    await __processTeiTranscriptionXMLProcessor({ identifier, sourceURI });
+    await __processTeiTranscriptionXMLProcessor({ directory, identifier, resource });
 }
 
 /*
@@ -88,27 +68,32 @@ export async function processDigivolTranscription({ directory, identifier, resou
 */
 
 export async function __processTeiTranscriptionXMLProcessor({
+    directory,
     identifier,
-    sourceURI,
-    output = undefined,
+    resource,
 }) {
-    /* identifier = e.g. "Bates23"; sourceURI = "file:///blah/blah/Bates23/Bates23-tei.xml" */
     let configuration = await loadConfiguration();
+    const teiFile = path.join(directory, resource);
+    // prepare the HTTP form post
+    const form = new FormData();
+    form.append("identifier", identifier);
+    form.append("page-identifier-regex", configuration.ui.filename.checkNameStructure);
+    const stream = createReadStream(teiFile);
+    form.append('source', stream, teiFile);
     try {
-        const transformationResults = await SaxonJS.transform(
-            {
-                stylesheetFileName: "/srv/tasks/src/xslt/process-tei-to-page-files.xsl.sef.json",
-                templateParams: {
-                    identifier: identifier,
-                    "source-uri": sourceURI,
-                    "page-identifier-regex": configuration.ui.filename.checkNameStructure,
-                },
-                baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
-            },
-            "async"
-        );
+    	// post the form data and retrieve a response containing a <directory> XML document, containing a list of <file> elements
+    	const response = await fetch('http://xml:8080/nyingarn/ingest-tei', {method: 'POST', body: form});
+    	if (response.ok) {
+    		// xml web service returned XML successfully
+    		const text = await response.text();
+    		// write the content of each <file> element as a separate file
+    		writeDirectory(text, directory);
+    	} else {
+    		// xml web service returned an error; entity will be a JSON representation of the error 
+    		const json = await response.json();
+    		throw json;
+    	}
     } catch (error) {
-        decodeSaxonJSError(error); // unwrap the JSON-formatted error data in the JS XError object thrown by SaxonJS
         throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
     }
 }
@@ -121,7 +106,6 @@ export async function __processDigivolTranscriptionXMLProcessor({
     directory,
     identifier,
     resource,
-    output = undefined,
 }) {
     // Parses a DigiVol CSV file into an equivalent JSON data structure, saves it to a file, and
     // passes the URI of the file to an XSLT to perform the remainder of the ingestion work.
@@ -150,34 +134,65 @@ export async function __processDigivolTranscriptionXMLProcessor({
     // serialize the data as a JSON file
     let jsonFile = csvFile + ".json";
     await writeFile(jsonFile, JSON.stringify(data));
-    // console.log(data);
 
     let configuration = await loadConfiguration();
-    let sourceURI = "file://" + jsonFile;
+    
+    // prepare the HTTP form post
+    const form = new FormData();
+    form.append("identifier", identifier);
+    form.append("page-identifier-regex", configuration.ui.filename.checkNameStructure);
+    const stream = createReadStream(jsonFile);
+    form.append('source', stream, jsonFile);
     try {
-        const transformationResults = await SaxonJS.transform(
-            {
-                stylesheetFileName:
-                    "/srv/tasks/src/xslt/process-digivol-csv-to-page-files.xsl.sef.json",
-                templateParams: {
-                    identifier: identifier,
-                    "source-uri": sourceURI,
-                    "page-identifier-regex": configuration.ui.filename.checkNameStructure,
-                },
-                baseOutputURI: output ? output : sourceURI, // output into the same folder as the source data file
-            },
-            "async"
-        );
+    	// post the form data and retrieve a response containing a <directory> XML document, containing a list of <file> elements
+    	const response = await fetch('http://xml:8080/nyingarn/ingest-json', {method: 'POST', body: form});
+    	if (response.ok) {
+    		// xml web service returned XML successfully
+    		const text = await response.text();
+    		// write the content of each <file> element as a separate file
+    		writeDirectory(text, directory);
+    	} else {
+    		// xml web service returned an error; entity will be a JSON representation of the error 
+    		const json = await response.json();
+    		throw json;
+    	}
     } catch (error) {
-        // console.error(error);
-        decodeSaxonJSError(error); // unwrap the JSON-formatted error data in the JS XError object thrown by SaxonJS
-        throw expandError(error); // expand the error using the error-definitions file, and throw the expanded error
+        throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
     } finally {
         // remove the temporary JSON file
         await remove(jsonFile);
     }
 }
 
+
+// Helper function to return the list of a child elements of a given element
+// NB this replaces xmldom's 'children' function which is defective.
+function childElements(element) {
+	return Array.from(element.childNodes).filter(node => node.nodeType === 1); // nodeType 1 is an element
+}
+
+function writeDirectory(directoryXML, directory) {
+	// parse a "directory" XML file and save its "file" child elements as separate files, into the specified output directory
+	const directoryDocument = new DOMParser().parseFromString(directoryXML, 'application/xml');
+	const serializer = new XMLSerializer();
+	const directoryElement = directoryDocument.documentElement;
+	// NB xmldom's 'children' and 'firstElementChild' properties don't work
+	const childNodes = childElements(directoryElement);
+	childNodes.forEach(
+		function(childNode) {
+			// childNode is a c:file element
+			var fileName = childNode.getAttribute("name");
+			// NB xmldom's 'children' and 'firstElementChild' properties don't work
+			var surfaceElement = childElements(childNode)[0];
+			writeFile(
+			  path.join(directory, fileName), 
+			  serializer.serializeToString(surfaceElement)
+			 );
+		}
+	);	
+}
+
+// TODO check if this function is now orphaned, and if so, delete it
 /*
 Tidy up the XError errors thrown by SaxonJS.
 

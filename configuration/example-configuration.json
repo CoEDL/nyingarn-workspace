@@ -158,6 +158,9 @@
             },
             "elastic": {
                 "host": "http://elastic:9200"
+            },
+            "xml": {
+                "host": "http://xml:8080"
             }
         },
         "authentication": {

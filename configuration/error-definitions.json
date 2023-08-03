@@ -70,10 +70,10 @@
     {
         "matchingProperties": {
             "name": "XError",
-            "code": "FODC0002"
+            "code": "Q{http://www.w3.org/2005/xqt-errors}FODC0006"
         },
         "name": "MalformedXMLFile",
-        "messageTemplate": "Unable to parse the file as XML. Please open it in an XML-aware editor (e.g. oXygen) and fix any errors.",
+        "messageTemplate": "Unable to parse the file ${cause.filename} as XML. Please open it in an XML-aware editor (e.g. oXygen) and fix any errors.",
         "remarks": "Error retrieving an XML resource, thrown by XPath doc() function when a resource is inaccessible or not well-formed. By assumption, the resource is not well-formed XML. See https://www.w3.org/TR/xpath-functions-31/#ERRFODC0002"
     },
     {

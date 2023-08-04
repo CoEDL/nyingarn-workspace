@@ -78,6 +78,15 @@
     },
     {
         "matchingProperties": {
+            "name": "XError",
+            "code": "Q{https://nyingarn.net/ns/errors}schematron-validation-failed"
+        },
+        "name": "SchemaValidationFailed",
+        "messageTemplate": "Schema validation failed: ${cause.failed-assertions}",
+        "remarks": "The stylesheet return-schematron-report.xsl is responsible for generating the failed-assertions property of cause from the SVRL report"
+    },
+    {
+        "matchingProperties": {
             "name": "XError"
         },
         "name": "UnexpectedXSLTError",

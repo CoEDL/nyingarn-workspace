@@ -4,6 +4,7 @@ import {
     __processTeiTranscriptionXMLProcessor,
     __processDigivolTranscriptionXMLProcessor,
     reconstituteTEIFile,
+    validateWithSchematron,
 } from "./transcription-processing";
 import SaxonJS from "saxon-js";
 import path from "path";
@@ -1128,8 +1129,6 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
         let directory = await makeScratchCopy(
             "Issue-excessive_tei_markup/cleanup_of_msword_formatting"
         );
-        // use TEI as the default namespace so our XPath expressions are more concise
-        let options = { xpathDefaultNamespace: "http://www.tei-c.org/ns/1.0" };
 
         try {
             await __processTeiTranscriptionXMLProcessor({
@@ -1137,53 +1136,20 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
                 identifier,
                 resource,
             });
-            let resourceDirectory = directory;
-            let sourceFile = path.join(resourceDirectory, resource);
-            let resultFile = path.join(resourceDirectory, "msword_formatting-001.tei.xml");
-            // parse the original TEI document and also the derived (single) TEI surface XML file
-            let sourceDoc = await SaxonJS.getResource({ file: sourceFile, type: "xml" });
-            let resultDoc = await SaxonJS.getResource({ file: resultFile, type: "xml" });
-            // evaluate XPath queries to retrieve lists of items with particular formatting
-            let italicised = SaxonJS.XPath.evaluate(
-                "//*[@rend => contains-token('italic')]",
-                resultDoc,
-                options
-            );
-            let bold = SaxonJS.XPath.evaluate(
-                "//*[@rend => contains-token('bold')]",
-                resultDoc,
-                options
-            );
-            let normalStyled = SaxonJS.XPath.evaluate(
-                "//*[tokenize(@rend) = 'Normal']",
-                resultDoc,
-                options
-            );
-            let underlinedOnly = SaxonJS.XPath.evaluate(
-                "//*[@rend = 'underline']",
-                resultDoc,
-                options
-            );
-            let struckOut = SaxonJS.XPath.evaluate(
-                "//*[contains-token(@rend, 'strikethrough')]",
-                resultDoc,
-                options
-            );
-            let deleted = SaxonJS.XPath.evaluate("//del", resultDoc, options);
-            let underlinedAndDeleted = SaxonJS.XPath.evaluate(
-                "//del[contains-token(@rend, 'underline')]",
-                resultDoc,
-                options
-            );
-            let adjacentIdenticallyFormattedHighlights = SaxonJS.XPath.evaluate(
-                "//hi[let $r1:= tokenize(@rend), $r2:= tokenize(following-sibling::node()[1]/self::hi/@rend) return (count($r1) = count($r2)) and (every $r in $r1 satisfies $r = $r2)]/text()",
-                resultDoc,
-                options
-            );
+            const instance = path.join(directory, "msword_formatting-001.tei.xml");
+            const schema = path.join(directory, "schematron.xml");
+            await validateWithSchematron({instance, schema});
+
+            // TODO try to replace this with something relying on xmldom's capabilities 
             // Parse the source and result documents into a sequence of tokens consisting of either (a) non-punctuation, non-whitespace, or (b) punctuation characters
             // so that we can compare the two lists.
             // NB the text of the page-identifier is excluded from the source document because we know the ingestion stylesheet is supposed
             // to remove this and convert it into a pb element in the result document.
+            /*
+            // parse the original TEI document and also the derived (single) TEI surface XML file
+            let sourceDoc = await SaxonJS.getResource({ file: sourceFile, type: "xml" });
+            let resultDoc = await SaxonJS.getResource({ file: resultFile, type: "xml" });
+            // evaluate XPath queries to retrieve lists of items with particular formatting
             let sourceWords = SaxonJS.XPath.evaluate(
                 "(for $text in /TEI/text//text()[not(ancestor::hi/@rend='Page')] return analyze-string($text, '[^\\s\\p{P}]+|\\p{P}+')//text()[normalize-space()]) => string-join(' ')",
                 sourceDoc,
@@ -1194,20 +1160,10 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
                 resultDoc,
                 options
             );
-            // there should be no elements whose @rend contains 'italic' or 'bold' or 'Normal'
-            expect(italicised).toBeNull();
-            expect(bold).toBeNull();
-            expect(normalStyled).toBeNull();
-            // every set of adjacent identically-formatted highlights should have been merged into a single highlight
-            expect(adjacentIdenticallyFormattedHighlights).toBeNull();
-            // there should be elements which are just underlined, elements which are deleted, and some which are both
-            expect(underlinedOnly).not.toBeNull();
-            expect(deleted).not.toBeNull();
-            expect(underlinedAndDeleted).not.toBeNull();
-            // there should be no elements which are 'strikethrough' because they should all have been converted to del elements
-            expect(struckOut).toBeNull();
+
             // the full textual content (ignoring white space) of the source document should be preserved in the result document
             expect(sourceWords).toEqual(resultWords);
+            */
         } finally {
             // clean up
             await removeScratchDirectory(directory);
@@ -1258,22 +1214,9 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
                 identifier,
                 resource,
             });
-            let resultFile = path.join(directory, "hw0024-001.tei.xml");
-            let resultDoc = await SaxonJS.getResource({ file: resultFile, type: "xml" });
-            // check the following input has been transformed:
-            // <rs ref="#S26184">Ulmin</rs> of <rs ref="#S13203">Omeo</rs>
-            let persName = SaxonJS.XPath.evaluate(
-                "//persName[@ref='#S26184'][.='Ulmin']",
-                resultDoc,
-                options
-            );
-            expect(persName).not.toBeNull();
-            let placeName = SaxonJS.XPath.evaluate(
-                "//placeName[@ref='#S13203'][.='Omeo']",
-                resultDoc,
-                options
-            );
-            expect(placeName).not.toBeNull();
+            const instance = path.join(directory, "hw0024-001.tei.xml");
+            const schema = path.join(directory, "schematron.xml");
+            await validateWithSchematron({instance, schema});
         } finally {
             // clean up
             await removeScratchDirectory(directory);

@@ -42,6 +42,7 @@
 								<li><a href="ingest-tei">Ingest TEI</a></li>
 								<li><a href="ingest-json">Ingest JSON (previously converted from CSV)</a></li>
 								<li><a href="reconstitute-tei">Reconstitute a TEI document from an RO-Crate metadata file and a set of TEI surface files</a></li>
+								<li><a href="validate-with-schematron">Validate an XML document with a Schematron schema</a></li>
 							</ul>
 						</body>
 					</html>
@@ -50,6 +51,28 @@
 		</p:identity>
 	</p:declare-step>
 
+	<p:declare-step name="validate-with-schematron-form" type="nyingarn:validate-with-schematron-form">
+		<p:input port="source"/>
+		<p:output port="result"/>
+		<p:identity>
+			<p:input port="source">
+				<p:inline>
+					<html xmlns="http://www.w3.org/1999/xhtml">
+						<body>
+							<p>Please upload an instance document and a Schematron schema</p>
+							<form action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+								<input type="hidden" name="_charset_" value="utf-8"/>
+								<input type="file" name="instance" id="instance" accept="application/xml"/>
+								<input type="file" name="schema" id="schema" accept="application/xml"/>
+								<button>Validate with Schematron</button>
+							</form>
+						</body>
+					</html>
+				</p:inline>
+			</p:input>
+		</p:identity>
+	</p:declare-step>
+	
 	
 	<p:declare-step name="ingest-json-form" type="nyingarn:ingest-json-form">
 		<p:input port="source"/>
@@ -166,6 +189,43 @@
 		<p:when test="$uri-path='nyingarn/'">
 			<nyingarn:home-page/>
 		</p:when>
+		<p:when test="$uri-path='nyingarn/validate-with-schematron'">
+			<p:choose>
+				<p:when test="
+					//c:body/@disposition[starts-with(., 'form-data; name=&quot;instance&quot;')] and
+					//c:body/@disposition[starts-with(., 'form-data; name=&quot;schema&quot;')]
+				">
+					<p:validate-with-schematron name="validate-with-schematron" assert-valid="false">
+						<p:input port="source" select="//c:body[starts-with(@disposition, 'form-data; name=&quot;instance&quot;')]/*">
+							<p:pipe step="nyingarn" port="source"/>
+						</p:input>
+						<p:input port="schema" select="//c:body[starts-with(@disposition, 'form-data; name=&quot;schema&quot;')]/*">
+							<p:pipe step="nyingarn" port="source"/>
+						</p:input>
+					</p:validate-with-schematron>
+					<!--
+					<p:identity>
+						<p:input port="source">
+							<p:pipe step="validate-with-schematron" port="report"/>
+						</p:input>
+					</p:identity>
+					-->
+					<p:xslt name="return-schematron-report">
+						<p:input port="parameters"><p:empty/></p:input>
+						<p:input port="stylesheet">
+							<p:document href="../xslt/return-schematron-report.xsl"/>
+						</p:input>
+						<p:input port="source">
+							<p:pipe step="validate-with-schematron" port="report"/>
+						</p:input>
+					</p:xslt>
+				</p:when>
+				<p:otherwise>
+					<!-- schema and instance files not uploaded, so display an upload form -->
+					<nyingarn:validate-with-schematron-form/>
+				</p:otherwise>
+			</p:choose>
+		</p:when>
 		<p:when test="$uri-path='nyingarn/ingest-tei'">
 			<p:choose>
 				<p:when test="//c:body/@disposition[starts-with(., 'form-data; name=&quot;source&quot;')]">
@@ -253,9 +313,11 @@
 	</p:choose>
 	<!-- return the result; either an XML file containing TEI surfaces, or a JSON-encoded error -->
 	<nyingarn:make-http-response/>
-	<z:dump><!-- href="/tmp/response.xml">-->
+	<z:dump href="/tmp/response.xml">
+		<!--
 		<p:with-option name="href" select="concat('/tmp/response-', //c:body[starts-with(@disposition, 'form-data; name=&quot;identifier&quot;')], '.xml')">
 			<p:pipe step="nyingarn" port="source"/>
 		</p:with-option>
+		-->
 	</z:dump>
 </p:declare-step>

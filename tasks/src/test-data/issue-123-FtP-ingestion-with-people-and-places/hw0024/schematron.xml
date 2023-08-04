@@ -1,0 +1,14 @@
+<schema xmlns="http://purl.oclc.org/dsdl/schematron">
+	<title>Unit test for ingestion of hw0024</title>
+	<ns prefix="tei" uri="http://www.tei-c.org/ns/1.0"/>
+	<pattern>
+            <!-- 
+            check the following input has been transformed:
+            <rs ref="#S26184">Ulmin</rs> of <rs ref="#S13203">Omeo</rs>
+            -->
+            <rule context="/">
+            	<assert id="persName" test=".//tei:persName[@ref='#S26184'][.='Ulmin']">An rs that referred to a person should be replaced with a persName</assert>
+            	<assert id="placeName" test=".//tei:placeName[@ref='#S13203'][.='Omeo']">An rs rather referred to a place should be replaced with a placeName</assert>
+            </rule>
+	</pattern>
+</schema>

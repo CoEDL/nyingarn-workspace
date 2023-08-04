@@ -1,0 +1,28 @@
+<schema xmlns="http://purl.oclc.org/dsdl/schematron">
+	<title>Unit test for ingestion of msword_formatting-tei.xml</title>
+	<ns prefix="tei" uri="http://www.tei-c.org/ns/1.0"/>
+	<pattern>
+            <rule context="//*/@rend">
+            	<assert id="italicised" test="not(contains-token(., 'italic'))">There should be no italicised text</assert>
+            	<assert id="bold" test="not(contains-token(., 'bold'))">There should be no bold text</assert>
+            	<assert id="normal" test="not(contains-token(., 'Normal'))">There should be no 'Normal' text</assert>
+            	<assert id="struck-out" test="not(contains-token(., 'strikethrough'))">There should be no strikethrough text</assert>
+            </rule>
+            <rule context="/">
+            	<assert id="deleted" test="//tei:del">There should be deleted text marked as &lt;del&gt;</assert>
+            	<assert id="underlined-only" test="//*[@rend = 'underline']">There should be text which is only underlined</assert>
+            	<assert id="underlined-and-deleted" test="//tei:del[contains-token(@rend, 'underline')]">There should be text which is underlined and deleted</assert>
+            </rule>
+            <rule context ="//tei:hi[@rend][following-sibling::node()[1]/self::tei:hi/@rend]">
+            	<assert id="no-adjacent-identically-formatted-text" test="
+            		let 
+            			$r1:= tokenize(@rend), 
+            			$r2:= tokenize(following-sibling::node()[1]/self::tei:hi/@rend) 
+            		return
+            			(count($r1) != count($r2)) or (some $r in $r1 satisfies not($r = $r2))
+            			(: either they have a different number of @rend attributes, or if they have the same number,
+            			there must be one from the first set which isn't a member of the second :)
+            	">In adjacent &lt;hi&gt; elements there must be some difference in the value of their @rend attributes</assert>
+            </rule>
+	</pattern>
+</schema>

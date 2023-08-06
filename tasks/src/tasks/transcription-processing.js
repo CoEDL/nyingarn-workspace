@@ -160,6 +160,36 @@ export async function __processDigivolTranscriptionXMLProcessor({
     }
 }
 
+export async function validateWithSchematron({instance, schema}) {
+    // Validates the named instance document against the named schema, returning a schematron report
+    // with HTTP response code 200 for valid documents or 400 for invalid documents
+    const form = new FormData();
+    const instanceStream = createReadStream(instance);
+    const schemaStream = createReadStream(schema);
+    form.append("instance", instanceStream, instance);
+    form.append("schema", schemaStream, schema);
+    try {
+        let configuration = await loadConfiguration();	
+        // post the form data and retrieve a response containing a successful SVRL report or an error
+        const response = await fetch(
+            `${configuration.api.services.xml.host}/nyingarn/validate-with-schematron`,
+            { method: "POST", body: form }
+        );
+        if (response.ok) {
+            // Validation succeeded; xml web service returns a report in Schematron Validation Report Language
+            const svrl = await response.text();
+            // return a DOM Document containing the SVRL report
+            return new DOMParser().parseFromString(svrl, "application/xml");
+        } else {
+            // Validation failed; xml web service returns the failed assertions in the form of a throwable JSON object 
+            const error = await response.json();
+            throw error;
+        }
+    } catch (error) {
+        throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
+    }
+}
+
 // Helper function to return the list of a child elements of a given element
 // NB this replaces xmldom's 'children' function which is defective.
 function childElements(element) {
@@ -180,39 +210,4 @@ function writeDirectory(directoryXML, directory) {
         var surfaceElement = childElements(childNode)[0];
         writeFile(path.join(directory, fileName), serializer.serializeToString(surfaceElement));
     });
-}
-
-// TODO check if this function is now orphaned, and if so, delete it
-/*
-Tidy up the XError errors thrown by SaxonJS.
-
-These XError objects are thrown by SaxonJS API functions SaxonJS.transform and SaxonJS.XPath.evaluate in
-response to errors thrown in XSLT or XPath code due to syntax or runtime errors, or by XPath code deliberately
-using the XPath error() function to raise an application-level ("Nyingarn") error.
-
-The Nyingarn XSLT throws errors whose codes are in the namespace "https://nyingarn.net/ns/errors", and
-where the error-object is an XDM map (a dictionary of name/value pairs).
-
-Nyingarn XSLT code uses the three-parameter form of the error function, in which the third parameter is a
-sequence of arbitrary XDM data items. SaxonJS's XError JavaScript objects contain a representation of these items
-inside an object property called errorObject.
-
-Unfortunately, the errorObject represents those XDM items in SaxonJS's own opaque internal form, rather than
-translated into standard primitive JS objects like Objects and Arrays, and this is impractical to convert.
-See <https://saxonica.plan.io/issues/5678>
-
-So Nyingarn's XSLT error procedure serializes the error map as a JSON object, and throws an error whose
-error-object is a single string containing that JSON.
-
-This function recognises those Nyingarn errors, extracts the string containing the JSON object, deserializes it to
-a simple JavaScript object, and stores it back in the XError object.
-*/
-function decodeSaxonJSError(error) {
-    if (error.errorObject && error.code.startsWith("Q{https://nyingarn.net/ns/errors}")) {
-        try {
-            error.errorObject = JSON.parse(error.errorObject["value"]);
-        } catch (failedToDecodeErrorObject) {
-            console.error("decodeSaxonJSError failed to decode errorObject", error.errorObject);
-        }
-    }
 }

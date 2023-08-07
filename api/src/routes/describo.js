@@ -138,7 +138,6 @@ async function postCopyCrateHandler(req) {
     const copy = req.body.copy;
     let store = await getStoreHandle({ id: copy.source, type: copy.sourceType });
     let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
-    console.log(crate);
 
     // remove properties that will be specific to the crate we're copying from
     let rootDescriptor = crate["@graph"].filter(
@@ -155,6 +154,16 @@ async function postCopyCrateHandler(req) {
 
     store = await getStoreHandle({ id: copy.target, type: copy.sourceType });
     await store.put({ json: crate, target: "ro-crate-metadata.json" });
+
+    // copy allowed users
+    let sourceItem = await models.item.findOne({
+        where: { identifier: copy.source },
+        include: [{ model: models.user }],
+    });
+    let targetItem = await models.item.findOne({ where: { identifier: copy.target } });
+    for (let user of sourceItem.users) {
+        await targetItem.addUser(user);
+    }
     return;
 }
 

@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col" v-loading="data.loading">
-        <div class="text-gray-600">Select a crate from which to copy the metadata.</div>
+        <div class="text-gray-600">Copy the metadata and access control list from this crate.</div>
         <el-autocomplete
             class="w-full"
             v-model="data.value"
@@ -29,6 +29,8 @@ const props = defineProps({
         },
     },
 });
+const $emit = defineEmits(["refresh"]);
+
 const data = reactive({
     loading: false,
     value: undefined,
@@ -82,15 +84,10 @@ async function copyCrate() {
         },
     });
     if (response.status === 200) {
-        ElMessage({
-            message: "The metadata was copied",
-            type: "success",
-        });
+        ElMessage.success("The metadata and access control list was copied");
+        $emit("refresh");
     } else {
-        ElMessage({
-            message: "There was an error copying the metadata",
-            type: "error",
-        });
+        ElMessage.error("There was an error copying data from the other crate");
     }
     data.loading = false;
 }

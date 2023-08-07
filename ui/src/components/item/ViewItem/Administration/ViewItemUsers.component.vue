@@ -16,6 +16,7 @@
                 <template #default="scope">
                     <div v-if="!scope.row.administrator && !scope.row.loggedin">
                         <el-popconfirm
+                            width="300"
                             title="Are you sure you want to detach this user?"
                             @confirm="detachUser(scope.row)"
                         >
@@ -32,31 +33,33 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import { ElMessage } from "element-plus";
 import { detachUserFromItem } from "../../item-services.js";
-export default {
-    props: {
-        users: {
-            type: Array,
-            required: true,
-        },
+import { computed, inject } from "vue";
+import { useRoute } from "vue-router";
+const $http = inject("$http");
+const $route = useRoute();
+
+const props = defineProps({
+    users: {
+        type: Array,
+        required: true,
     },
-    data() {
-        return { identifier: this.$route.params.identifier };
-    },
-    methods: {
-        async detachUser({ id }) {
-            let response = await detachUserFromItem({
-                $http: this.$http,
-                identifier: this.identifier,
-                userId: id,
-            });
-            if (response.status !== 200) {
-                ElMessage.success(`There was a problem detaching the user`);
-            }
-            this.$emit("refresh");
-        },
-    },
-};
+});
+const $emit = defineEmits(["refresh"]);
+let identifier = computed(() => $route.params.identifier);
+
+async function detachUser({ id }) {
+    let response = await detachUserFromItem({
+        $http,
+        identifier: identifier.value,
+        userId: id,
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`There was a problem detaching the user`);
+        console.log(await response.json());
+    }
+    $emit("refresh");
+}
 </script>

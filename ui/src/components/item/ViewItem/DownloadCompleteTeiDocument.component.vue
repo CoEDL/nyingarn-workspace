@@ -54,7 +54,7 @@ async function getStatus() {
     });
     if (response.status === 200) {
         response = await response.json();
-        if (response.status.pages.bad !== 0) data.disableTeiGeneration = true;
+        if (response.status?.pages?.bad !== 0) data.disableTeiGeneration = true;
     }
 }
 

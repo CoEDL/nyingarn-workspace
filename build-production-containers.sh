@@ -47,6 +47,12 @@ if [ "$resp" == "y" ] ; then
         -t ghcr.io/coedl/nyingarn-workspace-task-runner:${VERSION} \
         -f Dockerfile.tasks-build .
 
+    # build the XML container
+    docker buildx build --push --rm --platform=linux/amd64 \
+        -t ghcr.io/coedl/nyingarn-workspace-xml-processor:latest \
+        -t ghcr.io/coedl/nyingarn-workspace-xml-processor:${VERSION} \
+        -f Dockerfile.xml-build .
+
     # build the UI container
     docker run -it --rm \
         -v $PWD/ui:/srv/ui \

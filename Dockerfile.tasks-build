@@ -27,8 +27,8 @@ COPY tasks /srv/tasks
 COPY api /srv/api
 
 WORKDIR /srv/api
-RUN npm install
+RUN npm install --arch=x64 --platform=linux --libc=glibc sharp
 WORKDIR /srv/tasks
-RUN npm install
+RUN npm install --arch=x64 --platform=linux --libc=glibc sharp
 
 CMD [ "node", "/srv/tasks/index.js" ]

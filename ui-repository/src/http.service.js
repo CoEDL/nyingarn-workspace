@@ -2,7 +2,7 @@ import { tokenSessionKey, getLocalStorage } from "./storage.js";
 import { isNumber, isString, isBoolean } from "lodash";
 
 export default class HTTPService {
-    constructor({ router, loginPath = "/login" }) {
+    constructor({ router, loginPath = "/" }) {
         this.router = router;
         this.loginPath = loginPath;
     }

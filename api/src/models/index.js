@@ -2,6 +2,7 @@
 
 import Sequelize from "sequelize";
 import user from "./user.js";
+import otp from "./user_otp.js";
 import session from "./session.js";
 import item from "./item.js";
 import collection from "./collection.js";
@@ -37,7 +38,7 @@ let sequelize = new Sequelize(
     config.db
 );
 
-let modules = [user, session, item, collection, task, log, itemUser, repoitem];
+let modules = [user, otp, session, item, collection, task, log, itemUser, repoitem];
 
 // Initialize models
 modules.forEach((module) => {

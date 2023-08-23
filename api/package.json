@@ -29,6 +29,7 @@
         "nodemon": "^2.0.22"
     },
     "dependencies": {
+        "@aws-sdk/client-ses": "^3.386.0",
         "@coedl/nocfl-js": "^2.0.0",
         "@describo/data-packs": "^0.10.0",
         "@elastic/elasticsearch": "^8.8.0",

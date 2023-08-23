@@ -1,13 +1,14 @@
 import ShellComponent from "./components/Shell.component.vue";
 import LoginComponent from "./components/Login.component.vue";
 import CallbackOauthLogin from "./components/authentication/OauthCallback.component.vue";
+import CallbackOtpLogin from "./components/authentication/OtpCallback.component.vue";
 import DashboardComponent from "./components/dashboard/Shell.component.vue";
 import ViewItemComponent from "./components/item/ViewItem/Shell.component.vue";
 import ViewCollectionComponent from "./components/collection/ViewCollection/Shell.component.vue";
 import ViewResourceComponent from "./components/item/ViewResource/Shell.component.vue";
 import AdminComponent from "./components/admin/Shell.component.vue";
 import AdminManageUsersComponent from "./components/admin/users/ManageUsers.component.vue";
-import AdminWhitelistUsersComponent from "./components/admin/users/WhitelistUsers.component.vue";
+import AdminCreateUserAccountsComponent from "./components/admin/users/CreateUserAccounts.component.vue";
 import AdminLogsComponent from "./components/admin/Logs.component.vue";
 import AdminAwaitingReviewComponent from "./components/admin/AwaitingReview.component.vue";
 import AdminWorkspaceItemsComponent from "./components/admin/WorkspaceItems.component.vue";
@@ -111,7 +112,7 @@ const routes = [
                     {
                         name: "admin.users.invite",
                         path: "users/permitted",
-                        component: AdminWhitelistUsersComponent,
+                        component: AdminCreateUserAccountsComponent,
                         meta: { name: "permitted users" },
                     },
                     {
@@ -173,6 +174,11 @@ const routes = [
         name: "callback-oauth-login",
         path: "/callback-oauth-login",
         component: CallbackOauthLogin,
+    },
+    {
+        name: "otp-login",
+        path: "/otp/:otp",
+        component: CallbackOtpLogin,
     },
 ];
 

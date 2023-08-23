@@ -15,6 +15,7 @@ import { setupRoutes as setupDataRoutes } from "./src/routes/data/index.js";
 import { setupRoutes as setupPublishRoutes } from "./src/routes/publish.js";
 import { setupRoutes as setupRepositoryRoutes } from "./src/routes/repository.js";
 import rabbit from "foo-foo-mq";
+import { SES } from "./src/common/aws-ses.js";
 
 import Fastify from "fastify";
 import fastifyCompress from "@fastify/compress";
@@ -111,8 +112,8 @@ async function main() {
         global.testing = req.headers.testing;
     });
     fastify.addHook("onReady", async () => {
+        await Promise.all([setupSES({ configuration }), models.sequelize.sync()]);
         const rabbit = await initialiseRabbit({ configuration });
-        await models.sequelize.sync();
         fastify.decorate("models", models);
         fastify.decorate("rabbit", rabbit);
     });
@@ -153,4 +154,16 @@ async function initialiseRabbit({ configuration }) {
         bindings: configuration.api.services.rabbit.bindings,
     });
     return rabbit;
+}
+
+async function setupSES({ configuration }) {
+    const aws = configuration.api.services.aws;
+    const ses = new SES({
+        accessKeyId: aws.awsAccessKeyId,
+        secretAccessKey: aws.awsSecretAccessKey,
+        region: aws.region,
+        mode: configuration.api.sesMode,
+    });
+    // await ses.deleteAllTemplates();
+    await ses.loadTemplates();
 }

@@ -176,6 +176,12 @@
                 "redirectUri": "http://{your host}/callback-oauth-login",
                 "discover": "https://central.aaf.edu.au"
             }
-        }
+        },
+        "origin": {
+            "workspace": "https://workspace.nyingarn.net",
+            "repository": "https://repository.nyingarn.net"
+        },
+        "emailLoginTimeout": { "minutes": 10 },
+        "sesMode": "production"
     }
 }

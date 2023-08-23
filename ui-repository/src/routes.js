@@ -1,6 +1,7 @@
 import HTTPService from "./http.service.js";
 import HomePageShellComponent from "./components/home-page/Shell.component.vue";
 import ItemViewComponent from "./components/item/Shell.component.vue";
+import CallbackOtpLogin from "./components/authentication/OtpCallback.component.vue";
 import { createRouter, createWebHistory } from "vue-router";
 const routes = [
     {
@@ -28,6 +29,11 @@ const routes = [
                 props: true,
             },
         ],
+    },
+    {
+        name: "otp-login",
+        path: "/otp/:otp",
+        component: CallbackOtpLogin,
     },
 ];
 

@@ -7,4 +7,13 @@
 
 <script setup>
 import NavbarComponent from "./components/Navbar.component.vue";
+import { tokenSessionKey, getLocalStorage } from "./storage.js";
+import { useStore } from "vuex";
+const $store = useStore();
+
+let data = getLocalStorage({ key: tokenSessionKey });
+if (data) {
+    let user = JSON.parse(atob(data.token.split(".")[1]));
+    $store.commit("setUserData", user);
+}
 </script>

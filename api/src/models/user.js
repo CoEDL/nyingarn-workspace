@@ -60,6 +60,7 @@ export default function (sequelize, DataTypes) {
     );
     User.associate = function (models) {
         User.hasOne(models.session, { onDelete: "CASCADE" });
+        User.hasOne(models.otp, { onDelete: "CASCADE" });
         User.belongsToMany(models.item, {
             through: "item_users",
         });

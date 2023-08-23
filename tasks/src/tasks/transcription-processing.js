@@ -1,7 +1,6 @@
 import fsPackage from "fs-extra";
 const { createReadStream, writeFile, remove } = fsPackage;
 import path from "path";
-import SaxonJS from "saxon-js";
 import { parse } from "csv-parse";
 import lodashPackage from "lodash";
 const { zipObject } = lodashPackage;

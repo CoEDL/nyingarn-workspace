@@ -9,7 +9,6 @@ import {
 	makeScratchDirectory,
 	validateWithSchematron
 } from "./testing";
-import SaxonJS from "saxon-js";
 import path from "path";
 import { readdir, remove, ensureDir, pathExists, copy } from "fs-extra";
 import { prepare, cleanup } from "./index.js";

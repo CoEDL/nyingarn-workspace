@@ -176,7 +176,7 @@ export async function postEmailLoginRouteHandler(req, res) {
     const otp = await user.createOtp({ password: crypto.randomBytes(30).toString("hex") });
 
     let response = await ses.sendMessage({
-        templateName: `production-application-login`,
+        templateName: `${req.session.configuration.api.sesMode}-application-login`,
         data: {
             site: req.params.origin === "workspace" ? "Nyingarn Workspace" : "Nyingarn Repository",
             link: `${origin}/otp/${otp.password}`,

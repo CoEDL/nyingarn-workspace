@@ -12,6 +12,8 @@ import validatorPkg from "validator";
 const { isURL } = validatorPkg;
 import { ROCrate } from "ro-crate";
 import { registerAllFiles, getContext } from "../lib/crate-tools.js";
+import { SES } from "../common/aws-ses.js";
+import models from "../models/index.js";
 
 export function setupRoutes(fastify, options, done) {
     fastify.addHook("preHandler", demandAuthenticatedUser);
@@ -86,6 +88,8 @@ async function postPublishCollectionHandler(req, res) {
 
         await store.put({ target: "ro-crate-metadata.json", json: crate });
         req.io.to(req.query.clientId).emit("publish-collection", { msg: `Done`, date: new Date() });
+
+        await notifyAwaitingReview({ configuration: req.session.configuration });
     } catch (error) {
         console.log(error);
     }
@@ -184,6 +188,8 @@ async function postPublishItemHandler(req, res) {
 
         await store.put({ target: "ro-crate-metadata.json", json: crate });
         req.io.to(req.query.clientId).emit("publish-item", { msg: `Done`, date: new Date() });
+
+        await notifyAwaitingReview({ configuration: req.session.configuration });
     } catch (error) {
         console.log(error);
     }
@@ -202,4 +208,24 @@ async function getItemPublicationStatus(req) {
         narrative: req.session.item.publicationMetadata?.accessNarrative?.text,
         reviewDate: req.session.item.publicationMetadata?.accessNarrative?.reviewDate,
     };
+}
+
+async function notifyAwaitingReview({ configuration }) {
+    const aws = configuration.api.services.aws;
+    const ses = new SES({
+        accessKeyId: aws.awsAccessKeyId,
+        secretAccessKey: aws.awsSecretAccessKey,
+        region: aws.region,
+        mode: configuration.api.sesMode,
+    });
+    let adminEmails = await models.user.findAll({
+        where: { administrator: true },
+        attributes: ["email"],
+        raw: true,
+    });
+    let response = await ses.sendMessage({
+        templateName: `${configuration.api.sesMode}-awaiting-review`,
+        data: {},
+        to: adminEmails.map((u) => u.email),
+    });
 }

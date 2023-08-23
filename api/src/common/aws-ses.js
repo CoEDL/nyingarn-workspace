@@ -41,6 +41,12 @@ export class SES {
                 TextPart: "Login to the {{site}} by clicking on this link: {{link}}",
                 htmlFile: "application-login-email.html",
             },
+            {
+                TemplateName: `${mode}-awaiting-review`,
+                SubjectPart: `An item or collection is awaiting review`,
+                TextPart: "An item or collection has just been published and is awaiting review",
+                htmlFile: "awaiting-review-email.html",
+            },
         ];
         if (mode === "testing") {
             this.templates = this.templates.slice(0, 1);
@@ -83,7 +89,7 @@ export class SES {
         }
     }
 
-    async sendMessage({ templateName, data, to }) {
+    async sendMessage({ templateName, data = {}, to }) {
         if (this.mode === "testing") {
             return "email sent";
         }

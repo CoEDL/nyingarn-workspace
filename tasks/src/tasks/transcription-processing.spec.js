@@ -4,8 +4,11 @@ import {
     __processTeiTranscriptionXMLProcessor,
     __processDigivolTranscriptionXMLProcessor,
     reconstituteTEIFile,
-    validateWithSchematron,
 } from "./transcription-processing";
+import {
+	makeScratchDirectory,
+	validateWithSchematron
+} from "./testing";
 import SaxonJS from "saxon-js";
 import path from "path";
 import { readdir, remove, ensureDir, pathExists, copy } from "fs-extra";
@@ -777,34 +780,12 @@ describe(`Confirm that excessive TEI markup is removed`, () => {
                 identifier,
                 resource,
             });
-            const instance = path.join(directory, "msword_formatting-001.tei.xml");
+            // pass two instance documents (the original, and the single-page paginated version) to the schematron validator
+            const instance = [path.join(directory, resource), path.join(directory, "msword_formatting-001.tei.xml")];
+            // this schematron schema validates that the second instance document has been correctly purged of cruft,
+            // and also checks it against the original to validate that the textual content has not been munted
             const schema = path.join(directory, "schematron.xml");
             await validateWithSchematron({instance, schema});
-
-            // TODO try to replace this with something relying on xmldom's capabilities 
-            // Parse the source and result documents into a sequence of tokens consisting of either (a) non-punctuation, non-whitespace, or (b) punctuation characters
-            // so that we can compare the two lists.
-            // NB the text of the page-identifier is excluded from the source document because we know the ingestion stylesheet is supposed
-            // to remove this and convert it into a pb element in the result document.
-            /*
-            // parse the original TEI document and also the derived (single) TEI surface XML file
-            let sourceDoc = await SaxonJS.getResource({ file: sourceFile, type: "xml" });
-            let resultDoc = await SaxonJS.getResource({ file: resultFile, type: "xml" });
-            // evaluate XPath queries to retrieve lists of items with particular formatting
-            let sourceWords = SaxonJS.XPath.evaluate(
-                "(for $text in /TEI/text//text()[not(ancestor::hi/@rend='Page')] return analyze-string($text, '[^\\s\\p{P}]+|\\p{P}+')//text()[normalize-space()]) => string-join(' ')",
-                sourceDoc,
-                options
-            );
-            let resultWords = SaxonJS.XPath.evaluate(
-                "(for $text in /surface//text() return analyze-string($text, '[^\\s\\p{P}]+|\\p{P}+')//text()[normalize-space()]) => string-join(' ')",
-                resultDoc,
-                options
-            );
-
-            // the full textual content (ignoring white space) of the source document should be preserved in the result document
-            expect(sourceWords).toEqual(resultWords);
-            */
         } finally {
             // clean up
             await removeScratchDirectory(directory);

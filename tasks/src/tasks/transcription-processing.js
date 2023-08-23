@@ -160,35 +160,7 @@ export async function __processDigivolTranscriptionXMLProcessor({
     }
 }
 
-export async function validateWithSchematron({instance, schema}) {
-    // Validates the named instance document against the named schema, returning a schematron report
-    // with HTTP response code 200 for valid documents or 400 for invalid documents
-    const form = new FormData();
-    const instanceStream = createReadStream(instance);
-    const schemaStream = createReadStream(schema);
-    form.append("instance", instanceStream, instance);
-    form.append("schema", schemaStream, schema);
-    try {
-        let configuration = await loadConfiguration();	
-        // post the form data and retrieve a response containing a successful SVRL report or an error
-        const response = await fetch(
-            `${configuration.api.services.xml.host}/nyingarn/validate-with-schematron`,
-            { method: "POST", body: form }
-        );
-        if (response.ok) {
-            // Validation succeeded; xml web service returns a report in Schematron Validation Report Language
-            const svrl = await response.text();
-            // return a DOM Document containing the SVRL report
-            return new DOMParser().parseFromString(svrl, "application/xml");
-        } else {
-            // Validation failed; xml web service returns the failed assertions in the form of a throwable JSON object 
-            const error = await response.json();
-            throw error;
-        }
-    } catch (error) {
-        throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
-    }
-}
+
 
 // Helper function to return the list of a child elements of a given element
 // NB this replaces xmldom's 'children' function which is defective.

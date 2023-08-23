@@ -1,13 +1,17 @@
 import { assembleTeiDocument } from "./assemble-tei.js";
+import {
+    __processTeiTranscriptionXMLProcessor,
+} from "./transcription-processing";
+import {
+    validateWithSchematron,
+    makeScratchCopy
+} from "./testing";
 import path from "path";
 import { ensureDir, copy, remove, writeFile, writeJSON, readdir } from "fs-extra";
-import Chance from "chance";
-const chance = new Chance();
 
 describe(`Test assembling a TEI file from the stub files`, () => {
     it(`Should be able to assemble a simple TEI file from the stub files`, async () => {
-        const identifier = "test"; //chance.word();
-        //const directory = path.join("/tmp", chance.word());
+        const identifier = "test"; 
         const directory = "/tmp/test";
         await ensureDir(directory);
         // let store = await getStoreHandle({ id: identifier, className: "item" });
@@ -30,17 +34,50 @@ describe(`Test assembling a TEI file from the stub files`, () => {
 
     it(`Should be able to assemble a complex TEI file from the stub files`, async () => {
         // copy test data to a scratch folder
-        const directory = "/tmp/test";
-        await ensureDir(directory);
-        const sourceFolder = path.join(__dirname, "../test-data/reconstitute-tei/structured");
-        await copy(sourceFolder, directory);
+        const directory = await makeScratchCopy("reconstitute-tei/structured");
         // assemble the source files into a new TEI file
         const identifier = "structured";
         await assembleTeiDocument({ identifier, directory });
-        //await remove(directory);
+        await remove(directory);
     });
-    
+
+    it(`Should be able to perform a lossless round trip; splitting a file, reconstituting the parts, re-splitting, and re-reconstituting`, async () => {
+        // In order to test a full round trip, the input TEI document is first split, 
+        // then reassembled, and then split and reassembled a second time.
+        let identifier = "structured";
+        let resource = "structured-tei.xml";
+        let directory = await makeScratchCopy("tei-div-hierarchy-splitting/structured");
+        // make a snapshot of the original file, because round-tripping will overwrite it,
+        // and we need to have a snapshot to compare it to the final result
+        let sourceFile = path.join(directory, resource);
+        let sourceSnapshot = path.join(directory, "original-tei.xml");
+        await copy(sourceFile, sourceSnapshot);
+        // split and reassemble the source file 
+        await __processTeiTranscriptionXMLProcessor({
+            directory,
+            identifier,
+            resource,
+        });
+        await assembleTeiDocument({ identifier, directory });
+        // overwrite the source file with the reassembled file, and then split and reassemble that
+        let reassembledFile = path.join(directory, identifier + "-tei-complete.xml");
+        await copy(reassembledFile, sourceFile);
+        // split and reassemble the previously reassembled file 
+        await __processTeiTranscriptionXMLProcessor({
+            directory,
+            identifier,
+            resource,
+        });
+        await assembleTeiDocument({ identifier, directory });
+        // now compare the original source file (sourceSnapshot) with the final result (reassembledFile)
+        const instance = [sourceSnapshot, reassembledFile];
+        const schema = path.join(directory, "schematron.xml");
+        await validateWithSchematron({instance, schema});
+        // Clean up
+        await remove(directory);
+    });
 });
+
 
 function sampleDocument(identifier, page) {
    // NB some ingestion pathways produce <surface> documents containing <line> elements,

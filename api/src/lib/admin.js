@@ -406,7 +406,7 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
     resources = await objectWorkspace.listResources();
 }
 
-export async function setRepositoryItemMetadata({ item, store }) {
+export async function setRepositoryItemMetadata({ configuration, item, store }) {
     const { identifier, type } = item;
 
     let crate;
@@ -440,8 +440,9 @@ export async function setRepositoryItemMetadata({ item, store }) {
         await item.save();
 
         // index the item data in the repository
-        await indexItem({ item: { identifier, type }, crate: crate.toJSON() });
+        await indexItem({ configuration, item: { identifier, type }, crate: crate.toJSON() });
     } catch (error) {
+        console.log(error);
         log.error(`There was an issue depositing '${type}:${identifier}: ${error.message}`);
         item.openAccess = false;
         item.accessNarrative = "Error depositing item. Automatically set to restricted.";

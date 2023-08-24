@@ -50,7 +50,7 @@ export async function importRepositoryContentFromStorageIntoTheDb({ user, config
         item = item[0];
 
         // setup the metadata in the db
-        await setRepositoryItemMetadata({ item, store });
+        await setRepositoryItemMetadata({ configuration, item, store });
     }
 
     // insert any collections found on the backend storage not already in the DB

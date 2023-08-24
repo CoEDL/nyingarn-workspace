@@ -361,11 +361,22 @@
 	</p:choose>
 	<!-- return the result; either an XML file containing TEI surfaces, or a JSON-encoded error -->
 	<nyingarn:make-http-response/>
-	<z:dump href="/tmp/response.xml">
-		<!--
-		<p:with-option name="href" select="concat('/tmp/response-', //c:body[starts-with(@disposition, 'form-data; name=&quot;identifier&quot;')], '.xml')">
-			<p:pipe step="nyingarn" port="source"/>
-		</p:with-option>
-		-->
-	</z:dump>
+	
+	<!-- log the HTTP request -->
+	<cx:message name="log-request">
+		<p:with-option name="message" select="
+			concat(
+				'Request URI [',
+				$uri-path,
+				'] returning status code [',
+				/c:response/@status,
+				'], content type [',
+				/c:response/c:body/@content-type,
+				']'
+			)
+		"/>
+	</cx:message>
+	
+	<!-- dump the response -->
+	<z:dump href="/tmp/response.xml"/>
 </p:declare-step>

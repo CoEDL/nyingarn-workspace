@@ -5,6 +5,7 @@
 	xmlns:c="http://www.w3.org/ns/xproc-step" 
 	xmlns:z="https://github.com/Conal-Tuohy/XProc-Z"
 	xmlns:fn="http://www.w3.org/2005/xpath-functions"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:nyingarn="https://nyingarn.net/ns/functions">
 	
 	<p:input port="source" primary="true"/>
@@ -30,140 +31,23 @@
 	
 	<p:import href="xproc-z-library.xpl"/>
 	
-	<p:declare-step name="home-page" type="nyingarn:home-page">
+	<p:declare-step name="html-page" type="nyingarn:html-page">
 		<p:input port="source"/>
 		<p:output port="result"/>
-		<p:identity>
-			<p:input port="source">
-				<p:inline>
-					<html xmlns="http://www.w3.org/1999/xhtml">
-						<body>
-							<h1>Nyingarn XML-processing web service</h1>
-							<ul>
-								<li><a href="ingest-tei">Ingest TEI</a></li>
-								<li><a href="ingest-json">Ingest JSON (previously converted from CSV)</a></li>
-								<li><a href="reconstitute-tei">Reconstitute a TEI document from an RO-Crate metadata file and a set of TEI surface files</a></li>
-								<li><a href="validate-with-schematron">Validate an XML document with a Schematron schema</a></li>
-							</ul>
-						</body>
-					</html>
-				</p:inline>
-			</p:input>
-		</p:identity>
-	</p:declare-step>
-
-	<p:declare-step name="validate-with-schematron-form" type="nyingarn:validate-with-schematron-form">
-		<p:input port="source"/>
-		<p:output port="result"/>
-		<p:identity>
-			<p:input port="source">
-				<p:inline>
-					<html xmlns="http://www.w3.org/1999/xhtml">
-						<body>
-							<p>Please upload one or two instance documents and a Schematron schema</p>
-							<p>If you upload two documents, they will each be wrapped in 
-							<code>&lt;c:file xmlns:c="http://www.w3.org/ns/xproc-step"&gt;</code>
-							elements and these two <code>c:file</code> elements will themselves be wrapped in a root 
-							<code>c:directory</code> element, which will be passed to the Schematron validator.</p>
-							<p>If you upload a single document, it will be validated as is.</p> 
-							<form action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-								<input type="hidden" name="_charset_" value="utf-8"/>
-								<input type="file" name="instance" accept="application/xml"/>
-								<input type="file" name="instance" accept="application/xml"/>
-								<input type="file" name="schema" id="schema" accept="application/xml"/>
-								<button>Validate with Schematron</button>
-							</form>
-						</body>
-					</html>
-				</p:inline>
-			</p:input>
-		</p:identity>
+		<p:option name="page" required="true"/>
+		<p:load>
+			<p:with-option name="href" select="concat('../html/', $page, '.html')"/>
+		</p:load>
+		<p:xslt>
+			<p:input port="parameters"><p:empty/></p:input>
+			<p:input port="stylesheet"><p:document href="../xslt/style-html.xsl"/></p:input>
+		</p:xslt>
 	</p:declare-step>
 	
-	
-	<p:declare-step name="ingest-json-form" type="nyingarn:ingest-json-form">
-		<p:input port="source"/>
-		<p:output port="result"/>
-		<p:identity>
-			<p:input port="source">
-				<p:inline>
-					<html xmlns="http://www.w3.org/1999/xhtml">
-						<body>
-							<p>Please upload a JSON source file</p>
-							<form action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-								<input type="hidden" name="_charset_" value="utf-8"/>
-								<input type="text" name="identifier" value="" placeholder="identifier"/>
-								<input type="text" name="page-identifier-regex" value=".*\.(jpe?g|tif{1,2}|png|csv|xml)$"/>
-								<input type="file" name="source" id="source" accept="application/json"/>
-								<button>Get TEI surfaces</button>
-							</form>
-						</body>
-					</html>
-				</p:inline>
-			</p:input>
-		</p:identity>
-	</p:declare-step>
-	
-	<p:declare-step name="ingest-tei-form" type="nyingarn:ingest-tei-form">
-		<p:input port="source"/>
-		<p:output port="result"/>
-		<p:identity>
-			<p:input port="source">
-				<p:inline>
-					<html xmlns="http://www.w3.org/1999/xhtml">
-						<body>
-							<p>Please upload a source TEI XML file</p>
-							<form action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-								<input type="text" name="identifier" value="" placeholder="identifier"/>
-								<input type="text" name="page-identifier-regex" value=".*\.(jpe?g|tif{1,2}|png|csv|xml)$"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<button>Get TEI surfaces</button>
-							</form>
-						</body>
-					</html>
-				</p:inline>
-			</p:input>
-		</p:identity>
-	</p:declare-step>
-	
-	<p:declare-step name="reconstitute-tei-form" type="nyingarn:reconstitute-tei-form">
-		<p:input port="source"/>
-		<p:output port="result"/>
-		<p:identity>
-			<p:input port="source">
-				<p:inline>
-					<html xmlns="http://www.w3.org/1999/xhtml">
-						<body>
-							<p>Please upload a set of TEI surface files to reconstitute them into a single TEI file</p>
-							<form action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-								<input type="hidden" name="_charset_" value="utf-8"/>
-								<input type="text" name="identifier" value="" placeholder="identifier"/>
-								<input type="text" name="page-identifier-regex" value=".*\.(jpe?g|tif{1,2}|png|csv|xml)$"/>
-								<input type="file" name="ro-crate" id="source" accept="application/json"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<input type="file" name="source" id="source" accept="application/xml"/>
-								<button>Reconstitute a single TEI file</button>
-							</form>
-						</body>
-					</html>
-				</p:inline>
-			</p:input>
-		</p:identity>
-	</p:declare-step>
 	<!-- 
 		Package the source XML into an HTTP response:
 		If it's JSON-XML, regard it as an error: convert it to JSON and return it with an HTTP 400 error code.
-		If it's other XML, regard it as a success: return it as XML with a 200 OK
+		If it's other XML including XHTML, regard it as a success: return it as XML with a 200 OK
 	-->
 	<p:declare-step name="make-http-response" type="nyingarn:make-http-response">
 		<p:input port="source"/>
@@ -181,8 +65,15 @@
 					</p:input>
 				</p:template>
 			</p:when>
-			<p:otherwise><!-- TEI -->
-				<z:make-http-response/>
+			<p:otherwise><!-- TEI or XHTML -->
+				<z:make-http-response>
+					<p:with-option name="content-type" select="
+						if (/xhtml:html) then 
+							'application/xhtml+xml; charset=utf-8'
+						else
+							'application/xml; charset=utf-8'
+					"/>
+				</z:make-http-response>
 			</p:otherwise>
 		</p:choose>
 	</p:declare-step>
@@ -194,7 +85,7 @@
 	<!-- route HTTP request to the relevant sub-pipeline -->
 	<p:choose>
 		<p:when test="$uri-path='nyingarn/'">
-			<nyingarn:home-page/>
+			<nyingarn:html-page page="index"/>
 		</p:when>
 		<p:when test="$uri-path='nyingarn/validate-with-schematron'">
 			<p:choose>
@@ -270,7 +161,7 @@
 				</p:when>
 				<p:otherwise>
 					<!-- schema and instance files not uploaded, so display an upload form -->
-					<nyingarn:validate-with-schematron-form/>
+					<nyingarn:html-page page="validate-with-schematron"/>
 				</p:otherwise>
 			</p:choose>
 		</p:when>
@@ -310,7 +201,7 @@
 				</p:when>
 				<p:otherwise>
 					<!-- file was not uploaded; display an upload form, for manual testing -->
-					<nyingarn:ingest-tei-form/>
+					<nyingarn:html-page page="ingest-tei"/>
 				</p:otherwise>
 			</p:choose>
 		</p:when>
@@ -331,7 +222,7 @@
 				</p:when>
 				<p:otherwise>
 					<!-- file was not uploaded; display an upload form, for manual testing -->
-					<nyingarn:ingest-json-form/>
+					<nyingarn:html-page page="ingest-json"/>
 				</p:otherwise>
 			</p:choose>
 		</p:when>
@@ -350,7 +241,7 @@
 				</p:when>
 				<p:otherwise>
 					<!-- file was not uploaded; display an upload form, for manual testing -->
-					<nyingarn:reconstitute-tei-form/>
+					<nyingarn:html-page page="reconstitute-tei"/>
 				</p:otherwise>
 			</p:choose>
 		</p:when>

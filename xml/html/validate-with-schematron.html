@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<body>
+	    <h1>Validate with Schematron</h1>
+		<p>Upload one or two instance documents and a Schematron schema to perform validation.</p>
+		<ul>
+		    <li>If you upload two documents, they will each be wrapped in 
+		<code>&lt;c:file xmlns:c="http://www.w3.org/ns/xproc-step"&gt;</code>
+		elements and these two <code>c:file</code> elements will themselves be wrapped in a root 
+		<code>c:directory</code> element, which will be passed to the Schematron validator.</li>
+		<li>If you upload a single document, it will be validated as is.</li>
+		</ul>
+		<p>The service returns data in two different formats, depending on whether validation succeeds or fails.</p>
+		<ul>
+		    <li>If validation succeeds, the service returns a response entity which is an XML document in 
+		    <a href="https://schematron.com/schematron_open_documentation/schematron_cheat_sheet.html">SVRL</a>
+		    format, with an HTTP status code of 200 (OK)</li>
+		    <li>If validation fails, the response is a description of the errors in JSON format, with an HTTP status code of
+		    400 (Bad Request). The JSON data is intended to be parsed into a JavaScript object and thrown as an error.</li>
+		   </ul>
+		<form action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+			<input type="hidden" name="_charset_" value="utf-8"/>
+			<label for="instance">Instance document(s) to be validated</label>
+			<input type="file" name="instance" id="instance" accept="application/xml"/>
+			<input type="file" name="instance" accept="application/xml"/>
+			<label for="instance">Schematron schema</label>
+			<input type="file" name="schema" id="schema" accept="application/xml"/>
+			<button>Validate with Schematron</button>
+            <input type="reset" value="Reset form"/>
+		</form>
+	</body>
+</html>

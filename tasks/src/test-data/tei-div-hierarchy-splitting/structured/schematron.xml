@@ -1,0 +1,52 @@
+<schema xmlns="http://purl.oclc.org/dsdl/schematron">
+	<title>Unit test for round-tripping (splitting and reconstitution)</title>
+	<ns prefix="tei" uri="http://www.tei-c.org/ns/1.0"/>
+	<ns prefix="c" uri="http://www.w3.org/ns/xproc-step"/>
+	<let name="text-1" value="/c:directory/c:file[1]/tei:TEI/tei:text"/>
+	<let name="text-2" value="/c:directory/c:file[2]/tei:TEI/tei:text"/>
+	<pattern>
+		<rule context="/c:directory">
+			<assert id="two-files-uploaded" test="count(c:file) = 2">Two files were uploaded</assert>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="c:file//tei:text//tei:div">
+			<let name="other-file" value="ancestor::c:directory/c:file[not(. is ancestor::c:file)]"/>
+			<assert id="div-identifiers-match" test="
+				exists(@xml:id) and @xml:id = $other-file//tei:div/@xml:id 
+			">Every div in one file has an identifier which matches a div identifier in the other</assert>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="/c:directory">
+			<assert id="same-number-of-pages" test="
+				count(c:file[1]/tei:TEI/tei:text//tei:pb) =
+				count(c:file[2]/tei:TEI/tei:text//tei:pb)
+			">Files have the same number of pages</assert>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="tei:pb">
+			<assert id="page-breaks-have-identifiers" test="@xml:id">Every page break has an xml:id attribute</assert>
+		</rule>
+	</pattern>
+	<pattern>
+		<rule context="c:file[1]//tei:pb">
+			<let name="start" value="."/>
+			<let name="text-nodes" value="
+				$text-1//text() [
+					preceding::tei:pb[1] is $start
+				]
+			"/>
+			<let name="normalized-text" value="translate(normalize-space(string-join($text-nodes)), ' ', '')"/>
+			<let name="other-start" value="$text-2//tei:pb[@xml:id=$start/@xml:id]"/>
+			<let name="other-text-nodes" value="
+				$text-2//text() [
+					preceding::tei:pb[1] is $other-start
+				]
+			"/>
+			<let name="normalized-other-text" value="translate(normalize-space(string-join($other-text-nodes)), ' ', '')"/>
+			<assert id="other-pages-are-textually-identical" test="$normalized-text = $normalized-other-text">page "<value-of select="@xml:id"/>" content "<value-of select="$normalized-text"/>" should equal "<value-of select="$normalized-other-text"/>"</assert>
+		</rule>
+	</pattern>
+</schema>

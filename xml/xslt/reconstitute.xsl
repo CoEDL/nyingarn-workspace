@@ -15,11 +15,7 @@
 	<xsl:variable name="page-identifier-regex" select="//c:body[contains(@disposition, 'name=&#34;page-identifier-regex&#34;')]"/>
 	
 	<!-- a full TEI file will be regenerated from the TEI surface files generated at the time of ingestion into Nyingarn -->
-	<xsl:variable name="surfaces" select="
-		//c:body/surface
-			[starts-with(@xml:id, $identifier || '-')] (: the surface's id must start with the id of the item, followed by a hyphen :)
-			[matches(@xml:id || '.xml', $page-identifier-regex)]
-	"/>
+	<xsl:variable name="surfaces" select="//c:body/surface"/>
 	
 	<xsl:variable name="ro-crate-upload" select="//c:body[contains(@disposition, 'name=&#34;ro-crate&#34;')]"/>
 	<xsl:variable name="ro-crate" select="parse-json($ro-crate-upload)"/>
@@ -66,14 +62,17 @@
 			</xsl:variable>
 			<xsl:apply-templates mode="reconstitute" select="$text-content"/>
 		</TEI>
-	<!--</xsl:result-document>-->
     </xsl:template>
     
     <xsl:mode name="surface-to-text" on-no-match="shallow-copy"/>
     
     <!-- <surface> container elements are replaced with <pb> milestone elements -->
     <xsl:template match="surface" mode="surface-to-text">
-    	<xsl:element name="pb"><xsl:copy-of select="@*"/></xsl:element>
+    	<xsl:element name="pb">
+    	     <xsl:copy-of select="@*"/>
+            <!-- create a new xml:id attribute, overriding whatever xml:id the surface may have had, based on the TEI page file name -->
+            <xsl:attribute name="xml:id" select="parent::c:body/@disposition => substring-after('filename=&#34;') => substring-before('.tei.xml')"/>
+    	</xsl:element>
     	<xsl:apply-templates mode="surface-to-text"/>
     </xsl:template>
     

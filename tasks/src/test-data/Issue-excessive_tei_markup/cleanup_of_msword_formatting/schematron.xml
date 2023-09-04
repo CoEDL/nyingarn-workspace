@@ -12,9 +12,9 @@
        </pattern>
        <pattern>
             <rule context="/c:directory/c:file[2]">
-            	<assert id="deleted" test="//tei:del">There should be deleted text marked as &lt;del&gt;</assert>
-            	<assert id="underlined-only" test="//*[@rend = 'underline']">There should be text which is only underlined</assert>
-            	<assert id="underlined-and-deleted" test="//tei:del[contains-token(@rend, 'underline')]">There should be text which is underlined and deleted</assert>
+            	<assert id="deleted" test=".//tei:del">There should be deleted text marked as &lt;del&gt;</assert>
+            	<assert id="underlined-only" test=".//*[@rend = 'underline']">There should be text which is only underlined</assert>
+            	<assert id="underlined-and-deleted" test=".//tei:del[contains-token(@rend, 'underline')]">There should be text which is underlined and deleted</assert>
             </rule>
         </pattern>
         <pattern>

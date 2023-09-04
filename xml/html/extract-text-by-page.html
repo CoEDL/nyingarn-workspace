@@ -2,9 +2,10 @@
     <body>
         <h1>Extract a list of the plain text content of each page of a TEI document</h1>
         <p>Upload a TEI document to extract just the indexable plain text content.</p>
-        <p>Content is returned as an <code>application/json</code> object whose 
-        keys are page identifiers and whose values are strings containing the plain text 
-        of the corresponding page.</p>
+        <p>Content is returned as an <code>application/json</code> document.
+        The document consists of a JSON array of pages in the form of JSON objects with
+        <code>page</code> and <code>text</code> properties, whose values are strings
+        containing the page's identifier and its plain text content, respectively.</p> 
         <form action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
             <input type="hidden" name="_charset_" value="utf-8"/>
             <label for="source">TEI document</label>

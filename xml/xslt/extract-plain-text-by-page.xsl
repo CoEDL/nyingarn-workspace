@@ -11,11 +11,14 @@
 	<xsl:key name="text-by-page-id" match="text()" use="preceding::pb[1]/@xml:id"/>
 	<xsl:template match="/">
 		<xsl:try>
-			<map xmlns="http://www.w3.org/2005/xpath-functions">
+			<array xmlns="http://www.w3.org/2005/xpath-functions">
 				<xsl:for-each select="/TEI/text//pb">
-					<string xsl:expand-text="yes" key="{@xml:id}">{key('text-by-page-id', @xml:id) => string-join() => normalize-space()}</string>
+					<map>
+						<string xsl:expand-text="yes" key="page">{@xml:id}</string>
+						<string xsl:expand-text="yes" key="text">{key('text-by-page-id', @xml:id) => string-join() => normalize-space()}</string>
+					</map>
 				</xsl:for-each>
-			</map>
+			</array>
 			<xsl:catch>
 				<!-- Return any error as a JSON-XML version of a JSON object -->
 				<!-- The web service layer which invokes this stylesheet will recognise this JSON-XML response

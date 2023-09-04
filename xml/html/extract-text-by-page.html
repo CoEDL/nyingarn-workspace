@@ -1,0 +1,16 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <body>
+        <h1>Extract a list of the plain text content of each page of a TEI document</h1>
+        <p>Upload a TEI document to extract just the indexable plain text content.</p>
+        <p>Content is returned as an <code>application/json</code> object whose 
+        keys are page identifiers and whose values are strings containing the plain text 
+        of the corresponding page.</p>
+        <form action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+            <input type="hidden" name="_charset_" value="utf-8"/>
+            <label for="source">TEI document</label>
+            <input type="file" name="source" id="source" accept="application/xml"/>
+            <button>Extract plain text</button>
+            <input type="reset" value="Reset form"/>
+        </form>
+    </body>
+</html>

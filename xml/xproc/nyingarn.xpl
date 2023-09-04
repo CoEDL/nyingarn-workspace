@@ -46,39 +46,55 @@
 	
 	<!-- 
 		Package the source XML into an HTTP response:
-		If it's JSON-XML, regard it as an error: convert it to JSON and return it with an HTTP 400 error code.
-		If it's other XML including XHTML, regard it as a success: return it as XML with a 200 OK
+		If it's a JSON-XML map containing a 'name' and a 'code' property, regard it as an error: convert it to JSON and return it with an HTTP 400 error code.
+		If it's other JSON-XML, return it as JSON with a 200 OK status
+		If it's XML including XHTML, return it as XML with a 200 OK
 	-->
-	<p:declare-step name="make-http-response" type="nyingarn:make-http-response">
+	<p:declare-step name="make-http-response" type="nyingarn:make-http-response"  xmlns:fn="http://www.w3.org/2005/xpath-functions">
 		<p:input port="source"/>
 		<p:output port="result"/>
-		<p:choose>
-			<p:when test="/fn:map" xmlns:fn="http://www.w3.org/2005/xpath-functions"><!-- an error -->
-				<p:template name="http-response">
-					<p:input port="parameters"><p:empty/></p:input>
-					<p:input port="template">
-						<p:inline>
-							<c:response status="400">
-								<c:body content-type="application/json">{xml-to-json(/*)}</c:body>
-							</c:response>
-						</p:inline>
-					</p:input>
-				</p:template>
-			</p:when>
-			<p:otherwise><!-- TEI or XHTML -->
-				<z:make-http-response>
-					<p:with-option name="content-type" select="
-						if (/xhtml:html) then 
-							'application/xhtml+xml; charset=utf-8'
-						else
-							'application/xml; charset=utf-8'
-					"/>
-				</z:make-http-response>
-			</p:otherwise>
-		</p:choose>
+		<!-- if the result to be returned is a JSON object containing both a "name" and a "code" property, then it's assumed to represent an error --> 
+		<p:variable name="status" select="
+			if (/fn:map[fn:string/@key='name'][fn:string/@key='code']) then 
+				'400' 
+			else 
+				'200'
+		"/>
+		<p:variable name="content-type" select="
+			if (/xhtml:html) then 
+				'application/xhtml+xml; charset=utf-8'
+			else if (/fn:string) then
+				'text/plain; charset=utf-8'
+			else if (/fn:*) then
+				'application/json'
+			else
+				'application/xml; charset=utf-8'
+		"/>
+		<p:template name="http-response">
+			<p:with-param name="status" select="$status"/>
+			<p:with-param name="content-type" select="$content-type"/>
+			<p:input port="template">
+				<p:inline>
+					<c:response status="{$status}">
+						<c:body content-type="{$content-type}">{
+							if ($content-type='text/plain; charset=utf-8') then
+								(: convert a single JSON-XML string to plain text :)
+								string(/*)
+							else if ($content-type='application/json') then
+								(: convert other JSON-XML to JSON :)
+								xml-to-json(/*)
+							else 
+								(: copy other XML unchanged :)
+								/*
+						}</c:body>
+					</c:response>
+				</p:inline>
+			</p:input>
+		</p:template>
 	</p:declare-step>
 	
 	<p:variable name="uri-path" select="replace(/c:request/@href, 'http://.*?/([^?]*).*', '$1')"/>
+	<p:variable name="method" select="/c:request/@method"/>
 	
 	<z:dump href="/tmp/request.xml"/>
 
@@ -162,6 +178,47 @@
 				<p:otherwise>
 					<!-- schema and instance files not uploaded, so display an upload form -->
 					<nyingarn:html-page page="validate-with-schematron"/>
+				</p:otherwise>
+			</p:choose>
+		</p:when>
+		<p:when test="$uri-path='nyingarn/extract-text'">
+			<p:choose>
+				<p:when test="//c:body/@disposition[starts-with(., 'form-data; name=&quot;source&quot;')]">
+					<!-- pass the document to the text-extraction stylesheet -->
+					<p:xslt name="extract-plain-text">
+						<p:input port="parameters"><p:empty/></p:input>
+						<p:input port="source" select="//c:body[starts-with(@disposition, 'form-data; name=&quot;source&quot;')]/*">
+							<p:pipe step="nyingarn" port="source"/>
+						</p:input>
+						<p:input port="stylesheet">
+							<p:document href="../xslt/extract-plain-text.xsl"/>
+						</p:input>
+					</p:xslt>
+				</p:when>
+				<p:otherwise>
+					<!-- file was not uploaded; display an upload form, for manual testing -->
+					<nyingarn:html-page page="extract-text"/>
+				</p:otherwise>
+			</p:choose>
+		</p:when>
+
+		<p:when test="$uri-path='nyingarn/extract-text-by-page'">
+			<p:choose>
+				<p:when test="//c:body/@disposition[starts-with(., 'form-data; name=&quot;source&quot;')]">
+					<!-- pass the document to the text-extraction stylesheet -->
+					<p:xslt name="extract-plain-text">
+						<p:input port="parameters"><p:empty/></p:input>
+						<p:input port="source" select="//c:body[starts-with(@disposition, 'form-data; name=&quot;source&quot;')]/*">
+							<p:pipe step="nyingarn" port="source"/>
+						</p:input>
+						<p:input port="stylesheet">
+							<p:document href="../xslt/extract-plain-text-by-page.xsl"/>
+						</p:input>
+					</p:xslt>
+				</p:when>
+				<p:otherwise>
+					<!-- file was not uploaded; display an upload form, for manual testing -->
+					<nyingarn:html-page page="extract-text-by-page"/>
 				</p:otherwise>
 			</p:choose>
 		</p:when>
@@ -257,7 +314,9 @@
 	<cx:message name="log-request">
 		<p:with-option name="message" select="
 			concat(
-				'Request URI [',
+				'Method [',
+				$method,
+				'] URI [',
 				$uri-path,
 				'] returning status code [',
 				/c:response/@status,

@@ -3,9 +3,9 @@ const { groupBy, orderBy, flattenDeep, compact } = lodashPkg;
 import path from "path";
 
 export class Textract {
-    constructor({ identifier, resource, document }) {
+    constructor({ resource, document }) {
         this.document = document;
-        this.surface = `<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${identifier}-${resource}">`;
+        this.surface = `<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${resource}">`;
         this.minConfidence = 70;
         this.words = this.document.Blocks.filter((b) => b.BlockType === "WORD");
         this.wordsGroupedById = groupBy(this.words, "Id");

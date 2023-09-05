@@ -285,7 +285,14 @@ export class Bucket {
         if (maxKeys) params.MaxKeys = maxKeys;
         if (continuationToken) params.ContinuationToken = continuationToken;
         const command = new ListObjectsV2Command(params);
-        return await this.client.send(command);
+        try {
+            return await this.client.send(command);
+        } catch (error) {
+            if (error.$metadata.httpStatusCode === 500) {
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+                return await this.client.send(command);
+            }
+        }
     }
 
     async removeObjects({ keys = [], prefix = undefined }) {

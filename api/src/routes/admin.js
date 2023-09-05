@@ -7,6 +7,10 @@ import {
     listObjects,
     getLogger,
 } from "../common/index.js";
+
+// used in migrate backend function
+import { getS3Handle } from "../common/index.js";
+
 import { lookupItemByIdentifier } from "../lib/item.js";
 import { lookupCollectionByIdentifier } from "../lib/collection.js";
 import {
@@ -180,7 +184,6 @@ async function putDepositObjectHandler(req, res) {
 
     req.io.to(req.query.clientId).emit(`deposit-${type}`, { msg: `Done`, date: new Date() });
 }
-
 async function putRestoreObjectHandler(req) {
     let { type, identifier } = req.params;
     type = type === "items" ? "item" : "collection";
@@ -214,16 +217,20 @@ async function migrateBackend(req) {
     console.log("NOT RUNNING: migrate backend");
     return;
 
-    let items = await listObjects({ prefix: `/nyingarn.net/workspace/item` });
+    // let { bucket } = await getS3Handle();
+    // let items = await listObjects({ prefix: `/nyingarn.net/workspace/item` });
+    let items = await this.models.item.findAll();
     for (let item of items) {
+        item = item.get();
+        item.type = "item";
+        item.id = item.identifier;
+        console.log(`Checking: ${item.id}`);
+
         try {
-            item = await bucket.readJSON({ target: item });
-            console.log(item);
-            item.type = "item";
-            const identifier = item.id;
-
+            // item = await bucket.readJSON({ target: item });
+            // item.type = "item";
+            // const identifier = item.id;
             let store = await getStoreHandle(item);
-
             // get completed file
             // let completed = {};
             // try {
@@ -232,7 +239,6 @@ async function migrateBackend(req) {
             //     // if no completed file - nothing to do
             //     continue;
             // }
-
             // let statusFile = { item: {}, resources: {} };
             // try {
             //     statusFile = await store.getJSON({ target: resourceStatusFile });
@@ -240,7 +246,6 @@ async function migrateBackend(req) {
             //     // if no status file - nothing to do
             //     continue;
             // }
-
             // for (let resource of Object.keys(completed)) {
             //     let isCompleted = completed[resource];
             //     resource = resource.replace(`${identifier}/`, "");
@@ -251,10 +256,22 @@ async function migrateBackend(req) {
             //         statusFile.resources[resource].complete = isCompleted;
             //     }
             // }
-
-            // let { resources } = await listItemResources({ identifier });
+            let resources = await store.listResources();
+            for (let resource of resources) {
+                if (resource.Key.match(new RegExp(`${item.id}-.*.tei.xml`))) {
+                    let file = await store.get({ target: resource.Key });
+                    const re = new RegExp(
+                        `<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${item.id}-${item.id}.*>`
+                    );
+                    if (file.match(re)) {
+                        console.log(`Fixing: ${resource.Key}`);
+                        file = file.replace(`xml:id="${item.id}-${item.id}`, `xml:id="${item.id}`);
+                        await store.put({ target: resource.Key, content: file });
+                    }
+                }
+            }
+            await new Promise((resolve) => setTimeout(resolve, 2000));
             // resources = resources.map((r) => r.name);
-
             // for (let resource of resources) {
             //     console.log("processing ", resource);
             //     statusFile = await updateResourceStatus({ identifier, resource, statusFile });

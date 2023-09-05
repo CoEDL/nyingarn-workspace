@@ -90,6 +90,7 @@ export async function listObjects({ prefix }) {
                 (file) => file.Key
             )
         );
+        console.log(`Found ${files.length} objects in ${prefix}`);
         continuationToken = objects.NextContinuationToken;
     }
     let items = [];

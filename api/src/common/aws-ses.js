@@ -105,6 +105,11 @@ export class SES {
                     command = new CreateTemplateCommand({ Template: template });
                     await this.client.send(command);
                 }
+            } else {
+                // no matching ses template found so load this one
+                console.log(`Installing new SES template: ${template.TemplateName}`);
+                let command = new CreateTemplateCommand({ Template: template });
+                await this.client.send(command);
             }
         }
     }

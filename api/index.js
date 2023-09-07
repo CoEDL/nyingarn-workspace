@@ -164,7 +164,6 @@ async function setupSES({ configuration }) {
         region: aws.region,
         mode: configuration.api.sesMode,
     });
-    // await ses.deleteAllTemplates();
     await ses.compileTemplates();
     await ses.loadTemplates();
 }

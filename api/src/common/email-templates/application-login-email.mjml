@@ -1,0 +1,55 @@
+<mjml>
+    <mj-body width="1024px">
+        <mj-section>
+            <mj-column>
+                <mj-image
+                    width="200px"
+                    src="https://nyingarn.net/wp-content/uploads/2023/04/Nyingarn_Vertical_Peppermint_RGB-300x300.png"
+                    alt="Nyingarn Logo"
+                ></mj-image>
+
+                <mj-divider border-color="rgb(74, 97, 99)" border-width="2px"></mj-divider>
+
+                <mj-text align="left" padding-left="250px" font-size="18px" color="#333333">
+                    <h1>Hi,</h1>
+                </mj-text>
+
+                <mj-button href="{{link}}" background-color="rgb(74, 97, 99)" color="white">
+                    Login to the {{site}}.
+                </mj-button>
+
+                <mj-text align="center" font-size="14px" color="#333333">
+                    <p>Or copy and paste this link into your browser:</p>
+                    <p>{{link}}</p>
+                </mj-text>
+
+                <mj-text
+                    align="center"
+                    font-size="18px"
+                    color="#333333"
+                    text-decoration="underline"
+                    font-style="oblique"
+                >
+                    <p>Note: This link is active for 10 minutes only.</p>
+                </mj-text>
+            </mj-column>
+        </mj-section>
+        <mj-section>
+            <mj-column width="500px">
+                <mj-text align="center" font-size="18px" color="#333333">
+                    <p>
+                        If it's not you trying to login please ignore this message and let us know
+                        by sending an email to
+                        <a
+                            rel="noopener"
+                            href="mailto:nyingarn-project@unimelb.edu.au"
+                            target="_blank"
+                        >
+                            nyingarn-project@unimelb.edu.au </a
+                        >. (Or just reply to this email and it will come to us.)
+                    </p>
+                </mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>

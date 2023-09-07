@@ -6,8 +6,9 @@ import {
     SendTemplatedEmailCommand,
 } from "@aws-sdk/client-ses";
 import fsExtraPkg from "fs-extra";
-const { readFile } = fsExtraPkg;
+const { readFile, writeFile } = fsExtraPkg;
 import path from "path";
+import mjml2html from "mjml";
 
 export class SES {
     constructor({
@@ -50,6 +51,17 @@ export class SES {
         ];
         if (mode === "testing") {
             this.templates = this.templates.slice(0, 1);
+        }
+    }
+
+    async compileTemplates() {
+        for (let template of this.templates) {
+            const htmlFile = path.resolve(
+                path.join("src/common/email-templates", template.htmlFile)
+            );
+            template = (await readFile(htmlFile.replace(".html", ".mjml"))).toString();
+            const htmlOutput = mjml2html(template);
+            await writeFile(htmlFile, htmlOutput.html);
         }
     }
 

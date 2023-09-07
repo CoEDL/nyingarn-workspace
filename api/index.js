@@ -165,5 +165,6 @@ async function setupSES({ configuration }) {
         mode: configuration.api.sesMode,
     });
     // await ses.deleteAllTemplates();
+    await ses.compileTemplates();
     await ses.loadTemplates();
 }

@@ -1,0 +1,20 @@
+<mjml>
+    <mj-body width="1024px">
+        <mj-section>
+            <mj-column>
+                <mj-image
+                    width="150px"
+                    src="https://nyingarn.net/wp-content/uploads/2023/04/Nyingarn_Vertical_Peppermint_RGB-300x300.png"
+                    alt="Nyingarn Logo"
+                ></mj-image>
+
+                <mj-divider border-color="rgb(74, 97, 99)"></mj-divider>
+
+                <mj-text align="center" font-size="20px" color="#333333">
+                    An item or collection has just been published and is awaiting review in the
+                    workspace.
+                </mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>

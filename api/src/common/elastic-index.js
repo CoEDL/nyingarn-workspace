@@ -29,14 +29,16 @@ export async function indexItem({ configuration, item, crate }) {
     }
 
     const indexIdentifier = `/${item.type}/${item.identifier}`;
-    const document = assembleIndexRecord({ crate });
-    // console.log(document);
-    await client.index({
-        index: "metadata",
-        id: indexIdentifier,
-        document,
-    });
-
+    try {
+        const document = assembleIndexRecord({ crate });
+        await client.index({
+            index: "metadata",
+            id: indexIdentifier,
+            document,
+        });
+    } catch (error) {
+        console.log(error);
+    }
     // setup the entities index
     try {
         // await client.indices.delete({ index: "entities" });

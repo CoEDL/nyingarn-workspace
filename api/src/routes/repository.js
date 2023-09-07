@@ -203,7 +203,7 @@ async function indexRepositoryItemHandler(req) {
     let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
 
     // index the specified item
-    await indexItem({ item, crate });
+    await indexItem({ configuration: req.session.configuration, item, crate });
 
     return {};
 }

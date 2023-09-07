@@ -7,7 +7,7 @@ const { zipObject } = lodashPackage;
 import { log, loadConfiguration } from "/srv/api/src/common/index.js";
 import { expandError } from "../common/errors.js";
 import FormData from "form-data";
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 
 export async function processTeiTranscription({ directory, identifier, resource }) {
@@ -158,8 +158,6 @@ export async function __processDigivolTranscriptionXMLProcessor({
         await remove(jsonFile);
     }
 }
-
-
 
 // Helper function to return the list of a child elements of a given element
 // NB this replaces xmldom's 'children' function which is defective.

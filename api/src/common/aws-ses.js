@@ -5,8 +5,10 @@ import {
     DeleteTemplateCommand,
     SendTemplatedEmailCommand,
 } from "@aws-sdk/client-ses";
+import lodashPkg from "lodash";
+const { groupBy } = lodashPkg;
 import fsExtraPkg from "fs-extra";
-const { readFile, writeFile } = fsExtraPkg;
+const { readFile, writeFile, stat: fileStat } = fsExtraPkg;
 import path from "path";
 import mjml2html from "mjml";
 
@@ -72,18 +74,38 @@ export class SES {
     }
 
     async loadTemplates() {
-        let templates = await this.listTemplates();
-        templates = templates.TemplatesMetadata.map((t) => t.Name);
+        const sesTemplates = (await this.listTemplates()).TemplatesMetadata;
+        // templates = templates.TemplatesMetadata.map((t) => t.Name);
         for (let template of this.templates) {
-            if (templates.includes(template.TemplateName)) continue;
-            template.HtmlPart = (
-                await readFile(
-                    path.resolve(path.join("src/common/email-templates", template.htmlFile))
-                )
-            ).toString();
+            // if (templates.includes(template.TemplateName)) continue;
 
-            const command = new CreateTemplateCommand({ Template: template });
-            await this.client.send(command);
+            const htmlFile = path.resolve(
+                path.join("src/common/email-templates", template.htmlFile)
+            );
+            template.HtmlPart = (await readFile(htmlFile)).toString();
+            const stat = await fileStat(htmlFile.replace(".html", ".mjml"));
+
+            let exists = sesTemplates.filter((t) => t.Name === template?.TemplateName);
+            if (exists.length) {
+                const sesTemplate = exists[0];
+                if (stat.ctime > sesTemplate.CreatedTimestamp) {
+                    // local template is newer than ses template
+                    //   delete ses template
+                    console.log(`Installing new SES template: ${template.TemplateName}`);
+                    let command = new DeleteTemplateCommand({
+                        TemplateName: template.TemplateName,
+                    });
+                    try {
+                        await this.client.send(command);
+                    } catch (error) {
+                        console.log(error);
+                    }
+
+                    // load new template
+                    command = new CreateTemplateCommand({ Template: template });
+                    await this.client.send(command);
+                }
+            }
         }
     }
 

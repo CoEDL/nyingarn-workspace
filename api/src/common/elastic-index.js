@@ -1,9 +1,12 @@
 import { getStoreHandle } from "./index.js";
 import lodashPkg from "lodash";
 const { isArray, isString, isPlainObject, flattenDeep } = lodashPkg;
+import fsExtraPkg from "fs-extra";
+const { createReadStream } = fsExtraPkg;
 import { Client } from "@elastic/elasticsearch";
 import { ROCrate } from "ro-crate";
-import { FormData, File, Blob } from "formdata-node";
+// import { FormData, File, Blob } from "formdata-node";
+// import { Buffer } from "node:buffer";
 import fetch from "cross-fetch";
 
 const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates", "Language"];
@@ -16,11 +19,18 @@ export async function indexItem({ configuration, item, crate }) {
 
     // get the complete tei file and run it through the webservice to extract the text
     let store = await getStoreHandle({ id: item.identifier, type: "item" });
-    const completeTeiFile = await store.get({ target: `${item.identifier}-tei-complete.xml` });
+    await store.get({
+        target: `${item.identifier}-tei-complete.xml`,
+        localPath: "/tmp/file.xml",
+    });
     // console.log(completeTeiFile);
+    // let teiText = await extractText({
+    //     configuration,
+    //     content: completeTeiFile,
+    // });
     let teiText = await extractText({
         configuration,
-        content: completeTeiFile,
+        file: "/tmp/file.xml",
     });
     console.log(teiText);
 
@@ -201,10 +211,14 @@ export function assembleEntityLookupRecords({ crate }) {
     return entities;
 }
 
-export async function extractText({ configuration, content }) {
+export async function extractText({ configuration, content, file }) {
     const form = new FormData();
     //    content == string
-    form.append("source", new Blob([content], { type: "text/plain" }), "file.txt");
+    console.log("****", file);
+    const stream = createReadStream(file);
+    console.log(stream);
+    form.set("source", stream, "file.xml");
+    // form.set("source", new Blob([content], { type: "text/xml" }), "file.txt");
     try {
         // post the form data and retrieve a response containing a <directory> XML document, containing a list of <file> elements
         const response = await fetch(
@@ -217,7 +231,6 @@ export async function extractText({ configuration, content }) {
         if (response.ok) {
             // xml web service returned XML successfully
             const text = await response.text();
-            // write the content of each <file> element as a separate file
             return text;
         } else {
             // xml web service returned an error; entity will be a JSON representation of the error
@@ -225,7 +238,7 @@ export async function extractText({ configuration, content }) {
             throw json;
         }
     } catch (error) {
-        // console.log(error);
+        console.log(error);
         // throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
     }
 }

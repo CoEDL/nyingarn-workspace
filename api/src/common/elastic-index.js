@@ -1,8 +1,11 @@
-import { loadConfiguration } from "./index.js";
+import { getStoreHandle } from "./index.js";
 import lodashPkg from "lodash";
 const { isArray, isString, isPlainObject, flattenDeep } = lodashPkg;
 import { Client } from "@elastic/elasticsearch";
 import { ROCrate } from "ro-crate";
+import { FormData, File, Blob } from "formdata-node";
+import fetch from "cross-fetch";
+
 const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates", "Language"];
 
 export async function indexItem({ configuration, item, crate }) {
@@ -10,6 +13,17 @@ export async function indexItem({ configuration, item, crate }) {
     // console.log(configuration);
     // console.log(item);
     // console.log(crate);
+
+    // get the complete tei file and run it through the webservice to extract the text
+    let store = await getStoreHandle({ id: item.identifier, type: "item" });
+    const completeTeiFile = await store.get({ target: `${item.identifier}-tei-complete.xml` });
+    // console.log(completeTeiFile);
+    let teiText = await extractText({
+        configuration,
+        content: completeTeiFile,
+    });
+    console.log(teiText);
+
     crate = new ROCrate(crate, { array: true, link: true });
     // let document = crate.getTree({ valueObject: false });
 
@@ -185,4 +199,33 @@ export function assembleEntityLookupRecords({ crate }) {
         entities.push(entity);
     }
     return entities;
+}
+
+export async function extractText({ configuration, content }) {
+    const form = new FormData();
+    //    content == string
+    form.append("source", new Blob([content], { type: "text/plain" }), "file.txt");
+    try {
+        // post the form data and retrieve a response containing a <directory> XML document, containing a list of <file> elements
+        const response = await fetch(
+            `${configuration.api.services.xml.host}/nyingarn/extract-text`,
+            {
+                method: "POST",
+                body: form,
+            }
+        );
+        if (response.ok) {
+            // xml web service returned XML successfully
+            const text = await response.text();
+            // write the content of each <file> element as a separate file
+            return text;
+        } else {
+            // xml web service returned an error; entity will be a JSON representation of the error
+            const json = await response.json();
+            throw json;
+        }
+    } catch (error) {
+        // console.log(error);
+        // throw await expandError(error); // expand the error using the error-definitions file, and throw the expanded error
+    }
 }

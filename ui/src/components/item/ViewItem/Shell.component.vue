@@ -30,7 +30,7 @@ import UploadComponent from "./UploadComponent/Shell.component.vue";
 import AdministrationComponent from "./Administration/Shell.component.vue";
 import PublishComponent from "./PublishComponent/Shell.component.vue";
 import NavbarComponent from "./Navbar.component.vue";
-import MetadataComponent from "./Metadata.component.vue";
+import MetadataComponent from "../../Metadata.component.vue";
 import { reactive, onMounted, onBeforeMount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";

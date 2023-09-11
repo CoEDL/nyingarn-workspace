@@ -23,7 +23,7 @@
 import { reactive, onMounted, onBeforeUnmount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import { Lookup } from "../../lookup.js";
+import { Lookup } from "./lookup.js";
 import isEmpty from "lodash-es/isEmpty.js";
 const $route = useRoute();
 const $router = useRouter();

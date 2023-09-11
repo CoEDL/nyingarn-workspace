@@ -19,9 +19,9 @@ export function setupRoutes(fastify, options, done) {
 
 function assembleUrl({ targetType, identifier }) {
     if (targetType === "collection") {
-        return `https://catalog.nyingarn.net/collections/${identifier}`;
+        return `https://repository.nyingarn.net/collections/${identifier}`;
     } else if (targetType === "item") {
-        return `https://catalog.nyingarn.net/items/${identifier}`;
+        return `https://repository.nyingarn.net/items/${identifier}`;
     }
 }
 // TODO: this code does not have tests

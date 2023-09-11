@@ -6,6 +6,11 @@
         "warnMissingProperty": true,
         "keywords": ["languages", "Australian Languages", "Item Metadata"]
     },
+    "context": [
+        "https://w3id.org/ro/crate/1.1/context",
+        "https://w3id.org/ro/terms/text-commons",
+        "https://nyingarn.net/metadata-definitions"
+    ],
     "layouts": [
         {
             "appliesTo": ["Dataset"],
@@ -29,16 +34,25 @@
             "subClassOf": [],
             "inputs": [
                 {
+                    "id": "http://schema.org/identifier",
+                    "name": "identifier",
+                    "type": ["Text"],
+                    "multiple": false,
+                    "group": "about"
+                },
+                {
                     "id": "http://schema.org/description",
                     "name": "description",
                     "help": "Free notes",
                     "type": ["TextArea"],
+                    "required": true,
                     "multiple": true,
                     "group": "about"
                 },
                 {
-                    "id": "http://schema.org/languageName",
+                    "id": "https://nyingarn.net/metadata-definitions#languageName",
                     "name": "languageName",
+                    "label": "Language Name",
                     "help": "Language name as written in the document; also known as.",
                     "type": ["Text"],
                     "required": true,
@@ -46,9 +60,9 @@
                     "group": "about"
                 },
                 {
-                    "id": "http://schema.org/contentLanguage",
+                    "id": "https://nyingarn.net/metadata-definitions#contentLanguage",
                     "name": "contentLanguage",
-                    "label": "Content Language",
+                    "label": "Content Languages",
                     "help": "The language(s) that are in the document. If unknown - select unknown.",
                     "multiple": true,
                     "required": true,
@@ -56,9 +70,9 @@
                     "group": "about"
                 },
                 {
-                    "id": "http://schema.org/subjectLanguage",
+                    "id": "https://nyingarn.net/metadata-definitions#subjectLanguage",
                     "name": "subjectLanguage",
-                    "label": "Subject Language",
+                    "label": "Subject Languages",
                     "help": "The language(s) that the document is about. If unknown - select unknown.",
                     "multiple": true,
                     "required": true,
@@ -66,8 +80,9 @@
                     "group": "about"
                 },
                 {
-                    "id": "http://schema.org/licence",
+                    "id": "https://nyingarn.net/metadata-definitions#copyrightStatus",
                     "name": "copyrightStatus",
+                    "label": "Copyright Status",
                     "help": "Copyright Status",
                     "type": ["Select"],
                     "required": true,
@@ -283,7 +298,7 @@
                     "group": "who"
                 },
                 {
-                    "id": "http://schema.org/catalogLinkAtRelevantInstitution",
+                    "id": "https://nyingarn.net/metadata-definitions#catalogLinkAtRelevantInstitution",
                     "name": "catalogLinkAtRelevantInstitution",
                     "help": "Provide a link (URL) to the item in the relevant institution",
                     "type": ["URL"],
@@ -292,7 +307,7 @@
                     "group": "source"
                 },
                 {
-                    "id": "https://nyingarn.net/publicationTitle",
+                    "id": "https://nyingarn.net/metadata-definitions#publicationTitle",
                     "name": "publicationTitle",
                     "label": "Publication Title",
                     "help": "Publication Title (if published) of work from which the document is derived",
@@ -301,7 +316,7 @@
                     "group": "source"
                 },
                 {
-                    "id": "http://schema.org/holdingInstitution",
+                    "id": "https://nyingarn.net/metadata-definitions#holdingInstitution",
                     "name": "holdingInstitution",
                     "help": "Holding Institution",
                     "type": ["Organization"],
@@ -309,7 +324,7 @@
                     "group": "source"
                 },
                 {
-                    "id": "http://schema.org/extent",
+                    "id": "https://nyingarn.net/metadata-definitions#extent",
                     "name": "extent",
                     "help": "Number of pages",
                     "multiple": false,
@@ -324,7 +339,7 @@
                     "group": "source"
                 },
                 {
-                    "id": "http://schema.org/publicationDate",
+                    "id": "https://nyingarn.net/metadata-definitions#publicationDate",
                     "name": "publicationDate",
                     "help": "Date of publication.  If you don't know the full date then set the first of January of the year.",
                     "type": ["Date"],
@@ -332,7 +347,7 @@
                     "group": "source"
                 },
                 {
-                    "id": "http://nyingarn.net/metadata/dateFreetext",
+                    "id": "https://nyingarn.net/metadata-definitions#dateFreetext",
                     "name": "dateFreeText",
                     "label": "Date (free text)",
                     "help": "Used for unknown or estimated dates or for date ranges",
@@ -341,7 +356,7 @@
                     "group": "source"
                 },
                 {
-                    "id": "http://nyingarn.net/metadata/originalForm",
+                    "id": "https://nyingarn.net/metadata-definitions#originalForm",
                     "name": "originalForm",
                     "help": "Original in typed of handwritten form",
                     "type": ["Select"],
@@ -365,7 +380,7 @@
                     "group": "permissions"
                 },
                 {
-                    "id": "http://schema.org/languageAuthorityPermissions",
+                    "id": "https://nyingarn.net/metadata-definitions#languageAuthorityPermissions",
                     "name": "languageAuthorityPermissions",
                     "help": "Permissions required from the relevant language authority",
                     "type": ["Select"],

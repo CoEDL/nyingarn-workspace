@@ -6,9 +6,11 @@
         "warnMissingProperty": true,
         "keywords": ["languages", "Australian Languages", "Collection Metadata"]
     },
-    "hide": {
-        "Dataset": ["identifier", "hasPart", "licence"]
-    },
+    "context": [
+        "https://w3id.org/ro/crate/1.1/context",
+        "https://w3id.org/ro/terms/text-commons",
+        "https://nyingarn.net/metadata-definitions"
+    ],
     "layouts": [
         {
             "appliesTo": ["Dataset"],
@@ -31,15 +33,23 @@
             "subClassOf": [],
             "inputs": [
                 {
+                    "id": "http://schema.org/identifier",
+                    "name": "identifier",
+                    "type": ["Text"],
+                    "multiple": false,
+                    "group": "about"
+                },
+                {
                     "id": "http://schema.org/description",
                     "name": "description",
                     "help": "Free notes",
                     "type": ["TextArea"],
                     "multiple": true,
+                    "required": true,
                     "group": "about"
                 },
                 {
-                    "id": "http://schema.org/contentLanguage",
+                    "id": "https://nyingarn.net/metadata-definitions#contentLanguage",
                     "name": "contentLanguage",
                     "label": "Content Languages",
                     "help": "The language(s) that are in the document. If unknown - select unknown.",
@@ -49,7 +59,7 @@
                     "group": "about"
                 },
                 {
-                    "id": "http://schema.org/subjectLanguage",
+                    "id": "https://nyingarn.net/metadata-definitions#subjectLanguage",
                     "name": "subjectLanguage",
                     "label": "Subject Languages",
                     "help": "The language(s) that the document is about. If unknown - select unknown.",
@@ -259,14 +269,6 @@
                     "multiple": true,
                     "type": ["Person", "Organization"],
                     "group": "who"
-                },
-                {
-                    "id": "http://schema.org/location",
-                    "name": "location",
-                    "help": "Location [min/max lat/long]. Given by bounding box on map.",
-                    "type": ["Geo"],
-                    "multiple": true,
-                    "group": "location"
                 },
                 {
                     "id": "https://pcdm.org/2016/04/18/models#hasMmeber",

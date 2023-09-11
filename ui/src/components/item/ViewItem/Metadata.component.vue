@@ -70,17 +70,8 @@ function updateRoute(entity) {
 async function load() {
     if (!$route.meta.type && !$route.params.identifier) return;
 
-    // load the crate file
-    let response = await $http.get({
-        route: `/describo/rocrate/${$route.meta.type}/${$route.params.identifier}`,
-    });
-    if (response.status !== 200) {
-        ElMessage.error(`Unable to retrieve RO Crate file`);
-    }
-    data.crate = (await response.json()).crate;
-
     // load the profile
-    response = await $http.get({
+    let response = await $http.get({
         route: `/describo/profile/${$route.meta.type}`,
     });
     if (response.status !== 200) {
@@ -88,6 +79,16 @@ async function load() {
     }
     response = await response.json();
     data.profile = response.profile;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    // load the crate file
+    response = await $http.get({
+        route: `/describo/rocrate/${$route.meta.type}/${$route.params.identifier}`,
+    });
+    if (response.status !== 200) {
+        ElMessage.error(`Unable to retrieve RO Crate file`);
+    }
+    data.crate = (await response.json()).crate;
 }
 async function saveCrate(data) {
     let response = await $http.put({

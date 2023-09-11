@@ -7,6 +7,7 @@ import { Client } from "@elastic/elasticsearch";
 import { ROCrate } from "ro-crate";
 // import { FormData, File, Blob } from "formdata-node";
 // import { Buffer } from "node:buffer";
+import FormData from "form-data";
 import fetch from "cross-fetch";
 
 const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates", "Language"];
@@ -18,21 +19,6 @@ export async function indexItem({ configuration, item, crate }) {
     // console.log(crate);
 
     // get the complete tei file and run it through the webservice to extract the text
-    let store = await getStoreHandle({ id: item.identifier, type: "item" });
-    await store.get({
-        target: `${item.identifier}-tei-complete.xml`,
-        localPath: "/tmp/file.xml",
-    });
-    // console.log(completeTeiFile);
-    // let teiText = await extractText({
-    //     configuration,
-    //     content: completeTeiFile,
-    // });
-    let teiText = await extractText({
-        configuration,
-        file: "/tmp/file.xml",
-    });
-    console.log(teiText);
 
     crate = new ROCrate(crate, { array: true, link: true });
     // let document = crate.getTree({ valueObject: false });
@@ -54,7 +40,16 @@ export async function indexItem({ configuration, item, crate }) {
 
     const indexIdentifier = `/${item.type}/${item.identifier}`;
     try {
+        let store = await getStoreHandle({ id: item.identifier, type: "item" });
+        const teiFileContent = await store.get({
+            target: `${item.identifier}-tei-complete.xml`,
+        });
+        let teiText = await extractText({
+            configuration,
+            content: teiFileContent,
+        });
         const document = assembleIndexRecord({ crate });
+        document.text = teiText;
         await client.index({
             index: "metadata",
             id: indexIdentifier,
@@ -211,14 +206,9 @@ export function assembleEntityLookupRecords({ crate }) {
     return entities;
 }
 
-export async function extractText({ configuration, content, file }) {
+export async function extractText({ configuration, content }) {
     const form = new FormData();
-    //    content == string
-    console.log("****", file);
-    const stream = createReadStream(file);
-    console.log(stream);
-    form.set("source", stream, "file.xml");
-    // form.set("source", new Blob([content], { type: "text/xml" }), "file.txt");
+    form.append("source", content, "file.xml");
     try {
         // post the form data and retrieve a response containing a <directory> XML document, containing a list of <file> elements
         const response = await fetch(

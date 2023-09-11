@@ -100,7 +100,7 @@
                     />
                 </el-tooltip>
             </div>
-            <div class="flex flex-row space-x-2 py-4 min-max-width overflow-scroll">
+            <div class="flex flex-row space-x-2 py-4 min-max-width overflow-scroll" ref="el">
                 <div>
                     <el-button @click="undo" type="primary" size="large">
                         <i class="fa-solid fa-undo"></i>
@@ -112,6 +112,7 @@
                     </el-button>
                 </div>
                 <el-tooltip
+                    v-if="showControls"
                     class="box-item"
                     effect="dark"
                     content="Delete the transcription"
@@ -122,6 +123,7 @@
                     </el-button>
                 </el-tooltip>
                 <el-tooltip
+                    v-if="showControls"
                     class="box-item"
                     effect="dark"
                     content="Convert the text to a TEI document"
@@ -142,6 +144,7 @@
                     </el-button>
                 </el-tooltip>
                 <el-popconfirm
+                    v-if="showControls"
                     title="This will delete the current transcription. Are you sure you want to do this?"
                     @confirm="reprocessPageAsTable"
                     width="300"
@@ -153,15 +156,20 @@
                         </el-button>
                     </template>
                 </el-popconfirm>
-                <div>
-                    <el-button @click="decreaseFontSize" type="primary" size="large">
+                <div v-if="showControls">
+                    <el-button
+                        @click="decreaseFontSize"
+                        type="primary"
+                        size="large"
+                        v-if="showControls"
+                    >
                         <span class="fa-stack">
                             <i class="fa-solid fa-font" data-fa-transform="down-12 right-4"></i>
                             <i class="fa-solid fa-minus" data-fa-transform="up-2 left-2"></i>
                         </span>
                     </el-button>
                 </div>
-                <div>
+                <div v-if="showControls">
                     <el-button @click="increaseFontSize" type="primary" size="large">
                         <span class="fa-stack">
                             <i class="fa-solid fa-font" data-fa-transform="down-12 right-4"></i>
@@ -178,6 +186,7 @@
 </template>
 
 <script setup>
+import { useElementSize } from "@vueuse/core";
 import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
@@ -185,7 +194,7 @@ import { xml, xmlLanguage } from "@codemirror/lang-xml";
 import { CodemirrorEditorControls, formatDocument } from "./codemirror-editor.js";
 import { unclearHighlight } from "./decorators";
 import { Prec } from "@codemirror/state";
-import { ref, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
+import { ref, reactive, computed, inject, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
@@ -193,6 +202,8 @@ import { ElMessage } from "element-plus";
 const $http = inject("$http");
 const $route = useRoute();
 const $store = useStore();
+
+const el = ref(null);
 
 const props = defineProps({
     data: { type: Array, required: true },
@@ -239,6 +250,11 @@ onMounted(async () => {
 });
 onBeforeUnmount(async () => {
     await save();
+});
+
+let size = useElementSize(el);
+let showControls = computed(() => {
+    return size.width.value > 750 ? true : false;
 });
 
 function setupCodeMirror() {
@@ -375,7 +391,7 @@ function increaseFontSize() {
 }
 
 .min-max-width {
-    min-width: 500px;
+    min-width: 350px;
     /* max-width: calc(100vw / 2); */
 }
 .max-height {

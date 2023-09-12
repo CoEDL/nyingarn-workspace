@@ -7,7 +7,7 @@ const { zipObject } = lodashPackage;
 import { log, loadConfiguration } from "/srv/api/src/common/index.js";
 import { expandError } from "../common/errors.js";
 import FormData from "form-data";
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 
 export async function processTeiTranscription({ directory, identifier, resource }) {
@@ -78,7 +78,7 @@ export async function __processTeiTranscriptionXMLProcessor({ directory, identif
             // xml web service returned XML successfully
             const text = await response.text();
             // write the content of each <file> element as a separate file
-            writeDirectory(text, directory);
+            await writeDirectory(text, directory);
         } else {
             // xml web service returned an error; entity will be a JSON representation of the error
             const json = await response.json();
@@ -145,7 +145,7 @@ export async function __processDigivolTranscriptionXMLProcessor({
             // xml web service returned XML successfully
             const text = await response.text();
             // write the content of each <file> element as a separate file
-            writeDirectory(text, directory);
+            await writeDirectory(text, directory);
         } else {
             // xml web service returned an error; entity will be a JSON representation of the error
             const json = await response.json();
@@ -159,26 +159,27 @@ export async function __processDigivolTranscriptionXMLProcessor({
     }
 }
 
-
-
 // Helper function to return the list of a child elements of a given element
 // NB this replaces xmldom's 'children' function which is defective.
 function childElements(element) {
     return Array.from(element.childNodes).filter((node) => node.nodeType === 1); // nodeType 1 is an element
 }
 
-function writeDirectory(directoryXML, directory) {
+async function writeDirectory(directoryXML, directory) {
     // parse a "directory" XML file and save its "file" child elements as separate files, into the specified output directory
     const directoryDocument = new DOMParser().parseFromString(directoryXML, "application/xml");
     const serializer = new XMLSerializer();
     const directoryElement = directoryDocument.documentElement;
     // NB xmldom's 'children' and 'firstElementChild' properties don't work
     const childNodes = childElements(directoryElement);
-    childNodes.forEach(function (childNode) {
+    for (let childNode of childNodes) {
         // childNode is a c:file element
         var fileName = childNode.getAttribute("name");
         // NB xmldom's 'children' and 'firstElementChild' properties don't work
         var surfaceElement = childElements(childNode)[0];
-        writeFile(path.join(directory, fileName), serializer.serializeToString(surfaceElement));
-    });
+        await writeFile(
+            path.join(directory, fileName),
+            serializer.serializeToString(surfaceElement)
+        );
+    }
 }

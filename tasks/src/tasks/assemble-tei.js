@@ -6,7 +6,7 @@ import fsPackage from "fs-extra";
 const { createReadStream, writeFile, remove } = fsPackage;
 import { expandError } from "../common/errors.js";
 import FormData from "form-data";
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 
 const log = getLogger();
 

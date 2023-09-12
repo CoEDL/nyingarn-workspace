@@ -1,10 +1,18 @@
 // common utility functions used in testing
 
 import path from "path";
-import { createReadStream, writeFile, readdir, remove, ensureDir, pathExists, copy } from "fs-extra";
+import {
+    createReadStream,
+    writeFile,
+    readdir,
+    remove,
+    ensureDir,
+    pathExists,
+    copy,
+} from "fs-extra";
 import { log, loadConfiguration } from "/srv/api/src/common/index.js";
 import FormData from "form-data";
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import { expandError } from "../common/errors.js";
 
@@ -18,13 +26,16 @@ export async function makeScratchCopy(testDataFolder, testCode = "test") {
     // the optional testCode parameter is used to disambiguate tests which work with the same source data
     // since the tests may run simultaneously, creating and deleting files in the scratch directory, and
     // negating the independence of the tests
-    const scratchFolder = path.join("/tmp/test-data/", testDataFolder.replaceAll("/", "_") + '-' + testCode);
+    const scratchFolder = path.join(
+        "/tmp/test-data/",
+        testDataFolder.replaceAll("/", "_") + "-" + testCode
+    );
     await ensureDir(scratchFolder);
     await copy(sourceFolder, scratchFolder);
     return scratchFolder;
 }
 
-export async function validateWithSchematron({instance, schema}) {
+export async function validateWithSchematron({ instance, schema }) {
     // The instance parameter contains the name of a single file to validate,
     // or multiple file names in an array.
     // The schema parameter is the filename of a schematron schema.
@@ -35,26 +46,24 @@ export async function validateWithSchematron({instance, schema}) {
     // This function validates the named instance document(s) against the named schema.
     // If the validation succeeds, the XML web service returns a schematron report
     // with HTTP response code 200, and this function returns that as a DOM Document.
-    // If the validation fails, the XML web service returns an HTTP 400 code with a 
+    // If the validation fails, the XML web service returns an HTTP 400 code with a
     // JSON representation of an object which this function then throws as an error.
     const form = new FormData();
     const schemaStream = createReadStream(schema);
     form.append("schema", schemaStream, schema);
     // upload the instance or instances (if the parameter is an array)
     if (Array.isArray(instance)) {
-        instance.forEach(
-            function(singleInstance) {
-                const instanceStream = createReadStream(singleInstance);
-                form.append("instance", instanceStream, singleInstance);
-            }
-        );
+        instance.forEach(function (singleInstance) {
+            const instanceStream = createReadStream(singleInstance);
+            form.append("instance", instanceStream, singleInstance);
+        });
     } else {
         // single instance to upload
         const instanceStream = createReadStream(instance);
         form.append("instance", instanceStream, instance);
     }
     try {
-        let configuration = await loadConfiguration();	
+        let configuration = await loadConfiguration();
         // post the form data and retrieve a response containing a successful SVRL report or an error
         const response = await fetch(
             `${configuration.api.services.xml.host}/nyingarn/validate-with-schematron`,
@@ -66,7 +75,7 @@ export async function validateWithSchematron({instance, schema}) {
             // return a DOM Document containing the SVRL report
             return new DOMParser().parseFromString(svrl, "application/xml");
         } else {
-            // Validation failed; xml web service returns the failed assertions in the form of a throwable JSON object 
+            // Validation failed; xml web service returns the failed assertions in the form of a throwable JSON object
             const error = await response.json();
             throw error;
         }

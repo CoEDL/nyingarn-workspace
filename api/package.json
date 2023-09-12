@@ -44,6 +44,7 @@
         "fastify": "^4.22.2",
         "fastify-socket.io": "^4.0.0",
         "foo-foo-mq": "^8.0.1",
+        "form-data": "^4.0.0",
         "fs-extra": "^11.1.1",
         "jose": "^4.14.6",
         "lodash": "^4.17.20",

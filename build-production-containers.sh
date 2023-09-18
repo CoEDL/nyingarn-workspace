@@ -2,6 +2,8 @@
 
 
 VERSION=$(grep version api/package.json | awk -F ': ' '{ print $2 }' | sed 's/"//g' | sed 's/,//' )
+echo $VERSION
+exit
 
 # build the API container
 docker build --push --rm \

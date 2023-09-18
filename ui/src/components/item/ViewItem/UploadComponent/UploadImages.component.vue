@@ -37,13 +37,12 @@
 </template>
 
 <script setup>
-import { reactive, computed, inject } from "vue";
+import { reactive, computed, inject, onBeforeMount } from "vue";
 import UploaderComponent from "./Uploader.component.vue";
 import ImageHelpComponent from "./HelpImages.component.vue";
 import WarningBoxComponent from "../../../WarningBox.component.vue";
 import ProcessingStatusComponent from "../ProcessingStatus.component.vue";
 import { useRoute } from "vue-router";
-import { useStore } from "vuex";
 const $route = useRoute();
 const $http = inject("$http");
 
@@ -54,6 +53,10 @@ const data = reactive({
     ocr: true,
 });
 const identifier = computed(() => $route.params.identifier);
+
+onBeforeMount(() => {
+    removeTusFingerprints();
+});
 
 function fileRemoved(file) {
     data.showProcessingStatus = false;
@@ -69,6 +72,12 @@ async function processUploadedImage(file) {
     response = await response.json();
     data.showProcessingStatus = true;
     data.taskIds = [...data.taskIds, response.taskId];
+}
+
+function removeTusFingerprints() {
+    Object.keys(window.localStorage).map((k) => {
+        if (k.match(/^tus::.*/)) window.localStorage.removeItem(k);
+    });
 }
 </script>
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-sleep 30
-VERSION=$(grep version api/package.json | awk -F ': ' '{ print $2 }' | sed 's/"//g' | sed 's/,//' )
+#VERSION=$(grep version api/package.json | awk -F ': ' '{ print $2 }' | sed 's/"//g' | sed 's/,//' )
+VERSION=$1
 echo $VERSION
 exit
 

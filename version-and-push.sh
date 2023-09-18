@@ -13,7 +13,11 @@ fi
 # version the code
 cd api
 version=$(npm version --no-git-tag-version $1)
+cd ../tasks
+npm version --no-git-tag-version ${version}
 cd ../ui
+npm version --no-git-tag-version $version
+cd ../ui-repository
 npm version --no-git-tag-version $version
 cd ..
 git tag $version

@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, inject, onBeforeMount } from "vue";
+import { reactive, computed, inject, onBeforeMount, onBeforeUnmount } from "vue";
 import UploaderComponent from "./Uploader.component.vue";
 import ImageHelpComponent from "./HelpImages.component.vue";
 import WarningBoxComponent from "../../../WarningBox.component.vue";
@@ -55,6 +55,9 @@ const data = reactive({
 const identifier = computed(() => $route.params.identifier);
 
 onBeforeMount(() => {
+    removeTusFingerprints();
+});
+onBeforeUnmount(() => {
     removeTusFingerprints();
 });
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-
+sleep 30
 VERSION=$(grep version api/package.json | awk -F ': ' '{ print $2 }' | sed 's/"//g' | sed 's/,//' )
 echo $VERSION
 exit

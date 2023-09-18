@@ -24,15 +24,16 @@ docker build --push --rm \
 # build the UI container
 cd ui
 npm run build
+cd -
 docker build --push --rm \
     -t ghcr.io/coedl/nyingarn-workspace-ui:latest \
     -t ghcr.io/coedl/nyingarn-workspace-ui:${VERSION} \
     -f Dockerfile.ui-build .
 
 # build the UI Repository container
-cd -
 cd ui-repository
 npm run build
+cd -
 docker build --push --rm \
     -t ghcr.io/coedl/nyingarn-repository-ui:latest \
     -t ghcr.io/coedl/nyingarn-repository-ui:${VERSION} \

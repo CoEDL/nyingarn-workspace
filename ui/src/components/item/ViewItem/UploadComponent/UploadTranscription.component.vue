@@ -7,8 +7,9 @@
                 @upload-started="data.showProcessingStatus = false"
                 @file-uploaded="processUploadedTranscription"
             />
+            <el-switch v-model="data.overwrite" active-text="Overwrite existing transcriptions" />
         </div>
-        <div class="w-1/2 lg:w-3/5 px-2">
+        <div class="w-1/2 lg:w-3/5 px-2 flex flex-col justify-center">
             <HelpTranscriptionComponent
                 :identifier="identifier"
                 v-if="!data.showProcessingStatus"
@@ -29,6 +30,7 @@ const FileUploadComponent = defineAsyncComponent(() => import("./FileUpload.comp
 
 const data = reactive({
     showProcessingStatus: false,
+    overwrite: false,
     taskIds: [],
 });
 const identifier = computed(() => $route.params.identifier);
@@ -36,7 +38,7 @@ const identifier = computed(() => $route.params.identifier);
 async function processUploadedTranscription(file) {
     let response = await $http.post({
         route: `/process/post-finish/${identifier.value}/${file.name}`,
-        body: {},
+        body: { overwrite: data.overwrite },
     });
     response = await response.json();
     data.showProcessingStatus = true;

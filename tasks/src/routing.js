@@ -24,7 +24,7 @@ export async function runTask(msg) {
     // if (process.env.NODE_ENV === "development") msg.ack();
     let directory;
 
-    const { task, identifier, resource } = msg.body;
+    const { task, identifier, resource, overwrite } = msg.body;
     try {
         directory = await prepare({ task, identifier, resource });
 
@@ -37,7 +37,7 @@ export async function runTask(msg) {
             case "process-tei":
                 log.info(`Running 'process-tei' task for '${identifier}' in ${directory}`);
                 await processTeiTranscription({ directory, ...msg.body });
-                await removeOverlappingNewContent({ directory, identifier });
+                if (!overwrite) await removeOverlappingNewContent({ directory, identifier });
                 break;
             case "process-image":
                 log.info(`Running 'process-image' task for '${identifier}' in ${directory}`);

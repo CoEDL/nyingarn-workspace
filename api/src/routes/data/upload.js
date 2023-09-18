@@ -23,7 +23,7 @@ export async function getUploadDetails(req, res) {
 export async function triggerProcessing(req) {
     // await new Promise((resolve) => setTimeout(resolve, 15000));
     const { identifier, resource } = req.params;
-    const { action } = req.body;
+    const { action, overwrite } = req.body;
 
     log.info(`Process: ${identifier}/${resource}`);
     let name;
@@ -43,7 +43,7 @@ export async function triggerProcessing(req) {
         configuration: req.session.configuration,
         item: req.session.item.get(),
         name,
-        body: { resource },
+        body: { resource, overwrite },
     };
     task = await submitTask(task);
 

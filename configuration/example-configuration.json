@@ -103,7 +103,8 @@
                 "help": "The element signifies text which is not a transcription of the original, but was instead supplied by the encoder.<br/> For example the original text may have been damaged, or the original author may have<br/> inadvertently and obviously left out a word or punctuation character.",
                 "markup": { "element": "supplied" }
             }
-        ]
+        ],
+        "mapboxToken": "{{ mapbox token }}"
     },
     "api": {
         "domain": "nyingarn.net",

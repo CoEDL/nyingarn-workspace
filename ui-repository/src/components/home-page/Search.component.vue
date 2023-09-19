@@ -23,7 +23,7 @@
 
                 <el-form-item label="" class="flex-grow">
                     <template #label><div class="text-lg">Manuscripts Containing</div> </template>
-                    <el-input v-model="data.form.text" size="large" />
+                    <el-input v-model="data.form.text" size="large" clearable />
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="search" size="large">

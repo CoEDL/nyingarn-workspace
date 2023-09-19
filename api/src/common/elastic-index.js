@@ -10,7 +10,7 @@ import { ROCrate } from "ro-crate";
 import FormData from "form-data";
 import fetch from "cross-fetch";
 
-const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates", "Language"];
+const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates"];
 
 export async function indexItem({ configuration, item, crate }) {
     // let configuration = await loadConfiguration();
@@ -29,11 +29,21 @@ export async function indexItem({ configuration, item, crate }) {
 
     // setup the metadata index
     try {
-        // await client.indices.delete({ index: "metadata" });
-        await client.indices.get({ index: "metadata" });
+        await client.indices.delete({ index: "manuscripts" });
+        await client.indices.get({ index: "manuscripts" });
     } catch (error) {
         await client.indices.create({
-            index: "metadata",
+            index: "manuscripts",
+            mappings: {
+                properties: {
+                    location: {
+                        type: "geo_shape",
+                    },
+                    // languageSuggest: {
+                    //     type: "completion",
+                    // },
+                },
+            },
             settings: { "index.mapping.ignore_malformed": true },
         });
     }
@@ -51,16 +61,17 @@ export async function indexItem({ configuration, item, crate }) {
         const document = assembleIndexRecord({ crate });
         document.text = teiText;
         await client.index({
-            index: "metadata",
+            index: "manuscripts",
             id: indexIdentifier,
             document,
         });
+        // console.log(document);
     } catch (error) {
         console.log(error);
     }
     // setup the entities index
     try {
-        // await client.indices.delete({ index: "entities" });
+        await client.indices.delete({ index: "entities" });
         await client.indices.get({ index: "entities" });
     } catch (error) {
         await client.indices.create({ index: "entities" });
@@ -112,7 +123,7 @@ export function assembleIndexRecord({ crate }) {
         access: crate.rootDataset?.licence?.[0].name?.[0] ?? "Restricted",
         location: geography,
     };
-    // console.log(record);
+    // record.languageSuggest = [...record.subjectLanguage, ...record.contentLanguage];
     return record;
 }
 
@@ -133,49 +144,22 @@ export function extractGeography({ crate }) {
             '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[58.07810783386231,29.095852076791065],[58.07810783386231,-19.12303093039881],[11.671857833862305,-19.12303093039881],[11.671857833862305,29.095852076791065]]]}}',
         ],
     });
-    const geography = entities.map((entity) => {
-        if (entity?.geojson?.length) {
-            let geojson = JSON.parse(entity.geojson[0]);
-
-            let coordinates = geojson?.geometry?.coordinates.map((e) => {
-                if (isString(e)) return parseFloat(e);
-                if (isArray(e)) {
+    const coordinates = flattenDeep(entities.map((e) => JSON.parse(e.geojson).geometry)).map(
+        (feature) => {
+            feature.coordinates = feature.coordinates.map((c) => {
+                if (isString(c)) return parseFloat(c);
+                if (isArray(c)) {
                     return [
-                        e.map((c) => {
-                            return parseFloat(c);
+                        c.map((d) => {
+                            return parseFloat(d);
                         }),
                     ];
                 }
             });
-            // console.log(JSON.stringify(coordinates, null, 2));
-            return coordinates;
+            return feature;
         }
-    });
-
-    // console.log(JSON.stringify(geography, null, 2));
-
-    return geography;
-
-    // const feature = {
-    //     type: "Feature",
-    //     properties: { name: "Yorta Yorta" },
-    //     geometry: { type: "Point", coordinates: [145.26357989848, -36.093929709321] },
-    // };
-
-    // const feature = {
-    //     type: "Feature",
-    //     geometry: {
-    //         type: "Polygon",
-    //         coordinates: [
-    //             [
-    //                 [144.56249892711642, -27.126287638023676],
-    //                 [144.56249892711642, -29.486150057382325],
-    //                 [138.27831923961642, -29.486150057382325],
-    //                 [138.27831923961642, -27.126287638023676],
-    //             ],
-    //         ],
-    //     },
-    // };
+    );
+    return coordinates;
 }
 
 // TODO this method does not have tests

@@ -155,7 +155,7 @@ async function postRepositorySearchHandler(req) {
     let query = {
         index: "manuscripts",
         ...esbQuery.toJSON(),
-        fields: ["name", "description", "location", "subjectLanguage", "contentLanguage"],
+        fields: ["name", "description", "identifier", "location", "access"],
         _source: false,
     };
     let result = await client.search(query);

@@ -13,13 +13,6 @@ import fetch from "cross-fetch";
 const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates"];
 
 export async function indexItem({ configuration, item, crate }) {
-    // let configuration = await loadConfiguration();
-    // console.log(configuration);
-    // console.log(item);
-    // console.log(crate);
-
-    // get the complete tei file and run it through the webservice to extract the text
-
     crate = new ROCrate(crate, { array: true, link: true });
     // let document = crate.getTree({ valueObject: false });
 
@@ -29,7 +22,7 @@ export async function indexItem({ configuration, item, crate }) {
 
     // setup the metadata index
     try {
-        await client.indices.delete({ index: "manuscripts" });
+        // await client.indices.delete({ index: "manuscripts" });
         await client.indices.get({ index: "manuscripts" });
     } catch (error) {
         await client.indices.create({
@@ -48,6 +41,7 @@ export async function indexItem({ configuration, item, crate }) {
         });
     }
 
+    // index the item metadata and content
     const indexIdentifier = `/${item.type}/${item.identifier}`;
     try {
         let store = await getStoreHandle({ id: item.identifier, type: "item" });
@@ -71,7 +65,7 @@ export async function indexItem({ configuration, item, crate }) {
     }
     // setup the entities index
     try {
-        await client.indices.delete({ index: "entities" });
+        // await client.indices.delete({ index: "entities" });
         await client.indices.get({ index: "entities" });
     } catch (error) {
         await client.indices.create({ index: "entities" });

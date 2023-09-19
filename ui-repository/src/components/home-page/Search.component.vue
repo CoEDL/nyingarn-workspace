@@ -1,104 +1,135 @@
 <template>
     <div class="flex flex-col">
-        <div class="p-2">
-            <el-form
-                class="flex flex-row justify-around items-end space-x-2"
-                label-position="top"
-                :model="data.form"
-                @submit.prevent
-            >
-                <el-form-item label="" class="flex-grow">
-                    <template #label><div class="text-lg">Filter by Language</div> </template>
-                    <!-- <el-input v-model="data.form.language" size="large" /> -->
-                    <el-autocomplete
-                        class="w-full"
-                        size="large"
-                        :trigger-on-focus="false"
-                        v-model="data.query"
-                        :fetch-suggestions="lookup"
-                        clearable
-                    >
-                    </el-autocomplete>
-                </el-form-item>
+        <el-form
+            class="flex flex-row justify-around items-end space-x-2"
+            label-position="top"
+            :model="data.form"
+            @submit.prevent
+        >
+            <el-form-item>
+                <el-button @click="reset" size="large">
+                    <i class="fa-solid fa-refresh fa-xl"></i>
+                </el-button>
+            </el-form-item>
+            <el-form-item label="" class="flex-grow">
+                <template #label><div class="text-lg">Filter by Language</div> </template>
+                <!-- <el-input v-model="data.form.language" size="large" /> -->
+                <el-autocomplete
+                    class="w-full"
+                    size="large"
+                    :trigger-on-focus="false"
+                    v-model="data.form.language"
+                    :fetch-suggestions="lookup"
+                    @select="search"
+                    @change="search"
+                    clearable
+                >
+                </el-autocomplete>
+            </el-form-item>
 
-                <el-form-item label="" class="flex-grow">
-                    <template #label><div class="text-lg">Manuscripts Containing</div> </template>
-                    <el-input v-model="data.form.text" size="large" clearable />
-                </el-form-item>
-                <el-form-item>
-                    <el-button @click="search" size="large">
-                        <i class="fa-solid fa-magnifying-glass fa-xl"></i>
-                    </el-button>
-                </el-form-item>
-            </el-form>
-        </div>
+            <el-form-item label="" class="flex-grow">
+                <template #label><div class="text-lg">Manuscripts Containing</div> </template>
+                <el-input
+                    v-model="data.form.text"
+                    size="large"
+                    clearable
+                    @blur="search"
+                    @change="search"
+                />
+            </el-form-item>
+            <el-form-item>
+                <el-button @click="search" size="large">
+                    <i class="fa-solid fa-magnifying-glass fa-xl"></i>
+                </el-button>
+            </el-form-item>
+        </el-form>
         <div class="text-left">
             {{ data.documentsTotal }} {{ pluralize("manuscript", data.documentsTotal) }}
             {{ pluralize("were", data.documentsTotal) }} found matching your search.
         </div>
-        <div id="map" class="home-page-map-style"></div>
+        <MapboxMap
+            class="home-page-map-style"
+            :access-token="mapboxToken"
+            :map-style="mapboxStyle"
+            :bounds="bounds"
+            @mb-created="(mapboxInstance) => (map = mapboxInstance)"
+        >
+            <div v-for="feature of data.features">
+                <MapboxMarker
+                    :lng-lat="feature.geometry.coordinates"
+                    popupspace
+                    :color="feature.properties.access[0].match(/open/i) ? 'green' : 'red'"
+                >
+                    <template v-slot:popup>
+                        <div
+                            class="flex flex-col p-1 cursor-pointer hover:underline"
+                            @click="loadItem(feature.properties)"
+                        >
+                            <div class="text-lg">
+                                {{ feature.properties.identifier[0] }}
+                            </div>
+                            <div class="text-base">
+                                {{ feature.properties.name[0] }}
+                            </div>
+                        </div>
+                    </template>
+                </MapboxMarker>
+            </div>
+        </MapboxMap>
     </div>
 </template>
 
 <script setup>
-import { ElAutocomplete } from "element-plus";
-import "leaflet/dist/leaflet.css";
-import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
-import { reactive, inject, onMounted } from "vue";
+import { ref, reactive, inject, onMounted } from "vue";
+import { ElAutocomplete, ElForm, ElFormItem, ElButton } from "element-plus";
 import pluralize from "pluralize";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 import flattenDeep from "lodash-es/flattenDeep.js";
 import debounce from "lodash-es/debounce.js";
 const $http = inject("$http");
+const $store = useStore();
 const $router = useRouter();
+
+const mapboxToken = $store.state.configuration.ui.mapboxToken;
+const mapboxStyle = "mapbox://styles/mapbox/outdoors-v12";
+import { MapboxMap, MapboxMarker } from "@studiometa/vue-mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+const map = ref();
+const bounds = [
+    [107.9, -8.35],
+    [159.75, -46.28],
+];
 
 const data = reactive({
     form: {},
-    map: undefined,
-    query: "",
     documents: [],
     documentsTotal: 0,
-    contentLanguages: [],
-    subjectLanguages: [],
     debouncedSearch: debounce(search, 400),
 });
 
 onMounted(() => {
     init();
+    map.value.on("moveend", () => data.debouncedSearch());
+    map.value.on("zoomend", () => data.debouncedSearch());
 });
 
 async function init() {
-    data.map = new Leaflet.map("map");
-
-    // we need to give leaflet and vue and the dom a couple seconds before barreling on
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    data.map.fitBounds([
-        [-8.357896965231912, 107.90038704872133],
-        [-46.28217559951351, 159.75585579872134],
-    ]);
-    // centerMap();
-    Leaflet.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}", {
-        attribution:
-            'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        minZoom: 2,
-        maxZoom: 16,
-        ext: "jpg",
-        noWrap: true,
-    }).addTo(data.map);
-    data.map.setZoom(4);
-
-    await search();
-
-    data.map.on("zoomend", (e) => data.debouncedSearch());
-    data.map.on("moveend", (e) => data.debouncedSearch());
+    search();
 }
+
+function reset() {
+    map.value.fitBounds(bounds);
+    data.form = {};
+    search();
+}
+
 async function search() {
-    const bounds = data.map.getBounds();
+    const bounds = map.value.getBounds();
     let response = await $http.post({
         route: "/repository/search",
         body: {
             ...data.form,
-            language: data.query,
             boundingBox: {
                 topLeft: bounds.getNorthWest().wrap(),
                 bottomRight: bounds.getSouthEast().wrap(),
@@ -109,10 +140,7 @@ async function search() {
         response = await response.json();
         data.documents = response.hits;
         data.documentsTotal = response.hits.length;
-        //     cb(response.hits);
-        removeExistingLayers();
-        drawSearchResults();
-        // indexContent({ documents: response.hits });
+        assembleFeatures();
     }
 }
 
@@ -124,36 +152,28 @@ async function lookup(query, cb) {
     }
 }
 
-function removeExistingLayers() {
-    data.map.eachLayer((layer) => {
-        if (!layer?._url?.match(/stamen-tiles/)) {
-            data.map.removeLayer(layer);
-        }
-    });
-}
-
-function drawSearchResults() {
+function assembleFeatures() {
     let features = data.documents.map((document) => {
         return document.fields.location.map((geometry) => {
-            return { type: "Feature", geometry };
+            return {
+                type: "Feature",
+                properties: {
+                    path: document._id,
+                    identifier: document.fields.identifier,
+                    name: document.fields.name,
+                    description: document.fields.description,
+                    access: document.fields.access,
+                },
+                geometry,
+            };
         });
     });
     features = flattenDeep(features);
-
-    let fg = Leaflet.featureGroup(
-        features.map((feature) => {
-            return Leaflet.geoJSON(feature, {
-                pointToLayer: function (feature, latlng) {
-                    return Leaflet.marker(latlng);
-                },
-            });
-        })
-    );
-    fg.addTo(data.map);
+    data.features = [...features];
 }
 
 async function loadItem(item) {
-    $router.push({ path: item._id });
+    $router.push({ path: item.path });
 }
 </script>
 
@@ -162,9 +182,10 @@ async function loadItem(item) {
     width: 950px;
     height: 750px;
 }
-.leaflet-container {
-    border: 1px solid black;
+.mapboxgl-popup-close-button {
+    visibility: hidden;
+}
+.mapboxgl-popup-content {
     background-color: #f1f5f9;
-    outline: 0;
 }
 </style>

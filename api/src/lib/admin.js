@@ -190,7 +190,7 @@ export async function publishObject({ user, type, identifier, configuration }) {
 
     // try indexing the content and fail early if the metadata is bad
     try {
-        await indexItem({ item: { identifier, type }, crate: crate.toJSON() });
+        await indexItem({ configuration, item: { identifier, type }, crate: crate.toJSON() });
     } catch (error) {
         throw new Error(
             `Metadata is invalid and can't be indexed. It needs to be fixed in order to publish the object.`

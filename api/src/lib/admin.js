@@ -274,6 +274,7 @@ export async function objectRequiresMoreWork({ type, identifier }) {
 }
 
 export async function depositObjectIntoRepository({
+    configuration,
     type,
     identifier,
     version = { metadata: false, images: false, documents: false },
@@ -334,7 +335,11 @@ export async function depositObjectIntoRepository({
         msg: `Copying ${type} resources to the repository`,
         date: new Date(),
     });
-    await objectRepository.copy({ batch: resources });
+    try {
+        await objectRepository.copy({ batch: resources });
+    } catch (error) {
+        console.error(error);
+    }
 
     // delete the files from the workspace entry
     io.emit(`deposit-${type}`, {
@@ -351,7 +356,11 @@ export async function depositObjectIntoRepository({
     item = item[0];
 
     // setup the metadata in the db
-    await setRepositoryItemMetadata({ item, store: objectRepository });
+    try {
+        await setRepositoryItemMetadata({ configuration, item, store: objectRepository });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit: () => {} } }) {
@@ -386,11 +395,11 @@ export async function restoreObjectIntoWorkspace({ type, identifier, io = { emit
     let resources = await objectRepository.listResources();
     resources = resources
         .filter((resource) => !resource.Key.match(/nocfl.*/))
-        // .filter((resource) => {
-        //     return !resource.Key.match(
-        //         /.*\.v\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z).*/
-        //     );
-        // })
+        .filter((resource) => {
+            return !resource.Key.match(
+                /.*\.v\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z).*/
+            );
+        })
         .map((resource) => {
             return {
                 target: resource.Key,
@@ -440,7 +449,12 @@ export async function setRepositoryItemMetadata({ configuration, item, store }) 
         await item.save();
 
         // index the item data in the repository
-        await indexItem({ configuration, item: { identifier, type }, crate: crate.toJSON() });
+        await indexItem({
+            location: "repository",
+            configuration,
+            item: { identifier, type },
+            crate: crate.toJSON(),
+        });
     } catch (error) {
         console.log(error);
         log.error(`There was an issue depositing '${type}:${identifier}: ${error.message}`);

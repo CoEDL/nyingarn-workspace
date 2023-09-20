@@ -288,7 +288,12 @@ async function indexRepositoryItemHandler(req) {
     let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
 
     // index the specified item
-    await indexItem({ configuration: req.session.configuration, item, crate });
+    await indexItem({
+        location: "repository",
+        configuration: req.session.configuration,
+        item,
+        crate,
+    });
 
     return {};
 }
@@ -310,7 +315,12 @@ async function indexAllRepositoryContentHandler(req) {
                 location: "repository",
             });
             let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
-            await indexItem({ configuration: req.session.configuration, item, crate });
+            await indexItem({
+                location: "repository",
+                configuration: req.session.configuration,
+                item,
+                crate,
+            });
             itemsIndexed += 1;
         }
         if (itemsIndexed < total) await indexItems(itemsIndexed);

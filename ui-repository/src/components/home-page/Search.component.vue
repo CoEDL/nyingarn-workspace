@@ -54,7 +54,7 @@
             :bounds="bounds"
             @mb-created="(mapboxInstance) => (map = mapboxInstance)"
         >
-            <div v-for="feature of data.features">
+            <div v-for="(feature, idx) of data.features" :key="feature.properties.path + idx">
                 <MapboxMarker
                     :lng-lat="feature.geometry.coordinates"
                     popupspace

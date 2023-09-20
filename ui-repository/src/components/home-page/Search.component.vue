@@ -58,11 +58,11 @@
                 <MapboxMarker
                     :lng-lat="feature.geometry.coordinates"
                     popupspace
-                    :color="feature.properties.access[0].match(/open/i) ? 'green' : 'red'"
+                    :color="feature.properties.access[0].match(/open/i) ? 'green' : 'orange'"
                 >
                     <template v-slot:popup>
                         <div
-                            class="flex flex-col p-1 cursor-pointer hover:underline"
+                            class="flex flex-col space-y-4 p-1 cursor-pointer"
                             @click="loadItem(feature.properties)"
                         >
                             <div class="text-lg">
@@ -70,6 +70,15 @@
                             </div>
                             <div class="text-base">
                                 {{ feature.properties.name[0] }}
+                            </div>
+                            <div
+                                class="text-base italic"
+                                :class="{
+                                    'text-green-700': feature.properties.access[0].match(/open/i),
+                                    'text-red-700': !feature.properties.access[0].match(/open/i),
+                                }"
+                            >
+                                {{ feature.properties.access[0] }}
                             </div>
                         </div>
                     </template>

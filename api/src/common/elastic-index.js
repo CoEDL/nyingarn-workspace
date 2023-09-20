@@ -12,7 +12,7 @@ import fetch from "cross-fetch";
 
 const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates"];
 
-export async function indexItem({ configuration, item, crate }) {
+export async function indexItem({ location = "workspace", configuration, item, crate }) {
     crate = new ROCrate(crate, { array: true, link: true });
     // let document = crate.getTree({ valueObject: false });
 
@@ -44,7 +44,7 @@ export async function indexItem({ configuration, item, crate }) {
     // index the item metadata and content
     const indexIdentifier = `/${item.type}/${item.identifier}`;
     try {
-        let store = await getStoreHandle({ id: item.identifier, type: "item" });
+        let store = await getStoreHandle({ location, id: item.identifier, type: "item" });
         const teiFileContent = await store.get({
             target: `${item.identifier}-tei-complete.xml`,
         });

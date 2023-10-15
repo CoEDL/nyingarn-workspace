@@ -11,13 +11,13 @@
             <ViewerComponent />
         </div>
 
-        <div v-if="data.detailedMetadata">
-            <describo-crate-builder
-                :crate="data.crate"
-                :readonly="true"
-                :enable-internal-routing="true"
-            />
-        </div>
+        <describo-crate-builder
+            v-if="data.detailedMetadata"
+            :crate="data.crate"
+            :readonly="true"
+            :enable-internal-routing="true"
+            tab-location="right"
+        />
     </div>
     <div v-if="data.noSuchItem" class="text-center text-xl">That item is not available.</div>
     <div v-if="data.error" class="text-center text-xl">
@@ -44,7 +44,8 @@ const props = defineProps({
 const data = reactive({
     watchers: [],
     ready: false,
-    crate: {},
+    crate: undefined,
+    profile: undefined,
     detailedMetadata: false,
     noSuchItem: false,
     error: false,
@@ -74,6 +75,7 @@ async function loadItemMetadata() {
     if (response.status === 200) {
         response = await response.json();
         data.crate = { ...response.crate };
+        data.profile = { ...response.profile };
 
         data.ready = true;
     } else if (response.status === 404) {
@@ -86,10 +88,12 @@ async function loadItemMetadata() {
 function toggleDetailedMetadata() {
     const newMetadataState = !data.detailedMetadata;
     if (newMetadataState) {
+        loadItemMetadata();
         $router.push({ name: "item-rocrate-metadata" }).then(() => {
             data.detailedMetadata = newMetadataState;
         });
     } else {
+        data.profile = undefined;
         $router.push({ name: "item" }).then(() => {
             $router.replace({ query: {} });
             data.detailedMetadata = newMetadataState;

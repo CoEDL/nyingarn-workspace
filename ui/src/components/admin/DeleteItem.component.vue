@@ -56,6 +56,7 @@ async function deleteItem() {
     const item = data.options.filter((i) => i.id === data.selectedItemIdentifier)[0];
     await lib.deleteItemFromRepository({ $http, ...item });
     data.selectedItemIdentifier = undefined;
+    data.options = [];
     data.loading = false;
 }
 </script>

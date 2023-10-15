@@ -14,11 +14,11 @@
     },
     "devDependencies": {
         "@babel/cli": "^7.22.15",
-        "@babel/core": "^7.22.17",
-        "@babel/node": "^7.22.15",
+        "@babel/core": "^7.22.20",
+        "@babel/node": "^7.22.19",
         "@babel/plugin-proposal-optional-chaining": "^7.21.0",
         "@babel/plugin-syntax-import-assertions": "^7.22.5",
-        "@babel/preset-env": "^7.22.15",
+        "@babel/preset-env": "^7.22.20",
         "babel-jest": "^29.7.0",
         "babel-loader": "^9.1.3",
         "chance": "^1.1.11",
@@ -29,11 +29,11 @@
         "xslt3": "^2.5.0"
     },
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.410.0",
-        "@aws-sdk/client-textract": "^3.410.0",
-        "@aws-sdk/lib-storage": "^3.410.0",
-        "@aws-sdk/s3-request-presigner": "^3.410.0",
-        "@aws-sdk/util-endpoints": "^3.410.0",
+        "@aws-sdk/client-s3": "^3.414.0",
+        "@aws-sdk/client-textract": "^3.414.0",
+        "@aws-sdk/lib-storage": "^3.414.0",
+        "@aws-sdk/s3-request-presigner": "^3.414.0",
+        "@aws-sdk/util-endpoints": "^3.413.0",
         "@coedl/nocfl-js": "^2.0.0",
         "@root/walk": "^1.1.0",
         "@xmldom/xmldom": "^0.8.10",
@@ -49,7 +49,7 @@
         "regenerator-runtime": "^0.14.0",
         "saxon-js": "^2.5.0",
         "sequelize": "^6.33.0",
-        "sharp": "^0.32.5",
+        "sharp": "^0.32.6",
         "winston": "^3.10.0",
         "xmlserializer": "^0.6.1"
     }

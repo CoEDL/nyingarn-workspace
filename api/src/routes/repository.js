@@ -5,6 +5,7 @@ import {
     getLogger,
     getStoreHandle,
     indexItem,
+    loadProfile,
 } from "../common/index.js";
 import { deleteItemFromRepository } from "../lib/admin.js";
 import { listItemResources, getItemResourceLink } from "../lib/item.js";
@@ -13,11 +14,14 @@ import { transformDocument } from "../lib/transform.js";
 import models from "../models/index.js";
 import esb from "elastic-builder";
 import { Client } from "@elastic/elasticsearch";
+import lodashPkg from "lodash";
+const { flattenDeep } = lodashPkg;
 
 const log = getLogger();
 
 export function setupRoutes(fastify, options, done) {
-    fastify.get("/repository/search", postRepositorySearchHandler);
+    fastify.get("/repository/lookup/language", getRepositoryLookupLanguageHandler);
+    fastify.post("/repository/search", postRepositorySearchHandler);
     fastify.get("/repository/item/:identifier", getRepositoryItemMetadataHandler);
     fastify.get("/repository/item/:identifier/:resourceId", getItemResourceDataHandler);
     fastify.get("/repository/item/:identifier/resources", getItemResourcesHandler);
@@ -41,51 +45,134 @@ async function getItem({ identifier }) {
 }
 
 // TODO this code does not have tests yet
+export async function getRepositoryLookupLanguageHandler(req) {
+    // let esbQuery = esb
+    //     .requestBodySearch()
+    //     .agg([
+    //         esb.termsAggregation("contentLanguages", "contentLanguage.keyword"),
+    //         esb.termsAggregation("subjectLanguages", "subjectLanguage.keyword")
+    //     ]);
+    //  let esbQuery = esb
+    //      .requestBodySearch()
+    //      .suggest(esb.termSuggester("contentLanguage", "contentLanguage", req.query.query));
+
+    //  let esbQuery = esb
+    //      .requestBodySearch()
+    //      .suggest(
+    //          new esb.CompletionSuggester("languages", "languageSuggest").prefix(req.query.query)
+    //      );
+
+    try {
+        let esbQuery = esb
+            .requestBodySearch()
+            .query(
+                esb
+                    .boolQuery()
+                    .must(esb.matchQuery("@type", "Language"))
+                    .should([
+                        esb.matchQuery("name", req.query.query).fuzziness(2),
+                        esb.matchQuery("iso639-3", req.query.query).fuzziness(2),
+                        esb.matchQuery("languageCode", req.query.query).fuzziness(2),
+                        esb.matchQuery("alternateName", req.query.query).fuzziness(2),
+                    ])
+            )
+            .aggs([
+                esb.termsAggregation("name", "name.keyword").size(5),
+                esb.termsAggregation("iso639-3", "iso639-3.keyword").size(3),
+                esb.termsAggregation("alternateName", "alternateName.keyword").size(5),
+                esb.termsAggregation("languageCode", "languageCode.keyword").size(3),
+            ]);
+
+        const client = new Client({
+            node: req.session.configuration.api.services.elastic.host,
+        });
+        // console.log(JSON.stringify(esbQuery, null, 2));
+        let query = {
+            index: "entities",
+            ...esbQuery.toJSON(),
+            fields: ["name", "languageCode", "alternateName"],
+            _source: false,
+        };
+        let result = await client.search(query);
+
+        let matches = flattenDeep(
+            Object.keys(result.aggregations).map((agg) => {
+                return result.aggregations[agg].buckets.map((bucket) => bucket.key);
+            })
+        );
+        return { matches };
+    } catch (error) {
+        console.log(error);
+    }
+    return { matches: [] };
+    // return result.hits;
+}
+
+// TODO this code does not have tests yet
 async function postRepositorySearchHandler(req) {
-    let esbQuery = esb
-        .requestBodySearch()
-        .query(
+    const bounds = req.body.boundingBox;
+
+    let mustMatchQuery = [
+        esb
+            .geoShapeQuery("location")
+            .shape(
+                esb
+                    .geoShape()
+                    .type("envelope")
+                    .coordinates([
+                        [bounds.topLeft.lng, bounds.topLeft.lat],
+                        [bounds.bottomRight.lng, bounds.bottomRight.lat],
+                    ])
+            )
+            .relation("intersects"),
+    ];
+    if (req.body.language) {
+        mustMatchQuery.push(
             esb
                 .boolQuery()
-                .should(esb.matchQuery("name", req.query.query).operator("AND"))
-                .should(esb.matchQuery("description", req.query.query).operator("AND"))
-                .should(esb.matchQuery("subjectLanguage.name", req.query.query).operator("AND"))
-                .should(
-                    esb.matchQuery("subjectLanguage.languageCode", req.query.query).operator("AND")
-                )
-                .should(
-                    esb.matchQuery("subjectLanguage.alternateName", req.query.query).operator("AND")
-                )
-                .should(esb.matchQuery("contentLanguage.name", req.query.query).operator("AND"))
-                .should(
-                    esb.matchQuery("contentLanguage.alternateName", req.query.query).operator("AND")
-                )
+                .should([
+                    esb.matchQuery("contentLanguage", req.body.language).fuzziness(2),
+                    esb.matchQuery("subjectLanguage", req.body.language).fuzziness(2),
+                ])
         );
+    }
+    if (req.body.text) {
+        mustMatchQuery.push(
+            esb
+                .boolQuery()
+                .should([
+                    esb.matchQuery("name", req.body.text).fuzziness("AUTO"),
+                    esb.matchQuery("description", req.body.text).fuzziness("AUTO"),
+                    esb.matchQuery("text", req.body.text).fuzziness("AUTO"),
+                ])
+        );
+    }
+    let esbQuery = esb.requestBodySearch().query(esb.boolQuery().must(mustMatchQuery)).size(1000);
+    // console.log(JSON.stringify(esbQuery, null, 2));
 
     const client = new Client({
         node: req.session.configuration.api.services.elastic.host,
     });
     let query = {
-        index: "metadata",
+        index: "manuscripts",
         ...esbQuery.toJSON(),
-        fields: ["name", "description"],
+        fields: ["name", "description", "identifier", "location", "access"],
         _source: false,
     };
-    // console.log(JSON.stringify(query, null, 2));
     let result = await client.search(query);
-    // console.log(JSON.stringify(result.hits.hits.slice(0, 3), null, 2));
     return result.hits;
 }
 
 async function getRepositoryItemMetadataHandler(req, res) {
     try {
+        let profile = await loadProfile({ profile: `nyingarn-item-profile.json` });
         let store = await getStoreHandle({
             identifier: req.params.identifier,
             type: "item",
             location: "repository",
         });
         let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
-        return { crate };
+        return { crate, profile };
     } catch (error) {
         if (error.Code === "NoSuchKey") {
             return res.notFound();
@@ -203,7 +290,12 @@ async function indexRepositoryItemHandler(req) {
     let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
 
     // index the specified item
-    await indexItem({ configuration: req.session.configuration, item, crate });
+    await indexItem({
+        location: "repository",
+        configuration: req.session.configuration,
+        item,
+        crate,
+    });
 
     return {};
 }
@@ -225,7 +317,12 @@ async function indexAllRepositoryContentHandler(req) {
                 location: "repository",
             });
             let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
-            await indexItem({ configuration: req.session.configuration, item, crate });
+            await indexItem({
+                location: "repository",
+                configuration: req.session.configuration,
+                item,
+                crate,
+            });
             itemsIndexed += 1;
         }
         if (itemsIndexed < total) await indexItems(itemsIndexed);

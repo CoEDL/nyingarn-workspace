@@ -23,6 +23,9 @@
             <div class="w-1/5">Licence:</div>
             <div class="w-4/5">
                 {{ crate.rootDataset.licence[0].name[0] }}
+                <span v-if="crate.rootDataset.licence?.[0]?.description?.[0]">
+                    : {{ crate.rootDataset.licence?.[0]?.description?.[0] }}
+                </span>
             </div>
         </div>
 
@@ -32,17 +35,11 @@
                 <div v-for="language of languages">
                     <div>
                         {{ language.name[0] }}
-                        <span class="hidden text-sm">
-                            (Also known as:
-                            {{ language.alternateName.join(", ") }} )
-                        </span>
                     </div>
-                    <div class="flex flex-row space-x-2">
-                        <MapComponent class="flex-grow" :entity="language" v-if="language.geo" />
-                        <div class="md:w-2/5 hidden md:block">
-                            Also known as:
-                            {{ language.alternateName.join(", ") }}
-                        </div>
+                    <!-- <MapComponent class="flex-grow" :entity="language" v-if="language.geo" /> -->
+                    <div class="text-sm">
+                        Also known as:
+                        {{ language.alternateName.join(", ") }}
                     </div>
                 </div>
             </div>

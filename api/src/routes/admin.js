@@ -176,6 +176,7 @@ async function putDepositObjectHandler(req, res) {
         date: new Date(),
     });
     await depositObjectIntoRepository({
+        configuration: req.session.configuration,
         type,
         identifier,
         version,

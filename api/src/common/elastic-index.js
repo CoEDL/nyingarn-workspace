@@ -1,6 +1,6 @@
 import { getStoreHandle } from "./index.js";
 import lodashPkg from "lodash";
-const { isArray, isString, isPlainObject, flattenDeep } = lodashPkg;
+const { isArray, isString, isPlainObject, flattenDeep, compact } = lodashPkg;
 import fsExtraPkg from "fs-extra";
 const { createReadStream } = fsExtraPkg;
 import { Client } from "@elastic/elasticsearch";
@@ -10,16 +10,9 @@ import { ROCrate } from "ro-crate";
 import FormData from "form-data";
 import fetch from "cross-fetch";
 
-const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates", "Language"];
+const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates"];
 
-export async function indexItem({ configuration, item, crate }) {
-    // let configuration = await loadConfiguration();
-    // console.log(configuration);
-    // console.log(item);
-    // console.log(crate);
-
-    // get the complete tei file and run it through the webservice to extract the text
-
+export async function indexItem({ location = "workspace", configuration, item, crate }) {
     crate = new ROCrate(crate, { array: true, link: true });
     // let document = crate.getTree({ valueObject: false });
 
@@ -29,18 +22,29 @@ export async function indexItem({ configuration, item, crate }) {
 
     // setup the metadata index
     try {
-        // await client.indices.delete({ index: "metadata" });
-        await client.indices.get({ index: "metadata" });
+        // await client.indices.delete({ index: "manuscripts" });
+        await client.indices.get({ index: "manuscripts" });
     } catch (error) {
         await client.indices.create({
-            index: "metadata",
+            index: "manuscripts",
+            mappings: {
+                properties: {
+                    location: {
+                        type: "geo_shape",
+                    },
+                    // languageSuggest: {
+                    //     type: "completion",
+                    // },
+                },
+            },
             settings: { "index.mapping.ignore_malformed": true },
         });
     }
 
+    // index the item metadata and content
     const indexIdentifier = `/${item.type}/${item.identifier}`;
     try {
-        let store = await getStoreHandle({ id: item.identifier, type: "item" });
+        let store = await getStoreHandle({ location, id: item.identifier, type: "item" });
         const teiFileContent = await store.get({
             target: `${item.identifier}-tei-complete.xml`,
         });
@@ -51,10 +55,11 @@ export async function indexItem({ configuration, item, crate }) {
         const document = assembleIndexRecord({ crate });
         document.text = teiText;
         await client.index({
-            index: "metadata",
+            index: "manuscripts",
             id: indexIdentifier,
             document,
         });
+        // console.log(document);
     } catch (error) {
         console.log(error);
     }
@@ -83,7 +88,7 @@ export async function deleteItemFromIndex({ item, configuration }) {
 
     const indexIdentifier = `/${item.type}/${item.identifier}`;
     await client.delete({
-        index: "metadata",
+        index: "manuscripts",
         id: indexIdentifier,
     });
 }
@@ -112,7 +117,7 @@ export function assembleIndexRecord({ crate }) {
         access: crate.rootDataset?.licence?.[0].name?.[0] ?? "Restricted",
         location: geography,
     };
-    // console.log(record);
+    // record.languageSuggest = [...record.subjectLanguage, ...record.contentLanguage];
     return record;
 }
 
@@ -133,49 +138,27 @@ export function extractGeography({ crate }) {
             '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[58.07810783386231,29.095852076791065],[58.07810783386231,-19.12303093039881],[11.671857833862305,-19.12303093039881],[11.671857833862305,29.095852076791065]]]}}',
         ],
     });
-    const geography = entities.map((entity) => {
-        if (entity?.geojson?.length) {
-            let geojson = JSON.parse(entity.geojson[0]);
-
-            let coordinates = geojson?.geometry?.coordinates.map((e) => {
-                if (isString(e)) return parseFloat(e);
-                if (isArray(e)) {
-                    return [
-                        e.map((c) => {
-                            return parseFloat(c);
-                        }),
-                    ];
-                }
-            });
-            // console.log(JSON.stringify(coordinates, null, 2));
-            return coordinates;
+    let coordinates = flattenDeep(entities.map((e) => JSON.parse(e.geojson).geometry)).map(
+        (feature) => {
+            feature.coordinates = parseValuesAsFloat(feature.coordinates);
+            if (feature.type.match(/polygon/i)) {
+                feature.coordinates[0].push(feature.coordinates[0][0]);
+            }
+            return feature;
         }
-    });
+    );
+    // console.log("2", JSON.stringify(coordinates, null, 2));
+    coordinates = compact(coordinates);
+    return coordinates;
 
-    // console.log(JSON.stringify(geography, null, 2));
-
-    return geography;
-
-    // const feature = {
-    //     type: "Feature",
-    //     properties: { name: "Yorta Yorta" },
-    //     geometry: { type: "Point", coordinates: [145.26357989848, -36.093929709321] },
-    // };
-
-    // const feature = {
-    //     type: "Feature",
-    //     geometry: {
-    //         type: "Polygon",
-    //         coordinates: [
-    //             [
-    //                 [144.56249892711642, -27.126287638023676],
-    //                 [144.56249892711642, -29.486150057382325],
-    //                 [138.27831923961642, -29.486150057382325],
-    //                 [138.27831923961642, -27.126287638023676],
-    //             ],
-    //         ],
-    //     },
-    // };
+    function parseValuesAsFloat(arr) {
+        return arr.map((v) => {
+            if (isArray(v)) {
+                return parseValuesAsFloat(v);
+            }
+            return parseFloat(v);
+        });
+    }
 }
 
 // TODO this method does not have tests

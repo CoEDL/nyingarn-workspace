@@ -17,11 +17,6 @@
             "about": { "label": "About", "description": "", "order": 0 },
             "source": { "label": "Original Source Information", "description": "", "order": 1 },
             "who": { "label": "Who", "description": "", "order": 2 },
-            "permissions": {
-                "label": "Permissions",
-                "description": "",
-                "order": 3
-            },
             "overflow": {
                 "label": "Other",
                 "order": 4
@@ -38,6 +33,7 @@
                     "name": "identifier",
                     "type": ["Text"],
                     "multiple": false,
+                    "required": true,
                     "group": "about"
                 },
                 {
@@ -53,9 +49,9 @@
                     "id": "https://nyingarn.net/metadata-definitions#languageName",
                     "name": "languageName",
                     "label": "Language Name",
-                    "help": "Language name as written in the document; also known as.",
+                    "help": "The language name as written in the source document in freeform text. This allows a locally accepted name to be found in addition to the standard encoded in Austlang for the nearest standard language name",
                     "type": ["Text"],
-                    "required": true,
+                    "required": false,
                     "multiple": true,
                     "group": "about"
                 },
@@ -63,7 +59,7 @@
                     "id": "https://nyingarn.net/metadata-definitions#contentLanguage",
                     "name": "contentLanguage",
                     "label": "Content Languages",
-                    "help": "The language(s) that are in the document. If unknown - select unknown.",
+                    "help": "The language(s) that are in the document.",
                     "multiple": true,
                     "required": true,
                     "type": ["Language"],
@@ -73,7 +69,7 @@
                     "id": "https://nyingarn.net/metadata-definitions#subjectLanguage",
                     "name": "subjectLanguage",
                     "label": "Subject Languages",
-                    "help": "The language(s) that the document is about. If unknown - select unknown.",
+                    "help": "The language(s) that the document is about.",
                     "multiple": true,
                     "required": true,
                     "type": ["Language"],
@@ -86,19 +82,21 @@
                     "help": "Copyright Status",
                     "type": ["Select"],
                     "required": true,
-                    "values": [
-                        "Yes = in copyright",
-                        "No - out of copyright",
-                        "Public Domain",
-                        "Copyright conditions may apply",
-                        "Copyright holder(s) authority"
-                    ],
+                    "values": ["In copyright", "Out of copyright"],
+                    "group": "about"
+                },
+                {
+                    "id": "https://www.dublincore.org/specifications/dublin-core/dcmi-terms/terms/rightsHolder",
+                    "name": "rightsHolder",
+                    "help": "A person or organization owning or managing rights over the resource.",
+                    "type": ["Person", "Organization", "Text"],
+                    "required": true,
                     "group": "about"
                 },
                 {
                     "id": "https://w3id.org/ro/terms/text-commons#annotator",
                     "name": "annotator",
-                    "help": "The participant produced an annotation of this or a related resource.",
+                    "help": "The annotator produced an annotation of this or a related resource.",
                     "multiple": true,
                     "type": ["Person", "Organization"],
                     "group": "who"
@@ -106,7 +104,7 @@
                 {
                     "id": "https://w3id.org/ro/terms/text-commons#author",
                     "name": "author",
-                    "help": "The participant contributed original writings to the resource.",
+                    "help": "The author contributed original writings to the resource.",
                     "multiple": true,
                     "type": ["Person", "Organization"],
                     "group": "who"
@@ -117,15 +115,17 @@
                     "help": "The participant is responsible for collecting the sub-parts of the resource together.",
                     "multiple": true,
                     "type": ["Person", "Organization"],
-                    "group": "who"
+                    "group": "who",
+                    "required": true
                 },
                 {
                     "id": "https://w3id.org/ro/terms/text-commons#consultant",
                     "name": "consultant",
-                    "help": "The participant contributes expertise to the creation of a work.",
+                    "help": "The participant contributes expertise to the creation of a work, for example a language speaker.",
                     "multiple": true,
                     "type": ["Person", "Organization"],
-                    "group": "who"
+                    "group": "who",
+                    "required": true
                 },
                 {
                     "id": "https://w3id.org/ro/terms/text-commons#data_inputter",
@@ -141,15 +141,8 @@
                     "help": "The participant was responsible for depositing the resource in an archive.",
                     "multiple": true,
                     "type": ["Person", "Organization"],
-                    "group": "who"
-                },
-                {
-                    "id": "https://w3id.org/ro/terms/text-commons#developer",
-                    "name": "developer",
-                    "help": "The participant developed the methodology or tools that constitute the resource, or that were used to create the resource.",
-                    "multiple": true,
-                    "type": ["Person", "Organization"],
-                    "group": "who"
+                    "group": "who",
+                    "required": true
                 },
                 {
                     "id": "https://w3id.org/ro/terms/text-commons#editor",
@@ -213,14 +206,6 @@
                     "help": "The participant operated the recording machinery used to create the resource.",
                     "group": "who",
                     "bundlePropertyAs": "contributor",
-                    "multiple": true,
-                    "type": ["Person", "Organization"],
-                    "group": "who"
-                },
-                {
-                    "id": "https://w3id.org/ro/terms/text-commons#register",
-                    "name": "register",
-                    "help": "Specifies the type of register (any of the varieties of a language that a speaker uses in a particular social context [Merriam-Webster]) of the contents of a language resource\n",
                     "multiple": true,
                     "type": ["Person", "Organization"],
                     "group": "who"
@@ -298,37 +283,12 @@
                     "group": "who"
                 },
                 {
-                    "id": "https://nyingarn.net/metadata-definitions#catalogLinkAtRelevantInstitution",
-                    "name": "catalogLinkAtRelevantInstitution",
-                    "help": "Provide a link (URL) to the item in the relevant institution",
-                    "type": ["URL"],
-                    "required": true,
-                    "multiple": true,
-                    "group": "source"
-                },
-                {
                     "id": "https://nyingarn.net/metadata-definitions#publicationTitle",
                     "name": "publicationTitle",
                     "label": "Publication Title",
                     "help": "Publication Title (if published) of work from which the document is derived",
                     "multiple": false,
                     "type": ["Text"],
-                    "group": "source"
-                },
-                {
-                    "id": "https://nyingarn.net/metadata-definitions#holdingInstitution",
-                    "name": "holdingInstitution",
-                    "help": "Holding Institution",
-                    "type": ["Organization"],
-                    "required": true,
-                    "group": "source"
-                },
-                {
-                    "id": "https://nyingarn.net/metadata-definitions#extent",
-                    "name": "extent",
-                    "help": "Number of pages",
-                    "multiple": false,
-                    "type": ["Number"],
                     "group": "source"
                 },
                 {
@@ -347,6 +307,14 @@
                     "group": "source"
                 },
                 {
+                    "id": "http://schema.org/dateCreated",
+                    "name": "dateCreated",
+                    "help": "Date created. If you don't know the full date then set the first of January of the year.",
+                    "type": ["Date"],
+                    "multiple": false,
+                    "group": "source"
+                },
+                {
                     "id": "https://nyingarn.net/metadata-definitions#dateFreetext",
                     "name": "dateFreeText",
                     "label": "Date (free text)",
@@ -356,37 +324,53 @@
                     "group": "source"
                 },
                 {
-                    "id": "https://nyingarn.net/metadata-definitions#originalForm",
-                    "name": "originalForm",
-                    "help": "Original in typed of handwritten form",
-                    "type": ["Select"],
-                    "values": ["Hand", "Type", "Both"],
+                    "id": "https://nyingarn.net/metadata-definitions#catalogLinkAtRelevantInstitution",
+                    "name": "catalogLinkAtRelevantInstitution",
+                    "help": "Provide a link (URL) to the item in the relevant institution",
+                    "type": ["URL"],
+                    "required": true,
                     "multiple": true,
                     "group": "source"
                 },
+
                 {
-                    "id": "http://schema.org/dateCreated",
-                    "name": "dateCreated",
-                    "help": "Date created. If you don't know the full date then set the first of January of the year.",
-                    "type": ["Date"],
-                    "multiple": false,
+                    "id": "https://nyingarn.net/metadata-definitions#holdingInstitution",
+                    "name": "holdingInstitution",
+                    "help": "Holding Institution",
+                    "type": ["Organization"],
+                    "required": true,
                     "group": "source"
                 },
                 {
-                    "id": "https://www.dublincore.org/specifications/dublin-core/dcmi-terms/terms/rightsHolder",
-                    "name": "rightsHolder",
-                    "help": "Rights holder",
-                    "type": ["Person", "Organization", "Text"],
-                    "group": "permissions"
+                    "id": "https://nyingarn.net/metadata-definitions#extent",
+                    "name": "extent",
+                    "help": "Number of pages",
+                    "multiple": false,
+                    "type": ["Number"],
+                    "group": "source"
                 },
+
                 {
-                    "id": "https://nyingarn.net/metadata-definitions#languageAuthorityPermissions",
-                    "name": "languageAuthorityPermissions",
-                    "help": "Permissions required from the relevant language authority",
-                    "type": ["Select"],
-                    "values": ["Yes", "No"],
-                    "group": "permissions"
+                    "id": "https://nyingarn.net/metadata-definitions#originalForm",
+                    "name": "originalForm",
+                    "help": "Original in typed of handwritten form",
+                    "type": ["SelectObject"],
+                    "values": [
+                        {
+                            "@id": "https://github.com/Language-Research-Technology/language-data-commons-vocabs/blob/master/ontology.md#Handwritten",
+                            "@type": "DefinedTerm",
+                            "name": "Handwritten"
+                        },
+                        {
+                            "@id": "https://github.com/Language-Research-Technology/language-data-commons-vocabs/blob/master/ontology.md#Typewritten",
+                            "@type": "DefinedTerm",
+                            "name": "Typewritten"
+                        }
+                    ],
+                    "multiple": true,
+                    "group": "source"
                 },
+
                 {
                     "id": "http://schema.org/location",
                     "name": "location",

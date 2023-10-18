@@ -34,7 +34,7 @@
         "vue-router": "^4.2.5",
         "vuex": "^4.1.0",
         "xml-formatter": "^3.5.0",
-        "zoomist": "^2.0.10"
+        "zoomist": "^1.1.1"
     },
     "devDependencies": {
         "@babel/core": "^7.23.2",

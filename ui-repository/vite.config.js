@@ -20,6 +20,6 @@ export default defineConfig({
         }),
     ],
     optimizeDeps: {
-        include: ["element-plus", "lodash", "@describo/crate-builder-component"],
+        include: ["element-plus", "lodash", "@describo/crate-builder-component", "ajv"],
     },
 });

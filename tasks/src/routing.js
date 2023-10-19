@@ -13,8 +13,11 @@ import {
     syncToBucket,
     removeOverlappingNewContent,
 } from "./tasks/index.js";
-import { log, getStoreHandle } from "/srv/api/src/common/index.js";
+import { updateResourceStatus } from "/srv/api/src/lib/item.js";
+import { log, getStoreHandle, resourceStatusFile } from "/srv/api/src/common/index.js";
 import { updateTask, deleteTask } from "./common/task.js";
+import lodashPkg from "lodash";
+const { isEmpty } = lodashPkg;
 
 export function setupHandlers({ rabbit }) {
     rabbit.handle("*", runTask);
@@ -93,6 +96,19 @@ export async function runTask(msg) {
                 status: "done",
             });
         }
+
+        const resourceName = resource.split(".")[0];
+        let store = await getStoreHandle({ id: identifier, type: "item" });
+        let statusFile = await store.getJSON({ target: resourceStatusFile });
+        let status = statusFile.resources[resourceName];
+        if (isEmpty(status)) {
+            statusFile = await updateResourceStatus({
+                identifier,
+                resource: resourceName,
+                statusFile,
+            });
+        }
+        await store.put({ target: resourceStatusFile, json: statusFile });
     } catch (error) {
         log.error(`runTask ERROR: Task in ${directory}: ${error.message}`);
         console.log(error);

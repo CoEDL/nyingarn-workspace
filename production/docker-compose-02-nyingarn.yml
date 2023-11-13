@@ -1,0 +1,85 @@
+version: "3.7"
+
+networks:
+    default:
+        name: nyingarn
+
+services:
+    task-runner:
+        image: ghcr.io/coedl/nyingarn-workspace-task-runner:latest
+        hostname: worker1
+        restart: always
+        working_dir: /srv
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "${NODE_ENV}"
+            LOG_LEVEL: "${LOG_LEVEL}"
+            DB_HOST: "${POSTGRES_HOST}"
+            DB_PORT: "${POSTGRES_PORT}"
+            DB_USER: "${POSTGRES_USER}"
+            DB_PASSWORD: "${POSTGRES_PASSWORD}"
+            DB_DATABASE: "${NYINGARN_DB}"
+            POST_FINISH: "http://workspace-api:8080/process/post-finish"
+        volumes:
+            - ./configuration:/srv/configuration
+
+    xml-processor:
+        image: ghcr.io/coedl/nyingarn-workspace-xml-processor:latest
+        hostname: xml
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+        restart: unless-stopped
+
+    workspace_api:
+        image: ghcr.io/coedl/nyingarn-workspace-api:latest
+        hostname: workspace-api
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "${NODE_ENV}"
+            LOG_LEVEL: "${LOG_LEVEL}"
+            DB_HOST: "${POSTGRES_HOST}"
+            DB_PORT: "${POSTGRES_PORT}"
+            DB_USER: "${POSTGRES_USER}"
+            DB_PASSWORD: "${POSTGRES_PASSWORD}"
+            DB_DATABASE: "${NYINGARN_DB}"
+        volumes:
+            - ./configuration:/srv/configuration
+            - ./profiles:/srv/profiles
+
+    workspace-ui:
+        image: ghcr.io/coedl/nyingarn-workspace-ui:latest
+        hostname: workspace-ui
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "${NODE_ENV}"
+        volumes:
+            - ./nginx-workspace.conf:/etc/nginx/conf.d/nginx-workspace.conf
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.workspace.entrypoints=websecure
+            - traefik.http.routers.workspace.rule=Host(`workspace.nyingarn.net`)
+            - traefik.http.routers.workspace.service=workspace
+            - traefik.http.routers.workspace.tls=true
+            - traefik.http.routers.workspace.tls.certresolver=leresolver
+            - traefik.http.services.workspace.loadbalancer.server.port=80
+
+    repository-ui:
+        image: ghcr.io/coedl/nyingarn-repository-ui:latest
+        hostname: repository-ui
+        tty: true
+        environment:
+            TERM: "xterm-256color"
+            NODE_ENV: "${NODE_ENV}"
+        volumes:
+            - ./nginx-repository.conf:/etc/nginx/conf.d/nginx-repository.conf
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.repository.entrypoints=websecure
+            - traefik.http.routers.repository.rule=Host(`repository.nyingarn.net`)
+            - traefik.http.routers.repository.service=repository
+            - traefik.http.routers.repository.tls=true
+            - traefik.http.routers.repository.tls.certresolver=leresolver
+            - traefik.http.services.repository.loadbalancer.server.port=80

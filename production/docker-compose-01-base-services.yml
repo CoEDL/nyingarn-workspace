@@ -1,17 +1,41 @@
 version: "3.7"
 
 networks:
-  default:
-    external:
-      name: workspace_default
-
-volumes:
-    api_node_modules:
-        driver: local
-    ui_node_modules:
-        driver: local
+    default:
+        name: nyingarn
 
 services:
+    reverse-proxy:
+        # The official v2 Traefik docker image
+        image: traefik:v2.10
+        # Enables the web UI and tells Traefik to listen to docker
+        command:
+            - --api.insecure=true
+            - --api.dashboard=true
+            - --log.level=INFO
+            #- --log.filepath=/var/log/traefik.log
+            - --accesslog=true
+            #- --accesslog.filepath=/var/log/traefik-access.log
+            - --providers.docker.network=proxy
+            - --providers.docker.exposedByDefault=false
+            - --entrypoints.web.address=:80
+            #- --entrypoints.web.http.redirections.entrypoint.to=websecure
+            #- --entryPoints.web.http.redirections.entrypoint.scheme=https
+            - --entrypoints.websecure.address=:443
+            - --entrypoints.websecure.http.tls.certResolver=leresolver
+            - --certificatesresolvers.leresolver.acme.email={LETSENCRYPT_MAIL}
+            - --certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json
+            - --certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web
+        ports:
+            - 80:80
+            - 443:443
+            # The Web UI (enabled by --api.insecure=true)
+            - 8080:8080
+        volumes:
+            # So that Traefik can listen to the Docker events
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /srv/workspace/traefik-letsencrypt:/letsencrypt
+
     workspace_db:
         image: postgres:13-alpine
         hostname: db
@@ -24,30 +48,80 @@ services:
             PGDATA: /postgresql/data
         volumes:
             - /srv/workspace-data/postgres:/postgresql
-    minio:
-        image: minio/minio:latest
-        restart: always
-        ports:
-            - 10000:9000
-            - 10001:10001
-        environment:
-            MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
-            MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
-            MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
-        entrypoint:
-            bash -c '/opt/bin/minio server /data --console-address ":10001"'
-        volumes:
-            - /srv/workspace-data/s3:/data
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:10001/minio/health/live"]
-            interval: 30s
-            timeout: 20s
-            retries: 3
+
+    # UNCOMMENT and adapt the following configuration if you want to run a
+    #  MinIO service on this node. That said, it's probably better to put that
+    #  onto its own server. Even better yet - use AWS S3.
+    # minio:
+    #   image: minio/minio:RELEASE.2022-10-24T18-35-07Z.hotfix.ce525fdaf
+    #   restart: always
+    #   ports:
+    #   #    - 10000:9000
+    #       - 9001:9001
+    #   environment:
+    #       MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+    #       MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+    #       MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
+    #   entrypoint:
+    #       bash -c '/opt/bin/minio server /data --console-address ":9001"'
+    #   volumes:
+    #       - /srv/workspace-data/s3:/data
+    #   healthcheck:
+    #       test: ["CMD", "curl", "-f", "http://localhost:9001/minio/health/live"]
+    #       interval: 30s
+    #       timeout: 20s
+    #       retries: 3
+    #   labels:
+    #       - traefik.enable=true
+
+    #       - traefik.http.routers.minio.entrypoints=websecure
+    #       - traefik.http.routers.minio.rule=Host(`s3.nyingarn.net`)
+    #       - traefik.http.routers.minio.service=minio
+    #       - traefik.http.routers.minio.tls=true
+    #       - traefik.http.routers.minio.tls.certresolver=leresolver
+    #       - traefik.http.services.minio.loadbalancer.server.port=9000
+
+    #       - traefik.http.routers.minioconsole.entrypoints=websecure
+    #       - traefik.http.routers.minioconsole.rule=Host(`s3-console.nyingarn.net`)
+    #       - traefik.http.routers.minioconsole.service=minioconsole
+    #       - traefik.http.routers.minioconsole.tls=true
+    #       - traefik.http.routers.minioconsole.tls.certresolver=leresolver
+    #       - traefik.http.services.minioconsole.loadbalancer.server.port=9001
+
     dozzle:
         container_name: dozzle
         image: amir20/dozzle:latest
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
         ports:
-           - 9999:8080
+            - 9999:8080
 
+    rabbit:
+        image: rabbitmq:3-management
+        hostname: rabbit
+        restart: always
+        ports:
+            - 5672:5672
+            - 15672:15672
+
+    elastic:
+        image: elasticsearch:8.4.1
+        hostname: elastic
+        environment:
+            - discovery.type=single-node
+            - ES_JAVA_OPTS=-Xms750m -Xmx750m
+            - xpack.security.enabled=false
+            - node.name=elastic
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+            nofile:
+                soft: 65536
+                hard: 65536
+        cap_add:
+            - IPC_LOCK
+        volumes:
+            - /srv/workspace-data/elastic-data:/usr/share/elasticsearch/data:delegated
+        ports:
+            - 9200:9200

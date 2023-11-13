@@ -1,0 +1,8 @@
+version: "3.7"
+
+services:
+    certdumper:
+        image: ghcr.io/kereis/traefik-certs-dumper:sha-f4a6e5e
+        volumes:
+            - ./traefik-letsencrypt:/traefik:ro
+            - ./letsencrypt:/output:rw

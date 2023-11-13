@@ -183,6 +183,10 @@
             "repository": "https://repository.nyingarn.net"
         },
         "emailLoginTimeout": { "minutes": 10 },
-        "sesMode": "production"
+        "ses": {
+            "mode": "development",
+            "source": "nyingarnproject@gmail.com",
+            "replyTo": ["nyingarn-project@unimelb.edu.au"]
+        }
     }
 }

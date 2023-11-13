@@ -216,7 +216,9 @@ async function notifyAwaitingReview({ configuration }) {
         accessKeyId: aws.awsAccessKeyId,
         secretAccessKey: aws.awsSecretAccessKey,
         region: aws.region,
-        mode: configuration.api.sesMode,
+        mode: configuration.api.ses.mode,
+        source: configuration.api.ses.source,
+        replyTo: configuration.api.ses.replyTo,
     });
     let adminEmails = await models.user.findAll({
         where: { administrator: true },
@@ -224,7 +226,7 @@ async function notifyAwaitingReview({ configuration }) {
         raw: true,
     });
     let response = await ses.sendMessage({
-        templateName: `${configuration.api.sesMode}-awaiting-review`,
+        templateName: `${configuration.api.ses.mode}-awaiting-review`,
         data: {},
         to: adminEmails.map((u) => u.email),
     });

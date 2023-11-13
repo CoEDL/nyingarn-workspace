@@ -20,6 +20,8 @@ export class SES {
         endpoint,
         forcePathStyle = false,
         mode = undefined,
+        source = undefined,
+        replyTo = undefined,
     }) {
         if (!mode) throw new Error(`The SES mode must be defined`);
         this.mode = mode;
@@ -54,6 +56,9 @@ export class SES {
         if (mode === "testing") {
             this.templates = this.templates.slice(0, 1);
         }
+
+        this.source = source;
+        this.replyTo = replyTo;
     }
 
     async compileTemplates() {
@@ -133,11 +138,11 @@ export class SES {
             return "email sent";
         }
         const input = {
-            Source: "nyingarnproject@gmail.com", // required
+            Source: this.source, // required
             Destination: {
                 ToAddresses: to,
             },
-            ReplyToAddresses: ["nyingarn-project@unimelb.edu.au"],
+            ReplyToAddresses: this.replyTo,
             Template: templateName, // required
             TemplateData: JSON.stringify(data), // required
         };

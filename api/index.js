@@ -162,7 +162,9 @@ async function setupSES({ configuration }) {
         accessKeyId: aws.awsAccessKeyId,
         secretAccessKey: aws.awsSecretAccessKey,
         region: aws.region,
-        mode: configuration.api.sesMode,
+        mode: configuration.api.ses.mode,
+        source: configuration.api.ses.source,
+        replyTo: configuration.api.ses.replyTo,
     });
     await ses.compileTemplates();
     await ses.loadTemplates();

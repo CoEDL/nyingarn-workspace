@@ -12,6 +12,8 @@ describe("AWS SES tests", () => {
             secretAccessKey: aws.awsSecretAccessKey,
             region: aws.region,
             mode: "testing",
+            source: configuration.api.ses.source,
+            replyTo: configuration.api.ses.replyTo,
         };
         ses = new SES(params);
     });

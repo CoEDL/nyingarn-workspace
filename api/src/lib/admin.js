@@ -341,12 +341,14 @@ export async function depositObjectIntoRepository({
         console.error(error);
     }
 
+    // NOTE: Disabled on purpose. If you want to remove the item from the workspace
+    //   datastore when it gets deposited into the repo then uncomment the following code.
     // delete the files from the workspace entry
-    io.emit(`deposit-${type}`, {
-        msg: `Removing the ${type} from the workspace`,
-        date: new Date(),
-    });
-    await objectWorkspace.removeObject();
+    // io.emit(`deposit-${type}`, {
+    //     msg: `Removing the ${type} from the workspace`,
+    //     date: new Date(),
+    // });
+    // await objectWorkspace.removeObject();
 
     // register the repository item in the database
     let item = await models.repoitem.findOrCreate({

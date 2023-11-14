@@ -39,13 +39,9 @@
                 </template>
                 <el-table-column prop="identifier" label="">
                     <template #default="scope">
-                        <router-link
-                            :to="scope.row.link"
-                            class="text-base"
-                            v-if="scope.row.publicationStatus !== 'published'"
-                            >{{ scope.row.identifier }}</router-link
-                        >
-                        <div v-else class="text-base">{{ scope.row.identifier }}</div>
+                        <router-link :to="scope.row.link" class="text-base">{{
+                            scope.row.identifier
+                        }}</router-link>
                     </template>
                 </el-table-column>
                 <el-table-column prop="status" label="Status" width="150">
@@ -56,11 +52,6 @@
                 <el-table-column label="Actions" width="240">
                     <template #default="scope">
                         <div class="flex flex-row space-x-1">
-                            <div v-if="data.isAdmin && scope.row.publicationStatus === 'published'">
-                                <el-button type="primary" @click="restoreCollection(scope.row)">
-                                    <i class="fa-solid fa-rotate-left"></i>&nbsp; restore
-                                </el-button>
-                            </div>
                             <div v-if="data.isAdmin">
                                 <el-button type="primary" @click="unlinkMe(scope.row)">
                                     <i class="fa-solid fa-unlink"></i>
@@ -169,18 +160,5 @@ async function unlinkMe(collection) {
         console.log(error);
         ElMessage.error(`Something went wrong detaching you from this collection`);
     }
-}
-async function restoreCollection(item) {
-    data.restoreLogs = [];
-    data.loading = true;
-    await $http.put({
-        route: `/admin/collections/${item.identifier}/restore`,
-        params: { clientId: $socket.id },
-        body: {},
-    });
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    data.restoreLogs = [];
-    data.loading = false;
-    loadCollections();
 }
 </script>

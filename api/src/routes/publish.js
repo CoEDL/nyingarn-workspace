@@ -2,9 +2,9 @@ import {
     demandAuthenticatedUser,
     requireCollectionAccess,
     requireItemAccess,
-    getStoreHandle,
-    authorisedUsersFile,
-} from "../common/index.js";
+} from "../common/middleware.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
+import { authorisedUsersFile } from "../common/index.js";
 import { listItemResources, markAllResourcesComplete } from "../lib/item.js";
 import lodashPkg from "lodash";
 const { uniqBy, uniq } = lodashPkg;

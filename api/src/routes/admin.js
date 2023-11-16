@@ -3,13 +3,11 @@ import {
     demandAuthenticatedUser,
     requireCollectionAccess,
     requireItemAccess,
-    getStoreHandle,
-    listObjects,
-    getLogger,
-} from "../common/index.js";
+} from "../common/middleware.js";
+import { getLogger } from "../common/logger.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
 
 // used in migrate backend function
-import { getS3Handle } from "../common/index.js";
 
 import { lookupItemByIdentifier } from "../lib/item.js";
 import { lookupCollectionByIdentifier } from "../lib/collection.js";

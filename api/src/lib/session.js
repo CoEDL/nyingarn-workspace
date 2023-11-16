@@ -1,5 +1,6 @@
 import models from "../models/index.js";
-import { loadConfiguration, generateToken } from "../common/index.js";
+import { loadConfiguration } from "../common/configuration.js";
+import { generateToken } from "../common/jwt.js";
 
 export async function getSession({ userId, sessionId }) {
     let where = {};

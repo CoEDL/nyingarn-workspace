@@ -1,4 +1,4 @@
-import { getLogger, logEvent } from "../common/index.js";
+import { getLogger, logEvent } from "../common/logger.js";
 import { jwtVerify, createRemoteJWKSet } from "jose";
 import { Issuer, generators } from "openid-client";
 import { createUser } from "../lib/user.js";

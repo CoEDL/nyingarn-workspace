@@ -1,25 +1,3 @@
-export { loadConfiguration, loadProfile, filterPrivateInformation } from "./configuration.js";
-export { getLogger, logEvent, log } from "./logger.js";
-export { submitTask, registerTask } from "./task.js";
-export { getS3Handle, getStoreHandle } from "./getS3Handle.js";
-export {
-    demandAuthenticatedUser,
-    demandAdministrator,
-    isUserAuthenticated,
-    requireCollectionAccess,
-    requireItemAccess,
-} from "./middleware.js";
-export { generateToken, verifyToken } from "./jwt.js";
-export {
-    host,
-    headers,
-    TestSetup,
-    generateLogs,
-    setupTestItem,
-    setupTestCollection,
-} from "./test-utils.js";
-export { indexItem, deleteItemFromIndex } from "./elastic-index.js";
-
 export const completedResources = ".completed-resources.json";
 export const resourceStatusFile = ".item-status.json";
 export const specialFiles = [

@@ -2,7 +2,7 @@ import { specialFiles } from "../common/index.js";
 import path from "path";
 import mime from "mime-types";
 import lodashPkg from "lodash";
-const { difference, uniqBy } = lodashPkg;
+const { uniqBy } = lodashPkg;
 
 // TODO: this code does not have tests
 export async function registerAllFiles({ crate, resources }) {

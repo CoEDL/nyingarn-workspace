@@ -1,4 +1,6 @@
-import { submitTask, getStoreHandle, log } from "../../common/index.js";
+import { submitTask } from "../../common/task.js";
+import { log } from "../../common/logger.js";
+import { getStoreHandle } from "../../common/getS3Handle.js";
 
 export async function authenticateTusRequest(req, res) {
     if (!req.session.user.upload) {

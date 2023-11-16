@@ -1,4 +1,6 @@
-import { demandAuthenticatedUser, getStoreHandle, loadProfile } from "../common/index.js";
+import { loadProfile } from "../common/configuration.js";
+import { demandAuthenticatedUser } from "../common/middleware.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
 import lodashPkg from "lodash";
 const { uniqBy, compact, flattenDeep } = lodashPkg;
 import models from "../models/index.js";

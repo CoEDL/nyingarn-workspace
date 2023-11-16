@@ -1,6 +1,6 @@
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
-import { getStoreHandle } from "../common/index.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
 
 export async function lookupCollectionByIdentifier({ identifier, userId }) {
     let clause = {

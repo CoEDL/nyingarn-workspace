@@ -1,12 +1,8 @@
 import models from "../models/index.js";
-import {
-    logEvent,
-    getLogger,
-    getStoreHandle,
-    demandAuthenticatedUser,
-    requireItemAccess,
-    resourceStatusFile,
-} from "../common/index.js";
+import { logEvent, getLogger } from "../common/logger.js";
+import { resourceStatusFile } from "../common/index.js";
+import { demandAuthenticatedUser, requireItemAccess } from "../common/middleware.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
 import lodashPkg from "lodash";
 const { groupBy, isEmpty } = lodashPkg;
 import {

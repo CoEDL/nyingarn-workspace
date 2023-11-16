@@ -1,10 +1,6 @@
-import {
-    listObjects,
-    getStoreHandle,
-    getS3Handle,
-    authorisedUsersFile,
-    getLogger,
-} from "../common/index.js";
+import { listObjects, authorisedUsersFile } from "../common/index.js";
+import { getLogger } from "../common/logger.js";
+import { getS3Handle, getStoreHandle } from "../common/getS3Handle.js";
 import { indexItem, deleteItemFromIndex } from "../common/elastic-index.js";
 import { lookupItemByIdentifier, linkItemToUser, getItems } from "../lib/item.js";
 import {

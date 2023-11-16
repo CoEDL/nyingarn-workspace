@@ -1,7 +1,9 @@
 import("regenerator-runtime");
 
 import models from "./src/models/index.js";
-import { demandAuthenticatedUser, loadConfiguration, log } from "./src/common/index.js";
+import { demandAuthenticatedUser } from "./src/common/middleware.js";
+import { loadConfiguration } from "./src/common/configuration.js";
+import { log } from "./src/common/logger.js";
 import { setupRoutes as setupBaseRoutes } from "./src/routes/base.js";
 import { setupRoutes as setupAdminRoutes } from "./src/routes/admin.js";
 import { setupRoutes as setupAuthRoutes } from "./src/routes/auth.js";

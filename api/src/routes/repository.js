@@ -2,11 +2,11 @@ import {
     demandAdministrator,
     demandAuthenticatedUser,
     isUserAuthenticated,
-    getLogger,
-    getStoreHandle,
-    indexItem,
-    loadProfile,
-} from "../common/index.js";
+} from "../common/middleware.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
+import { getLogger } from "../common/logger.js";
+import { loadProfile } from "../common/configuration.js";
+import { indexItem } from "../common/elastic-index.js";
 import { deleteItemFromRepository } from "../lib/admin.js";
 import { listItemResources, getItemResourceLink } from "../lib/item.js";
 import { getRepositoryItems } from "../lib/repository.js";

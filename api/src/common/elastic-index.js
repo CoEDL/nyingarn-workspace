@@ -1,4 +1,4 @@
-import { getStoreHandle } from "./index.js";
+import { getStoreHandle } from "./getS3Handle.js";
 import lodashPkg from "lodash";
 const { isArray, isString, isPlainObject, flattenDeep, compact } = lodashPkg;
 import fsExtraPkg from "fs-extra";

@@ -1,4 +1,5 @@
-import { logEvent, demandAdministrator, demandAuthenticatedUser } from "../common/index.js";
+import { demandAdministrator, demandAuthenticatedUser } from "../common/middleware.js";
+import { logEvent } from "../common/logger.js";
 import {
     getUser,
     getUsers,

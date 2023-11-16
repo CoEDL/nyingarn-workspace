@@ -1,13 +1,8 @@
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
-import {
-    loadConfiguration,
-    getS3Handle,
-    getStoreHandle,
-    resourceStatusFile,
-    specialFiles,
-    imageExtensions,
-} from "../common/index.js";
+import { resourceStatusFile, specialFiles, imageExtensions } from "../common/index.js";
+import { loadConfiguration } from "../common/configuration.js";
+import { getS3Handle, getStoreHandle } from "../common/getS3Handle.js";
 import { transformDocument } from "../lib/transform.js";
 import path from "path";
 import lodashPkg from "lodash";

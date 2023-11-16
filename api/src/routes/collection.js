@@ -1,11 +1,7 @@
 import models from "../models/index.js";
-import {
-    logEvent,
-    getLogger,
-    getStoreHandle,
-    demandAuthenticatedUser,
-    requireCollectionAccess,
-} from "../common/index.js";
+import { logEvent, getLogger } from "../common/logger.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
+import { requireCollectionAccess, demandAuthenticatedUser } from "../common/middleware.js";
 import lodashPkg from "lodash";
 const { groupBy } = lodashPkg;
 import {

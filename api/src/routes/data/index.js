@@ -1,10 +1,7 @@
-import {
-    getLogger,
-    requireItemAccess,
-    demandAuthenticatedUser,
-    getStoreHandle,
-    submitTask,
-} from "../../common/index.js";
+import { getLogger } from "../../common/logger.js";
+import { submitTask } from "../../common/task.js";
+import { getStoreHandle } from "../../common/getS3Handle.js";
+import { requireItemAccess, demandAuthenticatedUser } from "../../common/middleware.js";
 const log = getLogger();
 import { differenceInMinutes } from "date-fns";
 import { getItemResourceLink } from "../../lib/item.js";

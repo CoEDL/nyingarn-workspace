@@ -1,4 +1,6 @@
-import { listObjects, getStoreHandle, getLogger, authorisedUsersFile } from "../common/index.js";
+import { listObjects } from "../common/index.js";
+import { getLogger } from "../common/logger.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
 import { setRepositoryItemMetadata } from "./admin.js";
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";

@@ -1,7 +1,7 @@
-// these endpoints will only return data they are responsible for
-//
 import models from "../models/index.js";
-import { demandAuthenticatedUser, filterPrivateInformation } from "../common/index.js";
+import { demandAuthenticatedUser } from "../common/middleware.js";
+import { filterPrivateInformation } from "../common/configuration.js";
+
 export function setupRoutes(fastify, options, done) {
     fastify.get("/", () => ({}));
     fastify.get("/configuration", async (req) => {

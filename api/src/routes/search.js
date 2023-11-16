@@ -1,4 +1,4 @@
-import { demandAuthenticatedUser } from "../common/index.js";
+import { demandAuthenticatedUser } from "../common/middleware.js";
 import fetch from "cross-fetch";
 
 export function setupRoutes(fastify, options, done) {

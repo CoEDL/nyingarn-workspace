@@ -6,7 +6,6 @@ import {
     SendTemplatedEmailCommand,
 } from "@aws-sdk/client-ses";
 import lodashPkg from "lodash";
-const { groupBy } = lodashPkg;
 import fsExtraPkg from "fs-extra";
 const { readFile, writeFile, stat: fileStat } = fsExtraPkg;
 import path from "path";

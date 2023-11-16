@@ -1,4 +1,4 @@
-import { demandAuthenticatedUser, demandAdministrator } from "../common/index.js";
+import { demandAuthenticatedUser, demandAdministrator } from "../common/middleware.js";
 import { getLogs } from "../lib/logs.js";
 
 export function setupRoutes(fastify, options, done) {

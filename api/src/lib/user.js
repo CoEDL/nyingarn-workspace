@@ -1,5 +1,5 @@
 import models from "../models/index.js";
-import { loadConfiguration } from "../common/index.js";
+import { loadConfiguration } from "../common/configuration.js";
 import lodashPkg from "lodash";
 const { uniqBy } = lodashPkg;
 

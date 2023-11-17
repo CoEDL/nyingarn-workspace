@@ -1,9 +1,8 @@
-import { getLogger, loadConfiguration } from "/srv/api/src/common/index.js";
+import { loadConfiguration } from "/srv/api/src/common/configuration.js";
+import { getLogger } from "/srv/api/src/common/logger.js";
 import fsExtraPkg from "fs-extra";
-const { readdir } = fsExtraPkg;
+const { readdir, createReadStream, writeFile } = fsExtraPkg;
 import path from "path";
-import fsPackage from "fs-extra";
-const { createReadStream, writeFile, remove } = fsPackage;
 import { expandError } from "../common/errors.js";
 import FormData from "form-data";
 import fetch from "cross-fetch";

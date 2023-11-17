@@ -4,7 +4,7 @@ import path from "path";
 import { parse } from "csv-parse";
 import lodashPackage from "lodash";
 const { zipObject } = lodashPackage;
-import { log, loadConfiguration } from "/srv/api/src/common/index.js";
+import { loadConfiguration } from "/srv/api/src/common/configuration.js";
 import { expandError } from "../common/errors.js";
 import FormData from "form-data";
 import fetch from "cross-fetch";

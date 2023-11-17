@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import path from "path";
-import { log } from "/srv/api/src/common/index.js";
+import { log } from "/srv/api/src/common/logger.js";
 import { remove } from "fs-extra";
 import { thumbnailHeight } from "./index.js";
 

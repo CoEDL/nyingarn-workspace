@@ -14,7 +14,9 @@ import {
     removeOverlappingNewContent,
 } from "./tasks/index.js";
 import { updateResourceStatus } from "/srv/api/src/lib/item.js";
-import { log, getStoreHandle, resourceStatusFile } from "/srv/api/src/common/index.js";
+import { resourceStatusFile } from "/srv/api/src/common/index.js";
+import { getStoreHandle } from "/srv/api/src/common/getS3Handle.js";
+import { log } from "/srv/api/src/common/logger.js";
 import { updateTask, deleteTask } from "./common/task.js";
 import lodashPkg from "lodash";
 const { isEmpty } = lodashPkg;

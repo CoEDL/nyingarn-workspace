@@ -10,7 +10,7 @@ import {
     pathExists,
     copy,
 } from "fs-extra";
-import { log, loadConfiguration } from "/srv/api/src/common/index.js";
+import { loadConfiguration } from "/srv/api/src/common/configuration.js";
 import FormData from "form-data";
 import fetch from "cross-fetch";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";

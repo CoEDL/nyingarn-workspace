@@ -1,5 +1,7 @@
 import path from "path";
-import { log, loadConfiguration, getStoreHandle } from "/srv/api/src/common/index.js";
+import { log } from "/srv/api/src/common/logger.js";
+import { loadConfiguration } from "/srv/api/src/common/configuration.js";
+import { getStoreHandle } from "/srv/api/src/common/getS3Handle.js";
 import { Textract } from "../common/textract.js";
 import fsExtraPkg from "fs-extra";
 const { readFile, writeFile, writeJSON, stat, readdir } = fsExtraPkg;

@@ -1,5 +1,6 @@
 import path from "path";
-import { log, getStoreHandle } from "/srv/api/src/common/index.js";
+import { log } from "/srv/api/src/common/logger.js";
+import { getStoreHandle } from "/srv/api/src/common/getS3Handle.js";
 import fsExtraPkg from "fs-extra";
 const { ensureDir, remove, pathExists, readdir } = fsExtraPkg;
 import { walk } from "@root/walk";

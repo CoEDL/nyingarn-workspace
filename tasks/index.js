@@ -1,5 +1,5 @@
 import rabbit from "foo-foo-mq";
-import { loadConfiguration } from "/srv/api/src/common/index.js";
+import { loadConfiguration } from "/srv/api/src/common/configuration.js";
 import { setupHandlers } from "./src/routing.js";
 import models from "/srv/api/src/models/index.js";
 setupHandlers({ rabbit });

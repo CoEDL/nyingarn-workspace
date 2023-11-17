@@ -1,6 +1,5 @@
 import lodashPkg from "lodash";
 const { groupBy, orderBy, flattenDeep, compact } = lodashPkg;
-import path from "path";
 
 export class Textract {
     constructor({ resource, document }) {

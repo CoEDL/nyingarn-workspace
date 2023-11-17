@@ -1,17 +1,12 @@
 import { assembleTeiDocument } from "./assemble-tei.js";
-import {
-    __processTeiTranscriptionXMLProcessor,
-} from "./transcription-processing";
-import {
-    validateWithSchematron,
-    makeScratchCopy
-} from "./testing";
+import { __processTeiTranscriptionXMLProcessor } from "./transcription-processing";
+import { validateWithSchematron, makeScratchCopy } from "./testing";
 import path from "path";
 import { ensureDir, copy, remove, writeFile, writeJSON, readdir } from "fs-extra";
 
 describe(`Test assembling a TEI file from the stub files`, () => {
     it(`Should be able to assemble a simple TEI file from the stub files`, async () => {
-        const identifier = "test"; 
+        const identifier = "test";
         const directory = "/tmp/test";
         await ensureDir(directory);
         // let store = await getStoreHandle({ id: identifier, className: "item" });
@@ -42,7 +37,7 @@ describe(`Test assembling a TEI file from the stub files`, () => {
     });
 
     it(`Should be able to perform a lossless round trip; splitting a file, reconstituting the parts, re-splitting, and re-reconstituting`, async () => {
-        // In order to test a full round trip, the input TEI document is first split, 
+        // In order to test a full round trip, the input TEI document is first split,
         // then reassembled, and then split and reassembled a second time.
         let identifier = "structured";
         let resource = "structured-tei.xml";
@@ -52,7 +47,7 @@ describe(`Test assembling a TEI file from the stub files`, () => {
         let sourceFile = path.join(directory, resource);
         let sourceSnapshot = path.join(directory, "original-tei.xml");
         await copy(sourceFile, sourceSnapshot);
-        // split and reassemble the source file 
+        // split and reassemble the source file
         await __processTeiTranscriptionXMLProcessor({
             directory,
             identifier,
@@ -62,7 +57,7 @@ describe(`Test assembling a TEI file from the stub files`, () => {
         // overwrite the source file with the reassembled file, and then split and reassemble that
         let reassembledFile = path.join(directory, identifier + "-tei-complete.xml");
         await copy(reassembledFile, sourceFile);
-        // split and reassemble the previously reassembled file 
+        // split and reassemble the previously reassembled file
         await __processTeiTranscriptionXMLProcessor({
             directory,
             identifier,
@@ -72,21 +67,20 @@ describe(`Test assembling a TEI file from the stub files`, () => {
         // now compare the original source file (sourceSnapshot) with the final result (reassembledFile)
         const instance = [sourceSnapshot, reassembledFile];
         const schema = path.join(directory, "schematron.xml");
-        await validateWithSchematron({instance, schema});
+        await validateWithSchematron({ instance, schema });
         // Clean up
         await remove(directory);
     });
 });
 
-
 function sampleDocument(identifier, page) {
-   // NB some ingestion pathways produce <surface> documents containing <line> elements,
-   // which represent a typographical line of text, with no other semantics.
-   // These <line> elements are only valid inside a <surface>, in an "embedded" transcription.
-   // See https://tei-c.org/release/doc/tei-p5-doc/en/html/PH.html#PHZLAB
-   // In the reconstituted TEI file we need to convert these to regular transcriptional elements.
-   // A sequence of <line> elements is replaced with an <ab> (anonymous block), containing 
-   // the content of each <line>, separated by an <lb/>
+    // NB some ingestion pathways produce <surface> documents containing <line> elements,
+    // which represent a typographical line of text, with no other semantics.
+    // These <line> elements are only valid inside a <surface>, in an "embedded" transcription.
+    // See https://tei-c.org/release/doc/tei-p5-doc/en/html/PH.html#PHZLAB
+    // In the reconstituted TEI file we need to convert these to regular transcriptional elements.
+    // A sequence of <line> elements is replaced with an <ab> (anonymous block), containing
+    // the content of each <line>, separated by an <lb/>
     return `<surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="${identifier}-${page}">
     <line>blah blah 1</line>
     <line>blah blah 2</line>

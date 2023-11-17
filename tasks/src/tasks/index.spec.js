@@ -7,7 +7,7 @@ import {
     cleanupAfterFailure,
     syncToBucket,
 } from "./index.js";
-import { getStoreHandle, getS3Handle } from "/srv/api/src/common/index.js";
+import { getStoreHandle, getS3Handle } from "/srv/api/src/common/getS3Handle.js";
 import Chance from "chance";
 const chance = new Chance();
 

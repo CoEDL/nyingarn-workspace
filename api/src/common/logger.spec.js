@@ -1,5 +1,5 @@
 import "regenerator-runtime";
-import { logEvent } from "./logger";
+import { logEvent } from "./logger.js";
 import models from "../models";
 describe("Logger tests", () => {
     it("should be able to log an event to the logs table", async () => {

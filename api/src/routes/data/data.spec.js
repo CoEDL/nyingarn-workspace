@@ -1,5 +1,5 @@
 import "regenerator-runtime";
-import { loadConfiguration } from "../../common";
+import { loadConfiguration } from "../../common/configuration.js";
 import { groupFilesByResource } from "../../lib/item";
 
 describe("Test data processing functions", () => {

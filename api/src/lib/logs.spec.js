@@ -1,7 +1,7 @@
 require("regenerator-runtime");
 import models from "../models";
 const { getLogs } = require("./logs");
-import { generateLogs } from "../common";
+import { generateLogs } from "../common/test-utils.js";
 
 describe("Log management tests", () => {
     beforeAll(async () => {

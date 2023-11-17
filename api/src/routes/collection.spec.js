@@ -3,7 +3,8 @@ import { deleteCollection, createCollection } from "../lib/collection";
 import { createSession } from "../lib/session";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";
-import { getStoreHandle, TestSetup, headers, host } from "../common";
+import { TestSetup, headers, host } from "../common/test-utils.js";
+import { getStoreHandle } from "../common/getS3Handle";
 import models from "../models";
 
 describe("Collection management route tests", () => {

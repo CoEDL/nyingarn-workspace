@@ -427,17 +427,28 @@ export async function setRepositoryItemMetadata({ configuration, item, store }) 
 
     try {
         let licence = crate.getEntity("LICENCE.md");
-        if (!licence) throw new Error(`no licence found - setting to closed`);
-        let openAccess = false;
-        let accessControlList = null;
-        let accessNarrative = null;
-        let reviewDate = null;
-        if (licence?.access?.[0]?.["@id"]?.match(/OpenAccess/)) {
-            openAccess = true;
+        let openAccess;
+        let accessControlList;
+        let accessNarrative;
+        let reviewDate;
+        if (!licence) {
+            console.log(`no licence found - setting to closed`);
+            openAccess = false;
+            accessControlList = null;
+            accessNarrative = null;
+            reviewDate = null;
         } else {
-            accessNarrative = licence.description.join("\n");
-            reviewDate = licence?.reviewDate?.[0];
-            accessControlList = await store.getJSON({ target: authorisedUsersFile });
+            openAccess = false;
+            accessControlList = null;
+            accessNarrative = null;
+            reviewDate = null;
+            if (licence?.access?.[0]?.["@id"]?.match(/OpenAccess/)) {
+                openAccess = true;
+            } else {
+                accessNarrative = licence.description.join("\n");
+                reviewDate = licence?.reviewDate?.[0];
+                accessControlList = await store.getJSON({ target: authorisedUsersFile });
+            }
         }
 
         item.openAccess = openAccess;

@@ -4,13 +4,13 @@ import Chance from "chance";
 const chance = Chance();
 import fetch from "cross-fetch";
 import {
-    getStoreHandle,
     TestSetup,
     headers,
     host,
     setupTestItem,
     setupTestCollection,
-} from "../common/index.js";
+} from "../common/test-utils.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
 import models from "../models/index.js";
 import { ROCrate } from "ro-crate";
 

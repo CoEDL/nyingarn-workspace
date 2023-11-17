@@ -1,9 +1,9 @@
 require("regenerator-runtime");
 import { generateToken, verifyToken } from "./jwt";
-import { loadConfiguration } from "../common";
+import { loadConfiguration } from "../common/configuration.js";
 const chance = require("chance").Chance();
 import MockDate from "mockdate";
-import { TestSetup } from "../common";
+import { TestSetup } from "../common/test-utils.js";
 
 describe("JWT tests", () => {
     let configuration, users, userEmail, adminEmail, bucket;

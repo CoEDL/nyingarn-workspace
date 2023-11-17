@@ -8,7 +8,8 @@ import {
     toggleCollectionVisibility,
 } from "./collection";
 const chance = require("chance").Chance();
-import { getStoreHandle, TestSetup } from "../common";
+import { TestSetup } from "../common/test-utils.js";
+import { getStoreHandle } from "../common/getS3Handle";
 
 describe("Collection management tests", () => {
     let configuration, users, userEmail, adminEmail, bucket;

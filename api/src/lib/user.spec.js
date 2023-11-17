@@ -8,7 +8,7 @@ import {
     createAllowedUserStubAccounts,
 } from "./user";
 const chance = require("chance").Chance();
-import { TestSetup } from "../common";
+import { TestSetup } from "../common/test-utils.js";
 
 describe("User management tests", () => {
     let configuration, users, userEmail, adminEmail, bucket;
@@ -60,7 +60,9 @@ describe("User management tests", () => {
     it("should be able to set up a normal user account", async () => {
         //  create stub account
         let email = chance.email();
-        let users = await createAllowedUserStubAccounts({ emails: [email] });
+        let users = await createAllowedUserStubAccounts({
+            accounts: [{ email, givenName: chance.word(), familyName: chance.word() }],
+        });
 
         //  create user
         let user = await createUser({
@@ -128,14 +130,18 @@ describe("User management tests", () => {
     });
     it("should be able to create user stub accounts", async () => {
         let emails = [chance.email()];
-        let users = await createAllowedUserStubAccounts({ emails });
+        let users = await createAllowedUserStubAccounts({
+            accounts: [{ email: emails[0], givenName: chance.word(), familyName: chance.word() }],
+        });
         expect(users.length).toEqual(1);
         expect(emails).toEqual([users[0].email]);
         for (let user of users) await user.destroy();
 
         let email = chance.email();
         emails = [email, email];
-        users = await createAllowedUserStubAccounts({ emails });
+        users = await createAllowedUserStubAccounts({
+            accounts: [{ email: emails[1], givenName: chance.word(), familyName: chance.word() }],
+        });
         expect(users.length).toEqual(1);
     });
 });

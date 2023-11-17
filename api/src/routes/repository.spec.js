@@ -3,16 +3,9 @@ import { createSession } from "../lib/session.js";
 import Chance from "chance";
 const chance = Chance();
 import fetch from "cross-fetch";
-import {
-    loadConfiguration,
-    getStoreHandle,
-    TestSetup,
-    headers,
-    host,
-    setupTestItem,
-    setupTestCollection,
-    getS3Handle,
-} from "../common/index.js";
+import { TestSetup, headers, host, setupTestItem } from "../common/test-utils.js";
+import { getStoreHandle, getS3Handle } from "../common/getS3Handle.js";
+import { loadConfiguration } from "../common/configuration.js";
 import models from "../models/index.js";
 import { importRepositoryContentFromStorageIntoTheDb } from "../lib/repository.js";
 import { publishObject } from "../lib/admin.js";
@@ -78,13 +71,11 @@ describe("Repository route tests", () => {
             node: configuration.api.services.elastic.host,
         });
         let document = await client.get({
-            index: "metadata",
+            index: "manuscripts",
             id: `/item/${item.identifier}`,
         });
         expect(document._source).toMatchObject({
-            "@id": "./",
-            "@type": ["Dataset"],
-            name: ["My Research Object Crate"],
+            name: "My Research Object Crate",
         });
 
         await models.repoitem.destroy({ where: { identifier } });
@@ -119,13 +110,11 @@ describe("Repository route tests", () => {
             node: configuration.api.services.elastic.host,
         });
         let document = await client.get({
-            index: "metadata",
+            index: "manuscripts",
             id: `/item/${identifier}`,
         });
         expect(document._source).toMatchObject({
-            "@id": "./",
-            "@type": ["Dataset"],
-            name: ["My Research Object Crate"],
+            name: "My Research Object Crate",
         });
 
         await models.repoitem.destroy({ where: { identifier } });

@@ -3,14 +3,9 @@ import { deleteItem, createItem, updateResourceStatus } from "../lib/item";
 import { createSession } from "../lib/session";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";
-import {
-    getStoreHandle,
-    TestSetup,
-    setupTestItem,
-    headers,
-    host,
-    resourceStatusFile,
-} from "../common";
+import { TestSetup, setupTestItem, headers, host } from "../common/test-utils.js";
+import { resourceStatusFile } from "../common/index.js";
+import { getStoreHandle } from "../common/getS3Handle";
 import models from "../models";
 
 describe("Item management route tests", () => {

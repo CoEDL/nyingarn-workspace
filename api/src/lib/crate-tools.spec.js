@@ -1,7 +1,8 @@
 require("regenerator-runtime");
 import { registerAllFiles } from "./crate-tools.js";
 const chance = require("chance").Chance();
-import { getStoreHandle, TestSetup, setupTestItem } from "../common";
+import { TestSetup, setupTestItem } from "../common/test-utils.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
 import { ROCrate } from "ro-crate";
 import models from "../models";
 
@@ -35,7 +36,7 @@ describe("Crate tools tests", () => {
         let resources = await store.listResources();
 
         await registerAllFiles({ crate, resources });
-        expect(crate.rootDataset.hasPart.length).toBe(4);
+        expect(crate.rootDataset.hasPart.length).toBe(5);
 
         await models.item.destroy({ where: { identifier } });
         await store.removeObject();

@@ -20,7 +20,9 @@ import {
     saveItemTranscription,
 } from "./item";
 const chance = require("chance").Chance();
-import { getStoreHandle, TestSetup, setupTestItem, resourceStatusFile } from "../common";
+import { resourceStatusFile } from "../common/index.js";
+import { TestSetup, setupTestItem } from "../common/test-utils.js";
+import { getStoreHandle } from "../common/getS3Handle";
 import models from "../models";
 
 describe("Item management tests", () => {

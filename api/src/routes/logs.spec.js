@@ -3,7 +3,7 @@ import models from "../models";
 import { createUser } from "../lib/user";
 import { createSession } from "../lib/session";
 import fetch from "node-fetch";
-import { TestSetup, headers, generateLogs, host } from "../common";
+import { TestSetup, headers, generateLogs, host } from "../common/test-utils.js";
 const chance = require("chance").Chance();
 
 describe("Log management tests", () => {

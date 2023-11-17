@@ -1,9 +1,10 @@
 import "regenerator-runtime";
 import fetch from "node-fetch";
-import { createUser } from "../lib/user";
-import { loadConfiguration, generateToken } from "../common";
+import { generateToken } from "../common/jwt.js";
+import { loadConfiguration } from "../common/configuration.js";
 const chance = require("chance").Chance();
-import { getStoreHandle, TestSetup, headers, host } from "../common";
+import { TestSetup, host } from "../common/test-utils.js";
+import { getStoreHandle } from "../common/getS3Handle";
 
 describe("Test loading the configuration", () => {
     test("it should be able to load the default configuration for the environment", async () => {

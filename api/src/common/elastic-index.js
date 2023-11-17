@@ -43,26 +43,27 @@ export async function indexItem({ location = "workspace", configuration, item, c
 
     // index the item metadata and content
     const indexIdentifier = `/${item.type}/${item.identifier}`;
+    let store = await getStoreHandle({ location, id: item.identifier, type: "item" });
+    let teiText;
     try {
-        let store = await getStoreHandle({ location, id: item.identifier, type: "item" });
         const teiFileContent = await store.get({
             target: `${item.identifier}-tei-complete.xml`,
         });
-        let teiText = await extractText({
+        teiText = await extractText({
             configuration,
             content: teiFileContent,
         });
-        const document = assembleIndexRecord({ crate });
-        document.text = teiText;
-        await client.index({
-            index: "manuscripts",
-            id: indexIdentifier,
-            document,
-        });
-        // console.log(document);
     } catch (error) {
-        console.log(error);
+        teiText = "";
     }
+    const document = assembleIndexRecord({ crate });
+    document.text = teiText;
+    await client.index({
+        index: "manuscripts",
+        id: indexIdentifier,
+        document,
+    });
+    // console.log(document);
     // setup the entities index
     try {
         // await client.indices.delete({ index: "entities" });

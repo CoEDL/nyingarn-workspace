@@ -1,13 +1,10 @@
 require("regenerator-runtime");
 import Chance from "chance";
 const chance = Chance();
-import {
-    loadConfiguration,
-    getStoreHandle,
-    getS3Handle,
-    TestSetup,
-    indexItem,
-} from "../common/index.js";
+import { TestSetup, teiDocument } from "../common/test-utils.js";
+import { indexItem } from "../common/elastic-index.js";
+import { getStoreHandle, getS3Handle } from "../common/getS3Handle.js";
+import { loadConfiguration } from "../common/configuration.js";
 import models from "../models/index.js";
 import { importRepositoryContentFromStorageIntoTheDb, getRepositoryItems } from "./repository.js";
 import { Client } from "@elastic/elasticsearch";
@@ -77,6 +74,10 @@ describe("Repository management tests", () => {
             location: "repository",
         });
         await storeItem.createObject();
+        await storeItem.put({
+            target: `${identifier}-tei-complete.xml`,
+            content: teiDocument(identifier),
+        });
 
         let crate = await storeItem.getJSON({ target: "ro-crate-metadata.json" });
 
@@ -104,7 +105,9 @@ describe("Repository management tests", () => {
 
         await indexItem({
             item: { identifier, type: "item" },
+            location: "repository",
             crate,
+            configuration,
         });
 
         const client = new Client({
@@ -112,15 +115,11 @@ describe("Repository management tests", () => {
         });
 
         let document = await client.get({
-            index: "metadata",
+            index: "manuscripts",
             id: `/item/${identifier}`,
         });
         expect(document._source).toMatchObject({
-            "@id": "./",
-            "@type": ["Dataset"],
-            name: ["crate"],
-            author: [{}],
-            thingo: [{}],
+            name: "crate",
         });
         let person = await client.get({
             index: "entities",
@@ -559,6 +558,8 @@ describe("Repository management tests", () => {
         await indexItem({
             item: { identifier, type: "item" },
             crate,
+            configuration,
+            location: "repository",
         });
     });
 });

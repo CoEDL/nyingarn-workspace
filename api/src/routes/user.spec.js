@@ -4,7 +4,7 @@ import models from "../models";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";
 import { createSession } from "../lib/session";
-import { TestSetup, headers, host } from "../common";
+import { TestSetup, headers, host } from "../common/test-utils.js";
 
 describe("User management route tests as admin", () => {
     let users, userEmail, adminEmail;
@@ -48,7 +48,15 @@ describe("User management route tests as admin", () => {
         let response = await fetch(`${host}/admin/users`, {
             method: "POST",
             headers: headers(session),
-            body: JSON.stringify({ emails: [email] }),
+            body: JSON.stringify({
+                accounts: [
+                    {
+                        email: chance.email(),
+                        givenName: chance.word(),
+                        familyName: chance.word,
+                    },
+                ],
+            }),
         });
         expect(response.status).toEqual(200);
 

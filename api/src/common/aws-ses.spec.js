@@ -28,13 +28,14 @@ describe("AWS SES tests", () => {
         let templates = await ses.listTemplates();
         templates.TemplatesMetadata = templates.TemplatesMetadata.filter(
             (t) => !t.Name.match(/production-/)
-        );
+        ).filter((t) => !t.Name.match(/development-/));
         expect(templates.TemplatesMetadata).toEqual([]);
+
         await ses.loadTemplates();
         templates = await ses.listTemplates();
         templates.TemplatesMetadata = templates.TemplatesMetadata.filter(
             (t) => !t.Name.match(/production-/)
-        );
+        ).filter((t) => !t.Name.match(/development-/));
         expect(templates.TemplatesMetadata).toMatchObject([{ Name: "testing-application-login" }]);
     });
     it("should be able to send a templated email", async () => {

@@ -1,18 +1,17 @@
 require("regenerator-runtime");
 import { createSession } from "../lib/session.js";
-import { deleteItem } from "../lib/item.js";
 import Chance from "chance";
 const chance = Chance();
 import fetch from "cross-fetch";
 import {
-    getStoreHandle,
     TestSetup,
     headers,
     host,
     setupTestItem,
     setupTestCollection,
-    loadConfiguration,
-} from "../common/index.js";
+} from "../common/test-utils.js";
+import { getStoreHandle } from "../common/getS3Handle.js";
+import { loadConfiguration } from "../common/configuration.js";
 import { publishObject } from "../lib/admin.js";
 import models from "../models/index.js";
 
@@ -313,7 +312,7 @@ describe("Admin route tests", () => {
         expect(await repositoryObject.exists()).toBeTrue;
         let resources = await repositoryObject.listResources();
         resources = resources.map((r) => r.Key);
-        expect(resources.length).toEqual(9);
+        expect(resources.length).toEqual(10);
 
         await models.item.destroy({ where: { identifier } });
         await workspaceObject.removeObject();

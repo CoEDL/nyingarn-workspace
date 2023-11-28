@@ -51,6 +51,7 @@ export async function runTask(msg) {
                 await createWebFormats({ directory, identifier, resource });
                 await syncToBucket({ directory, identifier });
                 await runTextractOCR({ directory, identifier, resource });
+                await updateStatusFile({ identifier, resource });
                 break;
             case "process-image-without-ocr":
                 log.info(
@@ -60,10 +61,12 @@ export async function runTask(msg) {
                 await syncToBucket({ directory, identifier });
                 await createWebFormats({ directory, identifier, resource });
                 await syncToBucket({ directory, identifier });
+                await updateStatusFile({ identifier, resource });
                 break;
             case "extract-table":
                 log.info(`Running 'extract-table' task for '${identifier}' in ${directory}`);
                 await runTextractOCR({ task: "table", directory, identifier, resource });
+                await updateStatusFile({ identifier, resource });
                 break;
             case "assemble-tei-document":
                 log.info(
@@ -98,19 +101,6 @@ export async function runTask(msg) {
                 status: "done",
             });
         }
-
-        const resourceName = resource.split(".")[0];
-        let store = await getStoreHandle({ id: identifier, type: "item" });
-        let statusFile = await store.getJSON({ target: resourceStatusFile });
-        let status = statusFile.resources[resourceName];
-        if (isEmpty(status)) {
-            statusFile = await updateResourceStatus({
-                identifier,
-                resource: resourceName,
-                statusFile,
-            });
-        }
-        await store.put({ target: resourceStatusFile, json: statusFile });
     } catch (error) {
         log.error(`runTask ERROR: Task in ${directory}: ${error.message}`);
         console.log(error);
@@ -137,4 +127,19 @@ export async function runTask(msg) {
         }
     }
     msg.ack();
+}
+
+async function updateStatusFile({ identifier, resource }) {
+    const resourceName = resource.split(".")[0];
+    let store = await getStoreHandle({ id: identifier, type: "item" });
+    let statusFile = await store.getJSON({ target: resourceStatusFile });
+    let status = statusFile.resources[resourceName];
+    if (isEmpty(status)) {
+        statusFile = await updateResourceStatus({
+            identifier,
+            resource: resourceName,
+            statusFile,
+        });
+    }
+    await store.put({ target: resourceStatusFile, json: statusFile });
 }

@@ -66,7 +66,7 @@ async function assembleTeiHandler(req) {
     const store = await getStoreHandle({ identifier, type: "item" });
     let fileStat = await store.stat({ path: `${identifier}-tei-complete.xml` });
     const now = new Date();
-    if (differenceInMinutes(now, fileStat.LastModified) < 30) {
+    if (differenceInMinutes(now, fileStat.LastModified) < 10) {
         let link = await getItemResourceLink({
             identifier,
             resource: `${identifier}-tei-complete.xml`,

@@ -7,7 +7,7 @@
                     :overwrite="data.overwrite"
                     @upload-started="data.showProcessingStatus = false"
                     @file-uploaded="processUploadedImage"
-                    @file-removed="fileRemoved"
+                    @done="done"
                 />
                 <div class="flex flex-col space-y-2 px-2" v-if="!data.showProcessingStatus">
                     <image-help-component :identifier="identifier" />
@@ -61,7 +61,7 @@ onBeforeUnmount(() => {
     removeTusFingerprints();
 });
 
-function fileRemoved(file) {
+function done() {
     data.showProcessingStatus = false;
     data.taskIds = [];
 }

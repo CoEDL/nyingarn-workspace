@@ -21,10 +21,10 @@ const $http = inject("$http");
 const $route = useRoute();
 const dashboard = ref(null);
 
-const emit = defineEmits(["upload-started", "file-uploaded", "file-removed"]);
+const emit = defineEmits(["upload-started", "file-uploaded", "done"]);
+let uppy;
 const data = reactive({
     specialFileNameChecks: ["-digivol.csv", "-tei.xml"],
-    uppy: undefined,
     path: undefined,
     overwrite: true,
 });
@@ -32,9 +32,9 @@ const data = reactive({
 watch(
     () => $route.params.identifier,
     () => {
-        if (data.uppy) {
-            data.uppy.close();
-            data.uppy = undefined;
+        if (uppy) {
+            uppy.close();
+            uppy = undefined;
         }
         if ($route.params.identifier) init();
     }
@@ -43,9 +43,9 @@ onMounted(() => {
     init();
 });
 onBeforeUnmount(() => {
-    if (data.uppy) {
-        data.uppy.close();
-        data.uppy = undefined;
+    if (uppy) {
+        uppy.close();
+        uppy = undefined;
     }
 });
 
@@ -54,8 +54,8 @@ async function init() {
     if (!data.path) return;
     const identifier = $route.params.identifier;
     const configuration = store.state.configuration;
-    let uppy = new Uppy({
-        debug: true,
+    let uploader = new Uppy({
+        debug: false,
         autoProceed: false,
 
         onBeforeFileAdded: (file) => {
@@ -102,11 +102,11 @@ async function init() {
             return true;
         },
     });
-    uppy.use(Dashboard, {
+    uploader.use(Dashboard, {
         target: dashboard.value,
         inline: true,
     });
-    uppy.use(Tus, {
+    uploader.use(Tus, {
         endpoint: configuration.ui.tusEndpoint,
         retryDelays: null,
         chunkSize: 64 * 1024 * 1024,
@@ -114,16 +114,17 @@ async function init() {
             authorization: $http.getHeaders().authorization,
         },
     });
-    uppy.on("upload", () => {
+    uploader.on("upload", () => {
         emit("upload-started");
     });
-    uppy.on("upload-success", (data) => {
+    uploader.on("upload-success", (data) => {
         emit("file-uploaded", { itemId: $route.params.identifier, name: data.name });
     });
-    uppy.on("file-removed", ({ data }) => {
-        emit("file-removed", { resource: data.name });
+    uploader.on("dashboard:modal-closed", () => {
+        emit("done");
     });
-    data.uppy = uppy;
+    uppy = uploader;
+    uploader.getPlugin("Dashboard").openModal();
 }
 
 async function getItemPath() {

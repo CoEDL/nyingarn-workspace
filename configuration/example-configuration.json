@@ -4,9 +4,7 @@
         "tusEndpoint": "http://tus.nyingarn.net/files/",
         "termsAndConditionsOfUse": "https://nyingarn.net/nyingarn-workspace-terms-and-conditions-of-use/",
         "notices": {
-            "workspace": [
-                "The Nyingarn Platform workspace will be unavailable on the 11th of December, 2023 between 10am and 4pm. "
-            ],
+            "workspace": [],
             "repository": []
         },
         "itemName": {

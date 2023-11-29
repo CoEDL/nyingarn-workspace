@@ -231,45 +231,49 @@ async function getItemThumbnailsHandler(req, res) {
 }
 
 async function getItemResourceDataHandler(req) {
-    const item = await getItem({ identifier: req.params.identifier });
-    const user = await isUserAuthenticated(req);
-
-    if (!item.openAccess) {
-        if (!user?.email && !item?.accessControlList?.includes(user?.email)) {
-            return {
-                total: 0,
-                thumbnails: [],
-                message: {
-                    code: "Access Denied",
-                    reason: !user?.email
-                        ? "The content of this item cannot be shown because you are not logged in."
-                        : "The content of this item cannot be shown because you are not authorised to see it.",
-                },
-            };
-        }
-    }
-
-    let store = await getStoreHandle({
-        id: req.params.identifier,
-        type: "item",
-        location: "repository",
-    });
-    let data = await Promise.all([
-        getItemResourceLink({
-            identifier: req.params.identifier,
-            resource: `${req.params.resourceId}.jpg`,
-            location: "repository",
-        }),
-        store.get({ target: `${req.params.resourceId}.tei.xml` }),
-    ]);
-
-    let document;
     try {
-        document = await transformDocument({ document: data[1] });
+        const item = await getItem({ identifier: req.params.identifier });
+        const user = await isUserAuthenticated(req);
+
+        if (!item.openAccess) {
+            if (!user?.email && !item?.accessControlList?.includes(user?.email)) {
+                return {
+                    total: 0,
+                    thumbnails: [],
+                    message: {
+                        code: "Access Denied",
+                        reason: !user?.email
+                            ? "The content of this item cannot be shown because you are not logged in."
+                            : "The content of this item cannot be shown because you are not authorised to see it.",
+                    },
+                };
+            }
+        }
+
+        let store = await getStoreHandle({
+            id: req.params.identifier,
+            type: "item",
+            location: "repository",
+        });
+        let data = await Promise.all([
+            getItemResourceLink({
+                identifier: req.params.identifier,
+                resource: `${req.params.resourceId}.webp`,
+                location: "repository",
+            }),
+            store.get({ target: `${req.params.resourceId}.tei.xml` }),
+        ]);
+
+        let document;
+        try {
+            document = await transformDocument({ document: data[1] });
+        } catch (error) {
+            console.log(error);
+        }
+        return { imageUrl: data[0], document };
     } catch (error) {
-        console.log(error);
+        return { imageUrl: "", document: "" };
     }
-    return { imageUrl: data[0], document };
 }
 
 async function getRepositoryLookupContentHandler(req) {

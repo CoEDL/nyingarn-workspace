@@ -312,7 +312,7 @@ async function getResourceStatus() {
     });
     if (response.status === 200) {
         response = await response.json();
-        data.status = response.status;
+        data.status = response?.status ?? false;
     }
 }
 function deleteTranscription() {

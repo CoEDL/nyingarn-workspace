@@ -36,6 +36,9 @@ const $router = useRouter();
 const $http = inject("$http");
 
 const props = defineProps({
+    pageId: {
+        type: String,
+    },
     itemId: {
         type: String,
         required: true,

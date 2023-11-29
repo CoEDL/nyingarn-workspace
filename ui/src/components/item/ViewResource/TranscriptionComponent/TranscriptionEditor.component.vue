@@ -302,7 +302,7 @@ function redo() {
 async function markComplete(status) {
     let response = await $http.put({
         route: `/items/${data.identifier}/resources/${data.resource}/status`,
-        params: { complete: status },
+        params: { complete: status ?? false },
     });
     await getResourceStatus();
 }
@@ -328,19 +328,23 @@ function format() {
 }
 async function save() {
     data.saving = true;
-    let document = view.state.doc.toString();
-    let response = await $http.put({
-        route: `/items/${data.identifier}/resources/${data.resource}/saveTranscription`,
-        body: { datafiles: props.data, document },
-    });
+    try {
+        let document = view.state.doc.toString();
+        let response = await $http.put({
+            route: `/items/${data.identifier}/resources/${data.resource}/saveTranscription`,
+            body: { datafiles: props.data, document },
+        });
 
-    data.saved = true;
-    data.saving = false;
-    format();
+        data.saved = true;
+        data.saving = false;
+        format();
 
-    setTimeout(() => {
-        data.saved = false;
-    }, 1500);
+        setTimeout(() => {
+            data.saved = false;
+        }, 1500);
+    } catch (error) {
+        // swallow errors - likely this is because the user navigated away
+    }
 }
 async function reprocessPageAsTable() {
     const { identifier, resource } = $route.params;

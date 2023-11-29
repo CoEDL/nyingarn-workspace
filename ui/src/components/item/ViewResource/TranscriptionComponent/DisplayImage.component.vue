@@ -94,13 +94,18 @@ async function getImageUrls() {
         }
     }
     if (data.src) {
-        data.zoomist = new Zoomist("#image", {
-            fill: "contain",
-            maxRatio: 10,
-            slider: true,
-            zoomer: true,
-            height: window.innerHeight - 150,
-        });
+        try {
+            data.zoomist = new Zoomist("#image", {
+                fill: "contain",
+                maxRatio: 10,
+                slider: true,
+                zoomer: true,
+                height: window.innerHeight - 150,
+            });
+        } catch (error) {
+            // swallow errors - likely the user     navigated away from resource
+            //  whilst this was still initialising
+        }
     }
 }
 function update() {

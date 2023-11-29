@@ -1,6 +1,14 @@
 <template>
     <div class="flex h-screen">
         <div class="w-full m-auto">
+            <div
+                v-if="$store.state.configuration.ui?.notices?.workspace?.length"
+                class="flex flex-col space-y-2 text-center m-10 p-10 bg-yellow-200 rounded text-xl"
+            >
+                <div v-for="notice of $store.state.configuration.ui.notices.workspace">
+                    {{ notice }}
+                </div>
+            </div>
             <div class="flex flex-row">
                 <div
                     class="w-1/2 text-right pr-4 text-gray-600 text-4xl flex flex-col justify-center"

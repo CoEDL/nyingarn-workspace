@@ -3,9 +3,15 @@
         "siteName": "Nyingarn Platform workspace",
         "tusEndpoint": "http://tus.nyingarn.net/files/",
         "termsAndConditionsOfUse": "https://nyingarn.net/nyingarn-workspace-terms-and-conditions-of-use/",
+        "notices": {
+            "workspace": [
+                "The Nyingarn Platform workspace will be unavailable on the 11th of December, 2023 between 10am and 4pm. "
+            ],
+            "repository": []
+        },
         "itemName": {
-            "help": "Must consist only of alphanumeric characters and must start with a letter.",
-            "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9]+$"
+            "help": "Must start with a letter and can have the following characters only: a-z, A-Z, 0-9 and _.",
+            "checkNameStructure": "^[a-z,A-Z][a-z,A-Z,0-9,_]+$"
         },
         "collectionName": {
             "help": "Must start with a letter and can have the following characters only: a-z, A-Z, 0-9 and _.",

@@ -514,7 +514,7 @@
 			<p:pipe step="dump" port="source"/>
 		</p:output>
 		<p:option name="href" required="true"/>
-		<p:store>
+		<p:store indent="true">
 			<p:with-option name="href" select="$href"/>
 		</p:store>
 	</p:declare-step>

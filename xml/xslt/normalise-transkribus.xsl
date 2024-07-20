@@ -12,15 +12,32 @@
 	The <lb> elements have @facs attributes whose referents are not present in the file, and @n attributes which are pointless.
 	Transkribus creates <hi> elements to record some typographical properties, but some of the typographical properties
 	recorded are bogus, e.g. fontSize:0.0
+	
+	Some other Transkribus files have a different convention:
+	The <pb> elements use @facs to point to <facsimile> elements, which each contain a single <graphic> child element
+	whose @url attributes point to the image files.
     -->
-
+    
     <!-- trim the file extension from the @xml:id -->
+<!--
     <xsl:template match="pb" mode="transkribus">
-	<pb xml:id="{replace(@xml:id, '(.*)\..+', '$1')}"/>
+        <xsl:choose>
+            <xsl:when test="@facs">
+                <xsl:variable name="url" select="id(@facs => substring-after('#'))/graphic[1]/@url"/> 
+                <pb xml:id="{replace($url, '(.*)\..+', '$1')}"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <pb xml:id="{replace(@xml:id, '(.*)\..+', '$1')}"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+-->
+    <xsl:template match="pb" mode="transkribus">
+    	<pb xml:id="{replace(@xml:id, '(.*)\..+', '$1')}"/>
     </xsl:template>
 
-    <!-- discard lb @facs and @n attributes because they point nowhere and say nothing useful -->
-    <xsl:template match="lb/@facs | lb/@n" mode="transkribus"/>
+    <!-- discard @facs and lb/@n attributes because they point nowhere and say nothing useful -->
+    <xsl:template match="@facs | lb/@n" mode="transkribus"/>
 
     <!-- deal with hi/@rend, which may have some limited value (e.g. in the case of underlined text) -->
     <xsl:template match="hi/@rend" mode="transkribus">

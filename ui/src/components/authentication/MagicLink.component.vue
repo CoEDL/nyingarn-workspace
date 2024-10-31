@@ -5,7 +5,7 @@
         </div>
         <div class="flex flex-col flex-grow">
             <div class="flex flex-row flex-grow space-x-2">
-                <el-input v-model="data.email" placeholder="Login with your email"></el-input>
+                <el-input v-model="data.email" v-on:keyup.enter="login" placeholder="Login with your email"></el-input>
                 <div class="my-auto">
                     <el-button class="text-3xl" @click="login" size="large" :disabled="!data.email">
                         <i class="fa-solid fa-arrow-right"></i>

@@ -37,7 +37,7 @@
 
 <script setup>
 import MagicLinkComponent from "./authentication/MagicLink.component.vue";
-import { defineAsyncComponent, reactive, computed } from "vue";
+import { defineAsyncComponent, reactive, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 const $store = useStore();
 
@@ -45,15 +45,24 @@ const OauthLoginComponent = defineAsyncComponent(() =>
     import("./authentication/OauthLogin.component.vue")
 );
 
-const data = reactive({
-    siteName: $store.state.configuration.ui.siteName,
-    loginProviders: [
-        { name: "aaf", icon: "aaf.png", text: "Login with the AAF" },
-        { name: "google", icon: "google.png", text: "Login with Google" },
-    ],
-});
 let enableGoogleLogin = computed(() =>
     $store.state.configuration.authentication.includes("google")
 );
 let enableAafLogin = computed(() => $store.state.configuration.authentication.includes("aaf"));
+
+
+const data = reactive({
+    siteName: $store.state.configuration.ui.siteName,
+    loginProviders: []
+});
+
+onMounted(() => {
+    if ($store.state.configuration.authentication.includes("aaf")) {
+        data.loginProviders.push({ name: "aaf", icon: "aaf.png", text: "Login with the AAF" })
+    }
+    if ($store.state.configuration.authentication.includes("google")) {
+        data.loginProviders.push({ name: "google", icon: "google.png", text: "Login with Google" })
+    }
+})
+
 </script>

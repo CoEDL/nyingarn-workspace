@@ -25,6 +25,10 @@ export async function indexItem({ location = "workspace", configuration, item, c
         // await client.indices.delete({ index: "manuscripts" });
         await client.indices.get({ index: "manuscripts" });
     } catch (error) {
+        await client.synonyms.putSynonym({
+            id: "nyingarn-synonyms",
+            synonyms_set: []
+        });
         await client.indices.create({
             index: "manuscripts",
             mappings: {
@@ -32,12 +36,49 @@ export async function indexItem({ location = "workspace", configuration, item, c
                     location: {
                         type: "geo_shape",
                     },
-                    // languageSuggest: {
-                    //     type: "completion",
-                    // },
+                    text: {
+                        type: "text",
+                        search_analyzer: "nyingarn_synonym"
+                    },
+                    phoneticText: {
+                        type: "text",
+                        analyzer: "nyingarn_phonetic"
+                    }
                 },
             },
-            settings: { "index.mapping.ignore_malformed": true },
+            settings: {
+                index: {
+                    analysis: {
+                        analyzer: {
+                            nyingarn_synonym: {
+                                tokenizer: "standard",
+                                filter: [
+                                    "lowercase",
+                                    "synonym_filter"
+                                ]
+                            },
+                            nyingarn_phonetic: {
+                                tokenizer: "standard",
+                                filter: [
+                                    "lowercase",
+                                    "synonym_filter",
+                                    "nyingarn-phonetic"
+                                ]
+                            },
+                        },
+                        filter: {
+                            synonym_filter: {
+                                type: "synonym_graph",
+                                synonyms_set: "nyingarn-synonyms",
+                                updateable: true
+                            }
+                        }
+                    },
+                    mapping: {
+                        ignore_malformed: true
+                    }
+                }
+            },
         });
     }
 
@@ -58,6 +99,7 @@ export async function indexItem({ location = "workspace", configuration, item, c
     }
     const document = assembleIndexRecord({ crate });
     document.text = teiText;
+    document.phoneticText = teiText;
     await client.index({
         index: "manuscripts",
         id: indexIdentifier,

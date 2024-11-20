@@ -14,6 +14,7 @@ import AdminAwaitingReviewComponent from "./components/admin/AwaitingReview.comp
 import AdminWorkspaceItemsComponent from "./components/admin/WorkspaceItems.component.vue";
 import AdminRepositoryItemsComponent from "./components/admin/RepositoryItems.component.vue";
 import AdminOperationsComponent from "./components/admin/AdminOperations.component.vue";
+import AdminSearchConfig from "./components/admin/AdminSearchConfig.component.vue";
 import HTTPService from "./http.service.js";
 import { createRouter, createWebHistory } from "vue-router";
 const routes = [
@@ -150,6 +151,12 @@ const routes = [
                         path: "operations",
                         component: AdminOperationsComponent,
                         meta: { name: "administrator operations" },
+                    },
+                    {
+                        name: "admin.searchConfig",
+                        path: "search-config",
+                        component: AdminSearchConfig,
+                        meta: { name: "administrator search config" },
                     },
                 ],
             },

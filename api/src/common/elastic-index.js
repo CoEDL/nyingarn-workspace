@@ -61,7 +61,6 @@ export async function indexItem({ location = "workspace", configuration, item, c
                                 tokenizer: "standard",
                                 filter: [
                                     "lowercase",
-                                    "synonym_filter",
                                     "nyingarn-phonetic"
                                 ]
                             },

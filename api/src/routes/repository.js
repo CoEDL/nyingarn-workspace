@@ -137,14 +137,22 @@ async function postRepositorySearchHandler(req) {
         );
     }
     if (req.body.text) {
+        let textQueries = [];
+        textQueries.push(
+            esb.matchQuery("name", req.body.text).fuzziness("AUTO"),
+            esb.matchQuery("description", req.body.text).fuzziness("AUTO"),
+        );
+        if (req.body.is_phonetic) {
+            textQueries.push(
+                esb.matchQuery("phoneticText", req.body.text).fuzziness("AUTO"),
+            );
+        } else {
+            textQueries.push(
+                esb.matchQuery("text", req.body.text).fuzziness("AUTO"),
+            );
+        }
         mustMatchQuery.push(
-            esb
-                .boolQuery()
-                .should([
-                    esb.matchQuery("name", req.body.text).fuzziness("AUTO"),
-                    esb.matchQuery("description", req.body.text).fuzziness("AUTO"),
-                    esb.matchQuery("text", req.body.text).fuzziness("AUTO"),
-                ])
+            esb.boolQuery().should(textQueries)
         );
     }
     let esbQuery = esb.requestBodySearch().query(esb.boolQuery().must(mustMatchQuery)).size(1000);

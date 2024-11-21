@@ -75,6 +75,7 @@ export default {
                     icon: "fa-solid fa-landmark",
                 },
                 { name: "Operations", path: "/admin/operations", icon: "fa-solid fa-cog" },
+                { name: "Search config", path: "/admin/search-config", icon: "fa-solid fa-ranking-star" },
             ],
         };
     },

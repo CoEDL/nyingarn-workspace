@@ -42,6 +42,13 @@
                 />
             </el-form-item>
             <el-form-item>
+                <el-checkbox
+                    v-model="data.form.is_phonetic"
+                    size="large"
+                    @blur="search"
+                    @change="search">phonetic search</el-checkbox>
+            </el-form-item>
+            <el-form-item>
                 <el-button @click="search" size="large">
                     <i class="fa-solid fa-magnifying-glass fa-xl"></i>
                 </el-button>
@@ -114,7 +121,7 @@
 
 <script setup>
 import { ref, reactive, inject, onMounted } from "vue";
-import { ElAutocomplete, ElForm, ElFormItem, ElButton } from "element-plus";
+import { ElAutocomplete, ElForm, ElFormItem, ElCheckbox, ElButton } from "element-plus";
 import pluralize from "pluralize";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";

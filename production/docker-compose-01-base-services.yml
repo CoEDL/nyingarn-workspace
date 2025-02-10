@@ -105,7 +105,7 @@ services:
             - 15672:15672
 
     elastic:
-        image: elasticsearch:8.4.1
+        image: elasticsearch:8.16.0
         hostname: elastic
         environment:
             - discovery.type=single-node
@@ -125,3 +125,8 @@ services:
             - /srv/workspace-data/elastic-data:/usr/share/elasticsearch/data:delegated
         ports:
             - 9200:9200
+        command: >
+            /bin/sh -c "
+            ./bin/elasticsearch-plugin remove nyingarn-phonetic-search;
+            ./bin/elasticsearch-plugin install https://github.com/r-tae/nyingarn-phonetic-search/releases/download/v1.0.0/nyingarn-phonetic-search-1.0-SNAPSHOT.zip;
+            /usr/local/bin/docker-entrypoint.sh"

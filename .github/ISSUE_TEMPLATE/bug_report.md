@@ -3,7 +3,7 @@ name: Data Ingestion / Processing Bug Report
 about: Template to report data ingestion / processing problems
 title: ''
 labels: bug
-assignees: marcolarosa
+assignees: r-tae
 
 ---
 

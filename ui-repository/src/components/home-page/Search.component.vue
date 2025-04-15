@@ -124,20 +124,23 @@
                     </div>
                 </div>
             </div>
-            <div v-if="data.showResultsList" v-for="(doc, idx) of data.documents" :key="doc._id + idx" style="display:block;border-bottom:gray 1px solid;padding:1em;cursor:pointer;" @click="loadItem({path: doc._id})">
-                <div class="text-base">
-                    {{ doc.fields.identifier[0] }}
-                </div>
-                <div class="text-lg font-medium">
-                    {{ doc.fields.name[0] }}
-                </div>
-                <div v-if="doc.highlight" v-for="(text, idx) of doc.highlight.text" class="text-sm font-medium">
-                        …<span v-html="text"></span>…
-                </div>
-                <div v-if="doc.highlight" v-for="(text, idx) of doc.highlight.phoneticText" class="text-sm font-medium">
-                        …<span v-html="text"></span>…
+            <div class="flex flex-col">
+                <div v-if="data.showResultsList" v-for="(doc, idx) of data.documents" :key="doc._id + idx" style="display:block;border-bottom:gray 1px solid;padding:1em;cursor:pointer;" @click="loadItem({path: doc._id})">
+                    <div class="text-base">
+                        {{ doc.fields.identifier[0] }}
+                    </div>
+                    <div class="text-lg font-medium">
+                        {{ doc.fields.name[0] }}
+                    </div>
+                    <div v-if="doc.highlight" v-for="(text, idx) of doc.highlight.text" class="text-sm font-medium">
+                            …<span v-html="text"></span>…
+                    </div>
+                    <div v-if="doc.highlight" v-for="(text, idx) of doc.highlight.phoneticText" class="text-sm font-medium">
+                            …<span v-html="text"></span>…
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </template>
@@ -213,15 +216,21 @@ async function search() {
         },
     });
     // Don't show the search results list until the user has explicitly searched for something
-    if (Object.keys({...data.form}).length !== 0) {
-        data.showResultsList = true;
-    }
+    data.showResultsList = !isFormEmpty(data.form);
     if (response.status === 200) {
         response = await response.json();
         data.documents = response.hits;
         data.documentsTotal = response.hits.length;
         assembleFeatures();
     }
+}
+
+function isFormEmpty(form) {
+    let nonEmptyFields = Object.entries(form).filter(([_k, v]) => {
+        return v !== ""
+    })
+
+    return nonEmptyFields.length === 0;
 }
 
 async function lookup(query, cb) {

@@ -58,62 +58,85 @@
             {{ data.documentsTotal }} {{ pluralize("manuscript", data.documentsTotal) }}
             {{ pluralize("were", data.documentsTotal) }} found matching your search.
         </div>
-        <MapboxMap
-            class="home-page-map-style m-auto"
-            :access-token="mapboxToken"
-            :map-style="mapboxStyle"
-            :bounds="bounds"
-            @mb-created="(mapboxInstance) => (map = mapboxInstance)"
-        >
-            <div v-for="(feature, idx) of data.features" :key="feature.properties.path + idx">
-                <MapboxMarker
-                    :lng-lat="feature.geometry.coordinates"
-                    :color="markerColor(feature.properties)"
-                    :popup="{ ...popupOptions, data: feature.properties }"
-                    @mb-open="showDescription"
+        <el-checkbox
+                    v-model="data.mapFilter"
+                    size="large"
+                    @blur="search"
+                    @change="search">Search map area only</el-checkbox>
+        <div class="flex flex-row items-start">
+            <div>
+                <MapboxMap
+                    class="home-page-map-style m-auto"
+                    :access-token="mapboxToken"
+                    :map-style="mapboxStyle"
+                    :bounds="bounds"
+                    @mb-created="(mapboxInstance) => (map = mapboxInstance)"
                 >
-                    <template v-slot:popup>
-                        <div
-                            class="flex flex-col space-y-1 p-2 cursor-pointer"
-                            @click="loadItem(feature.properties)"
+                    <div v-for="(feature, idx) of data.features" :key="feature.properties.path + idx">
+                        <MapboxMarker
+                            :lng-lat="feature.geometry.coordinates"
+                            :color="markerColor(feature.properties)"
+                            :popup="{ ...popupOptions, data: feature.properties }"
+                            @mb-open="showDescription"
                         >
-                            <div class="text-base">
-                                {{ feature.properties.identifier[0] }}
-                            </div>
-                            <div class="text-lg font-medium">
-                                {{ feature.properties.name[0] }}
-                            </div>
-                            <div
-                                class="text-base italic"
-                                :class="{
-                                    'text-green-700': feature.properties.access[0].match(/open/i),
-                                    'text-red-700': !feature.properties.access[0].match(/open/i),
-                                }"
-                            >
-                                {{ feature.properties.access[0] }}
-                            </div>
-                        </div>
-                    </template>
-                </MapboxMarker>
+                            <template v-slot:popup>
+                                <div
+                                    class="flex flex-col space-y-1 p-2 cursor-pointer"
+                                    @click="loadItem(feature.properties)"
+                                >
+                                    <div class="text-base">
+                                        {{ feature.properties.identifier[0] }}
+                                    </div>
+                                    <div class="text-lg font-medium">
+                                        {{ feature.properties.name[0] }}
+                                    </div>
+                                    <div
+                                        class="text-base italic"
+                                        :class="{
+                                            'text-green-700': feature.properties.access[0].match(/open/i),
+                                            'text-red-700': !feature.properties.access[0].match(/open/i),
+                                        }"
+                                    >
+                                        {{ feature.properties.access[0] }}
+                                    </div>
+                                </div>
+                            </template>
+                        </MapboxMarker>
+                    </div>
+                </MapboxMap>
+                <div class="flex flex-col space-y-1 p-4 md:p-0">
+                    <div>Legend:</div>
+                    <div>
+                        <i class="fa-solid fa-location-dot text-green-600"></i>&nbsp;The item is open access
+                        subject to agreeing to the terms of use.
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-location-dot text-red-700"></i>&nbsp;The item is restricted
+                        access.
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-location-dot"></i>
+                        &nbsp;The location has been defined as an area so a marker has been placed in the
+                        approximate centre of that area.
+                    </div>
+                    <div class="text-lg text-center font-bold">
+                        Please note that locations are general and not precise points on the map.
+                    </div>
+                </div>
             </div>
-        </MapboxMap>
-        <div class="flex flex-col space-y-1 p-4 md:p-0">
-            <div>Legend:</div>
-            <div>
-                <i class="fa-solid fa-location-dot text-green-600"></i>&nbsp;The item is open access
-                subject to agreeing to the terms of use.
-            </div>
-            <div>
-                <i class="fa-solid fa-location-dot text-red-700"></i>&nbsp;The item is restricted
-                access.
-            </div>
-            <div>
-                <i class="fa-solid fa-location-dot"></i>
-                &nbsp;The location has been defined as an area so a marker has been placed in the
-                approximate centre of that area.
-            </div>
-            <div class="text-lg text-center font-bold">
-                Please note that locations are general and not precise points on the map.
+            <div v-if="data.showResultsList" v-for="(doc, idx) of data.documents" :key="doc._id + idx" style="display:block;border-bottom:gray 1px solid;padding:1em;cursor:pointer;" @click="loadItem({path: doc._id})">
+                <div class="text-base">
+                    {{ doc.fields.identifier[0] }}
+                </div>
+                <div class="text-lg font-medium">
+                    {{ doc.fields.name[0] }}
+                </div>
+                <div v-if="doc.highlight" v-for="(text, idx) of doc.highlight.text" class="text-sm font-medium">
+                        …<span v-html="text"></span>…
+                </div>
+                <div v-if="doc.highlight" v-for="(text, idx) of doc.highlight.phoneticText" class="text-sm font-medium">
+                        …<span v-html="text"></span>…
+                </div>
             </div>
         </div>
     </div>
@@ -148,6 +171,8 @@ const popupOptions = {
 
 const data = reactive({
     form: {},
+    mapFilter: false,
+    showResultsList: false,
     documents: [],
     documentsTotal: 0,
     debouncedSearch: debounce(search, 400),
@@ -164,23 +189,33 @@ async function init() {
 }
 
 function reset() {
-    map.value.fitBounds(bounds);
     data.form = {};
+    data.showResultsList = false;
     search();
 }
 
 async function search() {
     const bounds = map.value.getBounds();
+    let boundingBox;
+    // TODO: replace with value from '[ ] map filter' checkbox
+    if (data.mapFilter) {
+        boundingBox = {
+            topLeft: bounds.getNorthWest().wrap(),
+            bottomRight: bounds.getSouthEast().wrap(),
+        }
+    }
+    console.log()
     let response = await $http.post({
         route: "/repository/search",
         body: {
             ...data.form,
-            boundingBox: {
-                topLeft: bounds.getNorthWest().wrap(),
-                bottomRight: bounds.getSouthEast().wrap(),
-            },
+            boundingBox: boundingBox,
         },
     });
+    // Don't show the search results list until the user has explicitly searched for something
+    if (Object.keys({...data.form}).length !== 0) {
+        data.showResultsList = true;
+    }
     if (response.status === 200) {
         response = await response.json();
         data.documents = response.hits;
@@ -237,14 +272,14 @@ function showDescription(event, data) {
     // console.log(event.target._content, data);
 }
 
-async function loadItem(item) {
-    $router.push({ path: item.path });
+async function loadItem({ path }) {
+    $router.push({ path: path });
 }
 </script>
 
 <style>
 .home-page-map-style {
-    width: calc(100vw - 0.1 * 100vw);
+    width: 100%;
     height: 750px;
 }
 .mapboxgl-popup-close-button {
@@ -252,5 +287,8 @@ async function loadItem(item) {
 }
 .mapboxgl-popup-content {
     background-color: #f1f5f9;
+}
+em {
+    background-color: yellow;
 }
 </style>

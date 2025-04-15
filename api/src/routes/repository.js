@@ -112,20 +112,24 @@ export async function getRepositoryLookupLanguageHandler(req) {
 async function postRepositorySearchHandler(req) {
     const bounds = req.body.boundingBox;
 
-    let mustMatchQuery = [
-        esb
-            .geoShapeQuery("location")
-            .shape(
-                esb
-                    .geoShape()
-                    .type("envelope")
-                    .coordinates([
-                        [bounds.topLeft.lng, bounds.topLeft.lat],
-                        [bounds.bottomRight.lng, bounds.bottomRight.lat],
-                    ])
-            )
-            .relation("intersects"),
-    ];
+    let mustMatchQuery = [];
+    if (bounds) {
+        
+        mustMatchQuery.push(
+            esb
+                .geoShapeQuery("location")
+                .shape(
+                    esb
+                        .geoShape()
+                        .type("envelope")
+                        .coordinates([
+                            [bounds.topLeft.lng, bounds.topLeft.lat],
+                            [bounds.bottomRight.lng, bounds.bottomRight.lat],
+                        ])
+                )
+                .relation("intersects"),
+            );
+    }
     if (req.body.language) {
         mustMatchQuery.push(
             esb
@@ -166,6 +170,12 @@ async function postRepositorySearchHandler(req) {
         ...esbQuery.toJSON(),
         fields: ["name", "description", "identifier", "location", "access"],
         _source: false,
+        highlight: {
+            fields: {
+                "text": {},
+                "phoneticText": {}
+            }
+        }
     };
     let result = await client.search(query);
     return result.hits;

@@ -1,5 +1,10 @@
 <template>
     <div>
+        <!-- <el-button type="primary" @click="saveCrate(data)">
+            Save
+        </el-button>
+        <crate-editor :crate="data.crate" :mode="mode" @ready="ready" @update:crate="ready"></crate-editor> -->
+
         <describo-crate-builder
             :style="{ height: metadataPanelHeight }"
             class="overflow-scroll"
@@ -36,6 +41,9 @@
 </template>
 
 <script setup>
+import {CrateEditor} from 'crate-o';
+import mode from 'ro-crate-modes/modes/base.json';
+
 import { reactive, onMounted, onBeforeUnmount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage, ElDialog, ElButton } from "element-plus";
@@ -47,6 +55,10 @@ const $router = useRouter();
 const $http = inject("$http");
 const lookup = new Lookup({ $http });
 
+
+function ready() {
+    console.log('updated')
+}
 let props = defineProps({
     identifier: {
         type: String,

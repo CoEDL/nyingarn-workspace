@@ -1,9 +1,7 @@
 <template>
     <div class="flex flex-col space-y-4" v-loading="data.loading">
         <div class="p-8 bg-red-200 rounded">
-            <div>
-                <textarea v-model="data.synonyms" placeholder="add synonyms"></textarea>
-            </div>
+            <textarea class="w-full h-[760px]" v-model="data.synonyms" placeholder="add synonyms"></textarea>
         </div>
         <div>
             <el-button @click="setSynonyms">set synonyms</el-button>
@@ -23,7 +21,6 @@ let data = reactive({
 
 onMounted(async () => {
     await getSynonyms();
-    // ({view} = setupCodeMirror());
 });
 
 onBeforeUnmount(async () => {

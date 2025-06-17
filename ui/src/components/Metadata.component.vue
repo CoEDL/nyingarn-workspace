@@ -2,10 +2,12 @@
     <div>
         <!-- <el-button type="primary" @click="saveCrate(data)">
             Save
-        </el-button>
-        <crate-editor :crate="data.crate" :mode="mode" @ready="ready" @update:crate="ready"></crate-editor> -->
+        </el-button> -->
+        <div :style="{ height: metadataPanelHeight }" class="overflow-scroll">
+            <crate-editor :crate="data.crate" :mode="mode" @ready="ready" @update:crate="ready"></crate-editor>
+        </div>
 
-        <describo-crate-builder
+        <!-- <describo-crate-builder
             :style="{ height: metadataPanelHeight }"
             class="overflow-scroll"
             :crate="data.crate"
@@ -24,7 +26,7 @@
             @warning="handleWarnings"
             @navigation="updateRoute"
         >
-        </describo-crate-builder>
+        </describo-crate-builder> -->
         <el-dialog v-model="data.dialogVisible" title="Metadata error" width="50%">
             <div class="flex flex-col items-center space-y-4">
                 <div>
@@ -43,6 +45,7 @@
 <script setup>
 import {CrateEditor} from 'crate-o';
 import mode from 'ro-crate-modes/modes/base.json';
+import 'crate-o/css'
 
 import { reactive, onMounted, onBeforeUnmount, inject, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
@@ -85,7 +88,7 @@ onBeforeUnmount(() => {
     data.routeWatcher();
 });
 const metadataPanelHeight = computed(() => {
-    return `${window.innerHeight - 140}px`;
+    return `${window.innerHeight - 150}px`;
 });
 
 function updateRoute(entity) {

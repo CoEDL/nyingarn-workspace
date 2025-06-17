@@ -185,6 +185,16 @@ async function getDescriboROCrate(req) {
     let crate, filesAdded;
     try {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        let context = crate["@context"]
+        crate["@context"] = context.map((val, index) => {
+            if (val["@vocab"]) {
+                return { '@vocab': 'https://schema.org/' }
+            } else if (val === "http://purl.archive.org/language-data-commons/context.json") {
+                return "https://purl.archive.org/language-data-commons/context.json"
+            } else {
+                return val
+            }
+        })
     } catch (error) {
         crate = createDefaultROCrateFile({ name: identifier });
     }

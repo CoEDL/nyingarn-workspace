@@ -166,12 +166,13 @@ export function assembleIndexRecord({ crate }) {
 // TODO this method does not have tests
 export function extractGeography({ crate }) {
     let entities = [];
-    for (let entity of crate.entities()) {
+    for (let entity of [...crate.rootDataset.location, ...crate.rootDataset.contentLocation]) {
         if (entity["@type"].includes("GeoShape") || entity["@type"].includes("GeoCoordinates")) {
             entities.push(entity);
         }
     }
 
+    // TODO: handle wkt by converting it to geojson
     let coordinates = flattenDeep(entities.map((e) => JSON.parse(e.geojson).geometry)).map(
         (feature) => {
             feature.coordinates = parseValuesAsFloat(feature.coordinates);
@@ -181,7 +182,6 @@ export function extractGeography({ crate }) {
             return feature;
         }
     );
-    // console.log("2", JSON.stringify(coordinates, null, 2));
     coordinates = compact(coordinates);
     return coordinates;
 

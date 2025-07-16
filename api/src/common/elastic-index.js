@@ -172,14 +172,6 @@ export function extractGeography({ crate }) {
         }
     }
 
-    entities.push({
-        "@id": "test",
-        "@type": ["GeoShape"],
-        name: "aaa",
-        geojson: [
-            '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[58.07810783386231,29.095852076791065],[58.07810783386231,-19.12303093039881],[11.671857833862305,-19.12303093039881],[11.671857833862305,29.095852076791065]]]}}',
-        ],
-    });
     let coordinates = flattenDeep(entities.map((e) => JSON.parse(e.geojson).geometry)).map(
         (feature) => {
             feature.coordinates = parseValuesAsFloat(feature.coordinates);

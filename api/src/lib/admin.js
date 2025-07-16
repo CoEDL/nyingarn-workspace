@@ -70,7 +70,7 @@ export async function importItemsFromStorageIntoTheDb({ user, configuration }) {
         throw new Error(`User must be an admin`);
     }
     let items =
-        (await listObjects({ prefix: `/${configuration.api.domain}/workspace/item` })) || [];
+        (await listObjects({ prefix: `/${configuration.api.storageRoot}/workspace/item` })) || [];
     items = items.map((item) => ({ identifier: item.id }));
 
     // insert any items found on the backend storage not already in the DB
@@ -93,7 +93,7 @@ export async function importCollectionsFromStorageIntoTheDb({ user, configuratio
         throw new Error(`User must be an admin`);
     }
     let collections =
-        (await listObjects({ prefix: `/${configuration.api.domain}/workspace/collection` })) || [];
+        (await listObjects({ prefix: `/${configuration.api.storageRoot}/workspace/collection` })) || [];
     collections = collections.map((collection) => ({ identifier: collection.id }));
 
     // insert any collections found on the backend storage not already in the DB

@@ -9,6 +9,9 @@ export async function loadConfiguration() {
             ? "/srv/configuration/development-configuration.json"
             : "/srv/configuration/configuration.json";
     configuration = await readJSON(configuration);
+    if (!"storageRoot" in configuration.api) {
+        configuration.api.storageRoot = configuration.api.domain;
+    }
     return configuration;
 }
 

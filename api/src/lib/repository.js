@@ -39,7 +39,7 @@ export async function importRepositoryContentFromStorageIntoTheDb({ user, config
 
     // insert any items found on the backend storage not already in the DB
     let items =
-        (await listObjects({ prefix: `/${configuration.api.domain}/repository/item` })) || [];
+        (await listObjects({ prefix: `/${configuration.api.storageRoot}/repository/item` })) || [];
     items = items.map((item) => ({ identifier: item.id, type: "item" }));
     for (let item of items) {
         let store = await getStoreHandle({ ...item, location: "repository" });
@@ -57,7 +57,7 @@ export async function importRepositoryContentFromStorageIntoTheDb({ user, config
 
     // insert any collections found on the backend storage not already in the DB
     let collections =
-        (await listObjects({ prefix: `/${configuration.api.domain}/repository/collection` })) || [];
+        (await listObjects({ prefix: `/${configuration.api.storageRoot}/repository/collection` })) || [];
     collections = collections.map((item) => ({ identifier: item.id, type: "collection" }));
     for (let collection of collections) {
         await models.repoitem.findOrCreate({

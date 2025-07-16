@@ -41,7 +41,7 @@ export async function getStoreHandle({ id, identifier, type, location = "workspa
     return new Store({
         id,
         type,
-        prefix: `${configuration.api.domain}/${location}`,
+        prefix: `${configuration.api.storageRoot}/${location}`,
         credentials,
     });
 }

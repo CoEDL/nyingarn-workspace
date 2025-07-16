@@ -73,12 +73,23 @@
                     @mb-created="(mapboxInstance) => (map = mapboxInstance)"
                 >
                     <div v-for="(feature, idx) of data.features" :key="feature.properties.path + idx">
+                         <!-- TODO: Add zoom buttons -->
                         <MapboxMarker
                             :lng-lat="feature.geometry.coordinates"
-                            :color="markerColor(feature.properties)"
                             :popup="{ ...popupOptions, data: feature.properties }"
                             @mb-open="showDescription"
                         >
+                            <div slot:marker class="flex flex-col">
+                                <!-- Layer a completely white pin underneath to fill in the otherwise-hollow dot -->
+                                <div class="grid grid-cols-1 grid-rows-1">
+                                    <i class="row-span-full col-span-full fa-solid fa-location-pin text-[white]" data-fa-transform="grow-15"></i>
+                                    <i v-if="feature.properties.access[0].match(/open/i)" class="row-span-full col-span-full z-1 fa-solid fa-location-dot text-green-700" data-fa-transform="grow-15"></i>
+                                    <i v-else class="row-span-full col-span-full z-1 fa-solid fa-location-pin-lock text-red-700" data-fa-transform="grow-15"></i>
+                                </div>
+                                <!-- shadow -->
+                                <div class="mt-[-3px] ml-[-20%] w-4 h-4 opacity-50 blur-sm rounded-[50%] scale-x-100 scale-y-[0.2] bg-slate-900"></div>
+                            </div>
+
                             <template v-slot:popup>
                                 <div
                                     class="flex flex-col space-y-1 p-2 cursor-pointer"
@@ -111,13 +122,8 @@
                         subject to agreeing to the terms of use.
                     </div>
                     <div>
-                        <i class="fa-solid fa-location-dot text-red-700"></i>&nbsp;The item is restricted
+                        <i class="fa-solid fa-location-pin-lock text-red-700"></i>&nbsp;The item is restricted
                         access.
-                    </div>
-                    <div>
-                        <i class="fa-solid fa-location-dot"></i>
-                        &nbsp;The location has been defined as an area so a marker has been placed in the
-                        approximate centre of that area.
                     </div>
                     <div class="text-lg text-center font-bold">
                         Please note that locations are general and not precise points on the map.
@@ -265,16 +271,6 @@ function assembleFeatures() {
     });
     features = flattenDeep(features);
     data.features = [...features];
-}
-
-function markerColor(properties) {
-    if (properties.centroid) {
-        return "black";
-    } else if (properties.access[0].match(/open/i)) {
-        return "green";
-    } else if (!properties.access[0].match(/open/i)) {
-        return "red";
-    }
 }
 
 function showDescription(event, data) {

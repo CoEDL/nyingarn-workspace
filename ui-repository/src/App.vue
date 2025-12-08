@@ -3,17 +3,26 @@
         <NavbarComponent />
         <router-view />
     </div>
+    <TermsAndConditionsComponent
+        :visible="showTerms"
+        @accept="handleTermsAccept"
+    />
 </template>
 
 <script setup>
+import { ref } from "vue";
 import NavbarComponent from "./components/Navbar.component.vue";
-import { tokenSessionKey, getLocalStorage } from "./storage.js";
-import { useStore } from "vuex";
-const $store = useStore();
+import TermsAndConditionsComponent from "./components/TermsAndConditions.component.vue";
+import {
+    termsAcceptedKey,
+    getLocalStorage,
+    putLocalStorage,
+} from "./storage.js";
 
-let data = getLocalStorage({ key: tokenSessionKey });
-if (data) {
-    let user = JSON.parse(atob(data.token.split(".")[1]));
-    $store.commit("setUserData", user);
-}
+const showTerms = ref(!getLocalStorage({ key: termsAcceptedKey }));
+
+const handleTermsAccept = () => {
+    putLocalStorage({ key: termsAcceptedKey, data: true });
+    showTerms.value = false;
+};
 </script>

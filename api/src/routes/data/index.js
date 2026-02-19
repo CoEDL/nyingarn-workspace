@@ -1,4 +1,4 @@
-import { getLogger } from "../../common/logger.js";
+import { getLogger, logEvent } from "../../common/logger.js";
 import { submitTask } from "../../common/task.js";
 import { getStoreHandle } from "../../common/getS3Handle.js";
 import { requireItemAccess, demandAuthenticatedUser } from "../../common/middleware.js";
@@ -71,6 +71,12 @@ async function assembleTeiHandler(req) {
             identifier,
             resource: `${identifier}-tei-complete.xml`,
             download: true,
+        });
+        await logEvent({
+            level: "info",
+            owner: req.session.user.email,
+            text: `User '${req.session.user.email}' downloaded TEI document for item '${identifier}'.`,
+            data: { identifier, file: `${identifier}-tei-complete.xml` },
         });
         return { link };
     } else {

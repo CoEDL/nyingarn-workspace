@@ -109,6 +109,12 @@ async function getOauthTokenRouteHandler(req, res) {
     }
     log.debug(`Creating session for ${user.email}`);
     let session = await createSession({ user });
+    await logEvent({
+        level: "info",
+        owner: user.email,
+        text: `User '${user.email}' logged in via ${provider}.`,
+        data: { provider },
+    });
 
     return { token: session.token };
 }
@@ -219,6 +225,12 @@ async function postOtpRouteHandler(req, res) {
         return res.unauthorized();
     }
     let session = await createSession({ user });
+    await logEvent({
+        level: "info",
+        owner: user.email,
+        text: `User '${user.email}' logged in via email OTP.`,
+        data: { provider: "email" },
+    });
     await models.otp.destroy({ where: { password: req.body.otp } });
 
     return { token: session.token };

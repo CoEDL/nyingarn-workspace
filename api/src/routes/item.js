@@ -356,6 +356,14 @@ async function getItemResourceFileLinkHandler(req, res) {
             resource: req.params.file,
             download: req.query.download,
         });
+        if (req.query.download === "true") {
+            await logEvent({
+                level: "info",
+                owner: req.session.user.email,
+                text: `User '${req.session.user.email}' downloaded '${req.params.file}' from item '${req.params.identifier}'.`,
+                data: { identifier: req.params.identifier, file: req.params.file },
+            });
+        }
         return { link };
     } catch (error) {
         return res.notFound();

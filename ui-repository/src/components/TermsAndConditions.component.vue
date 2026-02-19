@@ -8,49 +8,6 @@
 
         <div class="text-gray-700 text-sm space-y-2">
           <p>
-            Unless otherwise stated, this work is licensed under a
-            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"
-              class="text-sm text-blue-600 hover:underline">
-              Creative Commons Attribution-NonCommercial-ShareAlike 4.0
-              International License
-            </a>.
-            The moral rights of the creators are asserted.
-          </p>
-
-          <p>
-            Takedown Principle: Nyingarn has made every effort to consult with relevant language authorities to
-            determine appropriate access. Should you notice anything inappropriate, please contact our team and we will
-            immediately remove access to the content.
-          </p>
-
-          <p>
-            If you are not sure about the copyright status of the material you want to to work with, please see the
-            advice pages prepared by the Attorney-General’s Department
-            <a href="https://www.ag.gov.au/rights-and-protections/publications/duration-copyright-table" target="_blank"
-              class="text-sm text-blue-600 hover:underline">
-              here
-            </a>
-            .
-          </p>
-
-          <p>
-            Access to data is subject to Nyingarn’s Conditions of Access (as below).
-          </p>
-
-          <p>
-            The following are general conditions for obtaining material from the Nyingarn platform. They assume that the
-            depositor’s permission has been obtained for copying. Specific restrictions accompany each item in Nyingarn.
-          </p>
-
-          <p>
-            This is an online agreement that you can click before getting access to items in the collection via our
-            catalog.
-          </p>
-
-          <h3 class="font-semibold text-nyingarn-dark mt-6">
-            General Conditions of Access
-          </h3>
-          <p>
             In consideration of Nyingarn agreeing to supply me with certain data in machine-readable form together with
             supporting documentation, I hereby undertake:
           </p>

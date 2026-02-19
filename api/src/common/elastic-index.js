@@ -13,6 +13,7 @@ import fetch from "cross-fetch";
 const typesToExcludeFromIndex = ["File", "GeoShape", "GeoCoordinates"];
 
 export async function indexItem({ location = "workspace", configuration, item, crate }) {
+    const indexName = location === "repository" ? "manuscripts" : "workspace-manuscripts";
     crate = new ROCrate(crate, { array: true, link: true });
     // let document = crate.getTree({ valueObject: false });
 
@@ -22,15 +23,15 @@ export async function indexItem({ location = "workspace", configuration, item, c
 
     // setup the metadata index
     try {
-        // await client.indices.delete({ index: "manuscripts" });
-        await client.indices.get({ index: "manuscripts" });
+        // await client.indices.delete({ index: indexName });
+        await client.indices.get({ index: indexName });
     } catch (error) {
         await client.synonyms.putSynonym({
             id: "nyingarn-synonyms",
             synonyms_set: []
         });
         await client.indices.create({
-            index: "manuscripts",
+            index: indexName,
             mappings: {
                 properties: {
                     location: {
@@ -100,7 +101,7 @@ export async function indexItem({ location = "workspace", configuration, item, c
     document.text = teiText;
     document.phoneticText = teiText;
     await client.index({
-        index: "manuscripts",
+        index: indexName,
         id: indexIdentifier,
         document,
     });
@@ -123,14 +124,15 @@ export async function indexItem({ location = "workspace", configuration, item, c
     }
 }
 
-export async function deleteItemFromIndex({ item, configuration }) {
+export async function deleteItemFromIndex({ location = "workspace", item, configuration }) {
+    const indexName = location === "repository" ? "manuscripts" : "workspace-manuscripts";
     const client = new Client({
         node: configuration.api.services.elastic.host,
     });
 
     const indexIdentifier = `/${item.type}/${item.identifier}`;
     await client.delete({
-        index: "manuscripts",
+        index: indexName,
         id: indexIdentifier,
     });
 }

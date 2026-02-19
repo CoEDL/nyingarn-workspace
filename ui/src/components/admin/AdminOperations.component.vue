@@ -22,6 +22,15 @@
                 <el-button @click="indexRepository"> index the repository</el-button>
             </div>
         </div>
+        <div class="p-8 bg-yellow-200 rounded">
+            <div>
+                Build or rebuild the workspace search index. This indexes all workspace items
+                so they can be searched by language, text, and location.
+            </div>
+            <div>
+                <el-button @click="indexWorkspace"> index the workspace</el-button>
+            </div>
+        </div>
         <!-- <div>
             <el-button @click="migrate">migrate backend</el-button>
         </div> -->
@@ -58,6 +67,11 @@ async function importStore() {
 async function indexRepository() {
     data.loading = true;
     await $http.get({ route: `/repository/index-all-content` });
+    data.loading = false;
+}
+async function indexWorkspace() {
+    data.loading = true;
+    await $http.get({ route: `/admin/index-all-workspace-content` });
     data.loading = false;
 }
 async function migrate() {

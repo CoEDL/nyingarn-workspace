@@ -1,6 +1,7 @@
 import { loadProfile } from "../common/configuration.js";
 import { demandAuthenticatedUser } from "../common/middleware.js";
 import { getStoreHandle } from "../common/getS3Handle.js";
+import { indexItem } from "../common/elastic-index.js";
 import lodashPkg from "lodash";
 const { uniqBy, compact, flattenDeep } = lodashPkg;
 import models from "../models/index.js";
@@ -198,6 +199,20 @@ async function getDescriboROCrate(req) {
 async function putDescriboROCrate(req) {
     let store = await getStoreHandle({ id: req.params.identifier, type: req.params.type });
     await store.put({ target: "ro-crate-metadata.json", json: req.body.data.crate });
+
+    // Auto-index workspace item for search
+    try {
+        await indexItem({
+            location: "workspace",
+            configuration: req.session.configuration,
+            item: { identifier: req.params.identifier, type: req.params.type },
+            crate: req.body.data.crate,
+        });
+    } catch (error) {
+        // Don't fail the save if indexing fails — log and continue
+        console.log(`Failed to index workspace item ${req.params.identifier}:`, error.message);
+    }
+
     return {};
 }
 

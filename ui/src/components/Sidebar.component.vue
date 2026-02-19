@@ -76,6 +76,11 @@ export default {
                 },
                 { name: "Operations", path: "/admin/operations", icon: "fa-solid fa-cog" },
                 { name: "Search config", path: "/admin/search-config", icon: "fa-solid fa-ranking-star" },
+                {
+                    name: "Workspace Search",
+                    path: "/admin/workspace-search",
+                    icon: "fa-solid fa-map-location-dot",
+                },
             ],
         };
     },

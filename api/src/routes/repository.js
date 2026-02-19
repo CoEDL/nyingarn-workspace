@@ -30,6 +30,7 @@ export function setupRoutes(fastify, options, done) {
     fastify.register((fastify, options, done) => {
         fastify.addHook("preHandler", demandAuthenticatedUser);
         fastify.addHook("preHandler", demandAdministrator);
+        fastify.post("/workspace/search", postWorkspaceSearchHandler);
         fastify.get("/repository/lookup-content", getRepositoryLookupContentHandler);
         fastify.get("/repository/index-all-content", indexAllRepositoryContentHandler);
         fastify.get("/repository/index/:id", indexRepositoryItemHandler);
@@ -178,6 +179,77 @@ async function postRepositorySearchHandler(req) {
         }
     };
     let result = await client.search(query);
+    return result.hits;
+}
+
+async function postWorkspaceSearchHandler(req) {
+    const bounds = req.body.boundingBox;
+
+    let mustMatchQuery = [];
+    if (bounds) {
+        mustMatchQuery.push(
+            esb
+                .geoShapeQuery("location")
+                .shape(
+                    esb
+                        .geoShape()
+                        .type("envelope")
+                        .coordinates([
+                            [bounds.topLeft.lng, bounds.topLeft.lat],
+                            [bounds.bottomRight.lng, bounds.bottomRight.lat],
+                        ])
+                )
+                .relation("intersects"),
+            );
+    }
+    if (req.body.language) {
+        mustMatchQuery.push(
+            esb
+                .boolQuery()
+                .should([
+                    esb.matchQuery("contentLanguage", req.body.language).fuzziness(2),
+                    esb.matchQuery("subjectLanguage", req.body.language).fuzziness(2),
+                ])
+        );
+    }
+    if (req.body.text) {
+        let textQueries = [];
+        textQueries.push(
+            esb.matchQuery("name", req.body.text).fuzziness("AUTO"),
+            esb.matchQuery("description", req.body.text).fuzziness("AUTO"),
+        );
+        if (req.body.is_phonetic) {
+            textQueries.push(
+                esb.matchQuery("phoneticText", req.body.text).fuzziness("AUTO"),
+            );
+        } else {
+            textQueries.push(
+                esb.matchQuery("text", req.body.text).fuzziness("AUTO"),
+            );
+        }
+        mustMatchQuery.push(
+            esb.boolQuery().should(textQueries)
+        );
+    }
+    let esbQuery = esb.requestBodySearch().query(esb.boolQuery().must(mustMatchQuery)).size(1000);
+
+    const client = new Client({
+        node: req.session.configuration.api.services.elastic.host,
+    });
+    let query = {
+        index: "workspace-manuscripts",
+        ...esbQuery.toJSON(),
+        fields: ["name", "description", "identifier", "location", "access"],
+        _source: false,
+        highlight: {
+            fields: {
+                "text": {},
+                "phoneticText": {}
+            }
+        }
+    };
+    let result = await client.search(query);
+
     return result.hits;
 }
 

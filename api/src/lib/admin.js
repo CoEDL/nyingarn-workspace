@@ -488,7 +488,7 @@ export async function deleteItemFromRepository({ type, identifier, configuration
 
     //  delete it from elastic
     let item = await models.repoitem.findOne({ where: { identifier, type } });
-    await deleteItemFromIndex({ item, configuration });
+    await deleteItemFromIndex({ location: "repository", item, configuration });
 
     //  delete it from the db
     await models.repoitem.destroy({ where: { identifier } });

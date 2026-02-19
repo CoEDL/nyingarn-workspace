@@ -15,6 +15,7 @@ import AdminWorkspaceItemsComponent from "./components/admin/WorkspaceItems.comp
 import AdminRepositoryItemsComponent from "./components/admin/RepositoryItems.component.vue";
 import AdminOperationsComponent from "./components/admin/AdminOperations.component.vue";
 import AdminSearchConfig from "./components/admin/AdminSearchConfig.component.vue";
+import AdminWorkspaceSearchComponent from "./components/admin/WorkspaceSearch.component.vue";
 import HTTPService from "./http.service.js";
 import { createRouter, createWebHistory } from "vue-router";
 const routes = [
@@ -157,6 +158,12 @@ const routes = [
                         path: "search-config",
                         component: AdminSearchConfig,
                         meta: { name: "administrator search config" },
+                    },
+                    {
+                        name: "admin.workspaceSearch",
+                        path: "workspace-search",
+                        component: AdminWorkspaceSearchComponent,
+                        meta: { name: "workspace search" },
                     },
                 ],
             },

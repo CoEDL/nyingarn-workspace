@@ -6,6 +6,8 @@ import {
 } from "../common/middleware.js";
 import { getLogger } from "../common/logger.js";
 import { getStoreHandle } from "../common/getS3Handle.js";
+import { indexItem } from "../common/elastic-index.js";
+import { getItems } from "../lib/item.js";
 
 // used in migrate backend function
 
@@ -73,6 +75,7 @@ export function setupRoutes(fastify, options, done) {
         });
 
         fastify.get("/admin/migrate", migrateBackend);
+        fastify.get("/admin/index-all-workspace-content", indexAllWorkspaceContentHandler);
 
         done();
     });
@@ -211,6 +214,34 @@ async function putObjectNeedsWorkHandler(req, res) {
     type = type === "items" ? "item" : "collection";
 
     await objectRequiresMoreWork({ user: req.session.user, type, identifier });
+}
+async function indexAllWorkspaceContentHandler(req) {
+    let offset = 0;
+    const limit = 10;
+    let indexed = 0;
+
+    while (true) {
+        let { count, rows } = await getItems({ offset, limit });
+        for (let item of rows) {
+            try {
+                let store = await getStoreHandle({ id: item.identifier, type: "item" });
+                let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+                await indexItem({
+                    location: "workspace",
+                    configuration: req.session.configuration,
+                    item: { identifier: item.identifier, type: "item" },
+                    crate,
+                });
+                indexed += 1;
+            } catch (error) {
+                console.log(`Failed to index workspace item ${item.identifier}:`, error.message);
+            }
+        }
+        offset += limit;
+        if (offset >= count) break;
+    }
+
+    return { indexed };
 }
 async function migrateBackend(req) {
     console.log("NOT RUNNING: migrate backend");

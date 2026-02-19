@@ -21,6 +21,9 @@
                 >
                 </el-option>
             </el-select>
+            <el-button class="m-2" @click="downloadCSV">
+                <i class="fa-solid fa-download"></i>&nbsp;Download CSV
+            </el-button>
         </div>
         <el-table :data="users" style="width: 100%">
             <el-table-column prop="email" label="Email" width="300" />
@@ -156,6 +159,58 @@ export default {
                     break;
             }
             this.done = true;
+        },
+        async downloadCSV() {
+            let response = await this.$http.get({
+                route: `/admin/users?offset=0&limit=${this.total}&orderBy=${this.orderBy}`,
+            });
+            if (response.status !== 200) {
+                this.error = true;
+
+                return;
+            }
+            const data = await response.json();
+            const allUsers = data.users;
+
+            const columns = [
+                "id",
+                "email",
+                "givenName",
+                "familyName",
+                "identifier",
+                "provider",
+                "locked",
+                "upload",
+                "administrator",
+                "createdAt",
+                "updatedAt",
+            ];
+
+            const escapeCSV = (value) => {
+                if (value === null || value === undefined) return "";
+                let str = String(value);
+                if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+                    str = '"' + str.replace(/"/g, '""') + '"';
+                }
+
+                return str;
+            };
+
+            const header = columns.join(",");
+            const rows = allUsers.map((user) =>
+                columns.map((col) => escapeCSV(user[col])).join(",")
+            );
+            const csv = [header, ...rows].join("\n");
+
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "users.csv";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         },
         async deleteUser({ user }) {
             let response = await this.$http.delete({

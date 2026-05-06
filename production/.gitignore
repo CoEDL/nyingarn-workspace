@@ -1,0 +1,6 @@
+# Operator-local secrets file — never commit.
+env
+
+# .env (no suffix) is the committed template that gets rendered by deploy.sh,
+# so override the repo-root .env* rule for this directory.
+!.env

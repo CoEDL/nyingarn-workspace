@@ -1,0 +1,26 @@
+providers:
+  docker:
+    exposedByDefault: false
+
+entrypoints:
+  web:
+    address: ':80'
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ':443'
+    http:
+      tls:
+        certResolver: letsencrypt
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      # email: See docker-compose.yml
+      storage: /etc/traefik/letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web

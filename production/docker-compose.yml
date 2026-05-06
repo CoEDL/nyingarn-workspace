@@ -1,0 +1,146 @@
+services:
+  reverse-proxy:
+    image: traefik:3
+    restart: always
+    command: --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/letsencrypt:/etc/traefik/letsencrypt
+
+  db:
+    image: postgres:18
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: nyingarn
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: nyingarn
+    volumes:
+      - ./postgres-data:/var/lib/postgresql
+
+  s3:
+    image: chrislusf/seaweedfs
+    restart: always
+    #hostname: s3.${DOMAIN}
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: "${S3_SECRET_ACCESS_KEY}"
+      S3_BUCKET: uploads
+    volumes:
+      - ./s3-data:/data
+    # labels:
+    #   - traefik.enable=true
+    #
+    #   - traefik.http.routers.s3.entrypoints=websecure
+    #   - traefik.http.routers.s3.rule=Host(`s3.${DOMAIN}`)
+    #   - traefik.http.services.s3.loadbalancer.server.port=8333
+
+  rabbit:
+    # NOTE: We need to update mq library to move to 4 due to frameMax 
+    image: rabbitmq:3
+    restart: always
+    # environment:
+    #   RABBITMQ_DEFAULT_VHOST: rabbit
+
+  elastic:
+    # NOTE: Locking to 8.16.0 because that is what our plugin is tied to
+    image: elasticsearch:8.16.0
+    restart: always
+    environment:
+      - discovery.type=single-node
+      #- ES_JAVA_OPTS=-Xms750m -Xmx750m
+      #- xpack.security.enabled=false
+      #- node.name=elastic
+      #
+      #ulimits:
+      #  memlock:
+      #    soft: -1
+      #    hard: -1
+      #  nofile:
+      #    soft: 65536
+      #    hard: 65536
+      #cap_add:
+      #  - IPC_LOCK
+    volumes:
+      - ./elastic/data:/usr/share/elasticsearch/data:delegated
+      - ./elastic/entrypoint.sh:/entrypoint.sh:ro
+    #ports:
+    #  - 9200:9200
+    entrypoint: /entrypoint.sh
+
+  task-runner:
+    image: ghcr.io/coedl/nyingarn-workspace-task-runner:latest
+    restart: always
+    hostname: worker1
+    working_dir: /srv
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_USER: nyingarn
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_DATABASE: nyingarn
+      POST_FINISH: "http://workspace-api:8080/process/post-finish"
+    volumes:
+      - ./configuration:/srv/configuration
+    depends_on:
+      - db
+      - rabbit
+      - s3
+
+  xml:
+    image: ghcr.io/coedl/nyingarn-workspace-xml-processor:latest
+    restart: always
+
+  workspace-api:
+    image: ghcr.io/coedl/nyingarn-workspace-api:latest
+    restart: always
+    environment:
+      NODE_ENV: production
+      #LOG_LEVEL: "${LOG_LEVEL}"
+      DB_HOST: db
+      DB_USER: nyingarn
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_DATABASE: nyingarn
+      POST_FINISH: "http://workspace-api:8080/process/post-finish"
+    volumes:
+      - ./configuration:/srv/configuration
+      - ./profiles:/srv/profiles
+    depends_on:
+      - db
+      - rabbit
+      - s3
+
+  workspace-ui:
+    image: ghcr.io/coedl/nyingarn-workspace-ui:latest
+    restart: always
+    hostname: workspace-ui
+    environment:
+      NODE_ENV: production
+    volumes:
+      - ./workspace/nginx.conf:/etc/nginx/conf.d/nginx-workspace.conf
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.workspace.entrypoints=websecure
+      - traefik.http.routers.workspace.rule=Host(`workspace.${DOMAIN}`)
+      - traefik.http.services.workspace.loadbalancer.server.port=80
+    depends_on:
+      - workspace-api
+
+  repository-ui:
+    image: ghcr.io/coedl/nyingarn-repository-ui:latest
+    restart: always
+    environment:
+      NODE_ENV: production
+    volumes:
+      - ./repository/nginx.conf:/etc/nginx/conf.d/nginx-repository.conf
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.repository.entrypoints=websecure
+      - traefik.http.routers.repository.rule=Host(`repository.${DOMAIN}`)
+      - traefik.http.services.repository.loadbalancer.server.port=80
+    depends_on:
+      - workspace-api

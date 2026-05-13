@@ -228,18 +228,6 @@
       }
     },
     "authentication": {
-      "google": {
-        "clientId": "${GOOGLE_CLIENT_ID}",
-        "clientSecret": "${GOOGLE_CLIENT_SECRET}",
-        "redirectUri": "https://workspace.${DOMAIN}/callback-oauth-login",
-        "discover": "https://accounts.google.com"
-      },
-      "aaf": {
-        "clientId": "${AAF_CLIENT_ID}",
-        "clientSecret": "${AAF_CLIENT_SECRET}",
-        "redirectUri": "https://workspace.${DOMAIN}/callback-oauth-login",
-        "discover": "https://central.aaf.edu.au"
-      }
     },
     "origin": {
       "workspace": "https://workspace.${DOMAIN}",

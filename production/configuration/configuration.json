@@ -1,8 +1,8 @@
 {
   "ui": {
     "siteName": "Nyingarn Platform workspace",
-    "tusEndpoint": "https://workspace.${DOMAIN}/api/files/",
-    "termsAndConditionsOfUse": "https://nyingarn.net/nyingarn-workspace-terms-and-conditions-of-use/",
+    "tusEndpoint": "https://workspace.${DOMAIN}/api/files",
+    "termsAndConditionsOfUse": "https://nyingarn.net/terms-and-conditions/",
     "notices": {
       "workspace": [],
       "repository": []
@@ -208,12 +208,12 @@
         ]
       },
       "s3": {
-        "endpointUrl": "http://s3:8333",
-        "XXXforcePathStyle": true,
+        "endpointUrl": "https://files.${DOMAIN}",
+        "forcePathStyle": true,
         "bucket": "uploads",
         "awsAccessKeyId": "${S3_ACCESS_KEY_ID}",
         "awsSecretAccessKey": "${S3_SECRET_ACCESS_KEY}",
-        "XXXregion": "us-east-1"
+        "region": "us-east-1"
       },
       "aws": {
         "awsAccessKeyId": "${AWS_ACCESS_KEY_ID}",

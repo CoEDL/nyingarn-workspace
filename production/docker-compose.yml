@@ -32,12 +32,11 @@ services:
       S3_BUCKET: uploads
     volumes:
       - ./s3-data:/data
-    # labels:
-    #   - traefik.enable=true
-    #
-    #   - traefik.http.routers.s3.entrypoints=websecure
-    #   - traefik.http.routers.s3.rule=Host(`s3.${DOMAIN}`)
-    #   - traefik.http.services.s3.loadbalancer.server.port=8333
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.s3.entrypoints=websecure
+      - traefik.http.routers.s3.rule=Host(`files.${DOMAIN}`)
+      - traefik.http.services.s3.loadbalancer.server.port=8333
 
   rabbit:
     # NOTE: We need to update mq library to move to 4 due to frameMax 
@@ -51,9 +50,9 @@ services:
     image: elasticsearch:8.16.0
     restart: always
     environment:
-      - discovery.type=single-node
+      discovery.type: single-node
+      xpack.security.enabled: false # No SSL or passwords
       #- ES_JAVA_OPTS=-Xms750m -Xmx750m
-      #- xpack.security.enabled=false
       #- node.name=elastic
       #
       #ulimits:
@@ -68,8 +67,6 @@ services:
     volumes:
       - ./elastic/data:/usr/share/elasticsearch/data:delegated
       - ./elastic/entrypoint.sh:/entrypoint.sh:ro
-    #ports:
-    #  - 9200:9200
     entrypoint: /entrypoint.sh
 
   task-runner:

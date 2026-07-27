@@ -18,7 +18,8 @@ server.
 | `repository/nginx.conf` | yes (template) | Repository UI nginx config. |
 | `traefik/traefik.yml` | yes | Traefik config. |
 | `elastic/entrypoint.sh` | yes | Elastic startup script that installs the phonetic search plugin. |
-| `postgres-data/`, `s3-data/`, `elastic/data/`, `traefik/letsencrypt/` | yes (just `.gitkeep`) | Bind-mount targets. Rsync is non-destructive, so existing data on the server (databases, uploads, Let's Encrypt certs) is never touched. |
+| `postgres-data/`, `traefik/letsencrypt/` | yes (just `.gitkeep`) | Bind-mount targets. Rsync is non-destructive, so existing data on the server (databases, uploads, Let's Encrypt certs) is never touched. |
+| `s3-data/`, `elastic/data/` | no | Bind-mount targets created on the server. `s3-data/uploads` is created by `deploy.sh` — see [Object storage](#object-storage). |
 | `deploy.sh` | yes | Renders templates and rsyncs to the server. Not shipped to the server. |
 
 A few files are pulled from the parent directory at deploy time so we don't duplicate them:
@@ -47,6 +48,34 @@ The script will:
 2. Build a temp tree containing the rendered templates plus everything else from `production/` (and `../profiles/`).
 3. Rsync the temp tree to `user@host:/path` non-destructively (no `--delete`) so live databases, uploads, and certificates are never touched.
 4. SSH to the host and run `docker compose up -d` from the deploy path.
+
+## Object storage
+
+The `s3` service is [versitygw](https://github.com/versity/versitygw), an S3 gateway
+over a plain filesystem. Object keys map directly to paths, so a manuscript image
+lands on disk as a real file under `s3-data/uploads/` and can be read, checksummed
+or recovered without the gateway. That's the reason it was chosen over SeaweedFS:
+if the gateway goes away, the archive is still an ordinary directory tree.
+
+Operational notes:
+
+- **Buckets are directories.** `uploads` is `s3-data/uploads`. Anything else placed
+  directly in `s3-data/` would also be served as a bucket, so keep it to the one
+  directory. If the internal IAM or versioning features are ever enabled, mount
+  their directories *outside* the gateway root for the same reason.
+- **Extended attributes are required.** Object metadata is stored in xattrs and
+  the gateway validates support at startup. The bind mount from the host keeps
+  this working; serving `s3-data` from a filesystem without user xattrs would not.
+- **ext4 is a deliberate choice.** Completing a multipart upload merges the parts
+  with `copy_file_range()`, which is a metadata-only reflink on XFS and Btrfs but a
+  real byte copy on ext4. Uploads under 5 MB never take the multipart path at all,
+  and at our file sizes the extra copy costs a fraction of a second — far less than
+  the image processing that follows. Revisit only if very large files arrive.
+- **Aborted uploads leave parts behind** under `s3-data/uploads/.sgwtmp/multipart/`.
+  Abandoned browser uploads accumulate here; prune it if it grows.
+- **Snapshots are the backup.** Because metadata lives in xattrs on the same inodes
+  as the data, a block-level snapshot is inherently self-consistent — there is no
+  separate metadata database that could be captured out of step with the objects.
 
 ## Loading Describo data packs
 

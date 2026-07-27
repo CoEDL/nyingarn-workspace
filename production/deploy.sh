@@ -97,4 +97,8 @@ rsync -avz "$TMP/" "$TARGET/"
 
 HOST="${TARGET%%:*}"
 REMOTE_PATH="${TARGET#*:}"
-ssh "$HOST" "cd '$REMOTE_PATH' && docker compose up -d"
+
+# The `uploads` bucket is just a directory under the gateway root. It's created
+# here rather than tracked as a .gitkeep because every file under s3-data/uploads
+# is served as an S3 object, and a stray .gitkeep would become one.
+ssh "$HOST" "cd '$REMOTE_PATH' && mkdir -p s3-data/uploads && docker compose up -d"

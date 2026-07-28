@@ -1,6 +1,6 @@
 {
   "ui": {
-    "siteName": "Nyingarn Platform workspace",
+    "siteName": "Nyingarn Platform Workspace",
     "tusEndpoint": "https://workspace.${DOMAIN}/api/files",
     "termsAndConditionsOfUse": "https://nyingarn.net/terms-and-conditions/",
     "notices": {

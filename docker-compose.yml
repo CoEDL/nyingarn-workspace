@@ -56,6 +56,14 @@ services:
             - 5672:5672
             - 15672:15672
 
+    mail:
+        image: axllent/mailpit:latest
+        hostname: mail
+        restart: always
+        ports:
+            - 1025:1025
+            - 8025:8025
+
     rabbit-worker1:
         image: node:18-bullseye
         hostname: worker1

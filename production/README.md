@@ -90,6 +90,6 @@ docker compose exec workspace-api npm run load:datapacks
 See `env.example` for the full list. Two values must be JSON array literals:
 
 - `ADMINISTRATORS='["alice@example.com","bob@example.com"]'`
-- `SES_REPLY_TO='["nyingarn-project@unimelb.edu.au"]'`
+- `SMTP_REPLY_TO='["nyingarn-project@unimelb.edu.au"]'`
 
 These get substituted directly (without surrounding quotes) into `configuration.json`, so they must be valid JSON. **Wrap them in single quotes** in `env` — that prevents bash from stripping the embedded double quotes when the deploy script sources the file.

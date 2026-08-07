@@ -5,7 +5,7 @@ import { createUser } from "../lib/user.js";
 import { createSession } from "../lib/session.js";
 import crypto from "crypto";
 import models from "../models/index.js";
-import { SES } from "../common/aws-ses.js";
+import { Mailer } from "../common/email.js";
 import { add, isAfter, parseISO } from "date-fns";
 const log = getLogger();
 
@@ -170,28 +170,29 @@ export async function postEmailLoginRouteHandler(req, res) {
             // return res.unauthorized();
         }
     }
-    const aws = req.session.configuration.api.services.aws;
-    const ses = new SES({
-        accessKeyId: aws.awsAccessKeyId,
-        secretAccessKey: aws.awsSecretAccessKey,
-        region: aws.region,
-        mode: req.session.configuration.api.ses.mode,
-        source: req.session.configuration.api.ses.source,
-        replyTo: req.session.configuration.api.ses.replyTo,
-    });
+    const mailer = new Mailer(req.session.configuration.api.smtp);
 
     await models.otp.destroy({ where: { userId: user.id } });
     const otp = await user.createOtp({ password: crypto.randomBytes(30).toString("hex") });
 
-    let response = await ses.sendMessage({
-        templateName: `${req.session.configuration.api.ses.mode}-application-login`,
-        data: {
-            site: req.params.origin === "workspace" ? "Nyingarn Workspace" : "Nyingarn Repository",
-            link: `${origin}/otp/${otp.password}`,
-        },
-        to: [req.body.email],
-    });
-    if (response.$metadata.httpStatusCode !== 200) {
+    try {
+        let response = await mailer.sendMessage({
+            templateName: "application-login",
+            data: {
+                site:
+                    req.params.origin === "workspace"
+                        ? "Nyingarn Workspace"
+                        : "Nyingarn Repository",
+                link: `${origin}/otp/${otp.password}`,
+            },
+            to: [req.body.email],
+        });
+        if (response.rejected?.length) {
+            log.error(`Login email to ${req.body.email} was rejected by the SMTP server`);
+            return res.internalServerError();
+        }
+    } catch (error) {
+        log.error(`Unable to send login email to ${req.body.email}: ${error.message}`);
         return res.internalServerError();
     }
     return {};

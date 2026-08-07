@@ -18,6 +18,7 @@ docker compose up
 - MinIO console: http://localhost:10001
 - RabbitMQ management: http://localhost:15672
 - Elasticsearch: http://localhost:9200
+- Mailpit (catches all outgoing email in dev): http://localhost:8025
 
 ## Architecture
 
@@ -46,6 +47,7 @@ nginx (edge)
 | **elastic** | Elasticsearch 8.16 | 9200 | Full-text + phonetic search |
 | **minio** | MinIO | 10000 | S3-compatible object storage |
 | **rabbit** | RabbitMQ 3 | 5672 | Message broker |
+| **mail** | Mailpit | 1025 (SMTP), 8025 (UI) | Development SMTP sink |
 
 ## Key Patterns
 
@@ -55,6 +57,7 @@ nginx (edge)
 - **Auth:** OpenID Connect via `openid-client` (Google + AAF providers), JWT sessions via `jose`.
 - **Uploads:** TUS resumable upload protocol via `@paradisec-platform/fastify-tus-s3-plugin` (API) and Uppy (UI).
 - **Real-time:** Socket.IO for WebSocket communication between API and UIs.
+- **Email:** Nodemailer over SMTP (`api/src/common/email.js`), configured under `api.smtp`. MJML templates in `api/src/common/email-templates/` are compiled at startup. Dev mail lands in Mailpit.
 - **Shared code:** The tasks service mounts and imports directly from `/srv/api/src/` (Sequelize models, common utilities).
 - **State management:** Vuex 4 in both frontends.
 

@@ -12,7 +12,8 @@ import validatorPkg from "validator";
 const { isURL } = validatorPkg;
 import { ROCrate } from "ro-crate";
 import { registerAllFiles, getContext } from "../lib/crate-tools.js";
-import { SES } from "../common/aws-ses.js";
+import { Mailer } from "../common/email.js";
+import { log } from "../common/logger.js";
 import models from "../models/index.js";
 
 export function setupRoutes(fastify, options, done) {
@@ -211,23 +212,19 @@ async function getItemPublicationStatus(req) {
 }
 
 async function notifyAwaitingReview({ configuration }) {
-    const aws = configuration.api.services.aws;
-    const ses = new SES({
-        accessKeyId: aws.awsAccessKeyId,
-        secretAccessKey: aws.awsSecretAccessKey,
-        region: aws.region,
-        mode: configuration.api.ses.mode,
-        source: configuration.api.ses.source,
-        replyTo: configuration.api.ses.replyTo,
-    });
+    const mailer = new Mailer(configuration.api.smtp);
     let adminEmails = await models.user.findAll({
         where: { administrator: true },
         attributes: ["email"],
         raw: true,
     });
-    let response = await ses.sendMessage({
-        templateName: `${configuration.api.ses.mode}-awaiting-review`,
-        data: {},
-        to: adminEmails.map((u) => u.email),
-    });
+    try {
+        await mailer.sendMessage({
+            templateName: "awaiting-review",
+            data: {},
+            to: adminEmails.map((u) => u.email),
+        });
+    } catch (error) {
+        log.error(`Unable to send the awaiting review notification: ${error.message}`);
+    }
 }

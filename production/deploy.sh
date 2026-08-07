@@ -28,8 +28,13 @@ REQUIRED_VARS=(
   S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY
   AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION
   MAPBOX_TOKEN SESSION_SECRET
-  ADMINISTRATORS SES_SOURCE_EMAIL SES_REPLY_TO
+  ADMINISTRATORS
+  SMTP_HOST SMTP_PORT SMTP_SECURE SMTP_SOURCE_EMAIL SMTP_REPLY_TO
 )
+
+# Substituted if set, but allowed to be empty — a relay that doesn't require
+# authentication leaves these blank.
+OPTIONAL_VARS=(SMTP_USER SMTP_PASSWORD)
 
 missing=()
 for v in "${REQUIRED_VARS[@]}"; do
@@ -44,7 +49,7 @@ if (( ${#missing[@]} > 0 )); then
 fi
 
 # envsubst's allowlist must be a single string like "$DOMAIN $ACME_EMAIL ..."
-ALLOWLIST="$(printf '$%s ' "${REQUIRED_VARS[@]}")"
+ALLOWLIST="$(printf '$%s ' "${REQUIRED_VARS[@]}" "${OPTIONAL_VARS[@]}")"
 
 # Files to render. Anything else is copied verbatim.
 TEMPLATES=(

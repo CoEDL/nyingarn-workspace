@@ -187,8 +187,10 @@
             "repository": "https://repository.nyingarn.net"
         },
         "emailLoginTimeout": { "minutes": 10 },
-        "ses": {
-            "mode": "development",
+        "smtp": {
+            "host": "mail",
+            "port": 1025,
+            "secure": false,
             "source": "nyingarnproject@gmail.com",
             "replyTo": ["nyingarn-project@unimelb.edu.au"]
         }

@@ -236,10 +236,16 @@
     "emailLoginTimeout": {
       "minutes": 10
     },
-    "ses": {
-      "mode": "development",
-      "source": "${SES_SOURCE_EMAIL}",
-      "replyTo": ${SES_REPLY_TO}
+    "smtp": {
+      "host": "${SMTP_HOST}",
+      "port": ${SMTP_PORT},
+      "secure": ${SMTP_SECURE},
+      "auth": {
+        "user": "${SMTP_USER}",
+        "pass": "${SMTP_PASSWORD}"
+      },
+      "source": "${SMTP_SOURCE_EMAIL}",
+      "replyTo": ${SMTP_REPLY_TO}
     }
   }
 }

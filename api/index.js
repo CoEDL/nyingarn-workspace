@@ -17,7 +17,7 @@ import { setupRoutes as setupDataRoutes } from "./src/routes/data/index.js";
 import { setupRoutes as setupPublishRoutes } from "./src/routes/publish.js";
 import { setupRoutes as setupRepositoryRoutes } from "./src/routes/repository.js";
 import rabbit from "foo-foo-mq";
-import { SES } from "./src/common/aws-ses.js";
+import { Mailer } from "./src/common/email.js";
 
 import Fastify from "fastify";
 import fastifyCompress from "@fastify/compress";
@@ -114,7 +114,7 @@ async function main() {
         global.testing = req.headers.testing;
     });
     fastify.addHook("onReady", async () => {
-        await Promise.all([setupSES({ configuration }), models.sequelize.sync()]);
+        await Promise.all([setupEmail({ configuration }), models.sequelize.sync()]);
         const rabbit = await initialiseRabbit({ configuration });
         fastify.decorate("models", models);
         fastify.decorate("rabbit", rabbit);
@@ -158,16 +158,12 @@ async function initialiseRabbit({ configuration }) {
     return rabbit;
 }
 
-async function setupSES({ configuration }) {
-    const aws = configuration.api.services.aws;
-    const ses = new SES({
-        accessKeyId: aws.awsAccessKeyId,
-        secretAccessKey: aws.awsSecretAccessKey,
-        region: aws.region,
-        mode: configuration.api.ses.mode,
-        source: configuration.api.ses.source,
-        replyTo: configuration.api.ses.replyTo,
-    });
-    await ses.compileTemplates();
-    await ses.loadTemplates();
+async function setupEmail({ configuration }) {
+    const mailer = new Mailer(configuration.api.smtp);
+    await mailer.compileTemplates();
+    try {
+        await mailer.verifyConnection();
+    } catch (error) {
+        log.error(`Unable to connect to the SMTP server: ${error.message}`);
+    }
 }

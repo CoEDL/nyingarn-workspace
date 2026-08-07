@@ -29,7 +29,6 @@
         "nodemon": "^3.0.1"
     },
     "dependencies": {
-        "@aws-sdk/client-ses": "^3.462.0",
         "@coedl/nocfl-js": "^2.0.0",
         "@describo/data-packs": "^0.11.2",
         "@elastic/elasticsearch": "^8.10.0",
@@ -51,6 +50,7 @@
         "mime-types": "^2.1.35",
         "mjml": "^4.14.1",
         "mockdate": "^3.0.5",
+        "nodemailer": "^9.0.4",
         "openid-client": "^5.6.1",
         "pg": "^8.11.3",
         "pg-hstore": "^2.3.4",

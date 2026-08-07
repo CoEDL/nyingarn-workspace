@@ -240,10 +240,6 @@
       "host": "${SMTP_HOST}",
       "port": ${SMTP_PORT},
       "secure": ${SMTP_SECURE},
-      "auth": {
-        "user": "${SMTP_USER}",
-        "pass": "${SMTP_PASSWORD}"
-      },
       "source": "${SMTP_SOURCE_EMAIL}",
       "replyTo": ${SMTP_REPLY_TO}
     }

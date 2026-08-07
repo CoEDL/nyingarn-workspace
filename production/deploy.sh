@@ -97,8 +97,10 @@ done
 
 # Push the rendered tree. Non-destructive — no --delete, so live databases /
 # uploads / certificates are never touched, and config files removed from the
-# repo will linger on the server until cleaned up manually.
-rsync -avz "$TMP/" "$TARGET/"
+# repo will linger on the server until cleaned up manually. Ownership and
+# directory times are left alone; the remote account doesn't own the deploy
+# directory and can't set them on it.
+rsync -avz --no-owner --no-group --omit-dir-times "$TMP/" "$TARGET/"
 
 HOST="${TARGET%%:*}"
 REMOTE_PATH="${TARGET#*:}"

@@ -72,9 +72,16 @@ async function run() {
         );
     }
 
+    console.log(`\nProbing the object store for access control list files ...`);
+    const objectStoreTargets = await findObjectStoreAcls({
+        candidates: loser.acl,
+        email: loser.user.email,
+    });
+    console.log(`  found ${objectStoreTargets.length}`);
+
     const attributes = await resolveAttributes({ survivor, loser });
 
-    printPlan({ survivor, loser, attributes, sharedItems, sharedCollections });
+    printPlan({ survivor, loser, attributes, sharedItems, sharedCollections, objectStoreTargets });
 
     const confirmation = await rl.question(`\nType MERGE to proceed, anything else to abort: `);
     if (confirmation !== "MERGE") {
@@ -84,7 +91,7 @@ async function run() {
 
     console.log(`\nRewriting access control lists in the object store ...`);
     const objectStoreUpdates = await rewriteObjectStoreAcls({
-        candidates: loser.acl,
+        targets: objectStoreTargets,
         from: loser.user.email,
         to: survivor.user.email,
     });
@@ -110,8 +117,15 @@ async function run() {
         },
     };
 
+    const expected = {
+        items: unique([...survivor.items, ...loser.items]).sort(),
+        collections: unique([...survivor.collections, ...loser.collections]).sort(),
+    };
+
     console.log(`\nApplying database changes ...`);
     await models.sequelize.transaction(async (transaction) => {
+        await assertNothingDrifted({ survivor, loser, transaction });
+
         await moveGrants({
             association: models.user.associations.items,
             survivor: survivor.user,
@@ -152,9 +166,127 @@ async function run() {
         await models.user.destroy({ where: { id: loser.user.id }, transaction });
     });
 
+    const passed = await verifyMerge({ survivor, loser, expected, objectStoreTargets, attributes });
+
+    console.log(`\n${JSON.stringify(snapshot, null, 2)}`);
+
+    if (!passed) {
+        throw new Error(
+            `The merge was applied but the checks above did not all pass. The database changes ` +
+                `were committed - use the snapshot printed above to work out what to repair.`
+        );
+    }
     console.log(`\nDone. '${loser.user.email}' has been merged into '${survivor.user.email}'.`);
-    console.log(`Both users must log in again.\n`);
-    console.log(JSON.stringify(snapshot, null, 2));
+    console.log(`Both users must log in again.`);
+}
+
+async function assertNothingDrifted({ survivor, loser, transaction }) {
+    for (let account of [survivor, loser]) {
+        const user = await models.user.findOne({
+            where: { id: account.user.id },
+            transaction,
+            lock: transaction.LOCK.UPDATE,
+        });
+        if (!user) {
+            throw new Error(`'${account.user.email}' disappeared while you were deciding - aborted`);
+        }
+        const items = (await user.getItems({ attributes: ["identifier"], transaction }))
+            .map((i) => i.identifier)
+            .sort();
+        const collections = (await user.getCollections({ attributes: ["identifier"], transaction }))
+            .map((c) => c.identifier)
+            .sort();
+
+        if (items.join() !== account.items.join() || collections.join() !== account.collections.join()) {
+            throw new Error(
+                `The grants held by '${account.user.email}' changed while you were deciding - ` +
+                    `aborted without applying any database changes. Run the script again.`
+            );
+        }
+    }
+}
+
+async function verifyMerge({ survivor, loser, expected, objectStoreTargets, attributes }) {
+    console.log(`\nVerifying ...`);
+    let passed = true;
+
+    const check = (description, ok, detail) => {
+        console.log(`  ${ok ? "OK  " : "FAIL"} ${description}${detail ? ` - ${detail}` : ""}`);
+        if (!ok) passed = false;
+    };
+
+    const deleted = await models.user.findOne({ where: { id: loser.user.id } });
+    check(`'${loser.user.email}' no longer exists`, !deleted);
+
+    const user = await models.user.findOne({ where: { id: survivor.user.id } });
+    check(`'${survivor.user.email}' still exists`, !!user);
+
+    if (user) {
+        const items = (await user.getItems({ attributes: ["identifier"] }))
+            .map((i) => i.identifier)
+            .sort();
+        const collections = (await user.getCollections({ attributes: ["identifier"] }))
+            .map((c) => c.identifier)
+            .sort();
+
+        check(
+            `survivor holds all ${expected.items.length} item grant(s)`,
+            items.join() === expected.items.join(),
+            items.join() === expected.items.join() ? null : `got ${items.join(", ")}`
+        );
+        check(
+            `survivor holds all ${expected.collections.length} collection grant(s)`,
+            collections.join() === expected.collections.join(),
+            collections.join() === expected.collections.join()
+                ? null
+                : `got ${collections.join(", ")}`
+        );
+        check(
+            `no duplicate item grants`,
+            items.length === unique(items).length
+        );
+        check(
+            `no duplicate collection grants`,
+            collections.length === unique(collections).length
+        );
+
+        for (let [field, value] of Object.entries(attributes)) {
+            check(`survivor ${field} is ${serialise(value)}`, serialise(user[field]) === serialise(value));
+        }
+    }
+
+    const remaining = await findAclEntries({ email: loser.user.email });
+    check(
+        `no database access control list names '${loser.user.email}'`,
+        !remaining.length,
+        remaining.length ? remaining.map((e) => `${e.source}:${e.identifier}`).join(", ") : null
+    );
+
+    for (let target of objectStoreTargets) {
+        const store = await getStoreHandle({
+            identifier: target.identifier,
+            type: target.type,
+            location: target.location,
+        });
+        const acl = await store.getJSON({ target: authorisedUsersFile });
+        const ok =
+            Array.isArray(acl) &&
+            !acl.includes(loser.user.email) &&
+            acl.includes(survivor.user.email);
+        check(`${describeTarget(target)} names the survivor`, ok, ok ? null : JSON.stringify(acl));
+    }
+
+    const sessions = await models.session.count({
+        where: { userId: [survivor.user.id, loser.user.id] },
+    });
+    check(`no sessions remain for either account`, sessions === 0);
+
+    const audit = await models.log.count({
+        where: { owner: survivor.user.email, text: `Merged account '${loser.user.email}' into '${survivor.user.email}'` },
+    });
+    check(`the audit log entry was written`, audit === 1);
+
+    return passed;
 }
 
 async function describeAccount({ email, administrators }) {
@@ -293,7 +425,7 @@ function recommend({ field, keep, other }) {
     }
 }
 
-function printPlan({ survivor, loser, attributes, sharedItems, sharedCollections }) {
+function printPlan({ survivor, loser, attributes, sharedItems, sharedCollections, objectStoreTargets }) {
     console.log(`\n${"#".repeat(78)}`);
     console.log(`PLAN`);
     console.log(`${"#".repeat(78)}`);
@@ -317,12 +449,18 @@ function printPlan({ survivor, loser, attributes, sharedItems, sharedCollections
             `(the survivor already has access)`
     );
 
-    console.log(`\n  ${loser.acl.length} access control list entry/entries rewritten to the survivor:`);
+    console.log(`\n  ${loser.acl.length} database access control list(s) rewritten to the survivor:`);
     if (!loser.acl.length) console.log(`    -`);
     for (let entry of loser.acl) {
         console.log(`    ${entry.source} ${entry.type}/${entry.identifier}`);
     }
-    console.log(`    ...plus ${authorisedUsersFile} in the workspace and repository object stores`);
+
+    console.log(`\n  ${objectStoreTargets.length} object store file(s) rewritten to the survivor:`);
+    if (!objectStoreTargets.length) console.log(`    -`);
+    for (let target of objectStoreTargets) {
+        console.log(`    ${describeTarget(target)}`);
+        console.log(`      ${JSON.stringify(target.acl)}`);
+    }
 
     console.log(`\n  attribute changes to the survivor:`);
     if (!Object.keys(attributes).length) console.log(`    none`);
@@ -334,33 +472,60 @@ function printPlan({ survivor, loser, attributes, sharedItems, sharedCollections
     console.log(`  both accounts' sessions and one time passwords are destroyed`);
 }
 
-async function rewriteObjectStoreAcls({ candidates, from, to }) {
-    let updated = [];
-    const targets = uniqueBy(
+async function findObjectStoreAcls({ candidates, email }) {
+    let targets = [];
+    const objects = uniqueBy(
         candidates.map(({ identifier, type }) => ({ identifier, type })),
-        (target) => `${target.type}/${target.identifier}`
+        (object) => `${object.type}/${object.identifier}`
     );
 
-    for (let target of targets) {
+    for (let object of objects) {
         for (let location of objectStoreLocations) {
             const store = await getStoreHandle({
-                identifier: target.identifier,
-                type: target.type,
+                identifier: object.identifier,
+                type: object.type,
                 location,
             });
             if (!(await store.exists())) continue;
             if (!(await store.fileExists({ path: authorisedUsersFile }))) continue;
 
             const acl = await store.getJSON({ target: authorisedUsersFile });
-            const result = rewriteAcl({ acl, from, to });
-            if (!result.changed) continue;
+            if (!Array.isArray(acl) || !acl.includes(email)) continue;
 
-            await store.put({ target: authorisedUsersFile, json: result.acl });
-            updated.push(`${location}/${target.type}/${target.identifier}/${authorisedUsersFile}`);
+            targets.push({ ...object, location, acl });
         }
     }
 
+    return targets;
+}
+
+async function rewriteObjectStoreAcls({ targets, from, to }) {
+    let updated = [];
+
+    for (let target of targets) {
+        const store = await getStoreHandle({
+            identifier: target.identifier,
+            type: target.type,
+            location: target.location,
+        });
+
+        // re-read rather than trusting the probe, in case it changed in between
+        const acl = await store.getJSON({ target: authorisedUsersFile });
+        const result = rewriteAcl({ acl, from, to });
+        if (!result.changed) {
+            console.log(`  skipped ${describeTarget(target)} - no longer names '${from}'`);
+            continue;
+        }
+
+        await store.put({ target: authorisedUsersFile, json: result.acl });
+        updated.push(describeTarget(target));
+    }
+
     return updated;
+}
+
+function describeTarget({ location, type, identifier }) {
+    return `${location}/${type}/${identifier}/${authorisedUsersFile}`;
 }
 
 async function rewriteDatabaseAcls({ entries, from, to, transaction }) {
@@ -425,6 +590,10 @@ async function ask({ question, valid }) {
 
 function intersection(a, b) {
     return a.filter((value) => b.includes(value));
+}
+
+function unique(values) {
+    return [...new Set(values)];
 }
 
 function uniqueBy(values, key) {

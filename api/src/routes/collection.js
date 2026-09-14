@@ -11,6 +11,7 @@ import {
     linkCollectionToUser,
     deleteCollection,
     toggleCollectionVisibility,
+    inviteUserToCollectionItems,
 } from "../lib/collection.js";
 const log = getLogger();
 
@@ -131,10 +132,16 @@ async function putCollectionInviteUserHandler(req, res) {
             owner: req.session.user.email,
             text: `User '${req.session.user.email}' invited '${user.email}' to '${req.session.collection.identifier}'`,
         });
-        return {};
     } catch (error) {
         return res.internalServerError();
     }
+
+    if (req.body.includeItems !== true) return { granted: [], skipped: [] };
+    return await inviteUserToCollectionItems({
+        inviter: req.session.user,
+        invitee: user,
+        collection: req.session.collection,
+    });
 }
 
 async function putCollectionDetachUserHandler(req, res) {

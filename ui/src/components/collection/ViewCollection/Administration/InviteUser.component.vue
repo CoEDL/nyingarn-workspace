@@ -15,7 +15,7 @@
                         />
                     </div>
                     <div>
-                        <el-button @click="attachUsers">attach user</el-button>
+                        <el-button @click="inviteUsers">invite user</el-button>
                     </div>
                 </div>
                 <div class="text-xs text-gray-600">
@@ -23,15 +23,19 @@
                     exactly as the system knows it in order to find them. Specify multiple users by
                     comma or one per line.
                 </div>
+                <el-checkbox v-model="data.includeItems" class="mt-2">
+                    Also give access to every item in this collection
+                </el-checkbox>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { attachUser, getCollectionUsers } from "../../collection-services.js";
+import { inviteUser, getCollectionUsers } from "../../collection-services.js";
 import ViewCollectionUsersComponent from "./ViewCollectionUsers.component.vue";
 import { flattenDeep } from "lodash";
+import { ElMessage } from "element-plus";
 import { reactive, onMounted, inject } from "vue";
 import { useRoute } from "vue-router";
 const $route = useRoute();
@@ -39,26 +43,42 @@ const $http = inject("$http");
 
 const data = reactive({
     emails: undefined,
+    includeItems: false,
     users: [],
 });
 onMounted(() => {
     loadCollectionUsers();
 });
-async function attachUsers() {
+async function inviteUsers() {
     let emails = data.emails.split("\n").map((line) => line.split(",").map((e) => e.trim()));
     emails = flattenDeep(emails);
-    await Promise.all(
-        emails.map((email) => {
-            return attachUser({
+    const responses = await Promise.all(
+        emails.map(async (email) => {
+            const response = await inviteUser({
                 $http,
                 identifier: $route.params.identifier,
                 email,
+                includeItems: data.includeItems,
             });
+            return { email, response };
         })
-        // data.emails = undefined;
     );
+    if (data.includeItems) {
+        for (const { email, response } of responses) {
+            if (response.status === 200) reportItemAccess({ email, ...(await response.json()) });
+        }
+    }
     loadCollectionUsers();
     data.emails = undefined;
+}
+function reportItemAccess({ email, granted, skipped }) {
+    const total = granted.length + skipped.length;
+    let message = `Gave ${email} access to the collection and ${granted.length} of ${total} items.`;
+    if (skipped.length) {
+        const list = skipped.map((s) => `${s.identifier} (${s.reason})`).join(", ");
+        message += ` Skipped: ${list}`;
+    }
+    ElMessage({ message, type: skipped.length ? "warning" : "success", duration: 8000 });
 }
 async function loadCollectionUsers() {
     let response = await getCollectionUsers({

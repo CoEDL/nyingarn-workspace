@@ -1,6 +1,9 @@
 import models from "../models/index.js";
 import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import { getStoreHandle } from "../common/getS3Handle.js";
+import { logEvent, getLogger } from "../common/logger.js";
+import { lookupItemByIdentifier, linkItemToUser } from "./item.js";
+const log = getLogger();
 
 export async function lookupCollectionByIdentifier({ identifier, userId }) {
     let clause = {
@@ -77,4 +80,33 @@ export async function toggleCollectionVisibility({ collectionId }) {
     collection.data.private = collection.data.private ? !collection.data?.private : true;
     collection.changed("data", true);
     collection = await collection.save();
+}
+
+export async function inviteUserToCollectionItems({ inviter, invitee, collection }) {
+    let granted = [];
+    let skipped = [];
+    for (let item of await collection.getItems()) {
+        let inviterHasAccess =
+            inviter.administrator ||
+            (await lookupItemByIdentifier({ identifier: item.identifier, userId: inviter.id }));
+        if (!inviterHasAccess) {
+            skipped.push({ identifier: item.identifier, reason: "no access" });
+            continue;
+        }
+        try {
+            await linkItemToUser({ itemId: item.id, userId: invitee.id });
+            await logEvent({
+                level: "info",
+                owner: inviter.email,
+                text: `User '${inviter.email}' invited '${invitee.email}' to '${item.identifier}'`,
+            });
+            granted.push(item.identifier);
+        } catch (error) {
+            log.error(
+                `Failed to invite '${invitee.email}' to '${item.identifier}': ${error.message}`
+            );
+            skipped.push({ identifier: item.identifier, reason: "failed" });
+        }
+    }
+    return { granted, skipped };
 }

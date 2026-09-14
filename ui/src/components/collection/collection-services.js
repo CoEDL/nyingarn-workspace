@@ -24,10 +24,10 @@ export async function deleteCollection({ $http, identifier }) {
     });
 }
 
-export async function attachUser({ $http, identifier, email }) {
+export async function inviteUser({ $http, identifier, email, includeItems = false }) {
     return await $http.put({
         route: `/collections/${identifier}/attach-user`,
-        body: { email },
+        body: { email, includeItems },
     });
 }
 

@@ -15,7 +15,7 @@
                         />
                     </div>
                     <div>
-                        <el-button @click="attachUsers">attach user</el-button>
+                        <el-button @click="attachUsers">invite user</el-button>
                     </div>
                 </div>
                 <div class="text-xs text-gray-600">

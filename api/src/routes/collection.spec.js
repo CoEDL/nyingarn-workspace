@@ -1,5 +1,6 @@
 require("regenerator-runtime");
 import { deleteCollection, createCollection } from "../lib/collection";
+import { deleteItem, createItem } from "../lib/item";
 import { createSession } from "../lib/session";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";
@@ -9,24 +10,27 @@ import models from "../models";
 
 describe("Collection management route tests", () => {
     let configuration, users, userEmail, adminEmail, bucket;
-    let identifier, store;
+    let identifier;
     const tester = new TestSetup();
-
-    beforeAll(async () => {
-        ({ userEmail, adminEmail, configuration, bucket } = await tester.setupBeforeAll());
-        users = await tester.setupUsers({ emails: [userEmail], adminEmails: [adminEmail] });
-    });
-    beforeEach(async () => {
-        identifier = chance.word();
-        store = await getStoreHandle({
-            id: identifier,
-            type: "collection",
-        });
-    });
-    afterEach(async () => {
+    async function removeStore({ id, type }) {
+        let store = await getStoreHandle({ id, type });
         try {
             await store.removeObject();
         } catch (error) {}
+    }
+
+    beforeAll(async () => {
+        ({ userEmail, adminEmail, configuration, bucket } = await tester.setupBeforeAll());
+        users = await tester.setupUsers({
+            emails: [userEmail, chance.email()],
+            adminEmails: [adminEmail],
+        });
+    });
+    beforeEach(async () => {
+        identifier = chance.word();
+    });
+    afterEach(async () => {
+        await removeStore({ id: identifier, type: "collection" });
     });
     afterAll(async () => {
         await tester.purgeUsers({ users });
@@ -137,6 +141,136 @@ describe("Collection management route tests", () => {
 
         await deleteCollection({ id: collection.id });
         await models.log.destroy({ where: {} });
+    });
+    describe("inviting a user to a collection and its items", () => {
+        let inviter, invitee, admin, collection, items;
+
+        async function invite({ session, email, includeItems }) {
+            let response = await fetch(`${host}/collections/${identifier}/attach-user`, {
+                method: "PUT",
+                headers: headers(session),
+                body: JSON.stringify({ email, includeItems }),
+            });
+            expect(response.status).toEqual(200);
+            return await response.json();
+        }
+        async function itemIdentifiersAccessibleTo(user) {
+            let accessible = await user.getItems();
+            return accessible.map((i) => i.identifier).sort();
+        }
+        async function createItemFor({ userId }) {
+            let item = await createItem({ identifier: chance.word(), userId });
+            items.push(item);
+            return item;
+        }
+
+        beforeEach(async () => {
+            [inviter, invitee] = users.filter((u) => !u.administrator);
+            admin = users.filter((u) => u.administrator)[0];
+            collection = await createCollection({ identifier, userId: inviter.id });
+            items = [];
+        });
+        afterEach(async () => {
+            for (let item of items) {
+                await deleteItem({ id: item.id });
+                await removeStore({ id: item.identifier, type: "item" });
+            }
+            await deleteCollection({ id: collection.id });
+            await models.log.destroy({ where: {} });
+        });
+
+        it("grants access to the collection only when includeItems is not set", async () => {
+            let item = await createItemFor({ userId: inviter.id });
+            await collection.addItem(item);
+
+            let result = await invite({
+                session: await createSession({ user: inviter }),
+                email: invitee.email,
+            });
+            expect(result).toEqual({ granted: [], skipped: [] });
+            expect((await collection.getUsers()).map((u) => u.id)).toContain(invitee.id);
+            expect(await itemIdentifiersAccessibleTo(invitee)).toEqual([]);
+        });
+        it("grants access to every direct item the inviter can access", async () => {
+            let item1 = await createItemFor({ userId: inviter.id });
+            let item2 = await createItemFor({ userId: inviter.id });
+            await collection.addItems([item1, item2]);
+
+            let result = await invite({
+                session: await createSession({ user: inviter }),
+                email: invitee.email,
+                includeItems: true,
+            });
+            expect(result.granted.sort()).toEqual([item1.identifier, item2.identifier].sort());
+            expect(result.skipped).toEqual([]);
+            expect(await itemIdentifiersAccessibleTo(invitee)).toEqual(
+                [item1.identifier, item2.identifier].sort()
+            );
+
+            for (let item of [item1, item2]) {
+                let text = `User '${inviter.email}' invited '${invitee.email}' to '${item.identifier}'`;
+                let logs = await models.log.findAll({ where: { text } });
+                expect(logs.length).toEqual(1);
+            }
+        });
+        it("skips items the inviter cannot access", async () => {
+            let held = await createItemFor({ userId: inviter.id });
+            let notHeld = await createItemFor({ userId: admin.id });
+            await collection.addItems([held, notHeld]);
+
+            let result = await invite({
+                session: await createSession({ user: inviter }),
+                email: invitee.email,
+                includeItems: true,
+            });
+            expect(result.granted).toEqual([held.identifier]);
+            expect(result.skipped).toEqual([{ identifier: notHeld.identifier, reason: "no access" }]);
+            expect(await itemIdentifiersAccessibleTo(invitee)).toEqual([held.identifier]);
+        });
+        it("lets an administrator grant items they were never invited to", async () => {
+            let item = await createItemFor({ userId: inviter.id });
+            await collection.addItem(item);
+
+            let result = await invite({
+                session: await createSession({ user: admin }),
+                email: invitee.email,
+                includeItems: true,
+            });
+            expect(result.granted).toEqual([item.identifier]);
+            expect(result.skipped).toEqual([]);
+            expect(await itemIdentifiersAccessibleTo(invitee)).toEqual([item.identifier]);
+        });
+        it("leaves items that belong only to a sub-collection untouched", async () => {
+            let subCollection = await createCollection({
+                identifier: chance.word(),
+                userId: inviter.id,
+            });
+            let item = await createItemFor({ userId: inviter.id });
+            await subCollection.addItem(item);
+            await collection.addSubCollection(subCollection);
+
+            let result = await invite({
+                session: await createSession({ user: inviter }),
+                email: invitee.email,
+                includeItems: true,
+            });
+            expect(result).toEqual({ granted: [], skipped: [] });
+            expect(await itemIdentifiersAccessibleTo(invitee)).toEqual([]);
+
+            await deleteCollection({ id: subCollection.id });
+            await removeStore({ id: subCollection.identifier, type: "collection" });
+        });
+        it("is a no-op when repeated for the same user", async () => {
+            let item = await createItemFor({ userId: inviter.id });
+            await collection.addItem(item);
+            let session = await createSession({ user: inviter });
+
+            await invite({ session, email: invitee.email, includeItems: true });
+            let result = await invite({ session, email: invitee.email, includeItems: true });
+            expect(result.granted).toEqual([item.identifier]);
+            expect(await itemIdentifiersAccessibleTo(invitee)).toEqual([item.identifier]);
+            expect((await collection.getUsers()).length).toEqual(2);
+        });
     });
     it("should be able to detach a user from a collection", async () => {
         let user = users.filter((u) => !u.administrator)[0];

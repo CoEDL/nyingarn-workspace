@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <div class="text-gray-600">The following people have access to this item:</div>
+        <div class="text-gray-600">The following people have access to this collection:</div>
         <el-table :data="users">
             <el-table-column prop="email" label="Email" width="400" />
             <el-table-column prop="givenName" label="Given Name" />

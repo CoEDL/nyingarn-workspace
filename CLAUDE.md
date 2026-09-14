@@ -98,3 +98,17 @@ docker compose exec rabbit-worker1 npm test
 ```
 
 Tests use Jest 29 with `babel-jest`. Run with `--runInBand` (serial execution).
+
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked in GitHub Issues on `CoEDL/nyingarn-workspace` via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.

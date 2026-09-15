@@ -73,7 +73,7 @@ services:
             - 8025:8025
 
     rabbit-worker1:
-        image: node:18-bullseye
+        image: node:18-bookworm
         hostname: worker1
         restart: always
         working_dir: /srv/tasks
@@ -99,7 +99,7 @@ services:
         command: ["/wait-for-it.sh", "rabbit:15672", "--", "npm", "run", "develop"]
 
     api:
-        image: node:18-bullseye
+        image: node:18-bookworm
         hostname: api
         tty: true
         environment:
@@ -122,7 +122,7 @@ services:
         command: ["/wait-for-it.sh", "db:5432", "--", "npm", "run", "develop"]
 
     ui:
-        image: node:18-bullseye
+        image: node:18-bookworm
         hostname: ui
         tty: true
         environment:
@@ -136,7 +136,7 @@ services:
         command: ["npm", "run", "develop"]
 
     ui-repository:
-        image: node:18-bullseye
+        image: node:18-bookworm
         hostname: ui-repository
         tty: true
         environment:

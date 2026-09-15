@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "$(which psql)" != 0 ] ; then
+if ! command -v psql >/dev/null 2>&1 ; then
     apt-get update && apt-get install -y postgresql-client
 fi
 cmd="$@"

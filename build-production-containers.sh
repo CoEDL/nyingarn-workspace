@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 VERSION=$1
 echo "Building $VERSION"
 
@@ -22,18 +24,14 @@ docker build --push --rm \
     -f Dockerfile.xml-build .
 
 # build the UI container
-cd ui
-npm run build
-cd -
+(cd ui && npm run build)
 docker build --push --rm \
     -t ghcr.io/coedl/nyingarn-workspace-ui:latest \
     -t ghcr.io/coedl/nyingarn-workspace-ui:${VERSION} \
     -f Dockerfile.ui-build .
 
 # build the UI Repository container
-cd ui-repository
-npm run build
-cd -
+(cd ui-repository && npm run build)
 docker build --push --rm \
     -t ghcr.io/coedl/nyingarn-repository-ui:latest \
     -t ghcr.io/coedl/nyingarn-repository-ui:${VERSION} \

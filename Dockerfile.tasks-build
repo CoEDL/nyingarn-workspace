@@ -6,7 +6,7 @@
 #RUN npm install
 #RUN npm run build:production
 
-#FROM node:18-bullseye-slim
+#FROM node:18-bookworm-slim
 #WORKDIR /srv
 #RUN apt-get update && apt-get install -y ca-certificates
 #COPY --from=tasks-builder /srv/tasks/package.json /srv/package.json
@@ -17,7 +17,7 @@
 # COPY tasks/src/xslt /srv/tasks/src/xslt
 #CMD [ "node", "./server.bundle.cjs" ]
 
-FROM node:18-bullseye-slim
+FROM node:18-bookworm-slim
 LABEL org.opencontainers.image.source=https://github.com/CoEDL/nyingarn-workspace
 LABEL org.opencontainers.image.description="The Nyingarn Workspace Tasks container"
 LABEL org.opencontainers.image.licenses=GPLv3

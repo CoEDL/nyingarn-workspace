@@ -1,10 +1,11 @@
-const { copy, pathExists, remove } = require("fs-extra");
+const { readFile, writeFile, pathExists, remove } = require("fs-extra");
+
+const development = "/srv/configuration/development-configuration.json";
+const backup = `${development}.backup`;
+
 module.exports = async () => {
-    if (await pathExists("/srv/configuration/development-configuration.json.backup")) {
-        await copy(
-            "/srv/configuration/development-configuration.json.backup",
-            "/srv/configuration/development-configuration.json"
-        );
+    if (await pathExists(backup)) {
+        await writeFile(development, await readFile(backup));
+        await remove(backup);
     }
-    await remove("/srv/configuration/development-configuration.json.backup");
 };

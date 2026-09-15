@@ -1,14 +1,13 @@
-const { copy, pathExists } = require("fs-extra");
+const { readFile, writeFile, pathExists } = require("fs-extra");
 
+const development = "/srv/configuration/development-configuration.json";
+const backup = `${development}.backup`;
+const testing = "/srv/configuration/testing-configuration.json";
+
+// writeFile truncates in place, so the host owner and mode of the file survive
 module.exports = async () => {
-    if (!(await pathExists("/srv/configuration/development-configuration.json.backup"))) {
-        await copy(
-            "/srv/configuration/development-configuration.json",
-            "/srv/configuration/development-configuration.json.backup"
-        );
+    if (!(await pathExists(backup))) {
+        await writeFile(backup, await readFile(development));
     }
-    await copy(
-        "/srv/configuration/testing-configuration.json",
-        "/srv/configuration/development-configuration.json"
-    );
+    await writeFile(development, await readFile(testing));
 };

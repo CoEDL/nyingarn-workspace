@@ -14,11 +14,12 @@ docker compose up
 
 - Workspace UI: http://localhost:9000
 - Repository UI: http://localhost:9001
-- API: http://localhost:8080
+- API: http://localhost:9000/api/ (proxied by nginx, not published directly)
 - MinIO console: http://localhost:10001
 - RabbitMQ management: http://localhost:15672
-- Elasticsearch: http://localhost:9200
 - Mailpit (catches all outgoing email in dev): http://localhost:8025
+
+Only the browser-facing ports above are published on the host. Elasticsearch, MinIO S3, RabbitMQ AMQP, SMTP and the xml-processor are reachable from other containers by service name only. Local MinIO credentials can be overridden through a git-ignored `.env` file; see `.env.example`.
 
 ## Architecture
 

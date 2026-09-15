@@ -142,15 +142,13 @@ services:
         command: ["npm", "run", "develop"]
 
     elastic:
-        image: elasticsearch:8.16.0
+        build: elastic
         hostname: elastic
         environment:
             - discovery.type=single-node
             - ES_JAVA_OPTS=-Xms750m -Xmx750m
             - xpack.security.enabled=false
             - node.name=search
-        volumes:
-            - ./elasticsearch-plugins:/plugins
         ulimits:
             memlock:
                 soft: -1
@@ -162,12 +160,6 @@ services:
             - IPC_LOCK
         ports:
             - 9200:9200
-        command: >
-            /bin/sh -c "
-            ./bin/elasticsearch-plugin remove nyingarn-phonetic-search;
-            ./bin/elasticsearch-plugin install https://github.com/r-tae/nyingarn-phonetic-search/releases/download/v1.0.0/nyingarn-phonetic-search-1.0-SNAPSHOT.zip;
-            /usr/local/bin/docker-entrypoint.sh"
-
 
     edge:
         image: nginx:latest

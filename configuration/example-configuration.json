@@ -149,11 +149,11 @@
                 "bindings": [{ "exchange": "nyingarn", "target": "nyingarn_tasks", "keys": [] }]
             },
             "s3": {
-                "endpointUrl": "http://minio:9000",
+                "endpointUrl": "http://s3:9000",
                 "forcePathStyle": true,
                 "bucket": "uploads",
-                "awsAccessKeyId": "{ access key }",
-                "awsSecretAccessKey": "{ secret key }",
+                "awsAccessKeyId": "minioadmin",
+                "awsSecretAccessKey": "minioadmin",
                 "region": "us-east-1"
             },
             "aws": {

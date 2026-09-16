@@ -4,6 +4,7 @@ const { isArray, isString, isPlainObject, flattenDeep, compact } = lodashPkg;
 import fsExtraPkg from "fs-extra";
 const { createReadStream } = fsExtraPkg;
 import { Client } from "@elastic/elasticsearch";
+import { log } from "./logger.js";
 import { ROCrate } from "ro-crate";
 // import { FormData, File, Blob } from "formdata-node";
 // import { Buffer } from "node:buffer";
@@ -165,44 +166,55 @@ export function assembleIndexRecord({ crate }) {
     return record;
 }
 
-// TODO this method does not have tests
 export function extractGeography({ crate }) {
-    let entities = [];
+    let geometries = [];
     for (let entity of crate.entities()) {
         if (entity["@type"].includes("GeoShape") || entity["@type"].includes("GeoCoordinates")) {
-            entities.push(entity);
+            geometries.push(...extractGeometries({ entity }));
         }
     }
+    return geometries;
+}
 
-    entities.push({
-        "@id": "test",
-        "@type": ["GeoShape"],
-        name: "aaa",
-        geojson: [
-            '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[58.07810783386231,29.095852076791065],[58.07810783386231,-19.12303093039881],[11.671857833862305,-19.12303093039881],[11.671857833862305,29.095852076791065]]]}}',
-        ],
-    });
-    let coordinates = flattenDeep(entities.map((e) => JSON.parse(e.geojson).geometry)).map(
-        (feature) => {
-            feature.coordinates = parseValuesAsFloat(feature.coordinates);
-            if (feature.type.match(/polygon/i)) {
-                feature.coordinates[0].push(feature.coordinates[0][0]);
-            }
-            return feature;
+// bad geography on a single entity must not stop the whole item being indexed
+function extractGeometries({ entity }) {
+    let geometries = [];
+    for (let source of compact(flattenDeep([entity.geojson]))) {
+        let geojson;
+        try {
+            geojson = JSON.parse(source);
+        } catch (error) {
+            log.warn(`Ignoring unparseable geojson on '${entity["@id"]}': ${error.message}`);
+            continue;
         }
-    );
-    // console.log("2", JSON.stringify(coordinates, null, 2));
-    coordinates = compact(coordinates);
-    return coordinates;
-
-    function parseValuesAsFloat(arr) {
-        return arr.map((v) => {
-            if (isArray(v)) {
-                return parseValuesAsFloat(v);
+        const features = geojson?.type === "FeatureCollection" ? geojson.features ?? [] : [geojson];
+        for (let feature of features) {
+            const geometry = feature?.geometry ?? feature;
+            if (!isString(geometry?.type) || !isArray(geometry?.coordinates)) {
+                log.warn(`Ignoring geojson without a geometry on '${entity["@id"]}'`);
+                continue;
             }
-            return parseFloat(v);
-        });
+            geometry.coordinates = parseValuesAsFloat(geometry.coordinates);
+            const type = geometry.type.toLowerCase();
+            if (type === "polygon") closeRings(geometry.coordinates);
+            if (type === "multipolygon") geometry.coordinates.forEach(closeRings);
+            geometries.push(geometry);
+        }
     }
+    return geometries;
+}
+
+// elasticsearch rejects polygons whose rings aren't explicitly closed
+function closeRings(rings) {
+    for (let ring of rings) {
+        const [first, last] = [ring[0], ring.at(-1)];
+        if (!first) continue;
+        if (first[0] !== last[0] || first[1] !== last[1]) ring.push([...first]);
+    }
+}
+
+function parseValuesAsFloat(arr) {
+    return arr.map((v) => (isArray(v) ? parseValuesAsFloat(v) : parseFloat(v)));
 }
 
 // TODO this method does not have tests

@@ -153,7 +153,7 @@ describe("Repository route tests", () => {
         let session = await createSession({ user });
 
         // register the item in the db
-        let item = await models.repoitem.create({ identifier, type: "item" });
+        let item = await models.repoitem.create({ identifier, type: "item", openAccess: true });
 
         // index the item so that we can test for it
         let response = await fetch(`${host}/repository/index/${item.id}`, {
@@ -283,5 +283,70 @@ describe("Repository route tests", () => {
         await models.item.destroy({ where: { identifier } });
         await workspaceObject.removeObject();
         await repositoryObject.removeObject();
+    });
+    it("should only serve restricted content to users on the access control list", async () => {
+        let store = await getStoreHandle({
+            id: identifier,
+            type: "item",
+            location: "repository",
+        });
+        await store.createObject();
+        for (let file of [`${identifier}-001.webp`, `${identifier}-001.thumbnail_h300.jpg`]) {
+            await store.put({ target: file, json: {} });
+        }
+        await store.put({ target: `${identifier}-001.tei.xml`, content: "<tei></tei>" });
+
+        const authorised = users.filter((u) => !u.administrator)[0];
+        const unauthorised = users.filter((u) => u.administrator)[0];
+        await models.repoitem.create({
+            identifier,
+            type: "item",
+            openAccess: false,
+            accessControlList: [authorised.email],
+        });
+
+        const thumbnails = `${host}/repository/item/${identifier}/thumbnails`;
+        const resource = `${host}/repository/item/${identifier}/${identifier}-001`;
+
+        // not logged in
+        let response = await (await fetch(thumbnails, { method: "GET" })).json();
+        expect(response.thumbnails).toEqual([]);
+        expect(response.message).toMatchObject({
+            code: "Access Denied",
+            reason: expect.stringContaining("not logged in"),
+        });
+
+        // logged in but not on the access control list
+        let session = await createSession({ user: unauthorised });
+        response = await (
+            await fetch(thumbnails, { method: "GET", headers: headers(session) })
+        ).json();
+        expect(response.thumbnails).toEqual([]);
+        expect(response.message).toMatchObject({
+            code: "Access Denied",
+            reason: expect.stringContaining("not authorised"),
+        });
+
+        response = await (
+            await fetch(resource, { method: "GET", headers: headers(session) })
+        ).json();
+        expect(response.message).toMatchObject({ code: "Access Denied" });
+        expect(response.imageUrl).toBeUndefined();
+
+        // on the access control list
+        session = await createSession({ user: authorised });
+        response = await (
+            await fetch(thumbnails, { method: "GET", headers: headers(session) })
+        ).json();
+        expect(response.message).toBeUndefined();
+        expect(response.thumbnails).toMatchObject([
+            {
+                name: `${identifier}-001`,
+                filename: `${identifier}-001.thumbnail_h300.jpg`,
+            },
+        ]);
+
+        await models.repoitem.destroy({ where: { identifier } });
+        await store.removeObject();
     });
 });

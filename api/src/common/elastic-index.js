@@ -131,11 +131,10 @@ export async function deleteItemFromIndex({ location = "workspace", item, config
         node: configuration.api.services.elastic.host,
     });
 
-    const indexIdentifier = `/${item.type}/${item.identifier}`;
-    await client.delete({
-        index: indexName,
-        id: indexIdentifier,
-    });
+    await client.delete(
+        { index: indexName, id: `/${item.type}/${item.identifier}` },
+        { ignore: [404] }
+    );
 }
 
 // TODO this method does not have tests

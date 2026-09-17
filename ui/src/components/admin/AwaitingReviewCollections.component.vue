@@ -40,6 +40,7 @@
 
 <script setup>
 import { reactive, inject, onMounted } from "vue";
+import { ElMessage } from "element-plus";
 import { getAwaitingReview } from "./admin-services.js";
 import * as lib from "./lib.js";
 import { useRouter } from "vue-router";
@@ -75,12 +76,19 @@ async function deposit(type, item) {
     data.depositLogs = [];
     data.loading = true;
     let { identifier, version } = item;
-    let response = await $http.put({
-        route: `/admin/${type}/${identifier}/deposit`,
-        params: { clientId: $socket.id },
-        body: { version },
+    const { ok, message } = await lib.depositObject({
+        $http,
+        type,
+        identifier,
+        version,
+        clientId: $socket.id,
     });
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    if (ok) {
+        // give the deposit progress messages a moment to finish arriving
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+    } else {
+        ElMessage.error(`${identifier} was not deposited: ${message}`);
+    }
     data.depositLogs = [];
     data.loading = false;
     init();

@@ -45,10 +45,24 @@ export async function indexRepositoryContent({ $http, id }) {
         route: `/repository/index/${id}`,
     });
 }
+export async function depositObject({ $http, type, identifier, version, clientId }) {
+    let response = await $http.put({
+        route: `/admin/${type}/${identifier}/deposit`,
+        params: { clientId },
+        body: { version },
+    });
+    return await asOutcome(response);
+}
 export async function deleteItemFromRepository({ $http, type, identifier }) {
     let response = await $http.delete({
         route: `/repository/${type}/${identifier}`,
     });
+    return await asOutcome(response);
+}
+async function asOutcome(response) {
+    if (response.status === 200) return { ok: true };
+    const { message } = await response.json();
+    return { ok: false, message };
 }
 export async function connectItem({ $http, identifier }) {
     await $http.put({ route: `/admin/items/${identifier}/connect-user` });

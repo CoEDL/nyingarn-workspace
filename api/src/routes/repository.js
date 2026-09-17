@@ -433,8 +433,7 @@ async function deleteRepositoryObjectHandler(req, res) {
             configuration: req.session.configuration,
         });
     } catch (error) {
-        log.error(`There was a problem removing the item from the repository`);
-        console.error(error);
-        return res.internalServerError();
+        log.error(`Unable to remove '${type}:${identifier}' from the repository: ${error.message}`);
+        return res.internalServerError(error.message);
     }
 }

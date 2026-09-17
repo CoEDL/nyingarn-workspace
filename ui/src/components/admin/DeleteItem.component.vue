@@ -29,14 +29,13 @@
 </template>
 
 <script setup>
-import { ElCard, ElSelect, ElOption, vLoading } from "element-plus";
+import { ElCard, ElSelect, ElOption, ElMessage, vLoading } from "element-plus";
 import * as lib from "./lib.js";
 import { reactive, inject, onMounted } from "vue";
 const $http = inject("$http");
 
 const data = reactive({
     loading: false,
-    selectedItem: undefined,
     options: [],
 });
 
@@ -53,8 +52,13 @@ async function findItem(prefix) {
 }
 async function deleteItem() {
     data.loading = true;
-    const item = data.options.filter((i) => i.id === data.selectedItemIdentifier)[0];
-    await lib.deleteItemFromRepository({ $http, ...item });
+    const item = data.options.find((i) => i.id === data.selectedItemIdentifier);
+    const { ok, message } = await lib.deleteItemFromRepository({ $http, ...item });
+    if (ok) {
+        ElMessage.success(`${item.identifier} was removed from the repository`);
+    } else {
+        ElMessage.error(`${item.identifier} was not removed: ${message}`);
+    }
     data.selectedItemIdentifier = undefined;
     data.options = [];
     data.loading = false;

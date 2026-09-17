@@ -188,9 +188,8 @@ export async function publishObject({ user, type, identifier, configuration }) {
     try {
         await indexItem({ configuration, item: { identifier, type }, crate: crate.toJSON() });
     } catch (error) {
-        throw new Error(
-            `Metadata is invalid and can't be indexed. It needs to be fixed in order to publish the object.`
-        );
+        log.error(`Unable to index '${type}:${identifier}' for publication: ${error.message}`);
+        throw new Error(`The object can't be indexed so it can't be published: ${error.message}`);
     }
 
     let licence;
@@ -487,9 +486,12 @@ export async function deleteItemFromRepository({ type, identifier, configuration
     await objectRepository.removeObject();
 
     //  delete it from elastic
-    let item = await models.repoitem.findOne({ where: { identifier, type } });
-    await deleteItemFromIndex({ location: "repository", item, configuration });
+    await deleteItemFromIndex({
+        location: "repository",
+        item: { identifier, type },
+        configuration,
+    });
 
     //  delete it from the db
-    await models.repoitem.destroy({ where: { identifier } });
+    await models.repoitem.destroy({ where: { identifier, type } });
 }

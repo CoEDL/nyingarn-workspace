@@ -558,4 +558,26 @@ describe("Admin management tests", () => {
         await objectRepository.removeObject();
         await deleteItem({ id: item.id });
     });
+    it("should delete an item from the repository that isn't in the index", async () => {
+        let objectWorkspace = await getStoreHandle({ identifier, type: "item" });
+        let objectRepository = await getStoreHandle({
+            identifier,
+            type: "item",
+            location: "repository",
+        });
+
+        let user = users.filter((u) => !u.administrator)[0];
+        await setupTestItem({ identifier, store: objectWorkspace, user });
+        await objectRepository.createObject();
+        await models.repoitem.create({ identifier, type: "item", openAccess: true });
+
+        await deleteItemFromRepository({ type: "item", identifier, configuration });
+
+        let repoitem = await models.repoitem.findOne({ where: { identifier } });
+        expect(repoitem).toEqual(null);
+
+        let item = await models.item.findOne({ where: { identifier } });
+        await objectWorkspace.removeObject();
+        await deleteItem({ id: item.id });
+    });
 });

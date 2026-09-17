@@ -45,6 +45,22 @@ async function getItem({ identifier }) {
     return item;
 }
 
+function denyAccess({ item, user }) {
+    if (item?.openAccess) return null;
+    if (user?.email && item?.accessControlList?.includes(user.email)) return null;
+
+    return {
+        total: 0,
+        thumbnails: [],
+        message: {
+            code: "Access Denied",
+            reason: user?.email
+                ? "The content of this item cannot be shown because you are not authorised to see it."
+                : "The content of this item cannot be shown because you are not logged in.",
+        },
+    };
+}
+
 // TODO this code does not have tests yet
 export async function getRepositoryLookupLanguageHandler(req) {
     // let esbQuery = esb
@@ -283,20 +299,8 @@ async function getItemThumbnailsHandler(req, res) {
     const item = await getItem({ identifier: req.params.identifier });
     const user = await isUserAuthenticated(req);
 
-    if (!item.openAccess) {
-        if (!user?.email && !item?.accessControlList?.includes(user?.email)) {
-            return {
-                total: 0,
-                thumbnails: [],
-                message: {
-                    code: "Access Denied",
-                    reason: !user?.email
-                        ? "The content of this item cannot be shown because you are not logged in."
-                        : "The content of this item cannot be shown because you are not authorised to see it.",
-                },
-            };
-        }
-    }
+    const denied = denyAccess({ item, user });
+    if (denied) return denied;
 
     const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 20;
     const offset = req.query.offset ? parseInt(req.query.offset) : 0;
@@ -325,20 +329,8 @@ async function getItemResourceDataHandler(req) {
         const item = await getItem({ identifier: req.params.identifier });
         const user = await isUserAuthenticated(req);
 
-        if (!item.openAccess) {
-            if (!user?.email && !item?.accessControlList?.includes(user?.email)) {
-                return {
-                    total: 0,
-                    thumbnails: [],
-                    message: {
-                        code: "Access Denied",
-                        reason: !user?.email
-                            ? "The content of this item cannot be shown because you are not logged in."
-                            : "The content of this item cannot be shown because you are not authorised to see it.",
-                    },
-                };
-            }
-        }
+        const denied = denyAccess({ item, user });
+        if (denied) return denied;
 
         let store = await getStoreHandle({
             id: req.params.identifier,

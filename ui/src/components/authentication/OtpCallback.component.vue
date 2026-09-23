@@ -4,7 +4,6 @@
 
 <script setup>
 import {
-    loginSessionKey,
     tokenSessionKey,
     putLocalStorage,
     getLocalStorage,
@@ -28,7 +27,6 @@ onMounted(() => {
 });
 async function login() {
     const { otp } = $route.params;
-    removeLocalStorage({ key: loginSessionKey });
     let response = await $http.post({
         route: `/auth/otp`,
         body: { otp },

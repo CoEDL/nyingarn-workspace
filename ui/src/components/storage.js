@@ -1,4 +1,3 @@
-export const loginSessionKey = "nyingarn-login-session-data";
 export const tokenSessionKey = "nyingarn-user-token";
 
 // local storage handlers

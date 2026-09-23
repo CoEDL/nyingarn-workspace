@@ -14,7 +14,7 @@ The column is `NOT NULL`. The schema is managed by `sequelize.sync()`, which cre
 
 ## Decision
 
-Keep the column. The model gives it a default of `email` and no code sets or reads it.
+Keep the column. The model gives it a default of `email` and no application code sets or reads it. `api/src/scripts/merge-users.js` still prints it as context when comparing duplicate accounts.
 
 Existing values are historical and carry no meaning. How a user signed in is recorded in the `log` table (`data.provider`).
 

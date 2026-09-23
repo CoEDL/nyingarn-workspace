@@ -1,7 +1,7 @@
 {
   "ui": {
     "siteName": "Nyingarn Platform Workspace",
-    "tusEndpoint": "https://workspace.${DOMAIN}/api/files",
+    "tusEndpoint": "https://workspace.nyingarn.net/api/files",
     "termsAndConditionsOfUse": "https://nyingarn.net/terms-and-conditions/",
     "notices": {
       "workspace": [],
@@ -143,11 +143,11 @@
         }
       }
     ],
-    "mapboxToken": "${MAPBOX_TOKEN}"
+    "mapboxToken": "REPLACE_ME_MAPBOX_TOKEN"
   },
   "api": {
-    "domain": "${DOMAIN}",
-    "administrators": ${ADMINISTRATORS},
+    "domain": "nyingarn.net",
+    "administrators": ["REPLACE_ME_ADMINISTRATOR"],
     "filenaming": {
       "adminTag": "ADMIN",
       "resourceQualifierSeparator": ".",
@@ -171,8 +171,7 @@
     "session": {
       "lifetime": {
         "hours": 8
-      },
-      "secret": "${SESSION_SECRET}"
+      }
     },
     "processing": {
       "exchange": "nyingarn"
@@ -180,8 +179,6 @@
     "services": {
       "rabbit": {
         "host": "rabbit",
-        "user": "guest",
-        "pass": "guest",
         "port": "5672",
         "exchanges": [
           {
@@ -208,17 +205,13 @@
         ]
       },
       "s3": {
-        "endpointUrl": "https://files.${DOMAIN}",
+        "endpointUrl": "https://files.nyingarn.net",
         "forcePathStyle": true,
         "bucket": "uploads",
-        "awsAccessKeyId": "${S3_ACCESS_KEY_ID}",
-        "awsSecretAccessKey": "${S3_SECRET_ACCESS_KEY}",
         "region": "us-east-1"
       },
       "aws": {
-        "awsAccessKeyId": "${AWS_ACCESS_KEY_ID}",
-        "awsSecretAccessKey": "${AWS_SECRET_ACCESS_KEY}",
-        "region": "${AWS_REGION}"
+        "region": "ap-southeast-2"
       },
       "elastic": {
         "host": "http://elastic:9200"
@@ -228,18 +221,18 @@
       }
     },
     "origin": {
-      "workspace": "https://workspace.${DOMAIN}",
-      "repository": "https://repository.${DOMAIN}"
+      "workspace": "https://workspace.nyingarn.net",
+      "repository": "https://repository.nyingarn.net"
     },
     "emailLoginTimeout": {
       "minutes": 10
     },
     "smtp": {
-      "host": "${SMTP_HOST}",
-      "port": ${SMTP_PORT},
-      "secure": ${SMTP_SECURE},
-      "source": "${SMTP_SOURCE_EMAIL}",
-      "replyTo": ${SMTP_REPLY_TO}
+      "host": "email-smtp.ap-southeast-2.amazonaws.com",
+      "port": 587,
+      "secure": false,
+      "source": "nyingarnproject@gmail.com",
+      "replyTo": ["nyingarn-project@unimelb.edu.au"]
     }
   }
 }

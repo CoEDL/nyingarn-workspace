@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# deploy.sh — render the production config files using values from local
+# deploy.sh — render the production templates using values from local
 # `env`, copy them (plus the parent profiles/ directory) into a temp tree,
 # rsync to the production server, and restart docker compose.
 #
@@ -26,15 +26,13 @@ set +a
 REQUIRED_VARS=(
   DOMAIN ACME_EMAIL DB_PASSWORD
   S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY
-  AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION
-  MAPBOX_TOKEN SESSION_SECRET
-  ADMINISTRATORS
-  SMTP_HOST SMTP_PORT SMTP_SECURE SMTP_SOURCE_EMAIL SMTP_REPLY_TO
+  AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+  SESSION_SECRET
 )
 
 # Substituted if set, but allowed to be empty — a relay that doesn't require
-# authentication leaves these blank.
-OPTIONAL_VARS=(SMTP_USER SMTP_PASSWORD)
+# authentication leaves the SMTP pair blank, and rabbit falls back to guest.
+OPTIONAL_VARS=(SMTP_USER SMTP_PASSWORD RABBIT_USER RABBIT_PASS)
 
 missing=()
 for v in "${REQUIRED_VARS[@]}"; do
@@ -54,7 +52,6 @@ ALLOWLIST="$(printf '$%s ' "${REQUIRED_VARS[@]}" "${OPTIONAL_VARS[@]}")"
 # Files to render. Anything else is copied verbatim.
 TEMPLATES=(
   .env
-  configuration/configuration.json
   workspace/nginx.conf
   repository/nginx.conf
 )

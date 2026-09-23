@@ -1,9 +1,9 @@
 # Nyingarn Workspace — Production Deploy
 
-This directory holds the Docker Compose configuration for the production
-deployment, plus a deploy script that renders templated config files using
-secrets from a local `env` file and rsyncs the result to the production
-server.
+This directory holds the Docker Compose configuration and app configuration
+for the production deployment, plus a deploy script that renders templated
+files using secrets from a local `env` file and rsyncs the result to the
+production server.
 
 ## File layout
 
@@ -13,7 +13,7 @@ server.
 | `.env` | yes (template) | Committed template with `${VAR}` placeholders. The deploy script renders it using values from `env`, and the rendered file lands on the server next to `docker-compose.yml` so Docker Compose auto-loads it. |
 | `env.example` | yes | Schema for operators — shows all required variables with placeholder values. Copy this to `env` to start. |
 | `env` | **no** (gitignored) | Operator-local secrets. Read by `deploy.sh` to render templates. **Never commit this file.** |
-| `configuration/configuration.json` | yes (template) | API + UI configuration with `${VAR}` placeholders. |
+| `configuration/prod.json` | yes | API + UI configuration, copied as is. Holds no secrets — the api and task-runner get those as env vars from `.env`. Symlinked from `../configuration/prod.json`. |
 | `workspace/nginx.conf` | yes (template) | Workspace UI nginx config. |
 | `repository/nginx.conf` | yes (template) | Repository UI nginx config. |
 | `traefik/traefik.yml` | yes | Traefik config. |
@@ -87,9 +87,4 @@ docker compose exec workspace-api npm run load:datapacks
 
 ## Variables reference
 
-See `env.example` for the full list. Two values must be JSON array literals:
-
-- `ADMINISTRATORS='["alice@example.com","bob@example.com"]'`
-- `SMTP_REPLY_TO='["nyingarn-project@unimelb.edu.au"]'`
-
-These get substituted directly (without surrounding quotes) into `configuration.json`, so they must be valid JSON. **Wrap them in single quotes** in `env` — that prevents bash from stripping the embedded double quotes when the deploy script sources the file.
+See `env.example` for the full list. `env` holds secrets and `DOMAIN` only; administrators, SMTP host and addresses, the AWS region and the Mapbox token are set in `configuration/prod.json`.

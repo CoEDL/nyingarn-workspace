@@ -1,0 +1,27 @@
+{
+  "name": "nyingarn",
+  "private": true,
+  "description": "Convenience scripts for the docker compose development stack. Each service manages its own dependencies.",
+  "scripts": {
+    "setup": "cp -n configuration/example-configuration.json configuration/development-configuration.json",
+    "up": "docker compose up -d",
+    "down": "docker compose down",
+    "restart": "docker compose restart",
+    "ps": "docker compose ps",
+    "logs": "docker compose logs -f --tail 100",
+    "seed": "docker compose exec rabbit-worker1 npm run seed --",
+    "load:datapacks": "docker compose exec api npm run load:datapacks",
+    "test": "pnpm test:api && pnpm test:tasks",
+    "test:api": "docker compose exec api npm test --",
+    "test:tasks": "docker compose exec rabbit-worker1 npm test --",
+    "build": "pnpm build:ui && pnpm build:ui-repository",
+    "build:ui": "docker compose exec ui npm run build",
+    "build:ui-repository": "docker compose exec ui-repository npm run build",
+    "shell:api": "docker compose exec api bash",
+    "shell:tasks": "docker compose exec rabbit-worker1 bash",
+    "psql": "docker compose exec db psql -U root nyingarn",
+    "release:patch": "./version-and-push.sh patch",
+    "release:minor": "./version-and-push.sh minor"
+  },
+  "license": "GPL-3.0"
+}

@@ -74,6 +74,16 @@ All run inside Docker containers (or `docker compose exec <service>`):
 
 API also has `npm run load:datapacks` to load Describo data packs.
 
+The root `package.json` only holds wrapper scripts around `docker compose` (`pnpm up`, `pnpm logs api`, `pnpm test`, `pnpm psql`, `pnpm seed`, ...); it has no dependencies.
+
+### Seed data
+
+```bash
+pnpm seed [--email you@example.com]
+```
+
+Creates items from `tasks/src/test-data/` (TEI, DigiVol and images) in `SeedCollection`, runs them through the normal processing tasks, fills in missing crate metadata, assembles the TEI, indexes everything into the workspace search, and publishes most items to the repository (Bates35 restricted to the seeding user; `msword_example` and `SeedImages` stay workspace-only). Owner defaults to the first `api.administrators` entry. Safe to re-run: only resources without processed output are reprocessed. Needs `rabbit-worker1` running and data packs loaded.
+
 ## Database
 
 Sequelize models in `api/src/models/`: `collection`, `item`, `item_user`, `log`, `repoitem`, `session`, `task`, `user`, `user_otp`.

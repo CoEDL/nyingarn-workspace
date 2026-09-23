@@ -84,6 +84,11 @@ services:
             - ./scripts/wait-for-it.sh:/wait-for-it.sh
             - ./configuration:/srv/configuration
         command: ["/wait-for-it.sh", "rabbit:15672", "--", "npm", "run", "develop"]
+        depends_on:
+            - db
+            - rabbit
+            - s3
+            - elastic
 
     api:
         image: node:18-bookworm
@@ -99,6 +104,11 @@ services:
             - ./configuration:/srv/configuration
         working_dir: /srv/api
         command: ["/wait-for-it.sh", "db:5432", "--", "npm", "run", "develop"]
+        depends_on:
+            - db
+            - rabbit
+            - s3
+            - elastic
 
     ui:
         image: node:18-bookworm

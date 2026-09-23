@@ -22,9 +22,11 @@ export async function getUser({ userId, email, orderBy }) {
     return user;
 }
 
-export async function findOrCreateLoginUser({ email, configuration }) {
+export async function findUserOrCreateAdministrator({ email, configuration }) {
     let user = await models.user.findOne({ where: { email } });
-    if (user || !configuration.api.administrators.includes(email)) return user;
+    if (user || !configuration.api.administrators.includes(email)) {
+        return user;
+    }
 
     return await models.user.create({
         email,

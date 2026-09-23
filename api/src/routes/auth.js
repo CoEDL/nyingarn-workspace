@@ -1,5 +1,5 @@
 import { getLogger, logEvent } from "../common/logger.js";
-import { findOrCreateLoginUser } from "../lib/user.js";
+import { findUserOrCreateAdministrator } from "../lib/user.js";
 import { createSession } from "../lib/session.js";
 import crypto from "crypto";
 import models from "../models/index.js";
@@ -20,12 +20,12 @@ export async function postEmailLoginRouteHandler(req, res) {
         return {};
     }
 
-    const user = await findOrCreateLoginUser({
+    const user = await findUserOrCreateAdministrator({
         email: req.body.email,
         configuration: req.session.configuration,
     });
     if (!user) {
-        log.error(`User not found and not admin: ${req.body.email}. Denying login.`);
+        log.error(`User not found and not an administrator: ${req.body.email}. Denying login.`);
         return {};
     }
     const mailer = new Mailer(req.session.configuration.api.smtp);

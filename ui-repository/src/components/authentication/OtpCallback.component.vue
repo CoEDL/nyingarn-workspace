@@ -6,7 +6,6 @@
 import {
     tokenSessionKey,
     putLocalStorage,
-    removeLocalStorage,
 } from "../../storage.js";
 
 import { reactive, onMounted, inject } from "vue";

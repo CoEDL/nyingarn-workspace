@@ -2,7 +2,7 @@ require("regenerator-runtime");
 import {
     getUsers,
     getUser,
-    findOrCreateLoginUser,
+    findUserOrCreateAdministrator,
     deleteUser,
     toggleUserCapability,
     createAllowedUserStubAccounts,
@@ -59,13 +59,13 @@ describe("User management tests", () => {
     });
     it("should find an existing user by email", async () => {
         let userDef = users.filter((u) => !u.administrator)[0];
-        let user = await findOrCreateLoginUser({ email: userDef.email, configuration });
+        let user = await findUserOrCreateAdministrator({ email: userDef.email, configuration });
         expect(user.id).toEqual(userDef.id);
         expect(user.administrator).toEqual(false);
     });
     it("should create an administrator listed in the configuration", async () => {
         let email = chance.email();
-        let user = await findOrCreateLoginUser({
+        let user = await findUserOrCreateAdministrator({
             email,
             configuration: { api: { administrators: [email] } },
         });
@@ -78,7 +78,7 @@ describe("User management tests", () => {
     });
     it("should not create an unknown user", async () => {
         let email = chance.email();
-        let user = await findOrCreateLoginUser({ email, configuration });
+        let user = await findUserOrCreateAdministrator({ email, configuration });
         expect(user).toBeNull();
         expect(await getUser({ email })).toBeNull();
     });

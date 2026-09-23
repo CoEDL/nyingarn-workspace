@@ -14,8 +14,6 @@
 import {
     tokenSessionKey,
     putLocalStorage,
-    getLocalStorage,
-    removeLocalStorage,
 } from "../storage.js";
 
 export default {

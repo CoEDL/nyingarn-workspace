@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Users used to sign in with Google or AAF (OpenID Connect), or with an email login link. The `user.provider` column recorded which: `google`, `aaf`, `email`, or `unset` for accounts an administrator created before their first sign-in. Email login never updated it, so many rows still say `unset` for users who have signed in many times.
+Users used to sign in with Google or AAF (OpenID Connect), or with an email login link. The `user.provider` column recorded which: `google`, `aaf`, `email`, or `unset` for users an administrator created before their first sign-in. Email login never updated it, so many rows still say `unset` for users who have signed in many times.
 
 OpenID Connect has been removed. Email login links are now the only way to sign in, and it finds users by email alone, so existing Google and AAF users sign in unchanged.
 
@@ -14,7 +14,7 @@ The column is `NOT NULL`. The schema is managed by `sequelize.sync()`, which cre
 
 ## Decision
 
-Keep the column. The model gives it a default of `email` and no application code sets or reads it. `api/src/scripts/merge-users.js` still prints it as context when comparing duplicate accounts.
+Keep the column. The model gives it a default of `email` and no application code sets or reads it. `api/src/scripts/merge-users.js` still prints it as context when comparing duplicate users.
 
 Existing values are historical and carry no meaning. How a user signed in is recorded in the `log` table (`data.provider`).
 

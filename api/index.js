@@ -50,8 +50,8 @@ async function main() {
     try {
         configuration = await loadConfiguration();
     } catch (error) {
-        log.error("configuration.json not found - stopping now");
-        process.exit();
+        log.error(`Unable to load the configuration - stopping now: ${error.message}`);
+        process.exit(1);
     }
 
     await fastify.register(cors, {

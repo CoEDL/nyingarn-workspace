@@ -9,8 +9,8 @@
     "scripts": {
         "develop": "npm run develop:server",
         "develop:server": "npm install && sleep 10 && npm run load:datapacks && ./node_modules/.bin/nodemon --exec babel-node ./index.js",
-        "test": "./node_modules/.bin/jest --runInBand",
-        "test:watch": "./node_modules/.bin/jest --watch --runInBand",
+        "test": "NYINGARN_ENV=test ./node_modules/.bin/jest --runInBand",
+        "test:watch": "NYINGARN_ENV=test ./node_modules/.bin/jest --watch --runInBand",
         "load:datapacks": "sleep 10 && node ./load-data-packs.js"
     },
     "devDependencies": {

@@ -1,7 +1,6 @@
 import rabbit from "foo-foo-mq";
-import fsExtraPkg from "fs-extra";
-const { readJSON } = fsExtraPkg;
-const configuration = await readJSON("/srv/configuration/configuration.json");
+import { loadConfiguration } from "/srv/api/src/common/configuration.js";
+const configuration = await loadConfiguration();
 
 rabbit.handle("process-image", ack);
 rabbit.handle("process-digivol", ack);

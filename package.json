@@ -3,7 +3,6 @@
   "private": true,
   "description": "Convenience scripts for the docker compose development stack. Each service manages its own dependencies.",
   "scripts": {
-    "setup": "cp -n configuration/example-configuration.json configuration/development-configuration.json",
     "up": "docker compose up -d",
     "down": "docker compose down",
     "restart": "docker compose restart",

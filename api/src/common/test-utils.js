@@ -135,7 +135,6 @@ export class TestSetup {
         for (let email of emails) {
             let user = await models.user.create({
                 email: email,
-                provider: "unset",
                 locked: false,
                 upload: false,
                 administrator: false,
@@ -145,7 +144,6 @@ export class TestSetup {
         for (let email of adminEmails) {
             let user = await models.user.create({
                 email: email,
-                provider: "unset",
                 locked: false,
                 upload: false,
                 administrator: true,

@@ -55,7 +55,7 @@ nginx (edge)
 - **Language:** JavaScript with Babel transpilation (`babel-node`), ESM (`"type": "module"`). Not TypeScript.
 - **Configuration:** JSON files in `configuration/`, mounted at `/srv/configuration/` in Docker. Config loaded via `api/src/common/configuration.js`. Never commit real config — use `example-configuration.json` as template.
 - **RO-Crate:** Metadata standard used throughout. Profiles in `profiles/`. Libraries: `ro-crate`, `@coedl/nocfl-js`, `@describo/data-packs`.
-- **Auth:** OpenID Connect via `openid-client` (Google + AAF providers), JWT sessions via `jose`.
+- **Auth:** Email login links only (one-time code emailed to users who already have an account, or who are listed in `api.administrators`). JWT sessions via `jose`.
 - **Uploads:** TUS resumable upload protocol via `@paradisec-platform/fastify-tus-s3-plugin` (API) and Uppy (UI).
 - **Real-time:** Socket.IO for WebSocket communication between API and UIs.
 - **Email:** Nodemailer over SMTP (`api/src/common/email.js`), configured under `api.smtp`. MJML templates in `api/src/common/email-templates/` are compiled at startup. Dev mail lands in Mailpit.

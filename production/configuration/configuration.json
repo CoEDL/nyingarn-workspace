@@ -227,8 +227,6 @@
         "host": "http://xml:8080"
       }
     },
-    "authentication": {
-    },
     "origin": {
       "workspace": "https://workspace.${DOMAIN}",
       "repository": "https://repository.${DOMAIN}"

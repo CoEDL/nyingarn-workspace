@@ -178,7 +178,6 @@ export default {
                 "givenName",
                 "familyName",
                 "identifier",
-                "provider",
                 "locked",
                 "upload",
                 "administrator",

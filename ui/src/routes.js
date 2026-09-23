@@ -1,6 +1,5 @@
 import ShellComponent from "./components/Shell.component.vue";
 import LoginComponent from "./components/Login.component.vue";
-import CallbackOauthLogin from "./components/authentication/OauthCallback.component.vue";
 import CallbackOtpLogin from "./components/authentication/OtpCallback.component.vue";
 import DashboardComponent from "./components/dashboard/Shell.component.vue";
 import ViewItemComponent from "./components/item/ViewItem/Shell.component.vue";
@@ -173,21 +172,6 @@ const routes = [
         name: "login",
         path: "/login",
         component: LoginComponent,
-    },
-    {
-        name: "callback-google-login",
-        path: "/callback-google-login",
-        component: CallbackOauthLogin,
-    },
-    {
-        name: "callback-aaf-login",
-        path: "/callback-aaf-login",
-        component: CallbackOauthLogin,
-    },
-    {
-        name: "callback-oauth-login",
-        path: "/callback-oauth-login",
-        component: CallbackOauthLogin,
     },
     {
         name: "otp-login",

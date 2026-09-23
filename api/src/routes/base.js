@@ -1,16 +1,13 @@
 import models from "../models/index.js";
 import { demandAuthenticatedUser } from "../common/middleware.js";
-import { filterPrivateInformation } from "../common/configuration.js";
 
 export function setupRoutes(fastify, options, done) {
     fastify.get("/", () => ({}));
     fastify.get("/configuration", async (req) => {
-        let configuration = req.session.configuration;
-        configuration = filterPrivateInformation({ configuration });
+        const configuration = req.session.configuration;
         return {
             ui: configuration.ui,
             processing: configuration.api.processing,
-            authentication: Object.keys(configuration.api.authentication),
         };
     });
     fastify.get(

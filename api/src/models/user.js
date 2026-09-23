@@ -30,9 +30,11 @@ export default function (sequelize, DataTypes) {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
+            // Legacy, see docs/adr/0001-retain-user-provider-column.md
             provider: {
                 type: DataTypes.STRING,
                 allowNull: false,
+                defaultValue: "email",
             },
             locked: {
                 type: DataTypes.BOOLEAN,

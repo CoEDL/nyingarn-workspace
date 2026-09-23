@@ -1,5 +1,4 @@
 import models from "../models/index.js";
-import { loadConfiguration } from "../common/configuration.js";
 import lodashPkg from "lodash";
 const { uniqBy } = lodashPkg;
 
@@ -23,48 +22,16 @@ export async function getUser({ userId, email, orderBy }) {
     return user;
 }
 
-export async function createUser(data) {
-    const configuration = await loadConfiguration();
-    if (!data.email) {
-        throw new Error(`Email is a required property`);
-    }
-    if (!data.provider) {
-        throw new Error(`Provider is a required property`);
-    }
+export async function findOrCreateLoginUser({ email, configuration }) {
+    let user = await models.user.findOne({ where: { email } });
+    if (user || !configuration.api.administrators.includes(email)) return user;
 
-    // deny access if the user is not an admin and we don't
-    //  have an entry for them as a result of an admin invitation.
-    let user = await models.user.findOne({ where: { email: data.email } });
-    if (!user && !configuration.api.administrators.includes(data.email)) {
-        throw new Error(`Unauthorised`);
-    }
-
-    if (!user && configuration.api.administrators.includes(data.email)) {
-        // no user account found but email in admin list
-        data.locked = false;
-        data.upload = true;
-        data.administrator = true;
-        data.provider = data.provider;
-        data.givenName = data.givenName;
-        data.familyName = data.familyName;
-        user = (
-            await models.user.findOrCreate({
-                where: { email: data.email },
-                defaults: data,
-            })
-        )[0];
-    } else if (user && !configuration.api.administrators.includes(data.email)) {
-        // user account found and not admin
-        user.locked = false;
-        user.upload = false;
-        user.administrator = false;
-        user.provider = data.provider;
-        user.givenName = data.givenName;
-        user.familyName = data.familyName;
-
-        await user.save();
-    }
-    return user;
+    return await models.user.create({
+        email,
+        locked: false,
+        upload: true,
+        administrator: true,
+    });
 }
 
 export async function deleteUser({ userId }) {
@@ -95,7 +62,6 @@ export async function createAllowedUserStubAccounts({ accounts }) {
             email: user.email,
             givenName: user.givenName,
             familyName: user.familyName,
-            provider: "unset",
             locked: false,
             upload: false,
             administrator: false,

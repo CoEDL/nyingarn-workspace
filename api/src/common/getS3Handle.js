@@ -21,6 +21,16 @@ export async function getS3Handle() {
     return { s3, bucket };
 }
 
+export async function ensureBucket() {
+    const { s3, bucket } = await getS3Handle();
+    try {
+        await s3.bucketExists({ bucket: bucket.bucket });
+    } catch (error) {
+        if (error.name !== "NotFound") throw error;
+        await s3.createBucket({ bucket: bucket.bucket });
+    }
+}
+
 export async function getStoreHandle({ id, identifier, type, location = "workspace" }) {
     if (!id && !identifier) {
         throw new Error(`'id' or 'identifier' must be defined`);

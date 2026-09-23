@@ -19,7 +19,7 @@ import { publishObject, depositObjectIntoRepository } from "/srv/api/src/lib/adm
 import { createDefaultROCrateFile } from "/srv/api/src/lib/crate-tools.js";
 import { indexItem } from "/srv/api/src/common/elastic-index.js";
 import { authorisedUsersFile } from "/srv/api/src/common/index.js";
-import { getStoreHandle } from "/srv/api/src/common/getS3Handle.js";
+import { ensureBucket, getStoreHandle } from "/srv/api/src/common/getS3Handle.js";
 import { submitTask } from "/srv/api/src/common/task.js";
 
 const testData = "/srv/tasks/src/test-data";
@@ -89,6 +89,7 @@ async function main() {
     if (!email) throw new Error("No --email given and no administrators configured");
 
     await models.sequelize.sync();
+    await ensureBucket();
     await requireWorker(configuration);
     await connectRabbit(configuration);
 

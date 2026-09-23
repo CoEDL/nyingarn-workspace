@@ -37,9 +37,6 @@ export class Mailer {
         this.source = source;
         this.replyTo = Array.isArray(replyTo) ? replyTo.join(", ") : replyTo;
 
-        // an auth block with a blank user means the relay doesn't require
-        // authentication - passing it through makes nodemailer attempt AUTH anyway
-        if (!transport.auth?.user) delete transport.auth;
         this.transport = nodemailer.createTransport(transport);
     }
 

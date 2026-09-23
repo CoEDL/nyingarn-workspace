@@ -14,16 +14,8 @@ describe("Test loading the configuration", () => {
     });
     test("it should fill secrets in from the environment", async () => {
         process.env.SESSION_SECRET = "a-session-secret-from-the-environment";
-        process.env.SMTP_USER = "smtp-user";
         let configuration = await loadConfiguration();
         expect(configuration.api.session.secret).toEqual("a-session-secret-from-the-environment");
-        expect(configuration.api.smtp.auth.user).toEqual("smtp-user");
-    });
-    test("it should leave optional secrets out when they are not set", async () => {
-        delete process.env.SMTP_USER;
-        delete process.env.SMTP_PASSWORD;
-        let configuration = await loadConfiguration();
-        expect(configuration.api.smtp.auth).toBeUndefined();
     });
     test("it should name every missing required secret", async () => {
         delete process.env.SESSION_SECRET;

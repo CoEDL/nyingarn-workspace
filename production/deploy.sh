@@ -30,9 +30,8 @@ REQUIRED_VARS=(
   SESSION_SECRET
 )
 
-# Substituted if set, but allowed to be empty — a relay that doesn't require
-# authentication leaves the SMTP pair blank, and rabbit falls back to guest.
-OPTIONAL_VARS=(SMTP_USER SMTP_PASSWORD RABBIT_USER RABBIT_PASS)
+# Substituted if set, but allowed to be empty — rabbit falls back to guest.
+OPTIONAL_VARS=(RABBIT_USER RABBIT_PASS)
 
 missing=()
 for v in "${REQUIRED_VARS[@]}"; do

@@ -50,7 +50,7 @@ nginx (edge)
 ## Key Patterns
 
 - **Language:** JavaScript with Babel transpilation (`babel-node`), ESM (`"type": "module"`). Not TypeScript.
-- **Configuration:** Committed JSON per environment — `configuration/dev.json`, `configuration/test.json`, and `production/configuration/prod.json` (symlinked as `configuration/prod.json`) — mounted at `/srv/configuration/`. `NYINGARN_ENV` (`dev`, `test`, `prod`) picks the file; `npm test` sets `test`. The JSON holds no secrets: `loadConfiguration()` in `api/src/common/configuration.js` fills them in from env vars (`SESSION_SECRET`, `S3_*`, `AWS_*`, `RABBIT_*`, `SMTP_*`) and fails at startup if a required one is missing. Database settings are read from `DB_*` env vars directly.
+- **Configuration:** Committed JSON per environment — `configuration/dev.json`, `configuration/test.json`, and `production/configuration/prod.json` (symlinked as `configuration/prod.json`) — mounted at `/srv/configuration/`. `NYINGARN_ENV` (`dev`, `test`, `prod`) picks the file; `npm test` sets `test`. The JSON holds no secrets: `loadConfiguration()` in `api/src/common/configuration.js` fills them in from env vars (`SESSION_SECRET`, `S3_*`, `AWS_*`, `RABBIT_*`) and fails at startup if a required one is missing. Database settings are read from `DB_*` env vars directly.
 - **RO-Crate:** Metadata standard used throughout. Profiles in `profiles/`. Libraries: `ro-crate`, `@coedl/nocfl-js`, `@describo/data-packs`.
 - **Auth:** Email login links only (one-time code emailed to existing users, or to anyone listed in `api.administrators`). JWT sessions via `jose`.
 - **Uploads:** TUS resumable upload protocol via `@paradisec-platform/fastify-tus-s3-plugin` (API) and Uppy (UI).

@@ -12,8 +12,6 @@ const secrets = [
     ["AWS_SECRET_ACCESS_KEY", "api.services.aws.awsSecretAccessKey", ["prod"]],
     ["RABBIT_USER", "api.services.rabbit.user", environments],
     ["RABBIT_PASS", "api.services.rabbit.pass", environments],
-    ["SMTP_USER", "api.smtp.auth.user", []],
-    ["SMTP_PASSWORD", "api.smtp.auth.pass", []],
 ];
 
 export async function loadConfiguration() {

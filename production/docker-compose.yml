@@ -90,8 +90,6 @@ services:
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
       RABBIT_USER: "${RABBIT_USER:-guest}"
       RABBIT_PASS: "${RABBIT_PASS:-guest}"
-      SMTP_USER: "${SMTP_USER:-}"
-      SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
       DB_HOST: db
       DB_USER: nyingarn
       DB_PASSWORD: "${DB_PASSWORD}"
@@ -121,8 +119,6 @@ services:
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
       RABBIT_USER: "${RABBIT_USER:-guest}"
       RABBIT_PASS: "${RABBIT_PASS:-guest}"
-      SMTP_USER: "${SMTP_USER:-}"
-      SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
       #LOG_LEVEL: "${LOG_LEVEL}"
       DB_HOST: db
       DB_USER: nyingarn

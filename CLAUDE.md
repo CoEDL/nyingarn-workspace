@@ -13,11 +13,10 @@ Dev runs with no setup. To use Textract OCR, put `AWS_ACCESS_KEY_ID` and `AWS_SE
 - Workspace UI: http://localhost:9000
 - Repository UI: http://localhost:9001
 - API: http://localhost:9000/api/ (proxied by nginx, not published directly)
-- MinIO console: http://localhost:10001
 - RabbitMQ management: http://localhost:15672
 - Mailpit (catches all outgoing email in dev): http://localhost:8025
 
-Only the browser-facing ports above are published on the host. Elasticsearch, MinIO S3, RabbitMQ AMQP, SMTP and the xml-processor are reachable from other containers by service name only. Local credentials can be overridden through a git-ignored `.env` file; see `.env.example`.
+Only the browser-facing ports above are published on the host. Elasticsearch, the S3 gateway, RabbitMQ AMQP, SMTP and the xml-processor are reachable from other containers by service name only. Local credentials can be overridden through a git-ignored `.env` file; see `.env.example`.
 
 ## Architecture
 
@@ -28,7 +27,7 @@ nginx (edge)
 └── /api/ → api (Fastify backend)
               ├── PostgreSQL (db)
               ├── Elasticsearch (search + phonetic plugin)
-              ├── MinIO/S3 (object storage)
+              ├── S3 (versitygw object storage)
               ├── RabbitMQ → tasks (async worker)
               └── xml-processor (Tomcat/XProc TEI pipeline)
 ```
@@ -44,7 +43,7 @@ nginx (edge)
 | **xml-processor** | Tomcat 9, XProc, XSLT | 8888 | TEI/XML transformation pipeline |
 | **db** | PostgreSQL 18 | 5432 | Primary database (db: `nyingarn`, user: `root`) |
 | **elastic** | Elasticsearch 8.16 | 9200 | Full-text + phonetic search |
-| **minio** | MinIO | 10000 | S3-compatible object storage |
+| **s3** | versitygw | 9000 | S3 gateway over a local volume |
 | **rabbit** | RabbitMQ 3 | 5672 | Message broker |
 | **mail** | Mailpit | 1025 (SMTP), 8025 (UI) | Development SMTP sink |
 

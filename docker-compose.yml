@@ -1,7 +1,3 @@
-x-minio-credentials: &minio-credentials
-    MINIO_ROOT_USER: "${MINIO_ROOT_USER:-minioadmin}"
-    MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:-minioadmin}"
-
 x-app-environment: &app-environment
     TERM: "xterm-256color"
     NODE_ENV: "development"
@@ -13,8 +9,8 @@ x-app-environment: &app-environment
     DB_PASSWORD: ""
     DB_DATABASE: "nyingarn"
     SESSION_SECRET: "${SESSION_SECRET:-dev-only-session-secret-not-for-production}"
-    S3_ACCESS_KEY_ID: "${MINIO_ROOT_USER:-minioadmin}"
-    S3_SECRET_ACCESS_KEY: "${MINIO_ROOT_PASSWORD:-minioadmin}"
+    S3_ACCESS_KEY_ID: "${S3_ACCESS_KEY_ID:-nyingarn-dev}"
+    S3_SECRET_ACCESS_KEY: "${S3_SECRET_ACCESS_KEY:-nyingarn-dev-secret}"
     AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
     AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
     RABBIT_USER: "guest"
@@ -25,7 +21,7 @@ volumes:
         driver: local
     ui_node_modules:
         driver: local
-    MINIO_DATA_VOLUME:
+    S3_DATA_VOLUME:
         driver: local
     TUS_VOLUME:
         driver: local
@@ -43,33 +39,18 @@ services:
             POSTGRES_PASSWORD: ""
             POSTGRES_HOST_AUTH_METHOD: "trust"
 
-    minio:
-        image: minio/minio:RELEASE.2022-10-24T18-35-07Z.hotfix.ce525fdaf
-        hostname: s3
+    s3:
+        image: ghcr.io/versity/versitygw:v1.7.0
         restart: always
-        ports:
-            - 10001:10001
         environment:
-            <<: *minio-credentials
-            MINIO_BROWSER_REDIRECT_URL: "${MINIO_BROWSER_REDIRECT_URL:-http://localhost:10001}"
-        entrypoint: bash -c '/opt/bin/minio server /data --console-address ":10001"'
+            ROOT_ACCESS_KEY: "${S3_ACCESS_KEY_ID:-nyingarn-dev}"
+            ROOT_SECRET_KEY: "${S3_SECRET_ACCESS_KEY:-nyingarn-dev-secret}"
+            VGW_PORT: ":9000"
+            VGW_REGION: us-east-1
+            VGW_HEALTH: /_health
+        command: posix /data
         volumes:
-            - MINIO_DATA_VOLUME:/data
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:10001/minio/health/live"]
-            interval: 30s
-            timeout: 20s
-            retries: 3
-
-    minio-init:
-        image: quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z
-        depends_on:
-            - minio
-        environment: *minio-credentials
-        entrypoint: >
-            sh -c '
-            until mc alias set local http://s3:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do sleep 1; done;
-            mc mb --ignore-existing local/uploads'
+            - S3_DATA_VOLUME:/data
 
     rabbit:
         image: rabbitmq:3-management

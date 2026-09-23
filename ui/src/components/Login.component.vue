@@ -14,7 +14,7 @@
                     class="w-1/2 text-right pr-4 text-gray-600 text-4xl flex flex-col justify-center"
                 >
                     <div>
-                        {{ data.siteName }}
+                        {{ $store.state.configuration.ui.siteName }}
                     </div>
                 </div>
                 <div class="w-1/2 pl-4 flex flex-col space-y-4">
@@ -29,11 +29,4 @@
 
 <script setup>
 import MagicLinkComponent from "./authentication/MagicLink.component.vue";
-import { reactive } from "vue";
-import { useStore } from "vuex";
-const $store = useStore();
-
-const data = reactive({
-    siteName: $store.state.configuration.ui.siteName,
-});
 </script>

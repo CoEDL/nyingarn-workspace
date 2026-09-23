@@ -17,7 +17,6 @@ export function setupRoutes(fastify, options, done) {
 export async function postEmailLoginRouteHandler(req, res) {
     let origin = req.session.configuration.api.origin[req.params.origin];
     if (!req.body.email) {
-        // return res.unauthorized();
         return {};
     }
 

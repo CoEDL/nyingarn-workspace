@@ -12,7 +12,6 @@
 
 <script>
 import {
-    loginSessionKey,
     tokenSessionKey,
     putLocalStorage,
     getLocalStorage,

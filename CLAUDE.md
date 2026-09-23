@@ -5,12 +5,10 @@ A multi-service application for digitising and publishing Australian Indigenous 
 ## Quick Start
 
 ```bash
-# Copy and edit configuration
-cp configuration/example-configuration.json configuration/development-configuration.json
-
-# Start everything
 docker compose up
 ```
+
+Dev runs with no setup. To use Textract OCR, put `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in a git-ignored `.env` (see `.env.example`). Log in as `admin@example.com` and read the code in Mailpit.
 
 - Workspace UI: http://localhost:9000
 - Repository UI: http://localhost:9001
@@ -19,7 +17,7 @@ docker compose up
 - RabbitMQ management: http://localhost:15672
 - Mailpit (catches all outgoing email in dev): http://localhost:8025
 
-Only the browser-facing ports above are published on the host. Elasticsearch, MinIO S3, RabbitMQ AMQP, SMTP and the xml-processor are reachable from other containers by service name only. Local MinIO credentials can be overridden through a git-ignored `.env` file; see `.env.example`.
+Only the browser-facing ports above are published on the host. Elasticsearch, MinIO S3, RabbitMQ AMQP, SMTP and the xml-processor are reachable from other containers by service name only. Local credentials can be overridden through a git-ignored `.env` file; see `.env.example`.
 
 ## Architecture
 
@@ -53,7 +51,7 @@ nginx (edge)
 ## Key Patterns
 
 - **Language:** JavaScript with Babel transpilation (`babel-node`), ESM (`"type": "module"`). Not TypeScript.
-- **Configuration:** JSON files in `configuration/`, mounted at `/srv/configuration/` in Docker. Config loaded via `api/src/common/configuration.js`. Never commit real config — use `example-configuration.json` as template.
+- **Configuration:** Committed JSON per environment — `configuration/dev.json`, `configuration/test.json`, and `production/configuration/prod.json` (symlinked as `configuration/prod.json`) — mounted at `/srv/configuration/`. `NYINGARN_ENV` (`dev`, `test`, `prod`) picks the file; `npm test` sets `test`. The JSON holds no secrets: `loadConfiguration()` in `api/src/common/configuration.js` fills them in from env vars (`SESSION_SECRET`, `S3_*`, `AWS_*`, `RABBIT_*`, `SMTP_*`) and fails at startup if a required one is missing. Database settings are read from `DB_*` env vars directly.
 - **RO-Crate:** Metadata standard used throughout. Profiles in `profiles/`. Libraries: `ro-crate`, `@coedl/nocfl-js`, `@describo/data-packs`.
 - **Auth:** Email login links only (one-time code emailed to existing users, or to anyone listed in `api.administrators`). JWT sessions via `jose`.
 - **Uploads:** TUS resumable upload protocol via `@paradisec-platform/fastify-tus-s3-plugin` (API) and Uppy (UI).

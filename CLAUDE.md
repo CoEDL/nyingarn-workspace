@@ -42,7 +42,7 @@ nginx (edge)
 | **ui-repository** | Vue 3, Element Plus, Vite 5, Mapbox GL | via nginx:9001 | Public repository frontend |
 | **tasks** | foo-foo-mq, Sharp, AWS Textract | — | Async workers (image processing, OCR, TEI assembly) |
 | **xml-processor** | Tomcat 9, XProc, XSLT | 8888 | TEI/XML transformation pipeline |
-| **db** | PostgreSQL 13 | 5432 | Primary database (db: `nyingarn`, user: `root`) |
+| **db** | PostgreSQL 18 | 5432 | Primary database (db: `nyingarn`, user: `root`) |
 | **elastic** | Elasticsearch 8.16 | 9200 | Full-text + phonetic search |
 | **minio** | MinIO | 10000 | S3-compatible object storage |
 | **rabbit** | RabbitMQ 3 | 5672 | Message broker |

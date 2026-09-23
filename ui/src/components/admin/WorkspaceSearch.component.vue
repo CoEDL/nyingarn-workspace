@@ -221,7 +221,7 @@ async function lookup(query, cb) {
 
 function assembleFeatures() {
     let features = data.documents.map((document) => {
-        return document.fields.location.map((geometry) => {
+        return (document.fields.location ?? []).map((geometry) => {
             let centroid = false;
             if (geometry.type.match(/polygon/i)) {
                 geometry = turfCentroid(polygon(geometry.coordinates)).geometry;

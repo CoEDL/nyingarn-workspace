@@ -2,7 +2,7 @@ require("regenerator-runtime");
 import {
     getUsers,
     getUser,
-    createUser,
+    findOrCreateLoginUser,
     deleteUser,
     toggleUserCapability,
     createAllowedUserStubAccounts,
@@ -57,32 +57,30 @@ describe("User management tests", () => {
         user = await getUser({ email: chance.word() });
         expect(user).toBeNull;
     });
-    it("should be able to set up a normal user account", async () => {
-        //  create stub account
-        let email = chance.email();
-        let users = await createAllowedUserStubAccounts({
-            accounts: [{ email, givenName: chance.word(), familyName: chance.word() }],
-        });
-
-        //  create user
-        let user = await createUser({
-            email,
-            provider: "unset",
-            locked: false,
-            upload: false,
-            admin: false,
-        });
-        expect(user.email).toEqual(users[0].email);
+    it("should find an existing user by email", async () => {
+        let userDef = users.filter((u) => !u.administrator)[0];
+        let user = await findOrCreateLoginUser({ email: userDef.email, configuration });
+        expect(user.id).toEqual(userDef.id);
+        expect(user.administrator).toEqual(false);
     });
-    it("should be able to set up an admin user account", async () => {
-        //  create admin user account
-        let user = await createUser({
-            email: adminEmail,
-            provider: "unset",
-            locked: false,
-            upload: false,
+    it("should create an administrator listed in the configuration", async () => {
+        let email = chance.email();
+        let user = await findOrCreateLoginUser({
+            email,
+            configuration: { api: { administrators: [email] } },
         });
-        expect(user.email).toEqual(adminEmail);
+        expect(user.email).toEqual(email);
+        expect(user.administrator).toEqual(true);
+        expect(user.upload).toEqual(true);
+        expect(user.locked).toEqual(false);
+        expect(user.provider).toEqual("email");
+        await user.destroy();
+    });
+    it("should not create an unknown user", async () => {
+        let email = chance.email();
+        let user = await findOrCreateLoginUser({ email, configuration });
+        expect(user).toBeNull();
+        expect(await getUser({ email })).toBeNull();
     });
     it("should be able to lock a user", async () => {
         let user = users.filter((u) => !u.administrator)[0];

@@ -1,6 +1,5 @@
 require("regenerator-runtime");
 const { getSession, createSession, destroySession } = require("./session");
-const { createUser } = require("./user");
 const chance = require("chance").Chance();
 import { TestSetup } from "../common/test-utils.js";
 

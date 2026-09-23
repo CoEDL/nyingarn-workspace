@@ -168,20 +168,6 @@
                 "host": "http://xml:8080"
             }
         },
-        "authentication": {
-            "google": {
-                "clientId": "{client id}",
-                "clientSecret": "{client secret}",
-                "redirectUri": "http://{your host}/callback-oauth-login",
-                "discover": "https://accounts.google.com"
-            },
-            "aaf": {
-                "clientId": "{client id}",
-                "clientSecret": "{client secret}",
-                "redirectUri": "http://{your host}/callback-oauth-login",
-                "discover": "https://central.aaf.edu.au"
-            }
-        },
         "origin": {
             "workspace": "https://workspace.nyingarn.net",
             "repository": "https://repository.nyingarn.net"

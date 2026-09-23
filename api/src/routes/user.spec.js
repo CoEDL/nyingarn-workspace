@@ -1,5 +1,4 @@
 require("regenerator-runtime");
-import { createUser } from "../lib/user";
 import models from "../models";
 const chance = require("chance").Chance();
 import fetch from "node-fetch";

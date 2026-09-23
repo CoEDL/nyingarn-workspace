@@ -14,7 +14,7 @@ import {
     createCollection,
     createCollectionLocationInObjectStore,
 } from "/srv/api/src/lib/collection.js";
-import { createUser } from "/srv/api/src/lib/user.js";
+import { findOrCreateLoginUser } from "/srv/api/src/lib/user.js";
 import { publishObject, depositObjectIntoRepository } from "/srv/api/src/lib/admin.js";
 import { createDefaultROCrateFile } from "/srv/api/src/lib/crate-tools.js";
 import { indexItem } from "/srv/api/src/common/elastic-index.js";
@@ -92,11 +92,8 @@ async function main() {
     await requireWorker(configuration);
     await connectRabbit(configuration);
 
-    const user =
-        (await models.user.findOne({ where: { email } })) ??
-        (await createUser({ email, provider: "unset" }).catch(() => {
-            throw new Error(`${email} has no account and isn't in api.administrators`);
-        }));
+    const user = await findOrCreateLoginUser({ email, configuration });
+    if (!user) throw new Error(`${email} has no account and isn't in api.administrators`);
     console.log(`Seeding as ${email}`);
 
     console.log("\nCreating items");

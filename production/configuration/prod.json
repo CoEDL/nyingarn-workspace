@@ -143,24 +143,17 @@
         }
       }
     ],
-    "mapboxToken": "REPLACE_ME_MAPBOX_TOKEN"
+    "mapboxToken": "pk.eyJ1IjoibmljaG9sYXN0IiwiYSI6ImNscDI0YXF6cDBsdzMycWp6NHkyOHB2djUifQ.8yi98offL-MfV9-3AydT3A"
   },
   "api": {
     "domain": "nyingarn.net",
-    "administrators": ["REPLACE_ME_ADMINISTRATOR"],
+    "administrators": ["johnf@inodes.org", "thien@unimelb.edu.au", "jferlito@gmail.com"],
     "filenaming": {
       "adminTag": "ADMIN",
       "resourceQualifierSeparator": ".",
       "identifierSegments": {
-        "2": [
-          "itemId",
-          "resourceId"
-        ],
-        "3": [
-          "collectionId",
-          "itemId",
-          "resourceId"
-        ]
+        "2": ["itemId", "resourceId"],
+        "3": ["collectionId", "itemId", "resourceId"]
       }
     },
     "licence": "LICENCE.md",
@@ -228,10 +221,10 @@
       "minutes": 10
     },
     "smtp": {
-      "host": "email-smtp.ap-southeast-2.amazonaws.com",
+      "host": "smtp.unimelb.edu.au",
       "port": 587,
       "secure": false,
-      "source": "nyingarnproject@gmail.com",
+      "source": "nyingarn-project@unimelb.edu.au",
       "replyTo": ["nyingarn-project@unimelb.edu.au"]
     }
   }

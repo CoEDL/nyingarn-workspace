@@ -192,16 +192,16 @@ export async function publishObject({ user, type, identifier, configuration }) {
         throw new Error(`The object can't be indexed so it can't be published: ${error.message}`);
     }
 
-    let licence;
+    let license;
     if (type === "collection") {
         const collection = await lookupCollectionByIdentifier({ identifier });
         collection.publicationStatus = "published";
         await collection.save();
 
         // write the metadata into the crate
-        licence = {
-            "@id": configuration.api.licence,
-            "@type": ["File", "DataReuselicence"],
+        license = {
+            "@id": configuration.api.license,
+            "@type": ["File", "DataReuseLicense"],
             name: "Open (subject to agreeing to Nyingarn access conditions)",
             access: {
                 "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
@@ -215,9 +215,9 @@ export async function publishObject({ user, type, identifier, configuration }) {
         item.publicationStatus = "published";
         await item.save();
 
-        licence = {
-            "@id": configuration.api.licence,
-            "@type": ["File", "DataReuselicence"],
+        license = {
+            "@id": configuration.api.license,
+            "@type": ["File", "DataReuseLicense"],
             name: "Open (subject to agreeing to Nyingarn access conditions)",
             access: {
                 "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
@@ -227,30 +227,30 @@ export async function publishObject({ user, type, identifier, configuration }) {
             ],
         };
         if (item.publicationMetadata.accessType === "restricted") {
-            licence.name = "Restricted";
-            licence.description = item.publicationMetadata.accessNarrative.text;
-            licence.reviewDate = item.publicationMetadata.accessNarrative?.reviewDate;
-            licence.access = {
+            license.name = "Restricted";
+            license.description = item.publicationMetadata.accessNarrative.text;
+            license.reviewDate = item.publicationMetadata.accessNarrative?.reviewDate;
+            license.access = {
                 "@id": "http://purl.archive.org/language-data-commons/terms#AuthorizedAccess",
             };
-            licence.authorizationWorkflow.push({
+            license.authorizationWorkflow.push({
                 "@id": "http://purl.archive.org/language-data-commons/terms#AccessControlList",
             });
-            licence.accessControlList = `file://${authorisedUsersFile}`;
+            license.accessControlList = `file://${authorisedUsersFile}`;
         }
     }
 
-    if (crate.getEntity(licence["@id"])) crate.deleteEntity(licence["@id"]);
-    crate.addEntity(licence);
-    crate.rootDataset.licence = licence;
+    if (crate.getEntity(license["@id"])) crate.deleteEntity(license["@id"]);
+    crate.addEntity(license);
+    crate.rootDataset.license = license;
     crate.rootDataset.identifier = identifier;
     crate = crate.toJSON();
     crate["@context"] = getContext();
 
     await store.put({ target: "ro-crate-metadata.json", json: crate });
     await store.put({
-        target: configuration.api.licence,
-        localPath: path.join(`/srv/configuration/${configuration.api.licence}`),
+        target: configuration.api.license,
+        localPath: path.join(`/srv/configuration/${configuration.api.license}`),
         registerFile: false,
     });
 
@@ -425,13 +425,13 @@ export async function setRepositoryItemMetadata({ configuration, item, store }) 
     }
 
     try {
-        let licence = crate.getEntity("LICENCE.md");
+        let license = crate.getEntity(configuration.api.license);
         let openAccess;
         let accessControlList;
         let accessNarrative;
         let reviewDate;
-        if (!licence) {
-            console.log(`no licence found - setting to closed`);
+        if (!license) {
+            console.log(`no license found - setting to closed`);
             openAccess = false;
             accessControlList = null;
             accessNarrative = null;
@@ -441,11 +441,11 @@ export async function setRepositoryItemMetadata({ configuration, item, store }) 
             accessControlList = null;
             accessNarrative = null;
             reviewDate = null;
-            if (licence?.access?.[0]?.["@id"]?.match(/OpenAccess/)) {
+            if (license?.access?.[0]?.["@id"]?.match(/OpenAccess/)) {
                 openAccess = true;
             } else {
-                accessNarrative = licence.description.join("\n");
-                reviewDate = licence?.reviewDate?.[0];
+                accessNarrative = license.description.join("\n");
+                reviewDate = license?.reviewDate?.[0];
                 accessControlList = await store.getJSON({ target: authorisedUsersFile });
             }
         }

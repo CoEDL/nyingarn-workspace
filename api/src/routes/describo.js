@@ -150,7 +150,7 @@ async function postCopyCrateHandler(req) {
         if (e["@id"] === rootDescriptor.about["@id"]) {
             delete e["hasMember"];
             delete e["hasPart"];
-            delete e["licence"];
+            delete e["license"];
         }
         return e;
     });

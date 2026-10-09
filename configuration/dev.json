@@ -165,7 +165,7 @@
                 ]
             }
         },
-        "licence": "LICENCE.md",
+        "license": "LICENCE.md",
         "profiles": {
             "collection": "nyingarn-collection-profile.json",
             "item": "nyingarn-item-profile.json"

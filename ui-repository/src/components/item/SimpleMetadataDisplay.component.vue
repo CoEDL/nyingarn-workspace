@@ -22,9 +22,9 @@
         <div class="flex flex-col md:flex-row space-x-2">
             <div class="w-1/5">Licence:</div>
             <div class="w-4/5">
-                {{ crate.rootDataset?.licence?.[0]?.name?.[0] }}
-                <span v-if="crate.rootDataset?.licence?.[0]?.description?.[0]">
-                    : {{ crate.rootDataset?.licence?.[0]?.description?.[0] }}
+                {{ crate.rootDataset?.license?.[0]?.name?.[0] }}
+                <span v-if="crate.rootDataset?.license?.[0]?.description?.[0]">
+                    : {{ crate.rootDataset?.license?.[0]?.description?.[0] }}
                 </span>
             </div>
         </div>

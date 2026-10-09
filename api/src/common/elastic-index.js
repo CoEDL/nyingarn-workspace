@@ -158,7 +158,7 @@ export function assembleIndexRecord({ crate }) {
                     return [l.name, l.alternateName, l.languageCode];
                 })
             ) ?? [],
-        access: crate.rootDataset?.licence?.[0].name?.[0] ?? "Restricted",
+        access: crate.rootDataset?.license?.[0].name?.[0] ?? "Restricted",
         location: geography,
     };
     // record.languageSuggest = [...record.subjectLanguage, ...record.contentLanguage];

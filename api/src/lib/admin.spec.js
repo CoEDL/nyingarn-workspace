@@ -286,10 +286,10 @@ describe("Admin management tests", () => {
         expect(item.publicationStatus).toEqual("published");
 
         let crate = await storeItem.getJSON({ target: "ro-crate-metadata.json" });
-        let licence = crate["@graph"].filter((e) => e["@id"] === "LICENCE.md")[0];
-        expect(licence).toEqual({
+        let license = crate["@graph"].filter((e) => e["@id"] === "LICENCE.md")[0];
+        expect(license).toEqual({
             "@id": "LICENCE.md",
-            "@type": ["File", "DataReuselicence"],
+            "@type": ["File", "DataReuseLicense"],
             name: "Open (subject to agreeing to Nyingarn access conditions)",
             access: {
                 "@id": "http://purl.archive.org/language-data-commons/terms#OpenAccess",
@@ -345,10 +345,10 @@ describe("Admin management tests", () => {
         expect(item.publicationStatus).toEqual("published");
 
         let crate = await storeItem.getJSON({ target: "ro-crate-metadata.json" });
-        let licence = crate["@graph"].filter((e) => e["@id"] === "LICENCE.md")[0];
-        expect(licence).toMatchObject({
+        let license = crate["@graph"].filter((e) => e["@id"] === "LICENCE.md")[0];
+        expect(license).toMatchObject({
             "@id": "LICENCE.md",
-            "@type": ["File", "DataReuselicence"],
+            "@type": ["File", "DataReuseLicense"],
             access: {
                 "@id": "http://purl.archive.org/language-data-commons/terms#AuthorizedAccess",
             },

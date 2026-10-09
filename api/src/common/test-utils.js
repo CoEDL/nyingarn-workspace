@@ -30,7 +30,7 @@ export function teiDocument(identifier) {
     {
       "rightsHolder": { "@id": "https:\/\/orcid.org\/0000-0003-1783-627X" },
       "identifier": "MarcoTest",
-      "licence": { "@id": "LICENCE.md" },
+      "license": { "@id": "LICENCE.md" },
       "hasPart": [
         { "@id": "MarcoTest-357.jpg" },
         { "@id": "MarcoTest-357.tei.xml" },

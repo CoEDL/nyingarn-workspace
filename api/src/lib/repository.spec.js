@@ -220,7 +220,7 @@ describe("Repository management tests", () => {
                     subjectLanguage: {
                         "@id": "https://collection.aiatsis.gov.au/austlang/language/D2",
                     },
-                    licence: {
+                    license: {
                         "@id": "LICENCE.md",
                     },
                     holdingInstitution: {
@@ -345,12 +345,12 @@ describe("Repository management tests", () => {
                 },
                 {
                     "@id": "LICENCE.md",
-                    "@type": ["File", "DataReuselicence"],
+                    "@type": ["File", "DataReuseLicense"],
                     "@reverse": {
                         hasPart: {
                             "@id": "./",
                         },
-                        licence: {
+                        license: {
                             "@id": "./",
                         },
                     },

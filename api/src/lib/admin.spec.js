@@ -439,7 +439,7 @@ describe("Admin management tests", () => {
             id: `/item/${identifier}`,
         });
         expect(document._source).toMatchObject({
-            name: "My Research Object Crate",
+            name: identifier,
         });
 
         await objectWorkspace.removeObject();

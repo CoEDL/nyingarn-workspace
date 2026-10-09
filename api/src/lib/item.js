@@ -4,6 +4,7 @@ import { resourceStatusFile, specialFiles, imageExtensions } from "../common/ind
 import { loadConfiguration } from "../common/configuration.js";
 import { getS3Handle, getStoreHandle } from "../common/getS3Handle.js";
 import { transformDocument } from "../lib/transform.js";
+import { createDefaultROCrateFile } from "./crate-tools.js";
 import path from "path";
 import lodashPkg from "lodash";
 const { compact, groupBy, uniq, isNumber } = lodashPkg;
@@ -77,6 +78,10 @@ export async function createItemLocationInObjectStore({ identifier }) {
     let exists = await store.exists();
     if (!exists) {
         await store.createObject();
+        await store.put({
+            target: "ro-crate-metadata.json",
+            json: createDefaultROCrateFile({ name: identifier, type: "item" }),
+        });
         await store.put({
             target: resourceStatusFile,
             json: { item: {}, resources: {} },

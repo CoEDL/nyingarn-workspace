@@ -63,6 +63,9 @@ describe("Item management tests", () => {
             "nocfl.inventory.json",
             "ro-crate-metadata.json",
         ]);
+        let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        let root = crate["@graph"].find((e) => e["@id"] === "./");
+        expect(root["@type"]).toEqual(["Dataset", "RepositoryObject"]);
         await item.destroy();
     });
     it("should not be able to create a new item with the same identifier as an existing item", async () => {

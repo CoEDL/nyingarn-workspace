@@ -1,5 +1,6 @@
 require("regenerator-runtime");
-import { registerAllFiles } from "./crate-tools.js";
+import { registerAllFiles, createDefaultROCrateFile, getContext } from "./crate-tools.js";
+import { loadProfile } from "../common/configuration.js";
 const chance = require("chance").Chance();
 import { TestSetup, setupTestItem } from "../common/test-utils.js";
 import { getStoreHandle } from "../common/getS3Handle.js";
@@ -40,5 +41,17 @@ describe("Crate tools tests", () => {
 
         await models.item.destroy({ where: { identifier } });
         await store.removeObject();
+    });
+    it("should type default crates for the repository", () => {
+        const root = (type) =>
+            createDefaultROCrateFile({ name: "x", type })["@graph"].find((e) => e["@id"] === "./");
+        expect(root("item")["@type"]).toEqual(["Dataset", "RepositoryObject"]);
+        expect(root("collection")["@type"]).toEqual(["Dataset", "RepositoryCollection"]);
+    });
+    it("should give the Describo profiles the same context as the API", async () => {
+        for (const type of ["item", "collection"]) {
+            const profile = await loadProfile({ profile: `nyingarn-${type}-profile.json` });
+            expect(profile.context).toEqual(getContext());
+        }
     });
 });

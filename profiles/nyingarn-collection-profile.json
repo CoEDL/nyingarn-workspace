@@ -8,8 +8,11 @@
     },
     "context": [
         "https://w3id.org/ro/crate/1.1/context",
+        "http://purl.archive.org/language-data-commons/context.json",
         "https://w3id.org/ro/terms/text-commons",
-        "https://nyingarn.net/metadata-definitions"
+        "https://nyingarn.net/metadata-definitions",
+        { "@vocab": "http://schema.org/" },
+        { "@base": null }
     ],
     "layouts": [
         {

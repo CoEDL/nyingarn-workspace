@@ -209,7 +209,7 @@ async function ensureCrate({ configuration, seed }) {
     try {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
     } catch (error) {
-        crate = createDefaultROCrateFile({ name: identifier });
+        crate = createDefaultROCrateFile({ name: identifier, type });
     }
     const root = crate["@graph"].find((entity) => entity["@id"] === "./");
     root.identifier = identifier;

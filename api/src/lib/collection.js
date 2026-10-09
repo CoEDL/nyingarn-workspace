@@ -3,6 +3,7 @@ import { Op, fn as seqFn, col as seqCol } from "sequelize";
 import { getStoreHandle } from "../common/getS3Handle.js";
 import { logEvent, getLogger } from "../common/logger.js";
 import { lookupItemByIdentifier, linkItemToUser } from "./item.js";
+import { createDefaultROCrateFile } from "./crate-tools.js";
 const log = getLogger();
 
 export async function lookupCollectionByIdentifier({ identifier, userId }) {
@@ -67,6 +68,10 @@ export async function createCollectionLocationInObjectStore({ identifier }) {
     let exists = await store.exists();
     if (!exists) {
         await store.createObject();
+        await store.put({
+            target: "ro-crate-metadata.json",
+            json: createDefaultROCrateFile({ name: identifier, type: "collection" }),
+        });
     }
 }
 

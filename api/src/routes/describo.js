@@ -56,7 +56,7 @@ async function postLinkItemsHandler(req) {
         try {
             crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         } catch (error) {
-            crate = createDefaultROCrateFile({ name: update.source });
+            crate = createDefaultROCrateFile({ name: update.source, type: update.sourceType });
             await store.put({ json: crate, target: "ro-crate-metadata.json" });
         }
         let rootDescriptor = crate["@graph"].filter(
@@ -112,7 +112,7 @@ async function postUnlinkItemsHandler(req) {
         try {
             crate = await store.getJSON({ target: "ro-crate-metadata.json" });
         } catch (error) {
-            crate = createDefaultROCrateFile({ name: update.source });
+            crate = createDefaultROCrateFile({ name: update.source, type: update.sourceType });
             await store.put({ json: crate, target: "ro-crate-metadata.json" });
         }
         let rootDescriptor = crate["@graph"].filter(
@@ -179,7 +179,7 @@ async function getDescriboROCrate(req) {
     if (req.query.reset === "true") {
         await store.put({
             target: "ro-crate-metadata.json",
-            json: createDefaultROCrateFile({ name: identifier }),
+            json: createDefaultROCrateFile({ name: identifier, type }),
         });
     }
 
@@ -187,7 +187,7 @@ async function getDescriboROCrate(req) {
     try {
         crate = await store.getJSON({ target: "ro-crate-metadata.json" });
     } catch (error) {
-        crate = createDefaultROCrateFile({ name: identifier });
+        crate = createDefaultROCrateFile({ name: identifier, type });
     }
 
     crate = new ROCrate(crate);

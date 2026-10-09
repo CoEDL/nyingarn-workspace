@@ -4,7 +4,7 @@ import { createDefaultROCrateFile } from "../lib/crate-tools.js";
 import { extractGeography } from "./elastic-index.js";
 
 function crateWith(...entities) {
-    let crate = createDefaultROCrateFile({ name: "an item" });
+    let crate = createDefaultROCrateFile({ name: "an item", type: "item" });
     crate["@graph"] = [...crate["@graph"], ...entities];
     return new ROCrate(crate, { array: true, link: true });
 }

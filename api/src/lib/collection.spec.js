@@ -49,6 +49,9 @@ describe("Collection management tests", () => {
             "nocfl.inventory.json",
             "ro-crate-metadata.json",
         ]);
+        let crate = await store.getJSON({ target: "ro-crate-metadata.json" });
+        let root = crate["@graph"].find((e) => e["@id"] === "./");
+        expect(root["@type"]).toEqual(["Dataset", "RepositoryCollection"]);
         await collection.destroy();
     });
     it("should fail to create a new collection - identifier conflict", async () => {

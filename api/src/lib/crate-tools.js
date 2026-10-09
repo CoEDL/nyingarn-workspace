@@ -56,10 +56,13 @@ export async function registerAllFiles({ crate, resources }) {
     }
 }
 
+// Describo writes the profile context on save, so profiles/*.json must carry the same list.
 export function getContext() {
     return [
         "https://w3id.org/ro/crate/1.1/context",
         "http://purl.archive.org/language-data-commons/context.json",
+        "https://w3id.org/ro/terms/text-commons",
+        "https://nyingarn.net/metadata-definitions",
         {
             "@vocab": "http://schema.org/",
         },
@@ -69,7 +72,9 @@ export function getContext() {
     ];
 }
 
-export function createDefaultROCrateFile({ name }) {
+export const repositoryTypes = { item: "RepositoryObject", collection: "RepositoryCollection" };
+
+export function createDefaultROCrateFile({ name, type }) {
     return {
         "@context": getContext(),
         "@graph": [
@@ -77,7 +82,7 @@ export function createDefaultROCrateFile({ name }) {
                 "@id": "ro-crate-metadata.json",
                 "@type": "CreativeWork",
                 conformsTo: {
-                    "@id": "https://w3id.org/ro/crate/1.1/context",
+                    "@id": "https://w3id.org/ro/crate/1.1",
                 },
                 about: {
                     "@id": "./",
@@ -85,7 +90,7 @@ export function createDefaultROCrateFile({ name }) {
             },
             {
                 "@id": "./",
-                "@type": "Dataset",
+                "@type": ["Dataset", repositoryTypes[type]],
                 name: name,
             },
         ],

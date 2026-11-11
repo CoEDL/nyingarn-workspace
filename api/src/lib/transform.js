@@ -7,7 +7,7 @@
 //  TODO: Consider changing this to POST to the xml container down the track
 //  TODO:   so we can ditch saxonJS altogether
 
-import previewStylesheet from "../common/xslt/tei-to-html.xsl.sef.json" assert { type: "json" };
+import previewStylesheet from "../common/xslt/tei-to-html.xsl.sef.json" with { type: "json" };
 import SaxonJS from "saxon-js";
 
 export async function transformDocument({ document }) {

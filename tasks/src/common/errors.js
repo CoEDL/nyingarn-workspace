@@ -1,6 +1,6 @@
 import fsExtraPkg from "fs-extra";
 const { readJSON } = fsExtraPkg;
-import errorDefinitions from "/srv/configuration/error-definitions.json" assert { type: "json" };
+import errorDefinitions from "/srv/configuration/error-definitions.json" with { type: "json" };
 
 export function expandError(error) {
     /*

@@ -67,7 +67,7 @@ services:
             - 8025:8025
 
     rabbit-worker1:
-        image: node:18-bookworm
+        image: node:lts
         hostname: worker1
         restart: always
         working_dir: /srv/tasks
@@ -91,7 +91,7 @@ services:
             - elastic
 
     api:
-        image: node:18-bookworm
+        image: node:lts
         hostname: api
         tty: true
         environment: *app-environment
@@ -111,7 +111,7 @@ services:
             - elastic
 
     ui:
-        image: node:18-bookworm
+        image: node:lts
         hostname: ui
         tty: true
         environment:
@@ -125,7 +125,7 @@ services:
         command: ["npm", "run", "develop"]
 
     ui-repository:
-        image: node:18-bookworm
+        image: node:lts
         hostname: ui-repository
         tty: true
         environment:

@@ -2,13 +2,28 @@
 #
 # deploy.sh — render the production templates using values from local
 # `env`, copy them (plus the parent profiles/ directory) into a temp tree,
-# rsync to the production server, and restart docker compose.
+# show how it differs from what's on the server, then rsync it across, pull
+# the latest images and restart docker compose.
 #
-# Usage: ./deploy.sh user@host:/path/to/deploy/dir
+# Usage: ./deploy.sh [--diff] user@host:/path/to/deploy/dir
+#   --diff  show what would change on the server, then exit
 
 set -euo pipefail
 
-TARGET="${1:?usage: $0 user@host:/path/to/deploy/dir}"
+usage() {
+  echo "usage: $0 [--diff] user@host:/path/to/deploy/dir" >&2
+  exit 1
+}
+
+DIFF_ONLY=false
+if [[ "${1:-}" == "--diff" ]]; then
+  DIFF_ONLY=true
+  shift
+fi
+[[ $# -eq 1 ]] || usage
+TARGET="$1"
+HOST="${TARGET%%:*}"
+REMOTE_PATH="${TARGET#*:}"
 
 cd "$(dirname "$0")"
 
@@ -55,8 +70,11 @@ TEMPLATES=(
   repository/nginx.conf
 )
 
-TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
+WORK="$(mktemp -d)"
+trap 'rm -rf "$WORK"' EXIT
+TMP="$WORK/local"
+SERVER="$WORK/server"
+mkdir -p "$TMP" "$SERVER"
 
 # Copy the production tree into the temp dir, leaving operator-only files behind.
 rsync -a \
@@ -91,17 +109,48 @@ for tmpl in "${TEMPLATES[@]}"; do
   envsubst "$ALLOWLIST" < "$tmpl" > "$out"
 done
 
+# Fetch the server's copies of the files we're about to push and diff them.
+# Files that exist only on the server aren't shown; nothing here removes them.
+(cd "$TMP" && find . -type f -printf '%P\n') > "$WORK/files"
+rsync -a --ignore-missing-args --files-from="$WORK/files" "$TARGET/" "$SERVER/"
+
+echo
+echo "Changes to files on $HOST (server → local):"
+if (cd "$WORK" && git -c core.fileMode=false --no-pager diff --no-index --no-prefix --color=auto --stat server local) \
+  && echo "  none"; then
+  CHANGED=false
+else
+  CHANGED=true
+  (cd "$WORK" && git -c core.fileMode=false diff --no-index --no-prefix --color=auto server local) || true
+fi
+
+if $DIFF_ONLY; then
+  exit 0
+fi
+
+echo
+if $CHANGED; then
+  prompt="Push these changes, pull the latest images and restart? [y/N] "
+else
+  prompt="Pull the latest images and restart? [y/N] "
+fi
+read -r -p "$prompt" answer < /dev/tty
+if [[ "$answer" != [yY] ]]; then
+  echo "Aborted."
+  exit 1
+fi
+
 # Push the rendered tree. Non-destructive — no --delete, so live databases /
 # uploads / certificates are never touched, and config files removed from the
 # repo will linger on the server until cleaned up manually. Ownership and
 # directory times are left alone; the remote account doesn't own the deploy
 # directory and can't set them on it.
-rsync -avz --no-owner --no-group --omit-dir-times "$TMP/" "$TARGET/"
-
-HOST="${TARGET%%:*}"
-REMOTE_PATH="${TARGET#*:}"
+if $CHANGED; then
+  rsync -avz --no-owner --no-group --omit-dir-times "$TMP/" "$TARGET/"
+fi
 
 # The `uploads` bucket is just a directory under the gateway root. It's created
 # here rather than tracked as a .gitkeep because every file under s3-data/uploads
 # is served as an S3 object, and a stray .gitkeep would become one.
-ssh "$HOST" "cd '$REMOTE_PATH' && mkdir -p s3-data/uploads && docker compose up -d"
+# shellcheck disable=SC2029
+ssh "$HOST" "cd '$REMOTE_PATH' && mkdir -p s3-data/uploads && docker compose pull && docker compose up -d && docker compose ps"

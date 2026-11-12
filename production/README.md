@@ -39,12 +39,14 @@ cp env.example env
 ## Deploying
 
 ```bash
-./deploy.sh user@host:/path/to/deploy/dir         # diff, confirm, deploy
-./deploy.sh --diff user@host:/path/to/deploy/dir  # diff only
-./deploy.sh --pull user@host:/path/to/deploy/dir  # pull images and restart only
+./deploy.sh         # diff, confirm, deploy
+./deploy.sh --diff  # diff only
+./deploy.sh --pull  # pull images and restart only
 ```
 
 `--pull` leaves files alone and doesn't need `env`; use it after a release with no config changes.
+
+Each form deploys to `vm.nyingarn.net:/srv/docker` unless given another target as the last argument, e.g. `./deploy.sh --diff user@host:/path`.
 
 The script will:
 

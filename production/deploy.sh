@@ -5,14 +5,17 @@
 # show how it differs from what's on the server, then rsync it across, pull
 # the latest images and restart docker compose.
 #
-# Usage: ./deploy.sh [--diff | --pull] user@host:/path/to/deploy/dir
+# Usage: ./deploy.sh [--diff | --pull] [[user@]host:/path/to/deploy/dir]
 #   --diff  show what would change on the server, then exit
 #   --pull  only pull the latest images and restart; leave files alone
+# The target defaults to the production server.
 
 set -euo pipefail
 
+DEFAULT_TARGET="vm.nyingarn.net:/srv/docker"
+
 usage() {
-  echo "usage: $0 [--diff | --pull] user@host:/path/to/deploy/dir" >&2
+  echo "usage: $0 [--diff | --pull] [[user@]host:/path]   (default $DEFAULT_TARGET)" >&2
   exit 1
 }
 
@@ -21,8 +24,9 @@ case "${1:-}" in
   --diff) MODE="diff"; shift ;;
   --pull) MODE="pull"; shift ;;
 esac
-[[ $# -eq 1 ]] || usage
-TARGET="$1"
+[[ $# -le 1 ]] || usage
+TARGET="${1:-$DEFAULT_TARGET}"
+[[ "$TARGET" == *:* ]] || usage
 HOST="${TARGET%%:*}"
 REMOTE_PATH="${TARGET#*:}"
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 if [ "$#" != "1" ]; then
   echo "Usage: $0 [minor | patch]"
 
@@ -42,8 +44,8 @@ cd .. || {
   exit 1
 }
 
-git tag "$version"
 git commit -a -m "tag and bump version"
+git tag "$version"
 
 # push it to github to trigger container builds
 git push origin master --tags

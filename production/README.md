@@ -39,15 +39,23 @@ cp env.example env
 ## Deploying
 
 ```bash
-./deploy.sh user@host:/path/to/deploy/dir
+./deploy.sh         # diff, confirm, deploy
+./deploy.sh --diff  # diff only
+./deploy.sh --pull  # pull images and restart only
 ```
+
+`--pull` leaves files alone and doesn't need `env`; use it after a release with no config changes.
+
+Each form deploys to `vm.nyingarn.net:/srv/docker` unless given another target as the last argument, e.g. `./deploy.sh --diff user@host:/path`.
 
 The script will:
 
 1. Source `env` and validate that every required variable is non-empty.
 2. Build a temp tree containing the rendered templates plus everything else from `production/` (and `../profiles/`).
-3. Rsync the temp tree to `user@host:/path` non-destructively (no `--delete`) so live databases, uploads, and certificates are never touched.
-4. SSH to the host and run `docker compose up -d` from the deploy path.
+3. Fetch the server's copies of those files and show a diff (`-` is the server, `+` is what will replace it). Rendered files such as `.env` are diffed with their secrets, so watch your screen. Files that only exist on the server aren't shown.
+4. Ask for confirmation. With `--diff` it stops before this step.
+5. Rsync the temp tree to `user@host:/path` non-destructively (no `--delete`) so live databases, uploads, and certificates are never touched. Skipped if nothing changed.
+6. SSH to the host and run `docker compose pull`, `docker compose up -d` and `docker compose ps` from the deploy path, so services restart on the latest published images.
 
 ## Object storage
 

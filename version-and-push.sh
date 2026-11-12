@@ -44,12 +44,7 @@ cd .. || {
   exit 1
 }
 
-commit=(git commit)
-signed_commit="$HOME/.claude/bin/git-commit-signed"
-if [[ -x "$signed_commit" ]]; then
-  commit=("$signed_commit")
-fi
-"${commit[@]}" -a -m "tag and bump version"
+git commit -a -m "tag and bump version"
 git tag "$version"
 
 # push it to github to trigger container builds

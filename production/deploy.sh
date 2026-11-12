@@ -5,25 +5,39 @@
 # show how it differs from what's on the server, then rsync it across, pull
 # the latest images and restart docker compose.
 #
-# Usage: ./deploy.sh [--diff] user@host:/path/to/deploy/dir
+# Usage: ./deploy.sh [--diff | --pull] user@host:/path/to/deploy/dir
 #   --diff  show what would change on the server, then exit
+#   --pull  only pull the latest images and restart; leave files alone
 
 set -euo pipefail
 
 usage() {
-  echo "usage: $0 [--diff] user@host:/path/to/deploy/dir" >&2
+  echo "usage: $0 [--diff | --pull] user@host:/path/to/deploy/dir" >&2
   exit 1
 }
 
-DIFF_ONLY=false
-if [[ "${1:-}" == "--diff" ]]; then
-  DIFF_ONLY=true
-  shift
-fi
+MODE=deploy
+case "${1:-}" in
+  --diff) MODE="diff"; shift ;;
+  --pull) MODE="pull"; shift ;;
+esac
 [[ $# -eq 1 ]] || usage
 TARGET="$1"
 HOST="${TARGET%%:*}"
 REMOTE_PATH="${TARGET#*:}"
+
+# The `uploads` bucket is just a directory under the gateway root. It's created
+# here rather than tracked as a .gitkeep because every file under s3-data/uploads
+# is served as an S3 object, and a stray .gitkeep would become one.
+restart_services() {
+  # shellcheck disable=SC2029
+  ssh "$HOST" "cd '$REMOTE_PATH' && mkdir -p s3-data/uploads && docker compose pull && docker compose up -d && docker compose ps"
+}
+
+if [[ "$MODE" == pull ]]; then
+  restart_services
+  exit 0
+fi
 
 cd "$(dirname "$0")"
 
@@ -124,7 +138,7 @@ else
   (cd "$WORK" && git -c core.fileMode=false diff --no-index --no-prefix --color=auto server local) || true
 fi
 
-if $DIFF_ONLY; then
+if [[ "$MODE" == diff ]]; then
   exit 0
 fi
 
@@ -149,8 +163,4 @@ if $CHANGED; then
   rsync -avz --no-owner --no-group --omit-dir-times "$TMP/" "$TARGET/"
 fi
 
-# The `uploads` bucket is just a directory under the gateway root. It's created
-# here rather than tracked as a .gitkeep because every file under s3-data/uploads
-# is served as an S3 object, and a stray .gitkeep would become one.
-# shellcheck disable=SC2029
-ssh "$HOST" "cd '$REMOTE_PATH' && mkdir -p s3-data/uploads && docker compose pull && docker compose up -d && docker compose ps"
+restart_services

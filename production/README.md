@@ -41,7 +41,10 @@ cp env.example env
 ```bash
 ./deploy.sh user@host:/path/to/deploy/dir         # diff, confirm, deploy
 ./deploy.sh --diff user@host:/path/to/deploy/dir  # diff only
+./deploy.sh --pull user@host:/path/to/deploy/dir  # pull images and restart only
 ```
+
+`--pull` leaves files alone and doesn't need `env`; use it after a release with no config changes.
 
 The script will:
 

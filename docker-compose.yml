@@ -57,14 +57,14 @@ services:
         hostname: rabbit
         restart: always
         ports:
-            - 15672:15672
+            - "127.0.0.1:15672:15672"
 
     mail:
         image: axllent/mailpit:latest
         hostname: mail
         restart: always
         ports:
-            - 8025:8025
+            - "127.0.0.1:8025:8025"
 
     rabbit-worker1:
         image: node:lts
@@ -167,8 +167,8 @@ services:
             - ./scripts/wait-for-it.sh:/wait-for-it.sh
         command: ["/wait-for-it.sh", "api:8080", "-t", "10", "--", "nginx", "-g", "daemon off;"]
         ports:
-            - 9000:9000
-            - 9001:9001
+            - "127.0.0.1:9000:9000"
+            - "127.0.0.1:9001:9001"
 
     xml-processor:
         image: tomcat:9.0.76-jdk21-openjdk-slim

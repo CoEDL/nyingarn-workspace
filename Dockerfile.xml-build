@@ -1,3 +1,12 @@
-FROM tomcat:9.0.76-jdk21-openjdk-slim
+FROM tomcat:9.0.124-jre21-temurin AS tomcat
+
+FROM amazoncorretto:21-al2023-headless
+ENV CATALINA_HOME=/usr/local/tomcat
+ENV PATH=$CATALINA_HOME/bin:$PATH
+COPY --from=tomcat /usr/local/tomcat /usr/local/tomcat
+WORKDIR /usr/local/tomcat
+EXPOSE 8080
+
 COPY xml /srv/xml
 COPY xml/tomcat-config/nyingarn.xml /usr/local/tomcat/conf/Catalina/localhost/
+CMD ["catalina.sh", "run"]

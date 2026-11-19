@@ -52,11 +52,12 @@ services:
     #   RABBITMQ_DEFAULT_VHOST: rabbit
 
   elastic:
-    # NOTE: Locking to 8.16.0 because that is what our plugin is tied to
-    image: elasticsearch:8.16.0
+    image: elasticsearch:8.19.25
     restart: always
     environment:
       discovery.type: single-node
+      # CVE-2026-114938 workaround; drop once the bundled JDK is >= 27.0.1.1
+      ES_JAVA_OPTS: -XX:-UseBASE64Intrinsics
       xpack.security.enabled: false # No SSL or passwords
       #- ES_JAVA_OPTS=-Xms750m -Xmx750m
       #- node.name=elastic

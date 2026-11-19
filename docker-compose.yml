@@ -143,7 +143,8 @@ services:
         hostname: elastic
         environment:
             - discovery.type=single-node
-            - ES_JAVA_OPTS=-Xms750m -Xmx750m
+            # -XX:-UseBASE64Intrinsics: CVE-2026-114938 workaround; drop once the bundled JDK is >= 27.0.1.1
+            - ES_JAVA_OPTS=-Xms750m -Xmx750m -XX:-UseBASE64Intrinsics
             - xpack.security.enabled=false
             - node.name=search
         ulimits:
@@ -171,7 +172,9 @@ services:
             - "127.0.0.1:9001:9001"
 
     xml-processor:
-        image: tomcat:9.0.76-jdk21-openjdk-slim
+        build:
+            context: .
+            dockerfile: Dockerfile.xml-build
         hostname: xml
         tty: true
         environment:

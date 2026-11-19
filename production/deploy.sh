@@ -35,7 +35,7 @@ REMOTE_PATH="${TARGET#*:}"
 # is served as an S3 object, and a stray .gitkeep would become one.
 restart_services() {
   # shellcheck disable=SC2029
-  ssh "$HOST" "cd '$REMOTE_PATH' && mkdir -p s3-data/uploads && docker compose pull && docker compose up -d && docker compose ps"
+  ssh "$HOST" "cd '$REMOTE_PATH' && mkdir -p s3-data/uploads && docker compose pull --quiet && docker compose up -d && docker compose ps"
 }
 
 if [[ "$MODE" == pull ]]; then
